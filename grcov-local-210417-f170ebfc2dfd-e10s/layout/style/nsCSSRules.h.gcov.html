@@ -1,0 +1,679 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - layout/style/nsCSSRules.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">layout/style</a> - nsCSSRules.h<span style="font-size: 80%;"> (source / <a href="nsCSSRules.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryLo">73.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:24:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryLo">58.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : // vim:cindent:ts=2:et:sw=2:
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : /* rules in a CSS stylesheet other than style rules (e.g., @import rules) */
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #ifndef nsCSSRules_h_
+<span class="lineNum">      10 </span>            : #define nsCSSRules_h_
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;Declaration.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;StyleRule.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;gfxFontFeatures.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/MemoryReporting.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/Move.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/SheetType.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/css/GroupRule.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/dom/CSSMediaRule.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/dom/CSSPageRule.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsAutoPtr.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsCSSPropertyID.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;nsCSSValue.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;nsDOMCSSDeclaration.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;nsIDOMCSSConditionRule.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;nsIDOMCSSCounterStyleRule.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;nsIDOMCSSFontFeatureValuesRule.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;nsIDOMCSSGroupingRule.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;nsIDOMCSSMozDocumentRule.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;nsIDOMCSSSupportsRule.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsIDOMCSSKeyframeRule.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;nsIDOMCSSKeyframesRule.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : class nsMediaList;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : namespace mozilla {
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : class ErrorResult;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : namespace dom {
+<span class="lineNum">      43 </span>            : class MediaList;
+<span class="lineNum">      44 </span>            : }
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : namespace css {
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : class MediaRule final : public dom::CSSMediaRule
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span>            : public:
+<span class="lineNum">      51 </span>            :   MediaRule(uint32_t aLineNumber, uint32_t aColumnNumber);
+<span class="lineNum">      52 </span>            : private:
+<span class="lineNum">      53 </span>            :   MediaRule(const MediaRule&amp; aCopy);
+<span class="lineNum">      54 </span>            :   ~MediaRule();
+<a name="55"><span class="lineNum">      55 </span>            : public:</a>
+<span class="lineNum">      56 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_CLASS_INHERITED(MediaRule, dom::CSSMediaRule)</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :   // Rule methods
+<span class="lineNum">      60 </span>            : #ifdef DEBUG
+<span class="lineNum">      61 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">      62 </span>            : #endif
+<span class="lineNum">      63 </span>            :   virtual void SetStyleSheet(mozilla::StyleSheet* aSheet) override; //override GroupRule
+<span class="lineNum">      64 </span>            :   mozilla::CSSStyleSheet* GetStyleSheet() const
+<span class="lineNum">      65 </span>            :   {
+<span class="lineNum">      66 </span><span class="lineCov">          1 :     mozilla::StyleSheet* sheet = GroupRule::GetStyleSheet();</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :     return sheet ? sheet-&gt;AsGecko() : nullptr;</span>
+<span class="lineNum">      68 </span>            :   }
+<span class="lineNum">      69 </span>            :   virtual already_AddRefed&lt;Rule&gt; Clone() const override;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   // nsIDOMCSSConditionRule interface
+<span class="lineNum">      72 </span>            :   NS_DECL_NSIDOMCSSCONDITIONRULE
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   // rest of GroupRule
+<span class="lineNum">      75 </span>            :   virtual bool UseForPresentation(nsPresContext* aPresContext,
+<span class="lineNum">      76 </span>            :                                     nsMediaQueryResultCacheKey&amp; aKey) override;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :   // @media rule methods
+<span class="lineNum">      79 </span>            :   nsresult SetMedia(nsMediaList* aMedia);
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   // WebIDL interface
+<span class="lineNum">      82 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">      83 </span>            :   using CSSMediaRule::SetConditionText;
+<span class="lineNum">      84 </span>            :   dom::MediaList* Media() override;
+<span class="lineNum">      85 </span>            :   
+<span class="lineNum">      86 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf)
+<span class="lineNum">      87 </span>            :     const override MOZ_MUST_OVERRIDE;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : protected:
+<span class="lineNum">      90 </span>            :   void AppendConditionText(nsAString&amp; aOutput) const;
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :   RefPtr&lt;nsMediaList&gt; mMedia;
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : class DocumentRule final : public ConditionRule,
+<span class="lineNum">      96 </span>            :                            public nsIDOMCSSMozDocumentRule
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span>            : public:
+<span class="lineNum">      99 </span>            :   DocumentRule(uint32_t aLineNumber, uint32_t aColumnNumber);
+<span class="lineNum">     100 </span>            : private:
+<span class="lineNum">     101 </span>            :   DocumentRule(const DocumentRule&amp; aCopy);
+<span class="lineNum">     102 </span>            :   ~DocumentRule();
+<span class="lineNum">     103 </span>            : public:
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   // Rule methods
+<span class="lineNum">     108 </span>            : #ifdef DEBUG
+<span class="lineNum">     109 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     110 </span>            : #endif
+<span class="lineNum">     111 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     112 </span>            :   using Rule::GetType;
+<span class="lineNum">     113 </span>            :   virtual already_AddRefed&lt;Rule&gt; Clone() const override;
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :   // nsIDOMCSSGroupingRule interface
+<span class="lineNum">     116 </span>            :   NS_DECL_NSIDOMCSSGROUPINGRULE
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :   // nsIDOMCSSConditionRule interface
+<span class="lineNum">     119 </span>            :   NS_DECL_NSIDOMCSSCONDITIONRULE
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :   // nsIDOMCSSMozDocumentRule interface
+<span class="lineNum">     122 </span>            :   NS_DECL_NSIDOMCSSMOZDOCUMENTRULE
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :   // rest of GroupRule
+<span class="lineNum">     125 </span>            :   virtual bool UseForPresentation(nsPresContext* aPresContext,
+<span class="lineNum">     126 </span>            :                                     nsMediaQueryResultCacheKey&amp; aKey) override;
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :   bool UseForPresentation(nsPresContext* aPresContext);
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :   enum Function {
+<span class="lineNum">     131 </span>            :     eURL,
+<span class="lineNum">     132 </span>            :     eURLPrefix,
+<span class="lineNum">     133 </span>            :     eDomain,
+<span class="lineNum">     134 </span>            :     eRegExp
+<span class="lineNum">     135 </span>            :   };
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :   struct URL {
+<span class="lineNum">     138 </span>            :     Function func;
+<span class="lineNum">     139 </span>            :     nsCString url;
+<a name="140"><span class="lineNum">     140 </span>            :     URL *next;</a>
+<a name="141"><span class="lineNum">     141 </span>            : </a>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :     URL() : next(nullptr) {}</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     URL(const URL&amp; aOther)</span>
+<span class="lineNum">     144 </span>            :       : func(aOther.func)
+<span class="lineNum">     145 </span>            :       , url(aOther.url)
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :       , next(aOther.next ? new URL(*aOther.next) : nullptr)</span>
+<span class="lineNum">     147 </span>            :     {
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     149 </span>            :     ~URL();
+<span class="lineNum">     150 </span>            :   };
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">          1 :   void SetURLs(URL *aURLs) { mURLs = aURLs; }</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :   // WebIDL interface
+<span class="lineNum">     155 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     156 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     157 </span>            :   // Our XPCOM GetConditionText is OK
+<span class="lineNum">     158 </span>            :   virtual void SetConditionText(const nsAString&amp; aConditionText,
+<span class="lineNum">     159 </span>            :                                 ErrorResult&amp; aRv) override;
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf)
+<span class="lineNum">     162 </span>            :     const override MOZ_MUST_OVERRIDE;
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     165 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            : protected:
+<span class="lineNum">     168 </span>            :   void AppendConditionText(nsAString&amp; aOutput) const;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :   nsAutoPtr&lt;URL&gt; mURLs; // linked list of |struct URL| above.
+<span class="lineNum">     171 </span>            : };
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            : } // namespace css
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : } // namespace mozilla
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : class nsCSSFontFeatureValuesRule final : public mozilla::css::Rule,
+<span class="lineNum">     178 </span>            :                                          public nsIDOMCSSFontFeatureValuesRule
+<a name="179"><span class="lineNum">     179 </span>            : {</a>
+<span class="lineNum">     180 </span>            : public:
+<span class="lineNum">     181 </span><span class="lineCov">          1 :   nsCSSFontFeatureValuesRule(uint32_t aLineNumber, uint32_t aColumnNumber)</span>
+<span class="lineNum">     182 </span><span class="lineCov">          1 :     : mozilla::css::Rule(aLineNumber, aColumnNumber)</span>
+<span class="lineNum">     183 </span>            :   {
+<a name="184"><span class="lineNum">     184 </span><span class="lineCov">          1 :   }</span></a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   nsCSSFontFeatureValuesRule(const nsCSSFontFeatureValuesRule&amp; aCopy)</span>
+<span class="lineNum">     187 </span>            :     // copy everything except our reference count
+<span class="lineNum">     188 </span>            :     : mozilla::css::Rule(aCopy),
+<span class="lineNum">     189 </span>            :       mFamilyList(aCopy.mFamilyList),
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       mFeatureValues(aCopy.mFeatureValues)</span>
+<span class="lineNum">     191 </span>            :   {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     195 </span>            :   virtual bool IsCCLeaf() const override;
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : #ifdef DEBUG
+<span class="lineNum">     198 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     199 </span>            : #endif
+<span class="lineNum">     200 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     201 </span>            :   using Rule::GetType;
+<span class="lineNum">     202 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :   // nsIDOMCSSFontFaceRule interface
+<span class="lineNum">     205 </span>            :   NS_DECL_NSIDOMCSSFONTFEATUREVALUESRULE
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :   // WebIDL interface
+<span class="lineNum">     208 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     209 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     210 </span>            :   // The XPCOM GetFontFamily is fine
+<span class="lineNum">     211 </span>            :   void SetFontFamily(const nsAString&amp; aFamily, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     212 </span>            :   // The XPCOM GetValueText is fine
+<span class="lineNum">     213 </span>            :   void SetValueText(const nsAString&amp; aFamily, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :   const mozilla::FontFamilyList&amp; GetFamilyList() { return mFamilyList; }</span>
+<span class="lineNum">     216 </span>            :   void SetFamilyList(const mozilla::FontFamilyList&amp; aFamilyList);
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   void AddValueList(int32_t aVariantAlternate,
+<span class="lineNum">     219 </span>            :                     nsTArray&lt;gfxFontFeatureValueSet::ValueList&gt;&amp; aValueList);
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :   const nsTArray&lt;gfxFontFeatureValueSet::FeatureValues&gt;&amp; GetFeatureValues()
+<span class="lineNum">     222 </span>            :   {
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :     return mFeatureValues;</span>
+<span class="lineNum">     224 </span>            :   }
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     229 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<a name="230"><span class="lineNum">     230 </span>            : </a>
+<span class="lineNum">     231 </span>            : protected:
+<span class="lineNum">     232 </span><span class="lineCov">          1 :   ~nsCSSFontFeatureValuesRule() {}</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :   mozilla::FontFamilyList mFamilyList;
+<span class="lineNum">     235 </span>            :   nsTArray&lt;gfxFontFeatureValueSet::FeatureValues&gt; mFeatureValues;
+<span class="lineNum">     236 </span>            : };
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : class nsCSSKeyframeRule;
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : class nsCSSKeyframeStyleDeclaration final : public nsDOMCSSDeclaration
+<span class="lineNum">     241 </span>            : {
+<span class="lineNum">     242 </span>            : public:
+<span class="lineNum">     243 </span>            :   explicit nsCSSKeyframeStyleDeclaration(nsCSSKeyframeRule *aRule);
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :   NS_IMETHOD GetParentRule(nsIDOMCSSRule **aParent) override;
+<span class="lineNum">     246 </span><span class="lineCov">          1 :   void DropReference() { mRule = nullptr; }</span>
+<span class="lineNum">     247 </span>            :   virtual mozilla::DeclarationBlock* GetCSSDeclaration(Operation aOperation) override;
+<span class="lineNum">     248 </span>            :   virtual nsresult SetCSSDeclaration(mozilla::DeclarationBlock* aDecl) override;
+<span class="lineNum">     249 </span>            :   virtual void GetCSSParsingEnvironment(CSSParsingEnvironment&amp; aCSSParseEnv) override;
+<span class="lineNum">     250 </span>            :   mozilla::URLExtraData* GetURLData() const final;
+<span class="lineNum">     251 </span>            :   virtual nsIDocument* DocToUpdate() override;
+<a name="252"><span class="lineNum">     252 </span>            : </a>
+<span class="lineNum">     253 </span>            :   NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_AMBIGUOUS(nsCSSKeyframeStyleDeclaration,</span>
+<span class="lineNum">     255 </span>            :                                                          nsICSSDeclaration)
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :   virtual nsINode* GetParentObject() override;
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : protected:
+<span class="lineNum">     260 </span>            :   virtual ~nsCSSKeyframeStyleDeclaration();
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :   // This reference is not reference-counted. The rule object tells us
+<span class="lineNum">     263 </span>            :   // when it's about to go away.
+<span class="lineNum">     264 </span>            :   nsCSSKeyframeRule* MOZ_NON_OWNING_REF mRule;
+<span class="lineNum">     265 </span>            : };
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : class nsCSSKeyframeRule final : public mozilla::css::Rule,
+<span class="lineNum">     268 </span>            :                                 public nsIDOMCSSKeyframeRule
+<span class="lineNum">     269 </span>            : {
+<a name="270"><span class="lineNum">     270 </span>            : public:</a>
+<span class="lineNum">     271 </span>            :   // Steals the contents of aKeys, and takes the reference in Declaration
+<span class="lineNum">     272 </span><span class="lineCov">          1 :   nsCSSKeyframeRule(InfallibleTArray&lt;float&gt;&amp;&amp; aKeys,</span>
+<span class="lineNum">     273 </span>            :                     already_AddRefed&lt;mozilla::css::Declaration&gt;&amp;&amp; aDeclaration,
+<span class="lineNum">     274 </span>            :                     uint32_t aLineNumber, uint32_t aColumnNumber)
+<span class="lineNum">     275 </span>            :     : mozilla::css::Rule(aLineNumber, aColumnNumber)
+<span class="lineNum">     276 </span>            :     , mKeys(mozilla::Move(aKeys))
+<span class="lineNum">     277 </span><span class="lineCov">          1 :     , mDeclaration(mozilla::Move(aDeclaration))</span>
+<span class="lineNum">     278 </span>            :   {
+<span class="lineNum">     279 </span><span class="lineCov">          1 :     mDeclaration-&gt;SetOwningRule(this);</span>
+<span class="lineNum">     280 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     281 </span>            : private:
+<span class="lineNum">     282 </span>            :   nsCSSKeyframeRule(const nsCSSKeyframeRule&amp; aCopy);
+<span class="lineNum">     283 </span>            :   ~nsCSSKeyframeRule();
+<a name="284"><span class="lineNum">     284 </span>            : public:</a>
+<span class="lineNum">     285 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_CLASS_INHERITED(nsCSSKeyframeRule, mozilla::css::Rule)</span>
+<span class="lineNum">     287 </span>            :   virtual bool IsCCLeaf() const override;
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : #ifdef DEBUG
+<span class="lineNum">     290 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     291 </span>            : #endif
+<span class="lineNum">     292 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     293 </span>            :   using Rule::GetType;
+<span class="lineNum">     294 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :   // nsIDOMCSSKeyframeRule interface
+<span class="lineNum">     297 </span>            :   NS_DECL_NSIDOMCSSKEYFRAMERULE
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            :   // WebIDL interface
+<span class="lineNum">     300 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     301 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     302 </span>            :   // The XPCOM GetKeyText is fine.
+<span class="lineNum">     303 </span>            :   // The XPCOM SetKeyText is fine.
+<span class="lineNum">     304 </span>            :   nsICSSDeclaration* Style();
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineCov">          1 :   const nsTArray&lt;float&gt;&amp; GetKeys() const     { return mKeys; }</span>
+<span class="lineNum">     307 </span><span class="lineCov">          1 :   mozilla::css::Declaration* Declaration()   { return mDeclaration; }</span>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :   void ChangeDeclaration(mozilla::css::Declaration* aDeclaration);
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     314 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   void DoGetKeyText(nsAString &amp;aKeyText) const;
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : private:
+<span class="lineNum">     319 </span>            :   nsTArray&lt;float&gt;                            mKeys;
+<span class="lineNum">     320 </span>            :   RefPtr&lt;mozilla::css::Declaration&gt;          mDeclaration;
+<span class="lineNum">     321 </span>            :   // lazily created when needed:
+<span class="lineNum">     322 </span>            :   RefPtr&lt;nsCSSKeyframeStyleDeclaration&gt;    mDOMDeclaration;
+<span class="lineNum">     323 </span>            : };
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : class nsCSSKeyframesRule final : public mozilla::css::GroupRule,
+<span class="lineNum">     326 </span>            :                                  public nsIDOMCSSKeyframesRule
+<a name="327"><span class="lineNum">     327 </span>            : {</a>
+<span class="lineNum">     328 </span>            : public:
+<span class="lineNum">     329 </span><span class="lineCov">          1 :   nsCSSKeyframesRule(const nsSubstring&amp; aName,</span>
+<span class="lineNum">     330 </span>            :                      uint32_t aLineNumber, uint32_t aColumnNumber)
+<span class="lineNum">     331 </span>            :     : mozilla::css::GroupRule(aLineNumber, aColumnNumber)
+<span class="lineNum">     332 </span><span class="lineCov">          1 :     , mName(aName)</span>
+<span class="lineNum">     333 </span>            :   {
+<span class="lineNum">     334 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     335 </span>            : private:
+<span class="lineNum">     336 </span>            :   nsCSSKeyframesRule(const nsCSSKeyframesRule&amp; aCopy);
+<span class="lineNum">     337 </span>            :   ~nsCSSKeyframesRule();
+<span class="lineNum">     338 </span>            : public:
+<span class="lineNum">     339 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span>            :   // Rule methods
+<span class="lineNum">     342 </span>            : #ifdef DEBUG
+<span class="lineNum">     343 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     344 </span>            : #endif
+<span class="lineNum">     345 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     346 </span>            :   using Rule::GetType;
+<span class="lineNum">     347 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :   // nsIDOMCSSKeyframesRule interface
+<span class="lineNum">     350 </span>            :   NS_DECL_NSIDOMCSSKEYFRAMESRULE
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :   // WebIDL interface
+<span class="lineNum">     353 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     354 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     355 </span>            :   // The XPCOM GetName is OK
+<span class="lineNum">     356 </span>            :   // The XPCOM SetName is OK
+<span class="lineNum">     357 </span>            :   using mozilla::css::GroupRule::CssRules;
+<span class="lineNum">     358 </span>            :   // The XPCOM appendRule is OK, since it never throws
+<span class="lineNum">     359 </span>            :   // The XPCOM deleteRule is OK, since it never throws
+<span class="lineNum">     360 </span>            :   nsCSSKeyframeRule* FindRule(const nsAString&amp; aKey);
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            :   // rest of GroupRule
+<span class="lineNum">     363 </span>            :   virtual bool UseForPresentation(nsPresContext* aPresContext,
+<span class="lineNum">     364 </span>            :                                     nsMediaQueryResultCacheKey&amp; aKey) override;
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :   const nsString&amp; GetName() { return mName; }
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     371 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            : private:
+<span class="lineNum">     374 </span>            :   uint32_t FindRuleIndexForKey(const nsAString&amp; aKey);
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :   nsString                                   mName;
+<span class="lineNum">     377 </span>            : };
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            : class nsCSSPageRule;
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            : class nsCSSPageStyleDeclaration final : public nsDOMCSSDeclaration
+<span class="lineNum">     382 </span>            : {
+<span class="lineNum">     383 </span>            : public:
+<span class="lineNum">     384 </span>            :   explicit nsCSSPageStyleDeclaration(nsCSSPageRule *aRule);
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span>            :   NS_IMETHOD GetParentRule(nsIDOMCSSRule **aParent) override;
+<span class="lineNum">     387 </span><span class="lineCov">          1 :   void DropReference() { mRule = nullptr; }</span>
+<span class="lineNum">     388 </span>            :   virtual mozilla::DeclarationBlock* GetCSSDeclaration(Operation aOperation) override;
+<span class="lineNum">     389 </span>            :   virtual nsresult SetCSSDeclaration(mozilla::DeclarationBlock* aDecl) override;
+<span class="lineNum">     390 </span>            :   virtual void GetCSSParsingEnvironment(CSSParsingEnvironment&amp; aCSSParseEnv) override;
+<span class="lineNum">     391 </span>            :   mozilla::URLExtraData* GetURLData() const final;
+<span class="lineNum">     392 </span>            :   virtual nsIDocument* DocToUpdate() override;
+<a name="393"><span class="lineNum">     393 </span>            : </a>
+<span class="lineNum">     394 </span>            :   NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+<span class="lineNum">     395 </span><span class="lineCov">          1 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_AMBIGUOUS(nsCSSPageStyleDeclaration,</span>
+<span class="lineNum">     396 </span>            :                                                          nsICSSDeclaration)
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            :   virtual nsINode *GetParentObject() override;
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            : protected:
+<span class="lineNum">     401 </span>            :   virtual ~nsCSSPageStyleDeclaration();
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            :   // This reference is not reference-counted. The rule object tells us
+<span class="lineNum">     404 </span>            :   // when it's about to go away.
+<span class="lineNum">     405 </span>            :   nsCSSPageRule* MOZ_NON_OWNING_REF mRule;
+<span class="lineNum">     406 </span>            : };
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            : class nsCSSPageRule final : public mozilla::dom::CSSPageRule
+<a name="409"><span class="lineNum">     409 </span>            : {</a>
+<span class="lineNum">     410 </span>            : public:
+<span class="lineNum">     411 </span><span class="lineCov">          1 :   nsCSSPageRule(mozilla::css::Declaration* aDeclaration,</span>
+<span class="lineNum">     412 </span>            :                 uint32_t aLineNumber, uint32_t aColumnNumber)
+<span class="lineNum">     413 </span>            :     : mozilla::dom::CSSPageRule(aLineNumber, aColumnNumber)
+<span class="lineNum">     414 </span><span class="lineCov">          1 :     , mDeclaration(aDeclaration)</span>
+<span class="lineNum">     415 </span>            :   {
+<span class="lineNum">     416 </span><span class="lineCov">          1 :     mDeclaration-&gt;SetOwningRule(this);</span>
+<span class="lineNum">     417 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     418 </span>            : private:
+<span class="lineNum">     419 </span>            :   nsCSSPageRule(const nsCSSPageRule&amp; aCopy);
+<span class="lineNum">     420 </span>            :   ~nsCSSPageRule();
+<a name="421"><span class="lineNum">     421 </span>            : public:</a>
+<span class="lineNum">     422 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_CLASS_INHERITED(nsCSSPageRule, mozilla::dom::CSSPageRule)</span>
+<span class="lineNum">     424 </span>            :   virtual bool IsCCLeaf() const override;
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            : #ifdef DEBUG
+<span class="lineNum">     427 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     428 </span>            : #endif
+<span class="lineNum">     429 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :   // WebIDL interfaces
+<span class="lineNum">     432 </span>            :   virtual void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     433 </span>            :   virtual nsICSSDeclaration* Style() override;
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">          1 :   mozilla::css::Declaration* Declaration()   { return mDeclaration; }</span>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :   void ChangeDeclaration(mozilla::css::Declaration* aDeclaration);
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            : private:
+<span class="lineNum">     442 </span>            :   RefPtr&lt;mozilla::css::Declaration&gt;     mDeclaration;
+<span class="lineNum">     443 </span>            :   // lazily created when needed:
+<span class="lineNum">     444 </span>            :   RefPtr&lt;nsCSSPageStyleDeclaration&gt;     mDOMDeclaration;
+<span class="lineNum">     445 </span>            : };
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            : namespace mozilla {
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            : class CSSSupportsRule final : public css::ConditionRule,
+<span class="lineNum">     450 </span>            :                               public nsIDOMCSSSupportsRule
+<span class="lineNum">     451 </span>            : {
+<span class="lineNum">     452 </span>            : public:
+<span class="lineNum">     453 </span>            :   CSSSupportsRule(bool aConditionMet, const nsString&amp; aCondition,
+<span class="lineNum">     454 </span>            :                   uint32_t aLineNumber, uint32_t aColumnNumber);
+<span class="lineNum">     455 </span>            :   CSSSupportsRule(const CSSSupportsRule&amp; aCopy);
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            :   // Rule methods
+<span class="lineNum">     458 </span>            : #ifdef DEBUG
+<span class="lineNum">     459 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     460 </span>            : #endif
+<span class="lineNum">     461 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     462 </span>            :   using Rule::GetType;
+<span class="lineNum">     463 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     464 </span>            :   virtual bool UseForPresentation(nsPresContext* aPresContext,
+<span class="lineNum">     465 </span>            :                                   nsMediaQueryResultCacheKey&amp; aKey) override;
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :   // nsIDOMCSSGroupingRule interface
+<span class="lineNum">     470 </span>            :   NS_DECL_NSIDOMCSSGROUPINGRULE
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            :   // nsIDOMCSSConditionRule interface
+<span class="lineNum">     473 </span>            :   NS_DECL_NSIDOMCSSCONDITIONRULE
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span>            :   // nsIDOMCSSSupportsRule interface
+<span class="lineNum">     476 </span>            :   NS_DECL_NSIDOMCSSSUPPORTSRULE
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span>            :   // WebIDL interface
+<span class="lineNum">     479 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     480 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     481 </span>            :   // Our XPCOM GetConditionText is OK
+<span class="lineNum">     482 </span>            :   virtual void SetConditionText(const nsAString&amp; aConditionText,
+<span class="lineNum">     483 </span>            :                                 ErrorResult&amp; aRv) override;
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     488 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            : protected:
+<span class="lineNum">     491 </span>            :   virtual ~CSSSupportsRule();
+<span class="lineNum">     492 </span>            : 
+<span class="lineNum">     493 </span>            :   bool mUseGroup;
+<span class="lineNum">     494 </span>            :   nsString mCondition;
+<span class="lineNum">     495 </span>            : };
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            : } // namespace mozilla
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            : class nsCSSCounterStyleRule final : public mozilla::css::Rule,
+<span class="lineNum">     500 </span>            :                                     public nsIDOMCSSCounterStyleRule
+<a name="501"><span class="lineNum">     501 </span>            : {</a>
+<span class="lineNum">     502 </span>            : public:
+<span class="lineNum">     503 </span><span class="lineCov">          1 :   explicit nsCSSCounterStyleRule(const nsAString&amp; aName,</span>
+<span class="lineNum">     504 </span>            :                                  uint32_t aLineNumber, uint32_t aColumnNumber)
+<span class="lineNum">     505 </span>            :     : mozilla::css::Rule(aLineNumber, aColumnNumber)
+<span class="lineNum">     506 </span>            :     , mName(aName)
+<span class="lineNum">     507 </span><span class="lineCov">          1 :     , mGeneration(0)</span>
+<span class="lineNum">     508 </span>            :   {
+<span class="lineNum">     509 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            : private:
+<span class="lineNum">     512 </span>            :   nsCSSCounterStyleRule(const nsCSSCounterStyleRule&amp; aCopy);
+<span class="lineNum">     513 </span>            :   ~nsCSSCounterStyleRule();
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            : public:
+<span class="lineNum">     516 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     517 </span>            :   virtual bool IsCCLeaf() const override;
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            : #ifdef DEBUG
+<span class="lineNum">     520 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     521 </span>            : #endif
+<span class="lineNum">     522 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     523 </span>            :   using Rule::GetType;
+<span class="lineNum">     524 </span>            :   virtual already_AddRefed&lt;mozilla::css::Rule&gt; Clone() const override;
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            :   // nsIDOMCSSCounterStyleRule
+<span class="lineNum">     527 </span>            :   NS_DECL_NSIDOMCSSCOUNTERSTYLERULE
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :   // WebIDL interface
+<span class="lineNum">     530 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     531 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     532 </span>            :   // The XPCOM GetName is OK
+<span class="lineNum">     533 </span>            :   // The XPCOM SetName is OK
+<span class="lineNum">     534 </span>            :   // The XPCOM GetSystem is OK
+<span class="lineNum">     535 </span>            :   // The XPCOM SetSystem is OK
+<span class="lineNum">     536 </span>            :   // The XPCOM GetSymbols is OK
+<span class="lineNum">     537 </span>            :   // The XPCOM SetSymbols is OK
+<span class="lineNum">     538 </span>            :   // The XPCOM GetAdditiveSymbols is OK
+<span class="lineNum">     539 </span>            :   // The XPCOM SetAdditiveSymbols is OK
+<span class="lineNum">     540 </span>            :   // The XPCOM GetNegative is OK
+<span class="lineNum">     541 </span>            :   // The XPCOM SetNegative is OK
+<span class="lineNum">     542 </span>            :   // The XPCOM GetPrefix is OK
+<span class="lineNum">     543 </span>            :   // The XPCOM SetPrefix is OK
+<span class="lineNum">     544 </span>            :   // The XPCOM GetSuffix is OK
+<span class="lineNum">     545 </span>            :   // The XPCOM SetSuffix is OK
+<span class="lineNum">     546 </span>            :   // The XPCOM GetRange is OK
+<span class="lineNum">     547 </span>            :   // The XPCOM SetRange is OK
+<span class="lineNum">     548 </span>            :   // The XPCOM GetPad is OK
+<span class="lineNum">     549 </span>            :   // The XPCOM SetPad is OK
+<span class="lineNum">     550 </span>            :   // The XPCOM GetSpeakAs is OK
+<span class="lineNum">     551 </span>            :   // The XPCOM SetSpeakAs is OK
+<span class="lineNum">     552 </span>            :   // The XPCOM GetFallback is OK
+<span class="lineNum">     553 </span>            :   // The XPCOM SetFallback is OK
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            :   // This function is only used to check whether a non-empty value, which has
+<span class="lineNum">     556 </span>            :   // been accepted by parser, is valid for the given system and descriptor.
+<span class="lineNum">     557 </span>            :   static bool CheckDescValue(int32_t aSystem,
+<span class="lineNum">     558 </span>            :                              nsCSSCounterDesc aDescID,
+<span class="lineNum">     559 </span>            :                              const nsCSSValue&amp; aValue);
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span>            :   const nsString&amp; GetName() const { return mName; }
+<span class="lineNum">     562 </span>            : 
+<span class="lineNum">     563 </span>            :   uint32_t GetGeneration() const { return mGeneration; }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            :   int32_t GetSystem() const;
+<span class="lineNum">     566 </span>            :   const nsCSSValue&amp; GetSystemArgument() const;
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            :   const nsCSSValue&amp; GetDesc(nsCSSCounterDesc aDescID) const
+<span class="lineNum">     569 </span>            :   {
+<span class="lineNum">     570 </span>            :     MOZ_ASSERT(aDescID &gt;= 0 &amp;&amp; aDescID &lt; eCSSCounterDesc_COUNT,
+<span class="lineNum">     571 </span>            :                &quot;descriptor ID out of range&quot;);
+<span class="lineNum">     572 </span><span class="lineCov">          1 :     return mValues[aDescID];</span>
+<span class="lineNum">     573 </span>            :   }
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span>            :   void SetDesc(nsCSSCounterDesc aDescID, const nsCSSValue&amp; aValue);
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<span class="lineNum">     580 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            : private:
+<span class="lineNum">     583 </span>            :   typedef NS_STDCALL_FUNCPROTO(nsresult, Getter, nsCSSCounterStyleRule,
+<span class="lineNum">     584 </span>            :                                GetSymbols, (nsAString&amp;));
+<span class="lineNum">     585 </span>            :   static const Getter kGetters[];
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            :   nsresult GetDescriptor(nsCSSCounterDesc aDescID, nsAString&amp; aValue);
+<span class="lineNum">     588 </span>            :   nsresult SetDescriptor(nsCSSCounterDesc aDescID, const nsAString&amp; aValue);
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            :   nsString   mName;
+<span class="lineNum">     591 </span>            :   nsCSSValue mValues[eCSSCounterDesc_COUNT];
+<span class="lineNum">     592 </span>            :   uint32_t   mGeneration;
+<span class="lineNum">     593 </span>            : };
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : #endif /* !defined(nsCSSRules_h_) */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

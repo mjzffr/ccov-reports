@@ -1,0 +1,610 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - security/sandbox/chromium/base/bind_helpers.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium/base</a> - bind_helpers.h<span style="font-size: 80%;"> (source / <a href="bind_helpers.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright (c) 2011 The Chromium Authors. All rights reserved.</a>
+<span class="lineNum">       2 </span>            : // Use of this source code is governed by a BSD-style license that can be
+<span class="lineNum">       3 </span>            : // found in the LICENSE file.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : // This defines a set of argument wrappers and related factory methods that
+<span class="lineNum">       6 </span>            : // can be used specify the refcounting and reference semantics of arguments
+<span class="lineNum">       7 </span>            : // that are bound by the Bind() function in base/bind.h.
+<span class="lineNum">       8 </span>            : //
+<span class="lineNum">       9 </span>            : // It also defines a set of simple functions and utilities that people want
+<span class="lineNum">      10 </span>            : // when using Callback&lt;&gt; and Bind().
+<span class="lineNum">      11 </span>            : //
+<span class="lineNum">      12 </span>            : //
+<span class="lineNum">      13 </span>            : // ARGUMENT BINDING WRAPPERS
+<span class="lineNum">      14 </span>            : //
+<span class="lineNum">      15 </span>            : // The wrapper functions are base::Unretained(), base::Owned(), base::Passed(),
+<span class="lineNum">      16 </span>            : // base::ConstRef(), and base::IgnoreResult().
+<span class="lineNum">      17 </span>            : //
+<span class="lineNum">      18 </span>            : // Unretained() allows Bind() to bind a non-refcounted class, and to disable
+<span class="lineNum">      19 </span>            : // refcounting on arguments that are refcounted objects.
+<span class="lineNum">      20 </span>            : //
+<span class="lineNum">      21 </span>            : // Owned() transfers ownership of an object to the Callback resulting from
+<span class="lineNum">      22 </span>            : // bind; the object will be deleted when the Callback is deleted.
+<span class="lineNum">      23 </span>            : //
+<span class="lineNum">      24 </span>            : // Passed() is for transferring movable-but-not-copyable types (eg. scoped_ptr)
+<span class="lineNum">      25 </span>            : // through a Callback. Logically, this signifies a destructive transfer of
+<span class="lineNum">      26 </span>            : // the state of the argument into the target function.  Invoking
+<span class="lineNum">      27 </span>            : // Callback::Run() twice on a Callback that was created with a Passed()
+<span class="lineNum">      28 </span>            : // argument will CHECK() because the first invocation would have already
+<span class="lineNum">      29 </span>            : // transferred ownership to the target function.
+<span class="lineNum">      30 </span>            : //
+<span class="lineNum">      31 </span>            : // RetainedRef() accepts a ref counted object and retains a reference to it.
+<span class="lineNum">      32 </span>            : // When the callback is called, the object is passed as a raw pointer.
+<span class="lineNum">      33 </span>            : //
+<span class="lineNum">      34 </span>            : // ConstRef() allows binding a constant reference to an argument rather
+<span class="lineNum">      35 </span>            : // than a copy.
+<span class="lineNum">      36 </span>            : //
+<span class="lineNum">      37 </span>            : // IgnoreResult() is used to adapt a function or Callback with a return type to
+<span class="lineNum">      38 </span>            : // one with a void return. This is most useful if you have a function with,
+<span class="lineNum">      39 </span>            : // say, a pesky ignorable bool return that you want to use with PostTask or
+<span class="lineNum">      40 </span>            : // something else that expect a Callback with a void return.
+<span class="lineNum">      41 </span>            : //
+<span class="lineNum">      42 </span>            : // EXAMPLE OF Unretained():
+<span class="lineNum">      43 </span>            : //
+<span class="lineNum">      44 </span>            : //   class Foo {
+<span class="lineNum">      45 </span>            : //    public:
+<span class="lineNum">      46 </span>            : //     void func() { cout &lt;&lt; &quot;Foo:f&quot; &lt;&lt; endl; }
+<span class="lineNum">      47 </span>            : //   };
+<span class="lineNum">      48 </span>            : //
+<span class="lineNum">      49 </span>            : //   // In some function somewhere.
+<span class="lineNum">      50 </span>            : //   Foo foo;
+<span class="lineNum">      51 </span>            : //   Closure foo_callback =
+<span class="lineNum">      52 </span>            : //       Bind(&amp;Foo::func, Unretained(&amp;foo));
+<span class="lineNum">      53 </span>            : //   foo_callback.Run();  // Prints &quot;Foo:f&quot;.
+<span class="lineNum">      54 </span>            : //
+<span class="lineNum">      55 </span>            : // Without the Unretained() wrapper on |&amp;foo|, the above call would fail
+<span class="lineNum">      56 </span>            : // to compile because Foo does not support the AddRef() and Release() methods.
+<span class="lineNum">      57 </span>            : //
+<span class="lineNum">      58 </span>            : //
+<span class="lineNum">      59 </span>            : // EXAMPLE OF Owned():
+<span class="lineNum">      60 </span>            : //
+<span class="lineNum">      61 </span>            : //   void foo(int* arg) { cout &lt;&lt; *arg &lt;&lt; endl }
+<span class="lineNum">      62 </span>            : //
+<span class="lineNum">      63 </span>            : //   int* pn = new int(1);
+<span class="lineNum">      64 </span>            : //   Closure foo_callback = Bind(&amp;foo, Owned(pn));
+<span class="lineNum">      65 </span>            : //
+<span class="lineNum">      66 </span>            : //   foo_callback.Run();  // Prints &quot;1&quot;
+<span class="lineNum">      67 </span>            : //   foo_callback.Run();  // Prints &quot;1&quot;
+<span class="lineNum">      68 </span>            : //   *n = 2;
+<span class="lineNum">      69 </span>            : //   foo_callback.Run();  // Prints &quot;2&quot;
+<span class="lineNum">      70 </span>            : //
+<span class="lineNum">      71 </span>            : //   foo_callback.Reset();  // |pn| is deleted.  Also will happen when
+<span class="lineNum">      72 </span>            : //                          // |foo_callback| goes out of scope.
+<span class="lineNum">      73 </span>            : //
+<span class="lineNum">      74 </span>            : // Without Owned(), someone would have to know to delete |pn| when the last
+<span class="lineNum">      75 </span>            : // reference to the Callback is deleted.
+<span class="lineNum">      76 </span>            : //
+<span class="lineNum">      77 </span>            : // EXAMPLE OF RetainedRef():
+<span class="lineNum">      78 </span>            : //
+<span class="lineNum">      79 </span>            : //    void foo(RefCountedBytes* bytes) {}
+<span class="lineNum">      80 </span>            : //
+<span class="lineNum">      81 </span>            : //    scoped_refptr&lt;RefCountedBytes&gt; bytes = ...;
+<span class="lineNum">      82 </span>            : //    Closure callback = Bind(&amp;foo, base::RetainedRef(bytes));
+<span class="lineNum">      83 </span>            : //    callback.Run();
+<span class="lineNum">      84 </span>            : //
+<span class="lineNum">      85 </span>            : // Without RetainedRef, the scoped_refptr would try to implicitly convert to
+<span class="lineNum">      86 </span>            : // a raw pointer and fail compilation:
+<span class="lineNum">      87 </span>            : //
+<span class="lineNum">      88 </span>            : //    Closure callback = Bind(&amp;foo, bytes); // ERROR!
+<span class="lineNum">      89 </span>            : //
+<span class="lineNum">      90 </span>            : //
+<span class="lineNum">      91 </span>            : // EXAMPLE OF ConstRef():
+<span class="lineNum">      92 </span>            : //
+<span class="lineNum">      93 </span>            : //   void foo(int arg) { cout &lt;&lt; arg &lt;&lt; endl }
+<span class="lineNum">      94 </span>            : //
+<span class="lineNum">      95 </span>            : //   int n = 1;
+<span class="lineNum">      96 </span>            : //   Closure no_ref = Bind(&amp;foo, n);
+<span class="lineNum">      97 </span>            : //   Closure has_ref = Bind(&amp;foo, ConstRef(n));
+<span class="lineNum">      98 </span>            : //
+<span class="lineNum">      99 </span>            : //   no_ref.Run();  // Prints &quot;1&quot;
+<span class="lineNum">     100 </span>            : //   has_ref.Run();  // Prints &quot;1&quot;
+<span class="lineNum">     101 </span>            : //
+<span class="lineNum">     102 </span>            : //   n = 2;
+<span class="lineNum">     103 </span>            : //   no_ref.Run();  // Prints &quot;1&quot;
+<span class="lineNum">     104 </span>            : //   has_ref.Run();  // Prints &quot;2&quot;
+<span class="lineNum">     105 </span>            : //
+<span class="lineNum">     106 </span>            : // Note that because ConstRef() takes a reference on |n|, |n| must outlive all
+<span class="lineNum">     107 </span>            : // its bound callbacks.
+<span class="lineNum">     108 </span>            : //
+<span class="lineNum">     109 </span>            : //
+<span class="lineNum">     110 </span>            : // EXAMPLE OF IgnoreResult():
+<span class="lineNum">     111 </span>            : //
+<span class="lineNum">     112 </span>            : //   int DoSomething(int arg) { cout &lt;&lt; arg &lt;&lt; endl; }
+<span class="lineNum">     113 </span>            : //
+<span class="lineNum">     114 </span>            : //   // Assign to a Callback with a void return type.
+<span class="lineNum">     115 </span>            : //   Callback&lt;void(int)&gt; cb = Bind(IgnoreResult(&amp;DoSomething));
+<span class="lineNum">     116 </span>            : //   cb-&gt;Run(1);  // Prints &quot;1&quot;.
+<span class="lineNum">     117 </span>            : //
+<span class="lineNum">     118 </span>            : //   // Prints &quot;1&quot; on |ml|.
+<span class="lineNum">     119 </span>            : //   ml-&gt;PostTask(FROM_HERE, Bind(IgnoreResult(&amp;DoSomething), 1);
+<span class="lineNum">     120 </span>            : //
+<span class="lineNum">     121 </span>            : //
+<span class="lineNum">     122 </span>            : // EXAMPLE OF Passed():
+<span class="lineNum">     123 </span>            : //
+<span class="lineNum">     124 </span>            : //   void TakesOwnership(std::unique_ptr&lt;Foo&gt; arg) { }
+<span class="lineNum">     125 </span>            : //   std::unique_ptr&lt;Foo&gt; CreateFoo() { return std::unique_ptr&lt;Foo&gt;(new Foo());
+<span class="lineNum">     126 </span>            : //   }
+<span class="lineNum">     127 </span>            : //
+<span class="lineNum">     128 </span>            : //   std::unique_ptr&lt;Foo&gt; f(new Foo());
+<span class="lineNum">     129 </span>            : //
+<span class="lineNum">     130 </span>            : //   // |cb| is given ownership of Foo(). |f| is now NULL.
+<span class="lineNum">     131 </span>            : //   // You can use std::move(f) in place of &amp;f, but it's more verbose.
+<span class="lineNum">     132 </span>            : //   Closure cb = Bind(&amp;TakesOwnership, Passed(&amp;f));
+<span class="lineNum">     133 </span>            : //
+<span class="lineNum">     134 </span>            : //   // Run was never called so |cb| still owns Foo() and deletes
+<span class="lineNum">     135 </span>            : //   // it on Reset().
+<span class="lineNum">     136 </span>            : //   cb.Reset();
+<span class="lineNum">     137 </span>            : //
+<span class="lineNum">     138 </span>            : //   // |cb| is given a new Foo created by CreateFoo().
+<span class="lineNum">     139 </span>            : //   cb = Bind(&amp;TakesOwnership, Passed(CreateFoo()));
+<span class="lineNum">     140 </span>            : //
+<span class="lineNum">     141 </span>            : //   // |arg| in TakesOwnership() is given ownership of Foo(). |cb|
+<span class="lineNum">     142 </span>            : //   // no longer owns Foo() and, if reset, would not delete Foo().
+<span class="lineNum">     143 </span>            : //   cb.Run();  // Foo() is now transferred to |arg| and deleted.
+<span class="lineNum">     144 </span>            : //   cb.Run();  // This CHECK()s since Foo() already been used once.
+<span class="lineNum">     145 </span>            : //
+<span class="lineNum">     146 </span>            : // Passed() is particularly useful with PostTask() when you are transferring
+<span class="lineNum">     147 </span>            : // ownership of an argument into a task, but don't necessarily know if the
+<span class="lineNum">     148 </span>            : // task will always be executed. This can happen if the task is cancellable
+<span class="lineNum">     149 </span>            : // or if it is posted to a TaskRunner.
+<span class="lineNum">     150 </span>            : //
+<span class="lineNum">     151 </span>            : //
+<span class="lineNum">     152 </span>            : // SIMPLE FUNCTIONS AND UTILITIES.
+<span class="lineNum">     153 </span>            : //
+<span class="lineNum">     154 </span>            : //   DoNothing() - Useful for creating a Closure that does nothing when called.
+<span class="lineNum">     155 </span>            : //   DeletePointer&lt;T&gt;() - Useful for creating a Closure that will delete a
+<span class="lineNum">     156 </span>            : //                        pointer when invoked. Only use this when necessary.
+<span class="lineNum">     157 </span>            : //                        In most cases MessageLoop::DeleteSoon() is a better
+<span class="lineNum">     158 </span>            : //                        fit.
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : #ifndef BASE_BIND_HELPERS_H_
+<span class="lineNum">     161 </span>            : #define BASE_BIND_HELPERS_H_
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">     166 </span>            : #include &lt;utility&gt;
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : #include &quot;base/callback.h&quot;
+<span class="lineNum">     169 </span>            : #include &quot;base/memory/weak_ptr.h&quot;
+<span class="lineNum">     170 </span>            : #include &quot;build/build_config.h&quot;
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : namespace base {
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     175 </span>            : struct IsWeakReceiver;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : template &lt;typename&gt;
+<span class="lineNum">     178 </span>            : struct BindUnwrapTraits;
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            : namespace internal {
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     183 </span>            : class UnretainedWrapper {
+<span class="lineNum">     184 </span>            :  public:
+<span class="lineNum">     185 </span>            :   explicit UnretainedWrapper(T* o) : ptr_(o) {}
+<span class="lineNum">     186 </span>            :   T* get() const { return ptr_; }
+<span class="lineNum">     187 </span>            :  private:
+<span class="lineNum">     188 </span>            :   T* ptr_;
+<span class="lineNum">     189 </span>            : };
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     192 </span>            : class ConstRefWrapper {
+<span class="lineNum">     193 </span>            :  public:
+<span class="lineNum">     194 </span>            :   explicit ConstRefWrapper(const T&amp; o) : ptr_(&amp;o) {}
+<span class="lineNum">     195 </span>            :   const T&amp; get() const { return *ptr_; }
+<span class="lineNum">     196 </span>            :  private:
+<span class="lineNum">     197 </span>            :   const T* ptr_;
+<span class="lineNum">     198 </span>            : };
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     201 </span>            : class RetainedRefWrapper {
+<span class="lineNum">     202 </span>            :  public:
+<span class="lineNum">     203 </span>            :   explicit RetainedRefWrapper(T* o) : ptr_(o) {}
+<span class="lineNum">     204 </span>            :   explicit RetainedRefWrapper(scoped_refptr&lt;T&gt; o) : ptr_(std::move(o)) {}
+<span class="lineNum">     205 </span>            :   T* get() const { return ptr_.get(); }
+<span class="lineNum">     206 </span>            :  private:
+<span class="lineNum">     207 </span>            :   scoped_refptr&lt;T&gt; ptr_;
+<span class="lineNum">     208 </span>            : };
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     211 </span>            : struct IgnoreResultHelper {
+<span class="lineNum">     212 </span>            :   explicit IgnoreResultHelper(T functor) : functor_(std::move(functor)) {}
+<span class="lineNum">     213 </span>            :   explicit operator bool() const { return !!functor_; }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :   T functor_;
+<span class="lineNum">     216 </span>            : };
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : // An alternate implementation is to avoid the destructive copy, and instead
+<span class="lineNum">     219 </span>            : // specialize ParamTraits&lt;&gt; for OwnedWrapper&lt;&gt; to change the StorageType to
+<span class="lineNum">     220 </span>            : // a class that is essentially a std::unique_ptr&lt;&gt;.
+<span class="lineNum">     221 </span>            : //
+<span class="lineNum">     222 </span>            : // The current implementation has the benefit though of leaving ParamTraits&lt;&gt;
+<span class="lineNum">     223 </span>            : // fully in callback_internal.h as well as avoiding type conversions during
+<span class="lineNum">     224 </span>            : // storage.
+<span class="lineNum">     225 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     226 </span>            : class OwnedWrapper {
+<span class="lineNum">     227 </span>            :  public:
+<span class="lineNum">     228 </span>            :   explicit OwnedWrapper(T* o) : ptr_(o) {}
+<span class="lineNum">     229 </span>            :   ~OwnedWrapper() { delete ptr_; }
+<span class="lineNum">     230 </span>            :   T* get() const { return ptr_; }
+<span class="lineNum">     231 </span>            :   OwnedWrapper(OwnedWrapper&amp;&amp; other) {
+<span class="lineNum">     232 </span>            :     ptr_ = other.ptr_;
+<span class="lineNum">     233 </span>            :     other.ptr_ = NULL;
+<span class="lineNum">     234 </span>            :   }
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            :  private:
+<span class="lineNum">     237 </span>            :   mutable T* ptr_;
+<span class="lineNum">     238 </span>            : };
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : // PassedWrapper is a copyable adapter for a scoper that ignores const.
+<span class="lineNum">     241 </span>            : //
+<span class="lineNum">     242 </span>            : // It is needed to get around the fact that Bind() takes a const reference to
+<span class="lineNum">     243 </span>            : // all its arguments.  Because Bind() takes a const reference to avoid
+<span class="lineNum">     244 </span>            : // unnecessary copies, it is incompatible with movable-but-not-copyable
+<span class="lineNum">     245 </span>            : // types; doing a destructive &quot;move&quot; of the type into Bind() would violate
+<span class="lineNum">     246 </span>            : // the const correctness.
+<span class="lineNum">     247 </span>            : //
+<span class="lineNum">     248 </span>            : // This conundrum cannot be solved without either C++11 rvalue references or
+<span class="lineNum">     249 </span>            : // a O(2^n) blowup of Bind() templates to handle each combination of regular
+<span class="lineNum">     250 </span>            : // types and movable-but-not-copyable types.  Thus we introduce a wrapper type
+<span class="lineNum">     251 </span>            : // that is copyable to transmit the correct type information down into
+<span class="lineNum">     252 </span>            : // BindState&lt;&gt;. Ignoring const in this type makes sense because it is only
+<span class="lineNum">     253 </span>            : // created when we are explicitly trying to do a destructive move.
+<span class="lineNum">     254 </span>            : //
+<span class="lineNum">     255 </span>            : // Two notes:
+<span class="lineNum">     256 </span>            : //  1) PassedWrapper supports any type that has a move constructor, however
+<span class="lineNum">     257 </span>            : //     the type will need to be specifically whitelisted in order for it to be
+<span class="lineNum">     258 </span>            : //     bound to a Callback. We guard this explicitly at the call of Passed()
+<span class="lineNum">     259 </span>            : //     to make for clear errors. Things not given to Passed() will be forwarded
+<span class="lineNum">     260 </span>            : //     and stored by value which will not work for general move-only types.
+<span class="lineNum">     261 </span>            : //  2) is_valid_ is distinct from NULL because it is valid to bind a &quot;NULL&quot;
+<span class="lineNum">     262 </span>            : //     scoper to a Callback and allow the Callback to execute once.
+<span class="lineNum">     263 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     264 </span>            : class PassedWrapper {
+<span class="lineNum">     265 </span>            :  public:
+<span class="lineNum">     266 </span>            :   explicit PassedWrapper(T&amp;&amp; scoper)
+<span class="lineNum">     267 </span>            :       : is_valid_(true), scoper_(std::move(scoper)) {}
+<span class="lineNum">     268 </span>            :   PassedWrapper(PassedWrapper&amp;&amp; other)
+<span class="lineNum">     269 </span>            :       : is_valid_(other.is_valid_), scoper_(std::move(other.scoper_)) {}
+<span class="lineNum">     270 </span>            :   T Take() const {
+<span class="lineNum">     271 </span>            :     CHECK(is_valid_);
+<span class="lineNum">     272 </span>            :     is_valid_ = false;
+<span class="lineNum">     273 </span>            :     return std::move(scoper_);
+<span class="lineNum">     274 </span>            :   }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :  private:
+<span class="lineNum">     277 </span>            :   mutable bool is_valid_;
+<span class="lineNum">     278 </span>            :   mutable T scoper_;
+<span class="lineNum">     279 </span>            : };
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     282 </span>            : using Unwrapper = BindUnwrapTraits&lt;typename std::decay&lt;T&gt;::type&gt;;
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     285 </span>            : auto Unwrap(T&amp;&amp; o) -&gt; decltype(Unwrapper&lt;T&gt;::Unwrap(std::forward&lt;T&gt;(o))) {
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :   return Unwrapper&lt;T&gt;::Unwrap(std::forward&lt;T&gt;(o));</span>
+<span class="lineNum">     287 </span>            : }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : // IsWeakMethod is a helper that determine if we are binding a WeakPtr&lt;&gt; to a
+<span class="lineNum">     290 </span>            : // method.  It is used internally by Bind() to select the correct
+<span class="lineNum">     291 </span>            : // InvokeHelper that will no-op itself in the event the WeakPtr&lt;&gt; for
+<span class="lineNum">     292 </span>            : // the target object is invalidated.
+<span class="lineNum">     293 </span>            : //
+<span class="lineNum">     294 </span>            : // The first argument should be the type of the object that will be received by
+<span class="lineNum">     295 </span>            : // the method.
+<span class="lineNum">     296 </span>            : template &lt;bool is_method, typename... Args&gt;
+<span class="lineNum">     297 </span>            : struct IsWeakMethod : std::false_type {};
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            : template &lt;typename T, typename... Args&gt;
+<span class="lineNum">     300 </span>            : struct IsWeakMethod&lt;true, T, Args...&gt; : IsWeakReceiver&lt;T&gt; {};
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : // Packs a list of types to hold them in a single type.
+<span class="lineNum">     303 </span>            : template &lt;typename... Types&gt;
+<span class="lineNum">     304 </span>            : struct TypeList {};
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            : // Used for DropTypeListItem implementation.
+<span class="lineNum">     307 </span>            : template &lt;size_t n, typename List&gt;
+<span class="lineNum">     308 </span>            : struct DropTypeListItemImpl;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : // Do not use enable_if and SFINAE here to avoid MSVC2013 compile failure.
+<span class="lineNum">     311 </span>            : template &lt;size_t n, typename T, typename... List&gt;
+<span class="lineNum">     312 </span>            : struct DropTypeListItemImpl&lt;n, TypeList&lt;T, List...&gt;&gt;
+<span class="lineNum">     313 </span>            :     : DropTypeListItemImpl&lt;n - 1, TypeList&lt;List...&gt;&gt; {};
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            : template &lt;typename T, typename... List&gt;
+<span class="lineNum">     316 </span>            : struct DropTypeListItemImpl&lt;0, TypeList&lt;T, List...&gt;&gt; {
+<span class="lineNum">     317 </span>            :   using Type = TypeList&lt;T, List...&gt;;
+<span class="lineNum">     318 </span>            : };
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            : template &lt;&gt;
+<span class="lineNum">     321 </span>            : struct DropTypeListItemImpl&lt;0, TypeList&lt;&gt;&gt; {
+<span class="lineNum">     322 </span>            :   using Type = TypeList&lt;&gt;;
+<span class="lineNum">     323 </span>            : };
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : // A type-level function that drops |n| list item from given TypeList.
+<span class="lineNum">     326 </span>            : template &lt;size_t n, typename List&gt;
+<span class="lineNum">     327 </span>            : using DropTypeListItem = typename DropTypeListItemImpl&lt;n, List&gt;::Type;
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            : // Used for TakeTypeListItem implementation.
+<span class="lineNum">     330 </span>            : template &lt;size_t n, typename List, typename... Accum&gt;
+<span class="lineNum">     331 </span>            : struct TakeTypeListItemImpl;
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            : // Do not use enable_if and SFINAE here to avoid MSVC2013 compile failure.
+<span class="lineNum">     334 </span>            : template &lt;size_t n, typename T, typename... List, typename... Accum&gt;
+<span class="lineNum">     335 </span>            : struct TakeTypeListItemImpl&lt;n, TypeList&lt;T, List...&gt;, Accum...&gt;
+<span class="lineNum">     336 </span>            :     : TakeTypeListItemImpl&lt;n - 1, TypeList&lt;List...&gt;, Accum..., T&gt; {};
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            : template &lt;typename T, typename... List, typename... Accum&gt;
+<span class="lineNum">     339 </span>            : struct TakeTypeListItemImpl&lt;0, TypeList&lt;T, List...&gt;, Accum...&gt; {
+<span class="lineNum">     340 </span>            :   using Type = TypeList&lt;Accum...&gt;;
+<span class="lineNum">     341 </span>            : };
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            : template &lt;typename... Accum&gt;
+<span class="lineNum">     344 </span>            : struct TakeTypeListItemImpl&lt;0, TypeList&lt;&gt;, Accum...&gt; {
+<span class="lineNum">     345 </span>            :   using Type = TypeList&lt;Accum...&gt;;
+<span class="lineNum">     346 </span>            : };
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : // A type-level function that takes first |n| list item from given TypeList.
+<span class="lineNum">     349 </span>            : // E.g. TakeTypeListItem&lt;3, TypeList&lt;A, B, C, D&gt;&gt; is evaluated to
+<span class="lineNum">     350 </span>            : // TypeList&lt;A, B, C&gt;.
+<span class="lineNum">     351 </span>            : template &lt;size_t n, typename List&gt;
+<span class="lineNum">     352 </span>            : using TakeTypeListItem = typename TakeTypeListItemImpl&lt;n, List&gt;::Type;
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            : // Used for ConcatTypeLists implementation.
+<span class="lineNum">     355 </span>            : template &lt;typename List1, typename List2&gt;
+<span class="lineNum">     356 </span>            : struct ConcatTypeListsImpl;
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            : template &lt;typename... Types1, typename... Types2&gt;
+<span class="lineNum">     359 </span>            : struct ConcatTypeListsImpl&lt;TypeList&lt;Types1...&gt;, TypeList&lt;Types2...&gt;&gt; {
+<span class="lineNum">     360 </span>            :   using Type = TypeList&lt;Types1..., Types2...&gt;;
+<span class="lineNum">     361 </span>            : };
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            : // A type-level function that concats two TypeLists.
+<span class="lineNum">     364 </span>            : template &lt;typename List1, typename List2&gt;
+<span class="lineNum">     365 </span>            : using ConcatTypeLists = typename ConcatTypeListsImpl&lt;List1, List2&gt;::Type;
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            : // Used for MakeFunctionType implementation.
+<span class="lineNum">     368 </span>            : template &lt;typename R, typename ArgList&gt;
+<span class="lineNum">     369 </span>            : struct MakeFunctionTypeImpl;
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     372 </span>            : struct MakeFunctionTypeImpl&lt;R, TypeList&lt;Args...&gt;&gt; {
+<span class="lineNum">     373 </span>            :   // MSVC 2013 doesn't support Type Alias of function types.
+<span class="lineNum">     374 </span>            :   // Revisit this after we update it to newer version.
+<span class="lineNum">     375 </span>            :   typedef R Type(Args...);
+<span class="lineNum">     376 </span>            : };
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span>            : // A type-level function that constructs a function type that has |R| as its
+<span class="lineNum">     379 </span>            : // return type and has TypeLists items as its arguments.
+<span class="lineNum">     380 </span>            : template &lt;typename R, typename ArgList&gt;
+<span class="lineNum">     381 </span>            : using MakeFunctionType = typename MakeFunctionTypeImpl&lt;R, ArgList&gt;::Type;
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : // Used for ExtractArgs and ExtractReturnType.
+<span class="lineNum">     384 </span>            : template &lt;typename Signature&gt;
+<span class="lineNum">     385 </span>            : struct ExtractArgsImpl;
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     388 </span>            : struct ExtractArgsImpl&lt;R(Args...)&gt; {
+<span class="lineNum">     389 </span>            :   using ReturnType = R;
+<span class="lineNum">     390 </span>            :   using ArgsList = TypeList&lt;Args...&gt;;
+<span class="lineNum">     391 </span>            : };
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : // A type-level function that extracts function arguments into a TypeList.
+<span class="lineNum">     394 </span>            : // E.g. ExtractArgs&lt;R(A, B, C)&gt; is evaluated to TypeList&lt;A, B, C&gt;.
+<span class="lineNum">     395 </span>            : template &lt;typename Signature&gt;
+<span class="lineNum">     396 </span>            : using ExtractArgs = typename ExtractArgsImpl&lt;Signature&gt;::ArgsList;
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            : // A type-level function that extracts the return type of a function.
+<span class="lineNum">     399 </span>            : // E.g. ExtractReturnType&lt;R(A, B, C)&gt; is evaluated to R.
+<span class="lineNum">     400 </span>            : template &lt;typename Signature&gt;
+<span class="lineNum">     401 </span>            : using ExtractReturnType = typename ExtractArgsImpl&lt;Signature&gt;::ReturnType;
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : }  // namespace internal
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     406 </span>            : static inline internal::UnretainedWrapper&lt;T&gt; Unretained(T* o) {
+<span class="lineNum">     407 </span>            :   return internal::UnretainedWrapper&lt;T&gt;(o);
+<span class="lineNum">     408 </span>            : }
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     411 </span>            : static inline internal::RetainedRefWrapper&lt;T&gt; RetainedRef(T* o) {
+<span class="lineNum">     412 </span>            :   return internal::RetainedRefWrapper&lt;T&gt;(o);
+<span class="lineNum">     413 </span>            : }
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     416 </span>            : static inline internal::RetainedRefWrapper&lt;T&gt; RetainedRef(scoped_refptr&lt;T&gt; o) {
+<span class="lineNum">     417 </span>            :   return internal::RetainedRefWrapper&lt;T&gt;(std::move(o));
+<span class="lineNum">     418 </span>            : }
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     421 </span>            : static inline internal::ConstRefWrapper&lt;T&gt; ConstRef(const T&amp; o) {
+<span class="lineNum">     422 </span>            :   return internal::ConstRefWrapper&lt;T&gt;(o);
+<span class="lineNum">     423 </span>            : }
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     426 </span>            : static inline internal::OwnedWrapper&lt;T&gt; Owned(T* o) {
+<span class="lineNum">     427 </span>            :   return internal::OwnedWrapper&lt;T&gt;(o);
+<span class="lineNum">     428 </span>            : }
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            : // We offer 2 syntaxes for calling Passed().  The first takes an rvalue and
+<span class="lineNum">     431 </span>            : // is best suited for use with the return value of a function or other temporary
+<span class="lineNum">     432 </span>            : // rvalues. The second takes a pointer to the scoper and is just syntactic sugar
+<span class="lineNum">     433 </span>            : // to avoid having to write Passed(std::move(scoper)).
+<span class="lineNum">     434 </span>            : //
+<span class="lineNum">     435 </span>            : // Both versions of Passed() prevent T from being an lvalue reference. The first
+<span class="lineNum">     436 </span>            : // via use of enable_if, and the second takes a T* which will not bind to T&amp;.
+<span class="lineNum">     437 </span>            : template &lt;typename T,
+<span class="lineNum">     438 </span>            :           typename std::enable_if&lt;!std::is_lvalue_reference&lt;T&gt;::value&gt;::type* =
+<span class="lineNum">     439 </span>            :               nullptr&gt;
+<span class="lineNum">     440 </span>            : static inline internal::PassedWrapper&lt;T&gt; Passed(T&amp;&amp; scoper) {
+<span class="lineNum">     441 </span>            :   return internal::PassedWrapper&lt;T&gt;(std::move(scoper));
+<span class="lineNum">     442 </span>            : }
+<span class="lineNum">     443 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     444 </span>            : static inline internal::PassedWrapper&lt;T&gt; Passed(T* scoper) {
+<span class="lineNum">     445 </span>            :   return internal::PassedWrapper&lt;T&gt;(std::move(*scoper));
+<span class="lineNum">     446 </span>            : }
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     449 </span>            : static inline internal::IgnoreResultHelper&lt;T&gt; IgnoreResult(T data) {
+<span class="lineNum">     450 </span>            :   return internal::IgnoreResultHelper&lt;T&gt;(std::move(data));
+<span class="lineNum">     451 </span>            : }
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span>            : BASE_EXPORT void DoNothing();
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     456 </span>            : void DeletePointer(T* obj) {
+<span class="lineNum">     457 </span>            :   delete obj;
+<span class="lineNum">     458 </span>            : }
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span>            : // An injection point to control |this| pointer behavior on a method invocation.
+<span class="lineNum">     461 </span>            : // If IsWeakReceiver&lt;&gt; is true_type for |T| and |T| is used for a receiver of a
+<span class="lineNum">     462 </span>            : // method, base::Bind cancels the method invocation if the receiver is tested as
+<span class="lineNum">     463 </span>            : // false.
+<span class="lineNum">     464 </span>            : // E.g. Foo::bar() is not called:
+<span class="lineNum">     465 </span>            : //   struct Foo : base::SupportsWeakPtr&lt;Foo&gt; {
+<span class="lineNum">     466 </span>            : //     void bar() {}
+<span class="lineNum">     467 </span>            : //   };
+<span class="lineNum">     468 </span>            : //
+<span class="lineNum">     469 </span>            : //   WeakPtr&lt;Foo&gt; oo = nullptr;
+<span class="lineNum">     470 </span>            : //   base::Bind(&amp;Foo::bar, oo).Run();
+<span class="lineNum">     471 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     472 </span>            : struct IsWeakReceiver : std::false_type {};
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     475 </span>            : struct IsWeakReceiver&lt;internal::ConstRefWrapper&lt;T&gt;&gt; : IsWeakReceiver&lt;T&gt; {};
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     478 </span>            : struct IsWeakReceiver&lt;WeakPtr&lt;T&gt;&gt; : std::true_type {};
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span>            : // An injection point to control how bound objects passed to the target
+<span class="lineNum">     481 </span>            : // function. BindUnwrapTraits&lt;&gt;::Unwrap() is called for each bound objects right
+<span class="lineNum">     482 </span>            : // before the target function is invoked.
+<span class="lineNum">     483 </span>            : template &lt;typename&gt;
+<span class="lineNum">     484 </span>            : struct BindUnwrapTraits {
+<span class="lineNum">     485 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     486 </span>            :   static T&amp;&amp; Unwrap(T&amp;&amp; o) { return std::forward&lt;T&gt;(o); }
+<span class="lineNum">     487 </span>            : };
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     490 </span>            : struct BindUnwrapTraits&lt;internal::UnretainedWrapper&lt;T&gt;&gt; {
+<span class="lineNum">     491 </span>            :   static T* Unwrap(const internal::UnretainedWrapper&lt;T&gt;&amp; o) {
+<span class="lineNum">     492 </span>            :     return o.get();
+<span class="lineNum">     493 </span>            :   }
+<span class="lineNum">     494 </span>            : };
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     497 </span>            : struct BindUnwrapTraits&lt;internal::ConstRefWrapper&lt;T&gt;&gt; {
+<span class="lineNum">     498 </span>            :   static const T&amp; Unwrap(const internal::ConstRefWrapper&lt;T&gt;&amp; o) {
+<span class="lineNum">     499 </span>            :     return o.get();
+<span class="lineNum">     500 </span>            :   }
+<span class="lineNum">     501 </span>            : };
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     504 </span>            : struct BindUnwrapTraits&lt;internal::RetainedRefWrapper&lt;T&gt;&gt; {
+<span class="lineNum">     505 </span>            :   static T* Unwrap(const internal::RetainedRefWrapper&lt;T&gt;&amp; o) {
+<span class="lineNum">     506 </span>            :     return o.get();
+<span class="lineNum">     507 </span>            :   }
+<span class="lineNum">     508 </span>            : };
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     511 </span>            : struct BindUnwrapTraits&lt;internal::OwnedWrapper&lt;T&gt;&gt; {
+<span class="lineNum">     512 </span>            :   static T* Unwrap(const internal::OwnedWrapper&lt;T&gt;&amp; o) {
+<span class="lineNum">     513 </span>            :     return o.get();
+<span class="lineNum">     514 </span>            :   }
+<span class="lineNum">     515 </span>            : };
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     518 </span>            : struct BindUnwrapTraits&lt;internal::PassedWrapper&lt;T&gt;&gt; {
+<span class="lineNum">     519 </span>            :   static T Unwrap(const internal::PassedWrapper&lt;T&gt;&amp; o) {
+<span class="lineNum">     520 </span>            :     return o.Take();
+<span class="lineNum">     521 </span>            :   }
+<span class="lineNum">     522 </span>            : };
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            : }  // namespace base
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            : #endif  // BASE_BIND_HELPERS_H_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

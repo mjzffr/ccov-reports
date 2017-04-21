@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - toolkit/components/telemetry/pingsender/pingsender_unix_common.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">toolkit/components/telemetry/pingsender</a> - pingsender_unix_common.cpp<span style="font-size: 80%;"> (source / <a href="pingsender_unix_common.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntry">57</td>
+            <td class="headerCovTableEntryHi">94.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;cerrno&gt;
+<span class="lineNum">       7 </span>            : #include &lt;cstring&gt;
+<span class="lineNum">       8 </span>            : #include &lt;string&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dlfcn.h&gt;
+<span class="lineNum">      11 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &quot;third_party/curl/curl.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace PingSender {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : using std::string;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /**
+<span class="lineNum">      20 </span>            :  * A simple wrapper around libcurl &quot;easy&quot; functions. Provides RAII opening
+<span class="lineNum">      21 </span>            :  * and initialization of the curl library
+<span class="lineNum">      22 </span>            :  */
+<span class="lineNum">      23 </span>            : class CurlWrapper
+<span class="lineNum">      24 </span>            : {
+<span class="lineNum">      25 </span>            : public:
+<span class="lineNum">      26 </span>            :   CurlWrapper();
+<span class="lineNum">      27 </span>            :   ~CurlWrapper();
+<span class="lineNum">      28 </span>            :   bool Init();
+<span class="lineNum">      29 </span>            :   bool Post(const string&amp; url, const string&amp; payload);
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   // libcurl functions
+<span class="lineNum">      32 </span>            :   CURL* (*easy_init)(void);
+<span class="lineNum">      33 </span>            :   CURLcode (*easy_setopt)(CURL*, CURLoption, ...);
+<span class="lineNum">      34 </span>            :   CURLcode (*easy_perform)(CURL*);
+<span class="lineNum">      35 </span>            :   CURLcode (*easy_getinfo)(CURL*, CURLINFO, ...);
+<span class="lineNum">      36 </span>            :   curl_slist* (*slist_append)(curl_slist*, const char*);
+<span class="lineNum">      37 </span>            :   void (*slist_free_all)(curl_slist*);
+<span class="lineNum">      38 </span>            :   const char* (*easy_strerror)(CURLcode);
+<span class="lineNum">      39 </span>            :   void (*easy_cleanup)(CURL*);
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : private:
+<span class="lineNum">      42 </span>            :   void* mLib;
+<span class="lineNum">      43 </span>            :   void* mCurl;
+<a name="44"><span class="lineNum">      44 </span>            : };</a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          1 : CurlWrapper::CurlWrapper()</span>
+<span class="lineNum">      47 </span>            :   : easy_init(nullptr)
+<span class="lineNum">      48 </span>            :   , easy_setopt(nullptr)
+<span class="lineNum">      49 </span>            :   , easy_perform(nullptr)
+<span class="lineNum">      50 </span>            :   , easy_getinfo(nullptr)
+<span class="lineNum">      51 </span>            :   , slist_append(nullptr)
+<span class="lineNum">      52 </span>            :   , slist_free_all(nullptr)
+<span class="lineNum">      53 </span>            :   , easy_strerror(nullptr)
+<span class="lineNum">      54 </span>            :   , easy_cleanup(nullptr)
+<span class="lineNum">      55 </span>            :   , mLib(nullptr)
+<span class="lineNum">      56 </span><span class="lineCov">          1 :   , mCurl(nullptr)</span>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">          1 : {}</span></a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">          1 : CurlWrapper::~CurlWrapper()</span>
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   if(mLib) {</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :     if(mCurl &amp;&amp; easy_cleanup) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :       easy_cleanup(mCurl);</span>
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">          1 :     dlclose(mLib);</span>
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span><span class="lineCov">          1 : }</span>
+<a name="69"><span class="lineNum">      69 </span>            : </a>
+<span class="lineNum">      70 </span>            : bool
+<span class="lineNum">      71 </span><span class="lineCov">          1 : CurlWrapper::Init()</span>
+<span class="lineNum">      72 </span>            : {
+<span class="lineNum">      73 </span>            :   // libcurl might show up under different names, try them all until we find it
+<span class="lineNum">      74 </span>            :   const char* libcurlNames[] = {
+<span class="lineNum">      75 </span>            :     &quot;libcurl.so&quot;,
+<span class="lineNum">      76 </span>            :     &quot;libcurl.so.4&quot;,
+<span class="lineNum">      77 </span>            :     // Debian gives libcurl a different name when it is built against GnuTLS
+<span class="lineNum">      78 </span>            :     &quot;libcurl-gnutls.so.4&quot;,
+<span class="lineNum">      79 </span>            :     // Older libcurl if we can't find anything better
+<span class="lineNum">      80 </span>            :     &quot;libcurl.so.3&quot;,
+<span class="lineNum">      81 </span>            : #ifndef HAVE_64BIT_BUILD
+<span class="lineNum">      82 </span>            :     // 32-bit versions on 64-bit hosts
+<span class="lineNum">      83 </span>            :     &quot;/usr/lib32/libcurl.so&quot;,
+<span class="lineNum">      84 </span>            :     &quot;/usr/lib32/libcurl.so.4&quot;,
+<span class="lineNum">      85 </span>            :     &quot;/usr/lib32/libcurl-gnutls.so.4&quot;,
+<span class="lineNum">      86 </span>            :     &quot;/usr/lib32/libcurl.so.3&quot;,
+<span class="lineNum">      87 </span>            : #endif
+<span class="lineNum">      88 </span>            :     // macOS
+<span class="lineNum">      89 </span>            :     &quot;libcurl.dylib&quot;,
+<span class="lineNum">      90 </span>            :     &quot;libcurl.4.dylib&quot;,
+<span class="lineNum">      91 </span>            :     &quot;libcurl.3.dylib&quot;
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   };</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   for (const char* libname : libcurlNames) {</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :     mLib = dlopen(libname, RTLD_NOW);</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          1 :     if (mLib) {</span>
+<span class="lineNum">      98 </span>            :       break;
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            :   }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   if (!mLib) {</span>
+<span class="lineNum">     103 </span>            :     PINGSENDER_LOG(&quot;ERROR: Could not find libcurl\n&quot;);
+<span class="lineNum">     104 </span>            :     return false;
+<span class="lineNum">     105 </span>            :   }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_init) = dlsym(mLib, &quot;curl_easy_init&quot;);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_setopt) = dlsym(mLib, &quot;curl_easy_setopt&quot;);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_perform) = dlsym(mLib, &quot;curl_easy_perform&quot;);</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_getinfo) = dlsym(mLib, &quot;curl_easy_getinfo&quot;);</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :   *(void**) (&amp;slist_append) = dlsym(mLib, &quot;curl_slist_append&quot;);</span>
+<span class="lineNum">     112 </span><span class="lineCov">          1 :   *(void**) (&amp;slist_free_all) = dlsym(mLib, &quot;curl_slist_free_all&quot;);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_strerror) = dlsym(mLib, &quot;curl_easy_strerror&quot;);</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :   *(void**) (&amp;easy_cleanup) = dlsym(mLib, &quot;curl_easy_cleanup&quot;);</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          1 :   if (!easy_init ||</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :       !easy_setopt ||</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :       !easy_perform ||</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :       !easy_getinfo ||</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :       !slist_append ||</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :       !slist_free_all ||</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :       !easy_strerror ||</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :       !easy_cleanup) {</span>
+<span class="lineNum">     124 </span>            :     PINGSENDER_LOG(&quot;ERROR: libcurl is missing one of the required symbols\n&quot;);
+<span class="lineNum">     125 </span>            :     return false;
+<span class="lineNum">     126 </span>            :   }
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          1 :   mCurl = easy_init();</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">          1 :   if (!mCurl) {</span>
+<span class="lineNum">     131 </span>            :     PINGSENDER_LOG(&quot;ERROR: Could not initialize libcurl\n&quot;);
+<span class="lineNum">     132 </span>            :     return false;
+<span class="lineNum">     133 </span>            :   }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   return true;</span>
+<span class="lineNum">     136 </span>            : }
+<a name="137"><span class="lineNum">     137 </span>            : </a>
+<span class="lineNum">     138 </span>            : bool
+<span class="lineNum">     139 </span><span class="lineCov">          1 : CurlWrapper::Post(const string&amp; url, const string&amp; payload)</span>
+<span class="lineNum">     140 </span>            : {
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   easy_setopt(mCurl, CURLOPT_URL, url.c_str());</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :   easy_setopt(mCurl, CURLOPT_USERAGENT, kUserAgent);</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :   // Build the date header.
+<span class="lineNum">     145 </span><span class="lineCov">          1 :   std::string dateHeader = GenerateDateHeader();</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   // Set the custom headers.
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   curl_slist* headerChunk = nullptr;</span>
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   headerChunk = slist_append(headerChunk, kCustomVersionHeader);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          1 :   headerChunk = slist_append(headerChunk, kContentEncodingHeader);</span>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   headerChunk = slist_append(headerChunk, dateHeader.c_str());</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :   CURLcode err = easy_setopt(mCurl, CURLOPT_HTTPHEADER, headerChunk);</span>
+<span class="lineNum">     153 </span><span class="lineCov">          1 :   if (err != CURLE_OK) {</span>
+<span class="lineNum">     154 </span>            :     PINGSENDER_LOG(&quot;ERROR: Failed to set HTTP headers, %s\n&quot;,
+<span class="lineNum">     155 </span>            :                    easy_strerror(err));
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :     slist_free_all(headerChunk);</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     158 </span>            :   }
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :   // Set the size of the POST data
+<span class="lineNum">     161 </span><span class="lineCov">          1 :   easy_setopt(mCurl, CURLOPT_POSTFIELDSIZE, payload.length());</span>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :   // Set the contents of the POST data
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   easy_setopt(mCurl, CURLOPT_POSTFIELDS, payload.c_str());</span>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   // Fail if the server returns a 4xx code
+<span class="lineNum">     167 </span><span class="lineCov">          1 :   easy_setopt(mCurl, CURLOPT_FAILONERROR, 1);</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   // Block until the operation is performend. Ignore the response, if the POST
+<span class="lineNum">     170 </span>            :   // fails we can't do anything about it.
+<span class="lineNum">     171 </span><span class="lineCov">          1 :   err = easy_perform(mCurl);</span>
+<span class="lineNum">     172 </span>            :   // Whatever happens, we want to clean up the header memory.
+<span class="lineNum">     173 </span><span class="lineCov">          1 :   slist_free_all(headerChunk);</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          1 :   if (err != CURLE_OK) {</span>
+<span class="lineNum">     176 </span>            :     PINGSENDER_LOG(&quot;ERROR: Failed to send HTTP request, %s\n&quot;,
+<span class="lineNum">     177 </span>            :                    easy_strerror(err));
+<span class="lineNum">     178 </span>            :     return false;
+<span class="lineNum">     179 </span>            :   }
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     182 </span>            : }
+<a name="183"><span class="lineNum">     183 </span>            : </a>
+<span class="lineNum">     184 </span>            : bool
+<span class="lineNum">     185 </span><span class="lineCov">          1 : Post(const string&amp; url, const string&amp; payload)</span>
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   CurlWrapper curl;</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">          1 :   if (!curl.Init()) {</span>
+<span class="lineNum">     190 </span>            :     return false;
+<span class="lineNum">     191 </span>            :   }
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">          1 :   return curl.Post(url, payload);</span>
+<span class="lineNum">     194 </span>            : }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : } // namespace PingSender
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

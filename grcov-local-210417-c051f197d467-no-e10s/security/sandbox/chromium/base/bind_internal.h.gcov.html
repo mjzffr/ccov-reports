@@ -1,0 +1,642 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - security/sandbox/chromium/base/bind_internal.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium/base</a> - bind_internal.h<span style="font-size: 80%;"> (source / <a href="bind_internal.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright (c) 2011 The Chromium Authors. All rights reserved.</a>
+<span class="lineNum">       2 </span>            : // Use of this source code is governed by a BSD-style license that can be
+<span class="lineNum">       3 </span>            : // found in the LICENSE file.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef BASE_BIND_INTERNAL_H_
+<span class="lineNum">       6 </span>            : #define BASE_BIND_INTERNAL_H_
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;tuple&gt;
+<span class="lineNum">      11 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &quot;base/bind_helpers.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;base/callback_internal.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;base/memory/raw_scoped_refptr_mismatch_checker.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;base/memory/weak_ptr.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;base/template_util.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;base/tuple.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;build/build_config.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : namespace base {
+<span class="lineNum">      22 </span>            : namespace internal {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : // See base/callback.h for user documentation.
+<span class="lineNum">      25 </span>            : //
+<span class="lineNum">      26 </span>            : //
+<span class="lineNum">      27 </span>            : // CONCEPTS:
+<span class="lineNum">      28 </span>            : //  Functor -- A movable type representing something that should be called.
+<span class="lineNum">      29 </span>            : //             All function pointers and Callback&lt;&gt; are functors even if the
+<span class="lineNum">      30 </span>            : //             invocation syntax differs.
+<span class="lineNum">      31 </span>            : //  RunType -- A function type (as opposed to function _pointer_ type) for
+<span class="lineNum">      32 </span>            : //             a Callback&lt;&gt;::Run().  Usually just a convenience typedef.
+<span class="lineNum">      33 </span>            : //  (Bound)Args -- A set of types that stores the arguments.
+<span class="lineNum">      34 </span>            : //
+<span class="lineNum">      35 </span>            : // Types:
+<span class="lineNum">      36 </span>            : //  ForceVoidReturn&lt;&gt; -- Helper class for translating function signatures to
+<span class="lineNum">      37 </span>            : //                       equivalent forms with a &quot;void&quot; return type.
+<span class="lineNum">      38 </span>            : //  FunctorTraits&lt;&gt; -- Type traits used to determine the correct RunType and
+<span class="lineNum">      39 </span>            : //                     invocation manner for a Functor.  This is where function
+<span class="lineNum">      40 </span>            : //                     signature adapters are applied.
+<span class="lineNum">      41 </span>            : //  InvokeHelper&lt;&gt; -- Take a Functor + arguments and actully invokes it.
+<span class="lineNum">      42 </span>            : //                    Handle the differing syntaxes needed for WeakPtr&lt;&gt;
+<span class="lineNum">      43 </span>            : //                    support.  This is separate from Invoker to avoid creating
+<span class="lineNum">      44 </span>            : //                    multiple version of Invoker&lt;&gt;.
+<span class="lineNum">      45 </span>            : //  Invoker&lt;&gt; -- Unwraps the curried parameters and executes the Functor.
+<span class="lineNum">      46 </span>            : //  BindState&lt;&gt; -- Stores the curried parameters, and is the main entry point
+<span class="lineNum">      47 </span>            : //                 into the Bind() system.
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : template &lt;typename...&gt;
+<span class="lineNum">      50 </span>            : struct make_void {
+<span class="lineNum">      51 </span>            :   using type = void;
+<span class="lineNum">      52 </span>            : };
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : // A clone of C++17 std::void_t.
+<span class="lineNum">      55 </span>            : // Unlike the original version, we need |make_void| as a helper struct to avoid
+<span class="lineNum">      56 </span>            : // a C++14 defect.
+<span class="lineNum">      57 </span>            : // ref: http://en.cppreference.com/w/cpp/types/void_t
+<span class="lineNum">      58 </span>            : // ref: http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
+<span class="lineNum">      59 </span>            : template &lt;typename... Ts&gt;
+<span class="lineNum">      60 </span>            : using void_t = typename make_void&lt;Ts...&gt;::type;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : template &lt;typename Callable,
+<span class="lineNum">      63 </span>            :           typename Signature = decltype(&amp;Callable::operator())&gt;
+<span class="lineNum">      64 </span>            : struct ExtractCallableRunTypeImpl;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : template &lt;typename Callable, typename R, typename... Args&gt;
+<span class="lineNum">      67 </span>            : struct ExtractCallableRunTypeImpl&lt;Callable, R(Callable::*)(Args...) const&gt; {
+<span class="lineNum">      68 </span>            :   using Type = R(Args...);
+<span class="lineNum">      69 </span>            : };
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : // Evaluated to RunType of the given callable type.
+<span class="lineNum">      72 </span>            : // Example:
+<span class="lineNum">      73 </span>            : //   auto f = [](int, char*) { return 0.1; };
+<span class="lineNum">      74 </span>            : //   ExtractCallableRunType&lt;decltype(f)&gt;
+<span class="lineNum">      75 </span>            : //   is evaluated to
+<span class="lineNum">      76 </span>            : //   double(int, char*);
+<span class="lineNum">      77 </span>            : template &lt;typename Callable&gt;
+<span class="lineNum">      78 </span>            : using ExtractCallableRunType =
+<span class="lineNum">      79 </span>            :     typename ExtractCallableRunTypeImpl&lt;Callable&gt;::Type;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : // IsConvertibleToRunType&lt;Functor&gt; is std::true_type if |Functor| has operator()
+<span class="lineNum">      82 </span>            : // and convertible to the corresponding function pointer. Otherwise, it's
+<span class="lineNum">      83 </span>            : // std::false_type.
+<span class="lineNum">      84 </span>            : // Example:
+<span class="lineNum">      85 </span>            : //   IsConvertibleToRunType&lt;void(*)()&gt;::value is false.
+<span class="lineNum">      86 </span>            : //
+<span class="lineNum">      87 </span>            : //   struct Foo {};
+<span class="lineNum">      88 </span>            : //   IsConvertibleToRunType&lt;void(Foo::*)()&gt;::value is false.
+<span class="lineNum">      89 </span>            : //
+<span class="lineNum">      90 </span>            : //   auto f = []() {};
+<span class="lineNum">      91 </span>            : //   IsConvertibleToRunType&lt;decltype(f)&gt;::value is true.
+<span class="lineNum">      92 </span>            : //
+<span class="lineNum">      93 </span>            : //   int i = 0;
+<span class="lineNum">      94 </span>            : //   auto g = [i]() {};
+<span class="lineNum">      95 </span>            : //   IsConvertibleToRunType&lt;decltype(g)&gt;::value is false.
+<span class="lineNum">      96 </span>            : template &lt;typename Functor, typename SFINAE = void&gt;
+<span class="lineNum">      97 </span>            : struct IsConvertibleToRunType : std::false_type {};
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : template &lt;typename Callable&gt;
+<span class="lineNum">     100 </span>            : struct IsConvertibleToRunType&lt;Callable, void_t&lt;decltype(&amp;Callable::operator())&gt;&gt;
+<span class="lineNum">     101 </span>            :     : std::is_convertible&lt;Callable, ExtractCallableRunType&lt;Callable&gt;*&gt; {};
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : // HasRefCountedTypeAsRawPtr selects true_type when any of the |Args| is a raw
+<span class="lineNum">     104 </span>            : // pointer to a RefCounted type.
+<span class="lineNum">     105 </span>            : // Implementation note: This non-specialized case handles zero-arity case only.
+<span class="lineNum">     106 </span>            : // Non-zero-arity cases should be handled by the specialization below.
+<span class="lineNum">     107 </span>            : template &lt;typename... Args&gt;
+<span class="lineNum">     108 </span>            : struct HasRefCountedTypeAsRawPtr : std::false_type {};
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : // Implementation note: Select true_type if the first parameter is a raw pointer
+<span class="lineNum">     111 </span>            : // to a RefCounted type. Otherwise, skip the first parameter and check rest of
+<span class="lineNum">     112 </span>            : // parameters recursively.
+<span class="lineNum">     113 </span>            : template &lt;typename T, typename... Args&gt;
+<span class="lineNum">     114 </span>            : struct HasRefCountedTypeAsRawPtr&lt;T, Args...&gt;
+<span class="lineNum">     115 </span>            :     : std::conditional&lt;NeedsScopedRefptrButGetsRawPtr&lt;T&gt;::value,
+<span class="lineNum">     116 </span>            :                        std::true_type,
+<span class="lineNum">     117 </span>            :                        HasRefCountedTypeAsRawPtr&lt;Args...&gt;&gt;::type {};
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : // ForceVoidReturn&lt;&gt;
+<span class="lineNum">     120 </span>            : //
+<span class="lineNum">     121 </span>            : // Set of templates that support forcing the function return type to void.
+<span class="lineNum">     122 </span>            : template &lt;typename Sig&gt;
+<span class="lineNum">     123 </span>            : struct ForceVoidReturn;
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     126 </span>            : struct ForceVoidReturn&lt;R(Args...)&gt; {
+<span class="lineNum">     127 </span>            :   using RunType = void(Args...);
+<span class="lineNum">     128 </span>            : };
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : // FunctorTraits&lt;&gt;
+<span class="lineNum">     131 </span>            : //
+<span class="lineNum">     132 </span>            : // See description at top of file.
+<span class="lineNum">     133 </span>            : template &lt;typename Functor, typename SFINAE = void&gt;
+<span class="lineNum">     134 </span>            : struct FunctorTraits;
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : // For a callable type that is convertible to the corresponding function type.
+<span class="lineNum">     137 </span>            : // This specialization is intended to allow binding captureless lambdas by
+<span class="lineNum">     138 </span>            : // base::Bind(), based on the fact that captureless lambdas can be convertible
+<span class="lineNum">     139 </span>            : // to the function type while capturing lambdas can't.
+<span class="lineNum">     140 </span>            : template &lt;typename Functor&gt;
+<span class="lineNum">     141 </span>            : struct FunctorTraits&lt;
+<span class="lineNum">     142 </span>            :     Functor,
+<span class="lineNum">     143 </span>            :     typename std::enable_if&lt;IsConvertibleToRunType&lt;Functor&gt;::value&gt;::type&gt; {
+<span class="lineNum">     144 </span>            :   using RunType = ExtractCallableRunType&lt;Functor&gt;;
+<span class="lineNum">     145 </span>            :   static constexpr bool is_method = false;
+<span class="lineNum">     146 </span>            :   static constexpr bool is_nullable = false;
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :   template &lt;typename... RunArgs&gt;
+<span class="lineNum">     149 </span>            :   static ExtractReturnType&lt;RunType&gt;
+<span class="lineNum">     150 </span>            :   Invoke(const Functor&amp; functor, RunArgs&amp;&amp;... args) {
+<span class="lineNum">     151 </span>            :     return functor(std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     152 </span>            :   }
+<span class="lineNum">     153 </span>            : };
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            : // For functions.
+<span class="lineNum">     156 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     157 </span>            : struct FunctorTraits&lt;R (*)(Args...)&gt; {
+<span class="lineNum">     158 </span>            :   using RunType = R(Args...);
+<span class="lineNum">     159 </span>            :   static constexpr bool is_method = false;
+<span class="lineNum">     160 </span>            :   static constexpr bool is_nullable = true;
+<a name="161"><span class="lineNum">     161 </span>            : </a>
+<span class="lineNum">     162 </span>            :   template &lt;typename... RunArgs&gt;
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :   static R Invoke(R (*function)(Args...), RunArgs&amp;&amp;... args) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     return function(std::forward&lt;RunArgs&gt;(args)...);</span>
+<span class="lineNum">     165 </span>            :   }
+<span class="lineNum">     166 </span>            : };
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : #if defined(OS_WIN) &amp;&amp; !defined(ARCH_CPU_X86_64)
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : // For functions.
+<span class="lineNum">     171 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     172 </span>            : struct FunctorTraits&lt;R(__stdcall*)(Args...)&gt; {
+<span class="lineNum">     173 </span>            :   using RunType = R(Args...);
+<span class="lineNum">     174 </span>            :   static constexpr bool is_method = false;
+<span class="lineNum">     175 </span>            :   static constexpr bool is_nullable = true;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :   template &lt;typename... RunArgs&gt;
+<span class="lineNum">     178 </span>            :   static R Invoke(R(__stdcall* function)(Args...), RunArgs&amp;&amp;... args) {
+<span class="lineNum">     179 </span>            :     return function(std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     180 </span>            :   }
+<span class="lineNum">     181 </span>            : };
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            : // For functions.
+<span class="lineNum">     184 </span>            : template &lt;typename R, typename... Args&gt;
+<span class="lineNum">     185 </span>            : struct FunctorTraits&lt;R(__fastcall*)(Args...)&gt; {
+<span class="lineNum">     186 </span>            :   using RunType = R(Args...);
+<span class="lineNum">     187 </span>            :   static constexpr bool is_method = false;
+<span class="lineNum">     188 </span>            :   static constexpr bool is_nullable = true;
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :   template &lt;typename... RunArgs&gt;
+<span class="lineNum">     191 </span>            :   static R Invoke(R(__fastcall* function)(Args...), RunArgs&amp;&amp;... args) {
+<span class="lineNum">     192 </span>            :     return function(std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     193 </span>            :   }
+<span class="lineNum">     194 </span>            : };
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : #endif  // defined(OS_WIN) &amp;&amp; !defined(ARCH_CPU_X86_64)
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : // For methods.
+<span class="lineNum">     199 </span>            : template &lt;typename R, typename Receiver, typename... Args&gt;
+<span class="lineNum">     200 </span>            : struct FunctorTraits&lt;R (Receiver::*)(Args...)&gt; {
+<span class="lineNum">     201 </span>            :   using RunType = R(Receiver*, Args...);
+<span class="lineNum">     202 </span>            :   static constexpr bool is_method = true;
+<span class="lineNum">     203 </span>            :   static constexpr bool is_nullable = true;
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :   template &lt;typename ReceiverPtr, typename... RunArgs&gt;
+<span class="lineNum">     206 </span>            :   static R Invoke(R (Receiver::*method)(Args...),
+<span class="lineNum">     207 </span>            :                   ReceiverPtr&amp;&amp; receiver_ptr,
+<span class="lineNum">     208 </span>            :                   RunArgs&amp;&amp;... args) {
+<span class="lineNum">     209 </span>            :     // Clang skips CV qualifier check on a method pointer invocation when the
+<span class="lineNum">     210 </span>            :     // receiver is a subclass. Store the receiver into a const reference to
+<span class="lineNum">     211 </span>            :     // T to ensure the CV check works.
+<span class="lineNum">     212 </span>            :     // https://llvm.org/bugs/show_bug.cgi?id=27037
+<span class="lineNum">     213 </span>            :     Receiver&amp; receiver = *receiver_ptr;
+<span class="lineNum">     214 </span>            :     return (receiver.*method)(std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     215 </span>            :   }
+<span class="lineNum">     216 </span>            : };
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : // For const methods.
+<span class="lineNum">     219 </span>            : template &lt;typename R, typename Receiver, typename... Args&gt;
+<span class="lineNum">     220 </span>            : struct FunctorTraits&lt;R (Receiver::*)(Args...) const&gt; {
+<span class="lineNum">     221 </span>            :   using RunType = R(const Receiver*, Args...);
+<span class="lineNum">     222 </span>            :   static constexpr bool is_method = true;
+<span class="lineNum">     223 </span>            :   static constexpr bool is_nullable = true;
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   template &lt;typename ReceiverPtr, typename... RunArgs&gt;
+<span class="lineNum">     226 </span>            :   static R Invoke(R (Receiver::*method)(Args...) const,
+<span class="lineNum">     227 </span>            :                   ReceiverPtr&amp;&amp; receiver_ptr,
+<span class="lineNum">     228 </span>            :                   RunArgs&amp;&amp;... args) {
+<span class="lineNum">     229 </span>            :     // Clang skips CV qualifier check on a method pointer invocation when the
+<span class="lineNum">     230 </span>            :     // receiver is a subclass. Store the receiver into a const reference to
+<span class="lineNum">     231 </span>            :     // T to ensure the CV check works.
+<span class="lineNum">     232 </span>            :     // https://llvm.org/bugs/show_bug.cgi?id=27037
+<span class="lineNum">     233 </span>            :     const Receiver&amp; receiver = *receiver_ptr;
+<span class="lineNum">     234 </span>            :     return (receiver.*method)(std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     235 </span>            :   }
+<span class="lineNum">     236 </span>            : };
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : // For IgnoreResults.
+<span class="lineNum">     239 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     240 </span>            : struct FunctorTraits&lt;IgnoreResultHelper&lt;T&gt;&gt; : FunctorTraits&lt;T&gt; {
+<span class="lineNum">     241 </span>            :   using RunType =
+<span class="lineNum">     242 </span>            :       typename ForceVoidReturn&lt;typename FunctorTraits&lt;T&gt;::RunType&gt;::RunType;
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :   template &lt;typename IgnoreResultType, typename... RunArgs&gt;
+<span class="lineNum">     245 </span>            :   static void Invoke(IgnoreResultType&amp;&amp; ignore_result_helper,
+<span class="lineNum">     246 </span>            :                      RunArgs&amp;&amp;... args) {
+<span class="lineNum">     247 </span>            :     FunctorTraits&lt;T&gt;::Invoke(
+<span class="lineNum">     248 </span>            :         std::forward&lt;IgnoreResultType&gt;(ignore_result_helper).functor_,
+<span class="lineNum">     249 </span>            :         std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     250 </span>            :   }
+<span class="lineNum">     251 </span>            : };
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : // For Callbacks.
+<span class="lineNum">     254 </span>            : template &lt;typename R, typename... Args,
+<span class="lineNum">     255 </span>            :           CopyMode copy_mode, RepeatMode repeat_mode&gt;
+<span class="lineNum">     256 </span>            : struct FunctorTraits&lt;Callback&lt;R(Args...), copy_mode, repeat_mode&gt;&gt; {
+<span class="lineNum">     257 </span>            :   using RunType = R(Args...);
+<span class="lineNum">     258 </span>            :   static constexpr bool is_method = false;
+<span class="lineNum">     259 </span>            :   static constexpr bool is_nullable = true;
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :   template &lt;typename CallbackType, typename... RunArgs&gt;
+<span class="lineNum">     262 </span>            :   static R Invoke(CallbackType&amp;&amp; callback, RunArgs&amp;&amp;... args) {
+<span class="lineNum">     263 </span>            :     DCHECK(!callback.is_null());
+<span class="lineNum">     264 </span>            :     return std::forward&lt;CallbackType&gt;(callback).Run(
+<span class="lineNum">     265 </span>            :         std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     266 </span>            :   }
+<span class="lineNum">     267 </span>            : };
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : // InvokeHelper&lt;&gt;
+<span class="lineNum">     270 </span>            : //
+<span class="lineNum">     271 </span>            : // There are 2 logical InvokeHelper&lt;&gt; specializations: normal, WeakCalls.
+<span class="lineNum">     272 </span>            : //
+<span class="lineNum">     273 </span>            : // The normal type just calls the underlying runnable.
+<span class="lineNum">     274 </span>            : //
+<span class="lineNum">     275 </span>            : // WeakCalls need special syntax that is applied to the first argument to check
+<span class="lineNum">     276 </span>            : // if they should no-op themselves.
+<span class="lineNum">     277 </span>            : template &lt;bool is_weak_call, typename ReturnType&gt;
+<span class="lineNum">     278 </span>            : struct InvokeHelper;
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : template &lt;typename ReturnType&gt;
+<a name="281"><span class="lineNum">     281 </span>            : struct InvokeHelper&lt;false, ReturnType&gt; {</a>
+<span class="lineNum">     282 </span>            :   template &lt;typename Functor, typename... RunArgs&gt;
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :   static inline ReturnType MakeItSo(Functor&amp;&amp; functor, RunArgs&amp;&amp;... args) {</span>
+<span class="lineNum">     284 </span>            :     using Traits = FunctorTraits&lt;typename std::decay&lt;Functor&gt;::type&gt;;
+<span class="lineNum">     285 </span>            :     return Traits::Invoke(std::forward&lt;Functor&gt;(functor),
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                           std::forward&lt;RunArgs&gt;(args)...);</span>
+<span class="lineNum">     287 </span>            :   }
+<span class="lineNum">     288 </span>            : };
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            : template &lt;typename ReturnType&gt;
+<span class="lineNum">     291 </span>            : struct InvokeHelper&lt;true, ReturnType&gt; {
+<span class="lineNum">     292 </span>            :   // WeakCalls are only supported for functions with a void return type.
+<span class="lineNum">     293 </span>            :   // Otherwise, the function result would be undefined if the the WeakPtr&lt;&gt;
+<span class="lineNum">     294 </span>            :   // is invalidated.
+<span class="lineNum">     295 </span>            :   static_assert(std::is_void&lt;ReturnType&gt;::value,
+<span class="lineNum">     296 </span>            :                 &quot;weak_ptrs can only bind to methods without return values&quot;);
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :   template &lt;typename Functor, typename BoundWeakPtr, typename... RunArgs&gt;
+<span class="lineNum">     299 </span>            :   static inline void MakeItSo(Functor&amp;&amp; functor,
+<span class="lineNum">     300 </span>            :                               BoundWeakPtr&amp;&amp; weak_ptr,
+<span class="lineNum">     301 </span>            :                               RunArgs&amp;&amp;... args) {
+<span class="lineNum">     302 </span>            :     if (!weak_ptr)
+<span class="lineNum">     303 </span>            :       return;
+<span class="lineNum">     304 </span>            :     using Traits = FunctorTraits&lt;typename std::decay&lt;Functor&gt;::type&gt;;
+<span class="lineNum">     305 </span>            :     Traits::Invoke(std::forward&lt;Functor&gt;(functor),
+<span class="lineNum">     306 </span>            :                    std::forward&lt;BoundWeakPtr&gt;(weak_ptr),
+<span class="lineNum">     307 </span>            :                    std::forward&lt;RunArgs&gt;(args)...);
+<span class="lineNum">     308 </span>            :   }
+<span class="lineNum">     309 </span>            : };
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            : // Invoker&lt;&gt;
+<span class="lineNum">     312 </span>            : //
+<span class="lineNum">     313 </span>            : // See description at the top of the file.
+<span class="lineNum">     314 </span>            : template &lt;typename StorageType, typename UnboundRunType&gt;
+<span class="lineNum">     315 </span>            : struct Invoker;
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span>            : template &lt;typename StorageType, typename R, typename... UnboundArgs&gt;
+<span class="lineNum">     318 </span>            : struct Invoker&lt;StorageType, R(UnboundArgs...)&gt; {
+<span class="lineNum">     319 </span>            :   static R RunOnce(BindStateBase* base, UnboundArgs&amp;&amp;... unbound_args) {
+<span class="lineNum">     320 </span>            :     // Local references to make debugger stepping easier. If in a debugger,
+<span class="lineNum">     321 </span>            :     // you really want to warp ahead and step through the
+<span class="lineNum">     322 </span>            :     // InvokeHelper&lt;&gt;::MakeItSo() call below.
+<span class="lineNum">     323 </span>            :     StorageType* storage = static_cast&lt;StorageType*&gt;(base);
+<span class="lineNum">     324 </span>            :     static constexpr size_t num_bound_args =
+<span class="lineNum">     325 </span>            :         std::tuple_size&lt;decltype(storage-&gt;bound_args_)&gt;::value;
+<span class="lineNum">     326 </span>            :     return RunImpl(std::move(storage-&gt;functor_),
+<span class="lineNum">     327 </span>            :                    std::move(storage-&gt;bound_args_),
+<span class="lineNum">     328 </span>            :                    MakeIndexSequence&lt;num_bound_args&gt;(),
+<span class="lineNum">     329 </span>            :                    std::forward&lt;UnboundArgs&gt;(unbound_args)...);
+<a name="330"><span class="lineNum">     330 </span>            :   }</a>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :   static R Run(BindStateBase* base, UnboundArgs&amp;&amp;... unbound_args) {</span>
+<span class="lineNum">     333 </span>            :     // Local references to make debugger stepping easier. If in a debugger,
+<span class="lineNum">     334 </span>            :     // you really want to warp ahead and step through the
+<span class="lineNum">     335 </span>            :     // InvokeHelper&lt;&gt;::MakeItSo() call below.
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :     const StorageType* storage = static_cast&lt;StorageType*&gt;(base);</span>
+<span class="lineNum">     337 </span>            :     static constexpr size_t num_bound_args =
+<span class="lineNum">     338 </span>            :         std::tuple_size&lt;decltype(storage-&gt;bound_args_)&gt;::value;
+<span class="lineNum">     339 </span>            :     return RunImpl(storage-&gt;functor_,
+<span class="lineNum">     340 </span>            :                    storage-&gt;bound_args_,
+<span class="lineNum">     341 </span>            :                    MakeIndexSequence&lt;num_bound_args&gt;(),
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                    std::forward&lt;UnboundArgs&gt;(unbound_args)...);</span>
+<span class="lineNum">     343 </span>            :   }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :  private:
+<span class="lineNum">     346 </span>            :   template &lt;typename Functor, typename BoundArgsTuple, size_t... indices&gt;
+<span class="lineNum">     347 </span>            :   static inline R RunImpl(Functor&amp;&amp; functor,
+<span class="lineNum">     348 </span>            :                           BoundArgsTuple&amp;&amp; bound,
+<span class="lineNum">     349 </span>            :                           IndexSequence&lt;indices...&gt;,
+<span class="lineNum">     350 </span>            :                           UnboundArgs&amp;&amp;... unbound_args) {
+<span class="lineNum">     351 </span>            :     static constexpr bool is_method =
+<span class="lineNum">     352 </span>            :         FunctorTraits&lt;typename std::decay&lt;Functor&gt;::type&gt;::is_method;
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            :     using DecayedArgsTuple = typename std::decay&lt;BoundArgsTuple&gt;::type;
+<span class="lineNum">     355 </span>            :     static constexpr bool is_weak_call =
+<span class="lineNum">     356 </span>            :         IsWeakMethod&lt;is_method,
+<span class="lineNum">     357 </span>            :                      typename std::tuple_element&lt;
+<span class="lineNum">     358 </span>            :                          indices,
+<span class="lineNum">     359 </span>            :                          DecayedArgsTuple&gt;::type...&gt;::value;
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span>            :     return InvokeHelper&lt;is_weak_call, R&gt;::MakeItSo(
+<span class="lineNum">     362 </span>            :         std::forward&lt;Functor&gt;(functor),
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :         Unwrap(base::get&lt;indices&gt;(std::forward&lt;BoundArgsTuple&gt;(bound)))...,</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :         std::forward&lt;UnboundArgs&gt;(unbound_args)...);</span>
+<span class="lineNum">     365 </span>            :   }
+<span class="lineNum">     366 </span>            : };
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            : // Used to implement MakeUnboundRunType.
+<span class="lineNum">     369 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     370 </span>            : struct MakeUnboundRunTypeImpl {
+<span class="lineNum">     371 </span>            :   using RunType =
+<span class="lineNum">     372 </span>            :       typename FunctorTraits&lt;typename std::decay&lt;Functor&gt;::type&gt;::RunType;
+<span class="lineNum">     373 </span>            :   using ReturnType = ExtractReturnType&lt;RunType&gt;;
+<span class="lineNum">     374 </span>            :   using Args = ExtractArgs&lt;RunType&gt;;
+<span class="lineNum">     375 </span>            :   using UnboundArgs = DropTypeListItem&lt;sizeof...(BoundArgs), Args&gt;;
+<span class="lineNum">     376 </span>            :   using Type = MakeFunctionType&lt;ReturnType, UnboundArgs&gt;;
+<span class="lineNum">     377 </span>            : };
+<span class="lineNum">     378 </span>            : template &lt;typename Functor&gt;
+<span class="lineNum">     379 </span>            : typename std::enable_if&lt;FunctorTraits&lt;Functor&gt;::is_nullable, bool&gt;::type
+<span class="lineNum">     380 </span>            : IsNull(const Functor&amp; functor) {
+<span class="lineNum">     381 </span>            :   return !functor;
+<span class="lineNum">     382 </span>            : }
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            : template &lt;typename Functor&gt;
+<span class="lineNum">     385 </span>            : typename std::enable_if&lt;!FunctorTraits&lt;Functor&gt;::is_nullable, bool&gt;::type
+<span class="lineNum">     386 </span>            : IsNull(const Functor&amp;) {
+<span class="lineNum">     387 </span>            :   return false;
+<span class="lineNum">     388 </span>            : }
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     391 </span>            : struct BindState;
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : template &lt;typename BindStateType, typename SFINAE = void&gt;
+<span class="lineNum">     394 </span>            : struct CancellationChecker {
+<span class="lineNum">     395 </span>            :   static constexpr bool is_cancellable = false;
+<span class="lineNum">     396 </span>            :   static bool Run(const BindStateBase*) {
+<span class="lineNum">     397 </span>            :     return false;
+<span class="lineNum">     398 </span>            :   }
+<span class="lineNum">     399 </span>            : };
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     402 </span>            : struct CancellationChecker&lt;
+<span class="lineNum">     403 </span>            :     BindState&lt;Functor, BoundArgs...&gt;,
+<span class="lineNum">     404 </span>            :     typename std::enable_if&lt;IsWeakMethod&lt;FunctorTraits&lt;Functor&gt;::is_method,
+<span class="lineNum">     405 </span>            :                                          BoundArgs...&gt;::value&gt;::type&gt; {
+<span class="lineNum">     406 </span>            :   static constexpr bool is_cancellable = true;
+<span class="lineNum">     407 </span>            :   static bool Run(const BindStateBase* base) {
+<span class="lineNum">     408 </span>            :     using BindStateType = BindState&lt;Functor, BoundArgs...&gt;;
+<span class="lineNum">     409 </span>            :     const BindStateType* bind_state = static_cast&lt;const BindStateType*&gt;(base);
+<span class="lineNum">     410 </span>            :     return !base::get&lt;0&gt;(bind_state-&gt;bound_args_);
+<span class="lineNum">     411 </span>            :   }
+<span class="lineNum">     412 </span>            : };
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            : template &lt;typename Signature,
+<span class="lineNum">     415 </span>            :           typename... BoundArgs,
+<span class="lineNum">     416 </span>            :           CopyMode copy_mode,
+<span class="lineNum">     417 </span>            :           RepeatMode repeat_mode&gt;
+<span class="lineNum">     418 </span>            : struct CancellationChecker&lt;
+<span class="lineNum">     419 </span>            :     BindState&lt;Callback&lt;Signature, copy_mode, repeat_mode&gt;, BoundArgs...&gt;&gt; {
+<span class="lineNum">     420 </span>            :   static constexpr bool is_cancellable = true;
+<span class="lineNum">     421 </span>            :   static bool Run(const BindStateBase* base) {
+<span class="lineNum">     422 </span>            :     using Functor = Callback&lt;Signature, copy_mode, repeat_mode&gt;;
+<span class="lineNum">     423 </span>            :     using BindStateType = BindState&lt;Functor, BoundArgs...&gt;;
+<span class="lineNum">     424 </span>            :     const BindStateType* bind_state = static_cast&lt;const BindStateType*&gt;(base);
+<span class="lineNum">     425 </span>            :     return bind_state-&gt;functor_.IsCancelled();
+<span class="lineNum">     426 </span>            :   }
+<span class="lineNum">     427 </span>            : };
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            : // Template helpers to detect using Bind() on a base::Callback without any
+<span class="lineNum">     430 </span>            : // additional arguments. In that case, the original base::Callback object should
+<span class="lineNum">     431 </span>            : // just be directly used.
+<span class="lineNum">     432 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     433 </span>            : struct BindingCallbackWithNoArgs {
+<span class="lineNum">     434 </span>            :   static constexpr bool value = false;
+<span class="lineNum">     435 </span>            : };
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            : template &lt;typename Signature,
+<span class="lineNum">     438 </span>            :           typename... BoundArgs,
+<span class="lineNum">     439 </span>            :           CopyMode copy_mode,
+<span class="lineNum">     440 </span>            :           RepeatMode repeat_mode&gt;
+<span class="lineNum">     441 </span>            : struct BindingCallbackWithNoArgs&lt;Callback&lt;Signature, copy_mode, repeat_mode&gt;,
+<span class="lineNum">     442 </span>            :                                  BoundArgs...&gt; {
+<span class="lineNum">     443 </span>            :   static constexpr bool value = sizeof...(BoundArgs) == 0;
+<span class="lineNum">     444 </span>            : };
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : // BindState&lt;&gt;
+<span class="lineNum">     447 </span>            : //
+<span class="lineNum">     448 </span>            : // This stores all the state passed into Bind().
+<span class="lineNum">     449 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     450 </span>            : struct BindState final : BindStateBase {
+<span class="lineNum">     451 </span>            :   using IsCancellable = std::integral_constant&lt;
+<span class="lineNum">     452 </span>            :       bool, CancellationChecker&lt;BindState&gt;::is_cancellable&gt;;
+<a name="453"><span class="lineNum">     453 </span>            : </a>
+<span class="lineNum">     454 </span>            :   template &lt;typename ForwardFunctor, typename... ForwardBoundArgs&gt;
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :   explicit BindState(BindStateBase::InvokeFuncStorage invoke_func,</span>
+<span class="lineNum">     456 </span>            :                      ForwardFunctor&amp;&amp; functor,
+<span class="lineNum">     457 </span>            :                      ForwardBoundArgs&amp;&amp;... bound_args)
+<span class="lineNum">     458 </span>            :       // IsCancellable is std::false_type if the CancellationChecker&lt;&gt;::Run
+<span class="lineNum">     459 </span>            :       // returns always false. Otherwise, it's std::true_type.
+<span class="lineNum">     460 </span>            :       : BindState(IsCancellable{},
+<span class="lineNum">     461 </span>            :                   invoke_func,
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :                   std::forward&lt;ForwardFunctor&gt;(functor),</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :                   std::forward&lt;ForwardBoundArgs&gt;(bound_args)...) {</span>
+<span class="lineNum">     464 </span>            :     static_assert(!BindingCallbackWithNoArgs&lt;Functor, BoundArgs...&gt;::value,
+<span class="lineNum">     465 </span>            :                   &quot;Attempting to bind a base::Callback with no additional &quot;
+<span class="lineNum">     466 </span>            :                   &quot;arguments: save a heap allocation and use the original &quot;
+<span class="lineNum">     467 </span>            :                   &quot;base::Callback object&quot;);
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            :   Functor functor_;
+<span class="lineNum">     471 </span>            :   std::tuple&lt;BoundArgs...&gt; bound_args_;
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            :  private:
+<span class="lineNum">     474 </span>            :   template &lt;typename ForwardFunctor, typename... ForwardBoundArgs&gt;
+<span class="lineNum">     475 </span>            :   explicit BindState(std::true_type,
+<span class="lineNum">     476 </span>            :                      BindStateBase::InvokeFuncStorage invoke_func,
+<span class="lineNum">     477 </span>            :                      ForwardFunctor&amp;&amp; functor,
+<span class="lineNum">     478 </span>            :                      ForwardBoundArgs&amp;&amp;... bound_args)
+<span class="lineNum">     479 </span>            :       : BindStateBase(invoke_func, &amp;Destroy,
+<span class="lineNum">     480 </span>            :                       &amp;CancellationChecker&lt;BindState&gt;::Run),
+<span class="lineNum">     481 </span>            :         functor_(std::forward&lt;ForwardFunctor&gt;(functor)),
+<span class="lineNum">     482 </span>            :         bound_args_(std::forward&lt;ForwardBoundArgs&gt;(bound_args)...) {
+<span class="lineNum">     483 </span>            :     DCHECK(!IsNull(functor_));
+<span class="lineNum">     484 </span>            :   }
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :   template &lt;typename ForwardFunctor, typename... ForwardBoundArgs&gt;
+<span class="lineNum">     487 </span>            :   explicit BindState(std::false_type,
+<span class="lineNum">     488 </span>            :                      BindStateBase::InvokeFuncStorage invoke_func,
+<span class="lineNum">     489 </span>            :                      ForwardFunctor&amp;&amp; functor,
+<span class="lineNum">     490 </span>            :                      ForwardBoundArgs&amp;&amp;... bound_args)
+<span class="lineNum">     491 </span>            :       : BindStateBase(invoke_func, &amp;Destroy),
+<span class="lineNum">     492 </span>            :         functor_(std::forward&lt;ForwardFunctor&gt;(functor)),
+<span class="lineNum">     493 </span><span class="lineNoCov">          0 :         bound_args_(std::forward&lt;ForwardBoundArgs&gt;(bound_args)...) {</span>
+<span class="lineNum">     494 </span>            :     DCHECK(!IsNull(functor_));
+<span class="lineNum">     495 </span>            :   }
+<span class="lineNum">     496 </span>            : 
+<a name="497"><span class="lineNum">     497 </span><span class="lineNoCov">          0 :   ~BindState() {}</span></a>
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :   static void Destroy(const BindStateBase* self) {</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :     delete static_cast&lt;const BindState*&gt;(self);</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     502 </span>            : };
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            : // Used to implement MakeBindStateType.
+<span class="lineNum">     505 </span>            : template &lt;bool is_method, typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     506 </span>            : struct MakeBindStateTypeImpl;
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     509 </span>            : struct MakeBindStateTypeImpl&lt;false, Functor, BoundArgs...&gt; {
+<span class="lineNum">     510 </span>            :   static_assert(!HasRefCountedTypeAsRawPtr&lt;BoundArgs...&gt;::value,
+<span class="lineNum">     511 </span>            :                 &quot;A parameter is a refcounted type and needs scoped_refptr.&quot;);
+<span class="lineNum">     512 </span>            :   using Type = BindState&lt;typename std::decay&lt;Functor&gt;::type,
+<span class="lineNum">     513 </span>            :                          typename std::decay&lt;BoundArgs&gt;::type...&gt;;
+<span class="lineNum">     514 </span>            : };
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            : template &lt;typename Functor&gt;
+<span class="lineNum">     517 </span>            : struct MakeBindStateTypeImpl&lt;true, Functor&gt; {
+<span class="lineNum">     518 </span>            :   using Type = BindState&lt;typename std::decay&lt;Functor&gt;::type&gt;;
+<span class="lineNum">     519 </span>            : };
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            : template &lt;typename Functor, typename Receiver, typename... BoundArgs&gt;
+<span class="lineNum">     522 </span>            : struct MakeBindStateTypeImpl&lt;true, Functor, Receiver, BoundArgs...&gt; {
+<span class="lineNum">     523 </span>            :   static_assert(
+<span class="lineNum">     524 </span>            :       !std::is_array&lt;typename std::remove_reference&lt;Receiver&gt;::type&gt;::value,
+<span class="lineNum">     525 </span>            :       &quot;First bound argument to a method cannot be an array.&quot;);
+<span class="lineNum">     526 </span>            :   static_assert(!HasRefCountedTypeAsRawPtr&lt;BoundArgs...&gt;::value,
+<span class="lineNum">     527 </span>            :                 &quot;A parameter is a refcounted type and needs scoped_refptr.&quot;);
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :  private:
+<span class="lineNum">     530 </span>            :   using DecayedReceiver = typename std::decay&lt;Receiver&gt;::type;
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :  public:
+<span class="lineNum">     533 </span>            :   using Type = BindState&lt;
+<span class="lineNum">     534 </span>            :       typename std::decay&lt;Functor&gt;::type,
+<span class="lineNum">     535 </span>            :       typename std::conditional&lt;
+<span class="lineNum">     536 </span>            :           std::is_pointer&lt;DecayedReceiver&gt;::value,
+<span class="lineNum">     537 </span>            :           scoped_refptr&lt;typename std::remove_pointer&lt;DecayedReceiver&gt;::type&gt;,
+<span class="lineNum">     538 </span>            :           DecayedReceiver&gt;::type,
+<span class="lineNum">     539 </span>            :       typename std::decay&lt;BoundArgs&gt;::type...&gt;;
+<span class="lineNum">     540 </span>            : };
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     543 </span>            : using MakeBindStateType = typename MakeBindStateTypeImpl&lt;
+<span class="lineNum">     544 </span>            :     FunctorTraits&lt;typename std::decay&lt;Functor&gt;::type&gt;::is_method,
+<span class="lineNum">     545 </span>            :     Functor,
+<span class="lineNum">     546 </span>            :     BoundArgs...&gt;::Type;
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            : }  // namespace internal
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            : // Returns a RunType of bound functor.
+<span class="lineNum">     551 </span>            : // E.g. MakeUnboundRunType&lt;R(A, B, C), A, B&gt; is evaluated to R(C).
+<span class="lineNum">     552 </span>            : template &lt;typename Functor, typename... BoundArgs&gt;
+<span class="lineNum">     553 </span>            : using MakeUnboundRunType =
+<span class="lineNum">     554 </span>            :     typename internal::MakeUnboundRunTypeImpl&lt;Functor, BoundArgs...&gt;::Type;
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span>            : }  // namespace base
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span>            : #endif  // BASE_BIND_INTERNAL_H_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

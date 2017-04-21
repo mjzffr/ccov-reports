@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - gfx/vr/VRDisplayHost.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">gfx/vr</a> - VRDisplayHost.cpp<span style="font-size: 80%;"> (source / <a href="VRDisplayHost.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">61</td>
+            <td class="headerCovTableEntryLo">45.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:24:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-</a>
+<span class="lineNum">       2 </span>            : * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            : * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            : * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &quot;VRDisplayHost.h&quot;
+<span class="lineNum">       7 </span>            : #include &quot;gfxVR.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #if defined(XP_WIN)
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;d3d11.h&gt;
+<span class="lineNum">      12 </span>            : #include &quot;gfxWindowsPlatform.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;../layers/d3d11/CompositorD3D11.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/layers/TextureD3D11.h&quot;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : using namespace mozilla;
+<span class="lineNum">      19 </span>            : using namespace mozilla::gfx;
+<a name="20"><span class="lineNum">      20 </span>            : using namespace mozilla::layers;</a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          1 : VRDisplayHost::VRDisplayHost(VRDeviceType aType)</span>
+<span class="lineNum">      23 </span><span class="lineCov">          1 :   : mInputFrameID(0)</span>
+<span class="lineNum">      24 </span>            : {
+<span class="lineNum">      25 </span>            :   MOZ_COUNT_CTOR(VRDisplayHost);
+<span class="lineNum">      26 </span><span class="lineCov">          1 :   mDisplayInfo.mType = aType;</span>
+<span class="lineNum">      27 </span><span class="lineCov">          1 :   mDisplayInfo.mDisplayID = VRSystemManager::AllocateDisplayID();</span>
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   mDisplayInfo.mIsPresenting = false;</span>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          1 : VRDisplayHost::~VRDisplayHost()</span>
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :   MOZ_COUNT_DTOR(VRDisplayHost);
+<span class="lineNum">      34 </span><span class="lineCov">          1 : }</span>
+<a name="35"><span class="lineNum">      35 </span>            : </a>
+<span class="lineNum">      36 </span>            : void
+<span class="lineNum">      37 </span><span class="lineCov">          1 : VRDisplayHost::AddLayer(VRLayerParent *aLayer)</span>
+<span class="lineNum">      38 </span>            : {
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   mLayers.AppendElement(aLayer);</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   if (mLayers.Length() == 1) {</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :     StartPresentation();</span>
+<span class="lineNum">      42 </span>            :   }
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   mDisplayInfo.mIsPresenting = mLayers.Length() &gt; 0;</span>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   // Ensure that the content process receives the change immediately
+<span class="lineNum">      46 </span><span class="lineCov">          1 :   VRManager* vm = VRManager::Get();</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   vm-&gt;RefreshVRDisplays();</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 : }</span>
+<a name="49"><span class="lineNum">      49 </span>            : </a>
+<span class="lineNum">      50 </span>            : void
+<span class="lineNum">      51 </span><span class="lineCov">          1 : VRDisplayHost::RemoveLayer(VRLayerParent *aLayer)</span>
+<span class="lineNum">      52 </span>            : {
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   mLayers.RemoveElement(aLayer);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   if (mLayers.Length() == 0) {</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :     StopPresentation();</span>
+<span class="lineNum">      56 </span>            :   }
+<span class="lineNum">      57 </span><span class="lineCov">          1 :   mDisplayInfo.mIsPresenting = mLayers.Length() &gt; 0;</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :   // Ensure that the content process receives the change immediately
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   VRManager* vm = VRManager::Get();</span>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   vm-&gt;RefreshVRDisplays();</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : #if defined(XP_WIN)
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : void
+<span class="lineNum">      67 </span>            : VRDisplayHost::SubmitFrame(VRLayerParent* aLayer, const int32_t&amp; aInputFrameID,
+<span class="lineNum">      68 </span>            :   PTextureParent* aTexture, const gfx::Rect&amp; aLeftEyeRect,
+<span class="lineNum">      69 </span>            :   const gfx::Rect&amp; aRightEyeRect)
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :   // aInputFrameID is no longer controlled by content with the WebVR 1.1 API
+<span class="lineNum">      72 </span>            :   // update; however, we will later use this code to enable asynchronous
+<span class="lineNum">      73 </span>            :   // submission of multiple layers to be composited.  This will enable
+<span class="lineNum">      74 </span>            :   // us to build browser UX that remains responsive even when content does
+<span class="lineNum">      75 </span>            :   // not consistently submit frames.
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   int32_t inputFrameID = aInputFrameID;
+<span class="lineNum">      78 </span>            :   if (inputFrameID == 0) {
+<span class="lineNum">      79 </span>            :     inputFrameID = mInputFrameID;
+<span class="lineNum">      80 </span>            :   }
+<span class="lineNum">      81 </span>            :   if (inputFrameID &lt; 0) {
+<span class="lineNum">      82 </span>            :     // Sanity check to prevent invalid memory access on builds with assertions
+<span class="lineNum">      83 </span>            :     // disabled.
+<span class="lineNum">      84 </span>            :     inputFrameID = 0;
+<span class="lineNum">      85 </span>            :   }
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :   VRHMDSensorState sensorState = mLastSensorState[inputFrameID % kMaxLatencyFrames];
+<span class="lineNum">      88 </span>            :   // It is possible to get a cache miss on mLastSensorState if latency is
+<span class="lineNum">      89 </span>            :   // longer than kMaxLatencyFrames.  An optimization would be to find a frame
+<span class="lineNum">      90 </span>            :   // that is closer than the one selected with the modulus.
+<span class="lineNum">      91 </span>            :   // If we hit this; however, latency is already so high that the site is
+<span class="lineNum">      92 </span>            :   // un-viewable and a more accurate pose prediction is not likely to
+<span class="lineNum">      93 </span>            :   // compensate.
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   TextureHost* th = TextureHost::AsTextureHost(aTexture);
+<span class="lineNum">      96 </span>            :   // WebVR doesn't use the compositor to compose the frame, so use
+<span class="lineNum">      97 </span>            :   // AutoLockTextureHostWithoutCompositor here.
+<span class="lineNum">      98 </span>            :   AutoLockTextureHostWithoutCompositor autoLock(th);
+<span class="lineNum">      99 </span>            :   if (autoLock.Failed()) {
+<span class="lineNum">     100 </span>            :     NS_WARNING(&quot;Failed to lock the VR layer texture&quot;);
+<span class="lineNum">     101 </span>            :     return;
+<span class="lineNum">     102 </span>            :   }
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :   CompositableTextureSourceRef source;
+<span class="lineNum">     105 </span>            :   if (!th-&gt;BindTextureSource(source)) {
+<span class="lineNum">     106 </span>            :     NS_WARNING(&quot;The TextureHost was successfully locked but can't provide a TextureSource&quot;);
+<span class="lineNum">     107 </span>            :     return;
+<span class="lineNum">     108 </span>            :   }
+<span class="lineNum">     109 </span>            :   MOZ_ASSERT(source);
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :   IntSize texSize = source-&gt;GetSize();
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   TextureSourceD3D11* sourceD3D11 = source-&gt;AsSourceD3D11();
+<span class="lineNum">     114 </span>            :   if (!sourceD3D11) {
+<span class="lineNum">     115 </span>            :     NS_WARNING(&quot;WebVR support currently only implemented for D3D11&quot;);
+<span class="lineNum">     116 </span>            :     return;
+<span class="lineNum">     117 </span>            :   }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :   SubmitFrame(sourceD3D11, texSize, sensorState, aLeftEyeRect, aRightEyeRect);
+<span class="lineNum">     120 </span>            : }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : #else
+<a name="123"><span class="lineNum">     123 </span>            : </a>
+<span class="lineNum">     124 </span>            : void
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 : VRDisplayHost::SubmitFrame(VRLayerParent* aLayer, const int32_t&amp; aInputFrameID,</span>
+<span class="lineNum">     126 </span>            :   PTextureParent* aTexture, const gfx::Rect&amp; aLeftEyeRect,
+<span class="lineNum">     127 </span>            :   const gfx::Rect&amp; aRightEyeRect)
+<span class="lineNum">     128 </span>            : {
+<span class="lineNum">     129 </span>            :   NS_WARNING(&quot;WebVR only supported in Windows.&quot;);
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : #endif
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<span class="lineNum">     134 </span>            : bool
+<span class="lineNum">     135 </span><span class="lineCov">          1 : VRDisplayHost::CheckClearDisplayInfoDirty()</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   if (mDisplayInfo == mLastUpdateDisplayInfo) {</span>
+<span class="lineNum">     138 </span>            :     return false;
+<span class="lineNum">     139 </span>            :   }
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   mLastUpdateDisplayInfo = mDisplayInfo;</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   return true;</span>
+<a name="142"><span class="lineNum">     142 </span>            : }</a>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 : VRControllerHost::VRControllerHost(VRDeviceType aType)</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :  : mVibrateIndex(0)</span>
+<span class="lineNum">     146 </span>            : {
+<span class="lineNum">     147 </span>            :   MOZ_COUNT_CTOR(VRControllerHost);
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :   mControllerInfo.mType = aType;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   mControllerInfo.mControllerID = VRSystemManager::AllocateDisplayID();</span>
+<a name="150"><span class="lineNum">     150 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 : VRControllerHost::~VRControllerHost()</span>
+<span class="lineNum">     153 </span>            : {
+<span class="lineNum">     154 </span>            :   MOZ_COUNT_DTOR(VRControllerHost);
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 : }</span>
+<a name="156"><span class="lineNum">     156 </span>            : </a>
+<span class="lineNum">     157 </span>            : const VRControllerInfo&amp;
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 : VRControllerHost::GetControllerInfo() const</span>
+<span class="lineNum">     159 </span>            : {
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   return mControllerInfo;</span>
+<span class="lineNum">     161 </span>            : }
+<a name="162"><span class="lineNum">     162 </span>            : </a>
+<span class="lineNum">     163 </span>            : void
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 : VRControllerHost::SetButtonPressed(uint64_t aBit)</span>
+<span class="lineNum">     165 </span>            : {
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :   mButtonPressed = aBit;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 : }</span>
+<a name="168"><span class="lineNum">     168 </span>            : </a>
+<span class="lineNum">     169 </span>            : uint64_t
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 : VRControllerHost::GetButtonPressed()</span>
+<span class="lineNum">     171 </span>            : {
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   return mButtonPressed;</span>
+<span class="lineNum">     173 </span>            : }
+<a name="174"><span class="lineNum">     174 </span>            : </a>
+<span class="lineNum">     175 </span>            : void
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 : VRControllerHost::SetButtonTouched(uint64_t aBit)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :   mButtonTouched = aBit;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 : }</span>
+<a name="180"><span class="lineNum">     180 </span>            : </a>
+<span class="lineNum">     181 </span>            : uint64_t
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 : VRControllerHost::GetButtonTouched()</span>
+<span class="lineNum">     183 </span>            : {
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :   return mButtonTouched;</span>
+<span class="lineNum">     185 </span>            : }
+<a name="186"><span class="lineNum">     186 </span>            : </a>
+<span class="lineNum">     187 </span>            : void
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 : VRControllerHost::SetPose(const dom::GamepadPoseState&amp; aPose)</span>
+<span class="lineNum">     189 </span>            : {
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   mPose = aPose;</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 : }</span>
+<a name="192"><span class="lineNum">     192 </span>            : </a>
+<span class="lineNum">     193 </span>            : const dom::GamepadPoseState&amp;
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 : VRControllerHost::GetPose()</span>
+<span class="lineNum">     195 </span>            : {
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :   return mPose;</span>
+<span class="lineNum">     197 </span>            : }
+<a name="198"><span class="lineNum">     198 </span>            : </a>
+<span class="lineNum">     199 </span>            : dom::GamepadHand
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 : VRControllerHost::GetHand()</span>
+<span class="lineNum">     201 </span>            : {
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :   return mControllerInfo.mHand;</span>
+<span class="lineNum">     203 </span>            : }
+<a name="204"><span class="lineNum">     204 </span>            : </a>
+<span class="lineNum">     205 </span>            : void
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 : VRControllerHost::SetVibrateIndex(uint64_t aIndex)</span>
+<span class="lineNum">     207 </span>            : {
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :   mVibrateIndex = aIndex;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 : }</span>
+<a name="210"><span class="lineNum">     210 </span>            : </a>
+<span class="lineNum">     211 </span>            : uint64_t
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 : VRControllerHost::GetVibrateIndex()</span>
+<span class="lineNum">     213 </span>            : {
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :   return mVibrateIndex;</span>
+<span class="lineNum">     215 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

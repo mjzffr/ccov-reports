@@ -1,0 +1,1955 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - layout/style/ServoBindings.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">layout/style</a> - ServoBindings.cpp<span style="font-size: 80%;"> (source / <a href="ServoBindings.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">661</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">236</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &quot;mozilla/ServoBindings.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;ChildIterator.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;GeckoProfiler.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;gfxFontFamilyList.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsAnimationManager.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsAttrValueInlines.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;nsCSSFrameConstructor.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;nsCSSProps.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsCSSParser.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsCSSPseudoElements.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsCSSRuleProcessor.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsContentUtils.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsDOMTokenList.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsIContentInlines.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsIDOMNode.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsIDocument.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;nsIDocumentInlines.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;nsIFrame.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;nsINode.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;nsIPresShell.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;nsIPresShellInlines.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;nsIPrincipal.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;nsFontMetrics.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;nsMappedAttributes.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsMediaFeatures.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;nsNameSpaceManager.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;nsNetUtil.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;nsRuleNode.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;nsString.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;nsStyleStruct.h&quot;
+<span class="lineNum">      38 </span>            : #include &quot;nsStyleUtil.h&quot;
+<span class="lineNum">      39 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      40 </span>            : #include &quot;nsTransitionManager.h&quot;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #include &quot;mozilla/DeclarationBlockInlines.h&quot;
+<span class="lineNum">      43 </span>            : #include &quot;mozilla/EffectCompositor.h&quot;
+<span class="lineNum">      44 </span>            : #include &quot;mozilla/EffectSet.h&quot;
+<span class="lineNum">      45 </span>            : #include &quot;mozilla/EventStates.h&quot;
+<span class="lineNum">      46 </span>            : #include &quot;mozilla/Keyframe.h&quot;
+<span class="lineNum">      47 </span>            : #include &quot;mozilla/Mutex.h&quot;
+<span class="lineNum">      48 </span>            : #include &quot;mozilla/ServoElementSnapshot.h&quot;
+<span class="lineNum">      49 </span>            : #include &quot;mozilla/ServoRestyleManager.h&quot;
+<span class="lineNum">      50 </span>            : #include &quot;mozilla/StyleAnimationValue.h&quot;
+<span class="lineNum">      51 </span>            : #include &quot;mozilla/SystemGroup.h&quot;
+<span class="lineNum">      52 </span>            : #include &quot;mozilla/ServoMediaList.h&quot;
+<span class="lineNum">      53 </span>            : #include &quot;mozilla/dom/Element.h&quot;
+<span class="lineNum">      54 </span>            : #include &quot;mozilla/dom/ElementInlines.h&quot;
+<span class="lineNum">      55 </span>            : #include &quot;mozilla/dom/HTMLTableCellElement.h&quot;
+<span class="lineNum">      56 </span>            : #include &quot;mozilla/dom/HTMLBodyElement.h&quot;
+<span class="lineNum">      57 </span>            : #include &quot;mozilla/LookAndFeel.h&quot;
+<span class="lineNum">      58 </span>            : #include &quot;mozilla/URLExtraData.h&quot;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : using namespace mozilla;
+<span class="lineNum">      61 </span>            : using namespace mozilla::dom;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : #define SERVO_ARC_TYPE(name_, type_) \
+<span class="lineNum">      64 </span>            :   already_AddRefed&lt;type_&gt;            \
+<span class="lineNum">      65 </span>            :   type_##Strong::Consume() {         \
+<span class="lineNum">      66 </span>            :     RefPtr&lt;type_&gt; result;            \
+<span class="lineNum">      67 </span>            :     result.swap(mPtr);               \
+<span class="lineNum">      68 </span>            :     return result.forget();          \
+<span class="lineNum">      69 </span>            :   }
+<span class="lineNum">      70 </span>            : #include &quot;mozilla/ServoArcTypeList.h&quot;
+<span class="lineNum">      71 </span>            : #undef SERVO_ARC_TYPE
+<a name="72"><span class="lineNum">      72 </span>            : </a>
+<span class="lineNum">      73 </span>            : uint32_t
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 : Gecko_ChildrenCount(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetChildCount();</span>
+<span class="lineNum">      77 </span>            : }
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<span class="lineNum">      79 </span>            : bool
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 : Gecko_NodeIsElement(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">      81 </span>            : {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   return aNode-&gt;IsElement();</span>
+<span class="lineNum">      83 </span>            : }
+<a name="84"><span class="lineNum">      84 </span>            : </a>
+<span class="lineNum">      85 </span>            : bool
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 : Gecko_IsInDocument(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">      87 </span>            : {
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   return aNode-&gt;IsInComposedDoc();</span>
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : #ifdef MOZ_DEBUG_RUST
+<span class="lineNum">      92 </span>            : bool
+<span class="lineNum">      93 </span>            : Gecko_FlattenedTreeParentIsParent(RawGeckoNodeBorrowed aNode)
+<span class="lineNum">      94 </span>            : {
+<span class="lineNum">      95 </span>            :   // Servo calls this in debug builds to verify the result of its own
+<span class="lineNum">      96 </span>            :   // flattened_tree_parent_is_parent() function.
+<span class="lineNum">      97 </span>            :   return FlattenedTreeParentIsParent&lt;nsIContent::eForStyle&gt;(aNode);
+<span class="lineNum">      98 </span>            : }
+<span class="lineNum">      99 </span>            : #endif
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /*
+<span class="lineNum">     102 </span>            :  * Does this child count as significant for selector matching?
+<span class="lineNum">     103 </span>            :  *
+<span class="lineNum">     104 </span>            :  * See nsStyleUtil::IsSignificantChild for details.
+<a name="105"><span class="lineNum">     105 </span>            :  */</a>
+<span class="lineNum">     106 </span>            : bool
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 : Gecko_IsSignificantChild(RawGeckoNodeBorrowed aNode, bool aTextIsSignificant,</span>
+<span class="lineNum">     108 </span>            :                          bool aWhitespaceIsSignificant)
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span>            :   return nsStyleUtil::ThreadSafeIsSignificantChild(aNode-&gt;AsContent(),
+<span class="lineNum">     111 </span>            :                                                    aTextIsSignificant,
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                                                    aWhitespaceIsSignificant);</span>
+<span class="lineNum">     113 </span>            : }
+<a name="114"><span class="lineNum">     114 </span>            : </a>
+<span class="lineNum">     115 </span>            : RawGeckoNodeBorrowedOrNull
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 : Gecko_GetParentNode(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span>            :   MOZ_ASSERT(!FlattenedTreeParentIsParent&lt;nsIContent::eForStyle&gt;(aNode),
+<span class="lineNum">     119 </span>            :              &quot;Should have taken the inline path&quot;);
+<span class="lineNum">     120 </span>            :   MOZ_ASSERT(aNode-&gt;IsContent(), &quot;Slow path only applies to content&quot;);
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   const nsIContent* c = aNode-&gt;AsContent();</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   return c-&gt;GetFlattenedTreeParentNodeInternal(nsIContent::eForStyle);</span>
+<span class="lineNum">     123 </span>            : }
+<a name="124"><span class="lineNum">     124 </span>            : </a>
+<span class="lineNum">     125 </span>            : RawGeckoNodeBorrowedOrNull
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 : Gecko_GetFirstChild(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     127 </span>            : {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetFirstChild();</span>
+<span class="lineNum">     129 </span>            : }
+<a name="130"><span class="lineNum">     130 </span>            : </a>
+<span class="lineNum">     131 </span>            : RawGeckoNodeBorrowedOrNull
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 : Gecko_GetLastChild(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetLastChild();</span>
+<span class="lineNum">     135 </span>            : }
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<span class="lineNum">     137 </span>            : RawGeckoNodeBorrowedOrNull
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : Gecko_GetPrevSibling(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetPreviousSibling();</span>
+<span class="lineNum">     141 </span>            : }
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<span class="lineNum">     143 </span>            : RawGeckoNodeBorrowedOrNull
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 : Gecko_GetNextSibling(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     145 </span>            : {
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetNextSibling();</span>
+<span class="lineNum">     147 </span>            : }
+<a name="148"><span class="lineNum">     148 </span>            : </a>
+<span class="lineNum">     149 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : Gecko_GetParentElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :   return aElement-&gt;GetFlattenedTreeParentElementForStyle();</span>
+<span class="lineNum">     153 </span>            : }
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 : Gecko_GetFirstChildElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     157 </span>            : {
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   return aElement-&gt;GetFirstElementChild();</span>
+<a name="159"><span class="lineNum">     159 </span>            : }</a>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 : RawGeckoElementBorrowedOrNull Gecko_GetLastChildElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     162 </span>            : {
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :   return aElement-&gt;GetLastElementChild();</span>
+<span class="lineNum">     164 </span>            : }
+<a name="165"><span class="lineNum">     165 </span>            : </a>
+<span class="lineNum">     166 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 : Gecko_GetPrevSiblingElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     168 </span>            : {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   return aElement-&gt;GetPreviousElementSibling();</span>
+<span class="lineNum">     170 </span>            : }
+<a name="171"><span class="lineNum">     171 </span>            : </a>
+<span class="lineNum">     172 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 : Gecko_GetNextSiblingElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     174 </span>            : {
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   return aElement-&gt;GetNextElementSibling();</span>
+<span class="lineNum">     176 </span>            : }
+<a name="177"><span class="lineNum">     177 </span>            : </a>
+<span class="lineNum">     178 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 : Gecko_GetDocumentElement(RawGeckoDocumentBorrowed aDoc)</span>
+<span class="lineNum">     180 </span>            : {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   return aDoc-&gt;GetDocumentElement();</span>
+<span class="lineNum">     182 </span>            : }
+<a name="183"><span class="lineNum">     183 </span>            : </a>
+<span class="lineNum">     184 </span>            : StyleChildrenIteratorOwnedOrNull
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 : Gecko_MaybeCreateStyleChildrenIterator(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   if (!aNode-&gt;IsElement()) {</span>
+<span class="lineNum">     188 </span>            :     return nullptr;
+<span class="lineNum">     189 </span>            :   }
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :   const Element* el = aNode-&gt;AsElement();</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   return StyleChildrenIterator::IsNeeded(el) ? new StyleChildrenIterator(el)</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                                              : nullptr;</span>
+<span class="lineNum">     194 </span>            : }
+<a name="195"><span class="lineNum">     195 </span>            : </a>
+<span class="lineNum">     196 </span>            : void
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 : Gecko_DropStyleChildrenIterator(StyleChildrenIteratorOwned aIterator)</span>
+<span class="lineNum">     198 </span>            : {
+<span class="lineNum">     199 </span>            :   MOZ_ASSERT(aIterator);
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :   delete aIterator;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 : }</span>
+<a name="202"><span class="lineNum">     202 </span>            : </a>
+<span class="lineNum">     203 </span>            : RawGeckoNodeBorrowed
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 : Gecko_GetNextStyleChild(StyleChildrenIteratorBorrowedMut aIterator)</span>
+<span class="lineNum">     205 </span>            : {
+<span class="lineNum">     206 </span>            :   MOZ_ASSERT(aIterator);
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :   return aIterator-&gt;GetNextChild();</span>
+<span class="lineNum">     208 </span>            : }
+<a name="209"><span class="lineNum">     209 </span>            : </a>
+<span class="lineNum">     210 </span>            : EventStates::ServoType
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 : Gecko_ElementState(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     212 </span>            : {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :   return aElement-&gt;StyleState().ServoValue();</span>
+<span class="lineNum">     214 </span>            : }
+<a name="215"><span class="lineNum">     215 </span>            : </a>
+<span class="lineNum">     216 </span>            : bool
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 : Gecko_IsTextNode(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     218 </span>            : {
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   return aNode-&gt;NodeInfo()-&gt;NodeType() == nsIDOMNode::TEXT_NODE;</span>
+<span class="lineNum">     220 </span>            : }
+<a name="221"><span class="lineNum">     221 </span>            : </a>
+<span class="lineNum">     222 </span>            : bool
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 : Gecko_IsRootElement(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     224 </span>            : {
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :   return aElement-&gt;OwnerDoc()-&gt;GetRootElement() == aElement;</span>
+<span class="lineNum">     226 </span>            : }
+<a name="227"><span class="lineNum">     227 </span>            : </a>
+<span class="lineNum">     228 </span>            : bool
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 : Gecko_MatchesElement(CSSPseudoClassType aType,</span>
+<span class="lineNum">     230 </span>            :                      RawGeckoElementBorrowed aElement)
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :   return nsCSSPseudoClasses::MatchesElement(aType, aElement).value();</span>
+<span class="lineNum">     233 </span>            : }
+<a name="234"><span class="lineNum">     234 </span>            : </a>
+<span class="lineNum">     235 </span>            : nsIAtom*
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 : Gecko_LocalName(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     237 </span>            : {
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :   return aElement-&gt;NodeInfo()-&gt;NameAtom();</span>
+<span class="lineNum">     239 </span>            : }
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<span class="lineNum">     241 </span>            : nsIAtom*
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 : Gecko_Namespace(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     243 </span>            : {
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :   int32_t id = aElement-&gt;NodeInfo()-&gt;NamespaceID();</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :   return nsContentUtils::NameSpaceManager()-&gt;NameSpaceURIAtomForServo(id);</span>
+<span class="lineNum">     246 </span>            : }
+<a name="247"><span class="lineNum">     247 </span>            : </a>
+<span class="lineNum">     248 </span>            : nsIAtom*
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 : Gecko_GetElementId(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :   const nsAttrValue* attr = aElement-&gt;GetParsedAttr(nsGkAtoms::id);</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :   return attr ? attr-&gt;GetAtomValue() : nullptr;</span>
+<span class="lineNum">     253 </span>            : }
+<span class="lineNum">     254 </span>            : 
+<a name="255"><span class="lineNum">     255 </span>            : // Dirtiness tracking.</a>
+<span class="lineNum">     256 </span>            : uint32_t
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 : Gecko_GetNodeFlags(RawGeckoNodeBorrowed aNode)</span>
+<span class="lineNum">     258 </span>            : {
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :   return aNode-&gt;GetFlags();</span>
+<span class="lineNum">     260 </span>            : }
+<a name="261"><span class="lineNum">     261 </span>            : </a>
+<span class="lineNum">     262 </span>            : void
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 : Gecko_SetNodeFlags(RawGeckoNodeBorrowed aNode, uint32_t aFlags)</span>
+<span class="lineNum">     264 </span>            : {
+<span class="lineNum">     265 </span>            :   const_cast&lt;nsINode*&gt;(aNode)-&gt;SetFlags(aFlags);
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 : }</span>
+<a name="267"><span class="lineNum">     267 </span>            : </a>
+<span class="lineNum">     268 </span>            : void
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 : Gecko_UnsetNodeFlags(RawGeckoNodeBorrowed aNode, uint32_t aFlags)</span>
+<span class="lineNum">     270 </span>            : {
+<span class="lineNum">     271 </span>            :   const_cast&lt;nsINode*&gt;(aNode)-&gt;UnsetFlags(aFlags);
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 : }</span>
+<a name="273"><span class="lineNum">     273 </span>            : </a>
+<span class="lineNum">     274 </span>            : void
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 : Gecko_SetOwnerDocumentNeedsStyleFlush(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     276 </span>            : {
+<span class="lineNum">     277 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :   if (nsIPresShell* shell = aElement-&gt;OwnerDoc()-&gt;GetShell()) {</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :     shell-&gt;SetNeedStyleFlush();</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :     shell-&gt;ObserveStyleFlushes();</span>
+<span class="lineNum">     282 </span>            :   }
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 : }</span>
+<a name="284"><span class="lineNum">     284 </span>            : </a>
+<span class="lineNum">     285 </span>            : nsStyleContext*
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 : Gecko_GetStyleContext(RawGeckoNodeBorrowed aNode, nsIAtom* aPseudoTagOrNull)</span>
+<span class="lineNum">     287 </span>            : {
+<span class="lineNum">     288 </span>            :   MOZ_ASSERT(aNode-&gt;IsContent());
+<span class="lineNum">     289 </span>            :   nsIFrame* relevantFrame =
+<span class="lineNum">     290 </span>            :     ServoRestyleManager::FrameForPseudoElement(aNode-&gt;AsContent(),
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :                                                aPseudoTagOrNull);</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   if (relevantFrame) {</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     return relevantFrame-&gt;StyleContext();</span>
+<span class="lineNum">     294 </span>            :   }
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :   if (aPseudoTagOrNull) {</span>
+<span class="lineNum">     297 </span>            :     return nullptr;
+<span class="lineNum">     298 </span>            :   }
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   // FIXME(emilio): Is there a shorter path?
+<span class="lineNum">     301 </span>            :   nsCSSFrameConstructor* fc =
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :     aNode-&gt;OwnerDoc()-&gt;GetShell()-&gt;GetPresContext()-&gt;FrameConstructor();</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            :   // NB: This is only called for CalcStyleDifference, and we handle correctly
+<span class="lineNum">     305 </span>            :   // the display: none case since Servo still has the older style.
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   return fc-&gt;GetDisplayContentsStyleFor(aNode-&gt;AsContent());</span>
+<span class="lineNum">     307 </span>            : }
+<a name="308"><span class="lineNum">     308 </span>            : </a>
+<span class="lineNum">     309 </span>            : nsChangeHint
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 : Gecko_CalcStyleDifference(nsStyleContext* aOldStyleContext,</span>
+<span class="lineNum">     311 </span>            :                           ServoComputedValuesBorrowed aComputedValues)
+<span class="lineNum">     312 </span>            : {
+<span class="lineNum">     313 </span>            :   MOZ_ASSERT(aOldStyleContext);
+<span class="lineNum">     314 </span>            :   MOZ_ASSERT(aComputedValues);
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   // Eventually, we should compute things out of these flags like
+<span class="lineNum">     317 </span>            :   // ElementRestyler::RestyleSelf does and pass the result to the caller to
+<span class="lineNum">     318 </span>            :   // potentially halt traversal. See bug 1289868.
+<span class="lineNum">     319 </span>            :   uint32_t equalStructs, samePointerStructs;
+<span class="lineNum">     320 </span>            :   nsChangeHint result =
+<span class="lineNum">     321 </span>            :     aOldStyleContext-&gt;CalcStyleDifference(aComputedValues,
+<span class="lineNum">     322 </span>            :                                           &amp;equalStructs,
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                                           &amp;samePointerStructs);</span>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     326 </span>            : }
+<a name="327"><span class="lineNum">     327 </span>            : </a>
+<span class="lineNum">     328 </span>            : nsChangeHint
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 : Gecko_HintsHandledForDescendants(nsChangeHint aHint)</span>
+<span class="lineNum">     330 </span>            : {
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :   return aHint &amp; ~NS_HintsNotHandledForDescendantsIn(aHint);</span>
+<span class="lineNum">     332 </span>            : }
+<a name="333"><span class="lineNum">     333 </span>            : </a>
+<span class="lineNum">     334 </span>            : ServoElementSnapshotOwned
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 : Gecko_CreateElementSnapshot(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     336 </span>            : {
+<span class="lineNum">     337 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :   return new ServoElementSnapshot(aElement);</span>
+<span class="lineNum">     339 </span>            : }
+<a name="340"><span class="lineNum">     340 </span>            : </a>
+<span class="lineNum">     341 </span>            : void
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 : Gecko_DropElementSnapshot(ServoElementSnapshotOwned aSnapshot)</span>
+<span class="lineNum">     343 </span>            : {
+<span class="lineNum">     344 </span>            :   // Proxy deletes have a lot of overhead, so Servo tries hard to only drop
+<span class="lineNum">     345 </span>            :   // snapshots on the main thread. However, there are certain cases where
+<span class="lineNum">     346 </span>            :   // it's unavoidable (i.e. synchronously dropping the style data for the
+<a name="347"><span class="lineNum">     347 </span>            :   // descendants of a new display:none root).</a>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :   if (MOZ_UNLIKELY(!NS_IsMainThread())) {</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :     nsCOMPtr&lt;nsIRunnable&gt; task = NS_NewRunnableFunction([=]() { delete aSnapshot; });</span>
+<span class="lineNum">     350 </span>            :     SystemGroup::Dispatch(&quot;Gecko_DropElementSnapshot&quot;, TaskCategory::Other,
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                           task.forget());</span>
+<span class="lineNum">     352 </span>            :   } else {
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :     delete aSnapshot;</span>
+<span class="lineNum">     354 </span>            :   }
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 : }</span>
+<a name="356"><span class="lineNum">     356 </span>            : </a>
+<span class="lineNum">     357 </span>            : RawServoDeclarationBlockStrongBorrowedOrNull
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 : Gecko_GetStyleAttrDeclarationBlock(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     359 </span>            : {
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :   DeclarationBlock* decl = aElement-&gt;GetInlineStyleDeclaration();</span>
+<span class="lineNum">     361 </span>            :   if (!decl) {
+<span class="lineNum">     362 </span>            :     return nullptr;
+<span class="lineNum">     363 </span>            :   }
+<span class="lineNum">     364 </span>            :   if (decl-&gt;IsGecko()) {
+<span class="lineNum">     365 </span>            :     // XXX This can happen when nodes are adopted from a Gecko-style-backend
+<span class="lineNum">     366 </span>            :     //     document into a Servo-style-backend document.  See bug 1330051.
+<span class="lineNum">     367 </span>            :     NS_WARNING(&quot;stylo: requesting a Gecko declaration block?&quot;);
+<span class="lineNum">     368 </span>            :     return nullptr;
+<span class="lineNum">     369 </span>            :   }
+<span class="lineNum">     370 </span>            :   return decl-&gt;AsServo()-&gt;RefRawStrong();
+<span class="lineNum">     371 </span>            : }
+<a name="372"><span class="lineNum">     372 </span>            : </a>
+<span class="lineNum">     373 </span>            : RawServoDeclarationBlockStrongBorrowedOrNull
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 : Gecko_GetHTMLPresentationAttrDeclarationBlock(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     375 </span>            : {
+<span class="lineNum">     376 </span>            :   static_assert(sizeof(RefPtr&lt;RawServoDeclarationBlock&gt;) ==
+<span class="lineNum">     377 </span>            :                 sizeof(RawServoDeclarationBlockStrong),
+<span class="lineNum">     378 </span>            :                 &quot;RefPtr should just be a pointer&quot;);
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :   const nsMappedAttributes* attrs = aElement-&gt;GetMappedAttributes();</span>
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :   if (!attrs) {</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :     auto* svg = nsSVGElement::FromContentOrNull(aElement);</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :     if (svg) {</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :       if (auto decl = svg-&gt;GetContentDeclarationBlock()) {</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :         return decl-&gt;AsServo()-&gt;RefRawStrong();</span>
+<span class="lineNum">     385 </span>            :       }
+<span class="lineNum">     386 </span>            :     }
+<span class="lineNum">     387 </span>            :     return nullptr;
+<span class="lineNum">     388 </span>            :   }
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :   const RefPtr&lt;RawServoDeclarationBlock&gt;&amp; servo = attrs-&gt;GetServoStyle();</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :   return reinterpret_cast&lt;const RawServoDeclarationBlockStrong*&gt;(&amp;servo);</span>
+<span class="lineNum">     392 </span>            : }
+<a name="393"><span class="lineNum">     393 </span>            : </a>
+<span class="lineNum">     394 </span>            : RawServoDeclarationBlockStrongBorrowedOrNull
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 : Gecko_GetExtraContentStyleDeclarations(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     396 </span>            : {
+<span class="lineNum">     397 </span>            :   static_assert(sizeof(RefPtr&lt;RawServoDeclarationBlock&gt;) ==
+<span class="lineNum">     398 </span>            :                 sizeof(RawServoDeclarationBlockStrong),
+<span class="lineNum">     399 </span>            :                 &quot;RefPtr should just be a pointer&quot;);
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :   if (!aElement-&gt;IsAnyOfHTMLElements(nsGkAtoms::td, nsGkAtoms::th)) {</span>
+<span class="lineNum">     401 </span>            :     return nullptr;
+<span class="lineNum">     402 </span>            :   }
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :   const HTMLTableCellElement* cell = static_cast&lt;const HTMLTableCellElement*&gt;(aElement);</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :   if (nsMappedAttributes* attrs = cell-&gt;GetMappedAttributesInheritedFromTable()) {</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :     const RefPtr&lt;RawServoDeclarationBlock&gt;&amp; servo = attrs-&gt;GetServoStyle();</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :     return reinterpret_cast&lt;const RawServoDeclarationBlockStrong*&gt;(&amp;servo);</span>
+<span class="lineNum">     407 </span>            :   }
+<span class="lineNum">     408 </span>            :   return nullptr;
+<span class="lineNum">     409 </span>            : }
+<a name="410"><span class="lineNum">     410 </span>            : </a>
+<span class="lineNum">     411 </span>            : bool
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 : Gecko_GetAnimationRule(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     413 </span>            :                        nsIAtom* aPseudoTag,
+<span class="lineNum">     414 </span>            :                        EffectCompositor::CascadeLevel aCascadeLevel,
+<span class="lineNum">     415 </span>            :                        RawServoAnimationValueMapBorrowed aAnimationValues)
+<span class="lineNum">     416 </span>            : {
+<span class="lineNum">     417 </span>            :   MOZ_ASSERT(aElement, &quot;Invalid GeckoElement&quot;);
+<span class="lineNum">     418 </span>            :   MOZ_ASSERT(!aPseudoTag ||
+<span class="lineNum">     419 </span>            :              aPseudoTag == nsCSSPseudoElements::before ||
+<span class="lineNum">     420 </span>            :              aPseudoTag == nsCSSPseudoElements::after);
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :   nsIDocument* doc = aElement-&gt;GetComposedDoc();</span>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :   if (!doc || !doc-&gt;GetShell()) {</span>
+<span class="lineNum">     424 </span>            :     return false;
+<span class="lineNum">     425 </span>            :   }
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :   nsPresContext* presContext = doc-&gt;GetShell()-&gt;GetPresContext();</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :   if (!presContext || !presContext-&gt;IsDynamic()) {</span>
+<span class="lineNum">     428 </span>            :     // For print or print preview, ignore animations.
+<span class="lineNum">     429 </span>            :     return false;
+<span class="lineNum">     430 </span>            :   }
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            :   CSSPseudoElementType pseudoType =
+<span class="lineNum">     433 </span>            :     nsCSSPseudoElements::GetPseudoType(
+<span class="lineNum">     434 </span>            :       aPseudoTag,
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :       nsCSSProps::EnabledState::eIgnoreEnabledState);</span>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :   return presContext-&gt;EffectCompositor()
+<span class="lineNum">     438 </span>            :     -&gt;GetServoAnimationRule(aElement, pseudoType,
+<span class="lineNum">     439 </span>            :                             aCascadeLevel,
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :                             aAnimationValues);</span>
+<span class="lineNum">     441 </span>            : }
+<a name="442"><span class="lineNum">     442 </span>            : </a>
+<span class="lineNum">     443 </span>            : bool
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 : Gecko_StyleAnimationsEquals(RawGeckoStyleAnimationListBorrowed aA,</span>
+<span class="lineNum">     445 </span>            :                             RawGeckoStyleAnimationListBorrowed aB)
+<span class="lineNum">     446 </span>            : {
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :   return *aA == *aB;</span>
+<span class="lineNum">     448 </span>            : }
+<a name="449"><span class="lineNum">     449 </span>            : </a>
+<span class="lineNum">     450 </span>            : void
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 : Gecko_UpdateAnimations(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     452 </span>            :                        nsIAtom* aPseudoTagOrNull,
+<span class="lineNum">     453 </span>            :                        ServoComputedValuesBorrowedOrNull aOldComputedValues,
+<span class="lineNum">     454 </span>            :                        ServoComputedValuesBorrowedOrNull aComputedValues,
+<span class="lineNum">     455 </span>            :                        ServoComputedValuesBorrowedOrNull aParentComputedValues,
+<span class="lineNum">     456 </span>            :                        UpdateAnimationsTasks aTaskBits)
+<span class="lineNum">     457 </span>            : {
+<span class="lineNum">     458 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     459 </span>            :   MOZ_ASSERT(aElement);
+<span class="lineNum">     460 </span>            :   MOZ_ASSERT(!aPseudoTagOrNull ||
+<span class="lineNum">     461 </span>            :              aPseudoTagOrNull == nsCSSPseudoElements::before ||
+<span class="lineNum">     462 </span>            :              aPseudoTagOrNull == nsCSSPseudoElements::after);
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :   nsPresContext* presContext = nsContentUtils::GetContextForContent(aElement);</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :   if (!presContext) {</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     467 </span>            :   }
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :   UpdateAnimationsTasks tasks = static_cast&lt;UpdateAnimationsTasks&gt;(aTaskBits);</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :   if (presContext-&gt;IsDynamic() &amp;&amp; aElement-&gt;IsInComposedDoc()) {</span>
+<span class="lineNum">     471 </span>            :     const ServoComputedValuesWithParent servoValues =
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :       { aComputedValues, aParentComputedValues };</span>
+<span class="lineNum">     473 </span>            :     CSSPseudoElementType pseudoType =
+<span class="lineNum">     474 </span>            :       nsCSSPseudoElements::GetPseudoType(aPseudoTagOrNull,
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :                                          CSSEnabledState::eForAllContent);</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :     if (tasks &amp; UpdateAnimationsTasks::CSSAnimations) {</span>
+<span class="lineNum">     478 </span>            :       presContext-&gt;AnimationManager()-&gt;
+<span class="lineNum">     479 </span>            :         UpdateAnimations(const_cast&lt;dom::Element*&gt;(aElement), pseudoType,
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :                          servoValues);</span>
+<span class="lineNum">     481 </span>            :     }
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     if (tasks &amp; UpdateAnimationsTasks::CSSTransitions) {</span>
+<span class="lineNum">     483 </span>            :       MOZ_ASSERT(aOldComputedValues);
+<span class="lineNum">     484 </span>            :       const ServoComputedValuesWithParent oldServoValues =
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :         { aOldComputedValues, nullptr };</span>
+<span class="lineNum">     486 </span>            :       presContext-&gt;TransitionManager()-&gt;
+<span class="lineNum">     487 </span>            :         UpdateTransitions(const_cast&lt;dom::Element*&gt;(aElement), pseudoType,
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :                           oldServoValues, servoValues);</span>
+<span class="lineNum">     489 </span>            :     }
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :     if (tasks &amp; UpdateAnimationsTasks::EffectProperties) {</span>
+<span class="lineNum">     491 </span>            :       presContext-&gt;EffectCompositor()-&gt;UpdateEffectProperties(
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :         servoValues, const_cast&lt;dom::Element*&gt;(aElement), pseudoType);</span>
+<span class="lineNum">     493 </span>            :     }
+<span class="lineNum">     494 </span>            :   }
+<span class="lineNum">     495 </span>            : }
+<a name="496"><span class="lineNum">     496 </span>            : </a>
+<span class="lineNum">     497 </span>            : bool
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 : Gecko_ElementHasAnimations(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     499 </span>            :                            nsIAtom* aPseudoTagOrNull)
+<span class="lineNum">     500 </span>            : {
+<span class="lineNum">     501 </span>            :   MOZ_ASSERT(!aPseudoTagOrNull ||
+<span class="lineNum">     502 </span>            :              aPseudoTagOrNull == nsCSSPseudoElements::before ||
+<span class="lineNum">     503 </span>            :              aPseudoTagOrNull == nsCSSPseudoElements::after);
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :   CSSPseudoElementType pseudoType =
+<span class="lineNum">     506 </span>            :     nsCSSPseudoElements::GetPseudoType(aPseudoTagOrNull,
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :                                        CSSEnabledState::eForAllContent);</span>
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :   return !!EffectSet::GetEffectSet(aElement, pseudoType);</span>
+<span class="lineNum">     510 </span>            : }
+<a name="511"><span class="lineNum">     511 </span>            : </a>
+<span class="lineNum">     512 </span>            : bool
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 : Gecko_ElementHasCSSAnimations(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     514 </span>            :                               nsIAtom* aPseudoTagOrNull)
+<span class="lineNum">     515 </span>            : {
+<span class="lineNum">     516 </span>            :   nsAnimationManager::CSSAnimationCollection* collection =
+<span class="lineNum">     517 </span>            :     nsAnimationManager::CSSAnimationCollection
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :                       ::GetAnimationCollection(aElement, aPseudoTagOrNull);</span>
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :   return collection &amp;&amp; !collection-&gt;mAnimations.IsEmpty();</span>
+<span class="lineNum">     521 </span>            : }
+<a name="522"><span class="lineNum">     522 </span>            : </a>
+<span class="lineNum">     523 </span>            : bool
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 : Gecko_ElementHasCSSTransitions(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     525 </span>            :                                nsIAtom* aPseudoTagOrNull)
+<span class="lineNum">     526 </span>            : {
+<span class="lineNum">     527 </span>            :   nsTransitionManager::CSSTransitionCollection* collection =
+<span class="lineNum">     528 </span>            :     nsTransitionManager::CSSTransitionCollection
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :                        ::GetAnimationCollection(aElement, aPseudoTagOrNull);</span>
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :   return collection &amp;&amp; !collection-&gt;mAnimations.IsEmpty();</span>
+<span class="lineNum">     532 </span>            : }
+<a name="533"><span class="lineNum">     533 </span>            : </a>
+<span class="lineNum">     534 </span>            : size_t
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 : Gecko_ElementTransitions_Length(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     536 </span>            :                                 nsIAtom* aPseudoTagOrNull)
+<span class="lineNum">     537 </span>            : {
+<span class="lineNum">     538 </span>            :   nsTransitionManager::CSSTransitionCollection* collection =
+<span class="lineNum">     539 </span>            :     nsTransitionManager::CSSTransitionCollection
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :                        ::GetAnimationCollection(aElement, aPseudoTagOrNull);</span>
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :   return collection ? collection-&gt;mAnimations.Length() : 0;</span>
+<span class="lineNum">     543 </span>            : }
+<a name="544"><span class="lineNum">     544 </span>            : </a>
+<span class="lineNum">     545 </span>            : static CSSTransition*
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 : GetCurrentTransitionAt(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     547 </span>            :                        nsIAtom* aPseudoTagOrNull,
+<span class="lineNum">     548 </span>            :                        size_t aIndex)
+<span class="lineNum">     549 </span>            : {
+<span class="lineNum">     550 </span>            :   nsTransitionManager::CSSTransitionCollection* collection =
+<span class="lineNum">     551 </span>            :     nsTransitionManager::CSSTransitionCollection
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :                        ::GetAnimationCollection(aElement, aPseudoTagOrNull);</span>
+<span class="lineNum">     553 </span><span class="lineNoCov">          0 :   if (!collection) {</span>
+<span class="lineNum">     554 </span>            :     return nullptr;
+<span class="lineNum">     555 </span>            :   }
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :   nsTArray&lt;RefPtr&lt;CSSTransition&gt;&gt;&amp; transitions = collection-&gt;mAnimations;</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :   return aIndex &lt; transitions.Length()</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :          ? transitions[aIndex].get()</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :          : nullptr;</span>
+<span class="lineNum">     560 </span>            : }
+<a name="561"><span class="lineNum">     561 </span>            : </a>
+<span class="lineNum">     562 </span>            : nsCSSPropertyID
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 : Gecko_ElementTransitions_PropertyAt(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     564 </span>            :                                     nsIAtom* aPseudoTagOrNull,
+<span class="lineNum">     565 </span>            :                                     size_t aIndex)
+<span class="lineNum">     566 </span>            : {
+<span class="lineNum">     567 </span>            :   CSSTransition* transition = GetCurrentTransitionAt(aElement,
+<span class="lineNum">     568 </span>            :                                                      aPseudoTagOrNull,
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :                                                      aIndex);</span>
+<span class="lineNum">     570 </span>            :   return transition ? transition-&gt;TransitionProperty()
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :                     : nsCSSPropertyID::eCSSProperty_UNKNOWN;</span>
+<span class="lineNum">     572 </span>            : }
+<a name="573"><span class="lineNum">     573 </span>            : </a>
+<span class="lineNum">     574 </span>            : RawServoAnimationValueBorrowedOrNull
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 : Gecko_ElementTransitions_EndValueAt(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     576 </span>            :                                     nsIAtom* aPseudoTagOrNull,
+<span class="lineNum">     577 </span>            :                                     size_t aIndex)
+<span class="lineNum">     578 </span>            : {
+<span class="lineNum">     579 </span>            :   CSSTransition* transition = GetCurrentTransitionAt(aElement,
+<span class="lineNum">     580 </span>            :                                                      aPseudoTagOrNull,
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 :                                                      aIndex);</span>
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :   return transition ? transition-&gt;ToValue().mServo.get() : nullptr;</span>
+<span class="lineNum">     583 </span>            : }
+<a name="584"><span class="lineNum">     584 </span>            : </a>
+<span class="lineNum">     585 </span>            : double
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 : Gecko_GetProgressFromComputedTiming(RawGeckoComputedTimingBorrowed aComputedTiming)</span>
+<span class="lineNum">     587 </span>            : {
+<span class="lineNum">     588 </span><span class="lineNoCov">          0 :   return aComputedTiming-&gt;mProgress.Value();</span>
+<span class="lineNum">     589 </span>            : }
+<a name="590"><span class="lineNum">     590 </span>            : </a>
+<span class="lineNum">     591 </span>            : double
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 : Gecko_GetPositionInSegment(RawGeckoAnimationPropertySegmentBorrowed aSegment,</span>
+<span class="lineNum">     593 </span>            :                           double aProgress,
+<span class="lineNum">     594 </span>            :                           ComputedTimingFunction::BeforeFlag aBeforeFlag)
+<span class="lineNum">     595 </span>            : {
+<span class="lineNum">     596 </span>            :   MOZ_ASSERT(aSegment-&gt;mFromKey &lt; aSegment-&gt;mToKey,
+<span class="lineNum">     597 </span>            :              &quot;The segment from key should be less than to key&quot;);
+<span class="lineNum">     598 </span>            : 
+<span class="lineNum">     599 </span>            :   double positionInSegment =
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :     (aProgress - aSegment-&gt;mFromKey) / (aSegment-&gt;mToKey - aSegment-&gt;mFromKey);</span>
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            :   return ComputedTimingFunction::GetPortion(aSegment-&gt;mTimingFunction,
+<span class="lineNum">     603 </span>            :                                             positionInSegment,
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :                                             aBeforeFlag);</span>
+<span class="lineNum">     605 </span>            : }
+<a name="606"><span class="lineNum">     606 </span>            : </a>
+<span class="lineNum">     607 </span>            : RawServoAnimationValueBorrowedOrNull
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 : Gecko_AnimationGetBaseStyle(void* aBaseStyles, nsCSSPropertyID aProperty)</span>
+<span class="lineNum">     609 </span>            : {
+<span class="lineNum">     610 </span>            :   auto base =
+<span class="lineNum">     611 </span>            :     static_cast&lt;nsRefPtrHashtable&lt;nsUint32HashKey, RawServoAnimationValue&gt;*&gt;
+<span class="lineNum">     612 </span><span class="lineNoCov">          0 :       (aBaseStyles);</span>
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :   return base-&gt;GetWeak(aProperty);</span>
+<span class="lineNum">     614 </span>            : }
+<a name="615"><span class="lineNum">     615 </span>            : </a>
+<span class="lineNum">     616 </span>            : void
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 : Gecko_FillAllBackgroundLists(nsStyleImageLayers* aLayers, uint32_t aMaxLen)</span>
+<span class="lineNum">     618 </span>            : {
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :   nsRuleNode::FillAllBackgroundLists(*aLayers, aMaxLen);</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 : }</span>
+<a name="621"><span class="lineNum">     621 </span>            : </a>
+<span class="lineNum">     622 </span>            : void
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 : Gecko_FillAllMaskLists(nsStyleImageLayers* aLayers, uint32_t aMaxLen)</span>
+<span class="lineNum">     624 </span>            : {
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :   nsRuleNode::FillAllMaskLists(*aLayers, aMaxLen);</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 : }</span>
+<a name="627"><span class="lineNum">     627 </span>            : </a>
+<span class="lineNum">     628 </span>            : RawGeckoElementBorrowedOrNull
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 : Gecko_GetBody(RawGeckoPresContextBorrowed aPresContext)</span>
+<span class="lineNum">     630 </span>            : {
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :   return aPresContext-&gt;Document()-&gt;GetBodyElement();</span>
+<a name="632"><span class="lineNum">     632 </span>            : }</a>
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 : nscolor Gecko_GetLookAndFeelSystemColor(int32_t aId,</span>
+<span class="lineNum">     635 </span>            :                                         RawGeckoPresContextBorrowed aPresContext)
+<span class="lineNum">     636 </span>            : {
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :   bool useStandinsForNativeColors = aPresContext &amp;&amp; !aPresContext-&gt;IsChrome();</span>
+<span class="lineNum">     638 </span>            :   nscolor result;
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :   LookAndFeel::ColorID colorId = static_cast&lt;LookAndFeel::ColorID&gt;(aId);</span>
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :   LookAndFeel::GetColor(colorId, useStandinsForNativeColors, &amp;result);</span>
+<span class="lineNum">     641 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">     642 </span>            : }
+<a name="643"><span class="lineNum">     643 </span>            : </a>
+<span class="lineNum">     644 </span>            : bool
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 : Gecko_MatchStringArgPseudo(RawGeckoElementBorrowed aElement,</span>
+<span class="lineNum">     646 </span>            :                            CSSPseudoClassType aType,
+<span class="lineNum">     647 </span>            :                            const char16_t* aIdent,
+<span class="lineNum">     648 </span>            :                            bool* aSetSlowSelectorFlag)
+<span class="lineNum">     649 </span>            : {
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :   EventStates dummyMask; // mask is never read because we pass aDependence=nullptr</span>
+<span class="lineNum">     651 </span>            :   return nsCSSRuleProcessor::StringPseudoMatches(aElement, aType, aIdent,
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :                                                  aElement-&gt;OwnerDoc(), true,</span>
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 :                                                  dummyMask, false, aSetSlowSelectorFlag, nullptr);</span>
+<span class="lineNum">     654 </span>            : }
+<a name="655"><span class="lineNum">     655 </span>            : </a>
+<span class="lineNum">     656 </span>            : nsIAtom*
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 : Gecko_GetXMLLangValue(RawGeckoElementBorrowed aElement)</span>
+<span class="lineNum">     658 </span>            : {
+<span class="lineNum">     659 </span>            :   nsString string;
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :   if (aElement-&gt;GetAttr(kNameSpaceID_XML, nsGkAtoms::lang, string)) {</span>
+<span class="lineNum">     661 </span><span class="lineNoCov">          0 :     return NS_Atomize(string).take();</span>
+<span class="lineNum">     662 </span>            :   }
+<span class="lineNum">     663 </span>            :   return nullptr;
+<span class="lineNum">     664 </span>            : }
+<span class="lineNum">     665 </span>            : 
+<a name="666"><span class="lineNum">     666 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     667 </span>            : static nsIAtom*
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 : AtomAttrValue(Implementor* aElement, nsIAtom* aName)</span>
+<span class="lineNum">     669 </span>            : {
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :   const nsAttrValue* attr = aElement-&gt;GetParsedAttr(aName);</span>
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :   return attr ? attr-&gt;GetAtomValue() : nullptr;</span>
+<span class="lineNum">     672 </span>            : }
+<span class="lineNum">     673 </span>            : 
+<a name="674"><span class="lineNum">     674 </span>            : template &lt;typename Implementor, typename MatchFn&gt;</a>
+<span class="lineNum">     675 </span>            : static bool
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 : DoMatch(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName, MatchFn aMatch)</span>
+<span class="lineNum">     677 </span>            : {
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :   if (aNS) {</span>
+<span class="lineNum">     679 </span>            :     int32_t ns = nsContentUtils::NameSpaceManager()-&gt;GetNameSpaceID(aNS,
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :                                                                     aElement-&gt;IsInChromeDocument());</span>
+<span class="lineNum">     681 </span><span class="lineNoCov">          0 :     NS_ENSURE_TRUE(ns != kNameSpaceID_Unknown, false);</span>
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :     const nsAttrValue* value = aElement-&gt;GetParsedAttr(aName, ns);</span>
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :     return value &amp;&amp; aMatch(value);</span>
+<span class="lineNum">     684 </span>            :   }
+<span class="lineNum">     685 </span>            :   // No namespace means any namespace - we have to check them all. :-(
+<span class="lineNum">     686 </span>            :   BorrowedAttrInfo attrInfo;
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; (attrInfo = aElement-&gt;GetAttrInfoAt(i)); ++i) {</span>
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :     if (attrInfo.mName-&gt;LocalName() != aName) {</span>
+<span class="lineNum">     689 </span>            :       continue;
+<span class="lineNum">     690 </span>            :     }
+<span class="lineNum">     691 </span><span class="lineNoCov">          0 :     if (aMatch(attrInfo.mValue)) {</span>
+<span class="lineNum">     692 </span>            :       return true;
+<span class="lineNum">     693 </span>            :     }
+<span class="lineNum">     694 </span>            :   }
+<span class="lineNum">     695 </span>            :   return false;
+<span class="lineNum">     696 </span>            : }
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span>            : template &lt;typename Implementor&gt;
+<span class="lineNum">     699 </span>            : static bool
+<span class="lineNum">     700 </span>            : HasAttr(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName)
+<span class="lineNum">     701 </span>            : {
+<span class="lineNum">     702 </span>            :   auto match = [](const nsAttrValue* aValue) { return true; };
+<span class="lineNum">     703 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     704 </span>            : }
+<span class="lineNum">     705 </span>            : 
+<a name="706"><span class="lineNum">     706 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     707 </span>            : static bool
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 : AttrEquals(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName, nsIAtom* aStr,</span>
+<a name="709"><span class="lineNum">     709 </span>            :            bool aIgnoreCase)</a>
+<span class="lineNum">     710 </span>            : {
+<span class="lineNum">     711 </span><span class="lineNoCov">          0 :   auto match = [aStr, aIgnoreCase](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :     return aValue-&gt;Equals(aStr, aIgnoreCase ? eIgnoreCase : eCaseMatters);</span>
+<span class="lineNum">     713 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     715 </span>            : }
+<span class="lineNum">     716 </span>            : 
+<a name="717"><span class="lineNum">     717 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     718 </span>            : static bool
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 : AttrDashEquals(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName,</span>
+<a name="720"><span class="lineNum">     720 </span>            :                nsIAtom* aStr)</a>
+<span class="lineNum">     721 </span>            : {
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :   auto match = [aStr](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :     nsAutoString str;</span>
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :     aValue-&gt;ToString(str);</span>
+<span class="lineNum">     725 </span>            :     const nsDefaultStringComparator c;
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :     return nsStyleUtil::DashMatchCompare(str, nsDependentAtomString(aStr), c);</span>
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     729 </span>            : }
+<span class="lineNum">     730 </span>            : 
+<a name="731"><span class="lineNum">     731 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     732 </span>            : static bool
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 : AttrIncludes(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName,</span>
+<a name="734"><span class="lineNum">     734 </span>            :              nsIAtom* aStr)</a>
+<span class="lineNum">     735 </span>            : {
+<span class="lineNum">     736 </span><span class="lineNoCov">          0 :   auto match = [aStr](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     737 </span><span class="lineNoCov">          0 :     nsAutoString str;</span>
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :     aValue-&gt;ToString(str);</span>
+<span class="lineNum">     739 </span>            :     const nsDefaultStringComparator c;
+<span class="lineNum">     740 </span><span class="lineNoCov">          0 :     return nsStyleUtil::ValueIncludes(str, nsDependentAtomString(aStr), c);</span>
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     743 </span>            : }
+<span class="lineNum">     744 </span>            : 
+<a name="745"><span class="lineNum">     745 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     746 </span>            : static bool
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 : AttrHasSubstring(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName,</span>
+<a name="748"><span class="lineNum">     748 </span>            :                  nsIAtom* aStr)</a>
+<span class="lineNum">     749 </span>            : {
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :   auto match = [aStr](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :     nsAutoString str;</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :     aValue-&gt;ToString(str);</span>
+<span class="lineNum">     753 </span><span class="lineNoCov">          0 :     return FindInReadable(str, nsDependentAtomString(aStr));</span>
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     756 </span>            : }
+<span class="lineNum">     757 </span>            : 
+<a name="758"><span class="lineNum">     758 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     759 </span>            : static bool
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 : AttrHasPrefix(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName,</span>
+<a name="761"><span class="lineNum">     761 </span>            :               nsIAtom* aStr)</a>
+<span class="lineNum">     762 </span>            : {
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :   auto match = [aStr](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 :     nsAutoString str;</span>
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :     aValue-&gt;ToString(str);</span>
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :     return StringBeginsWith(str, nsDependentAtomString(aStr));</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     769 </span>            : }
+<span class="lineNum">     770 </span>            : 
+<a name="771"><span class="lineNum">     771 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     772 </span>            : static bool
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 : AttrHasSuffix(Implementor* aElement, nsIAtom* aNS, nsIAtom* aName,</span>
+<a name="774"><span class="lineNum">     774 </span>            :               nsIAtom* aStr)</a>
+<span class="lineNum">     775 </span>            : {
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :   auto match = [aStr](const nsAttrValue* aValue) {</span>
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :     nsAutoString str;</span>
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :     aValue-&gt;ToString(str);</span>
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :     return StringEndsWith(str, nsDependentAtomString(aStr));</span>
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     781 </span><span class="lineNoCov">          0 :   return DoMatch(aElement, aNS, aName, match);</span>
+<span class="lineNum">     782 </span>            : }
+<span class="lineNum">     783 </span>            : 
+<span class="lineNum">     784 </span>            : /**
+<span class="lineNum">     785 </span>            :  * Gets the class or class list (if any) of the implementor. The calling
+<span class="lineNum">     786 </span>            :  * convention here is rather hairy, and is optimized for getting Servo the
+<span class="lineNum">     787 </span>            :  * information it needs for hot calls.
+<span class="lineNum">     788 </span>            :  *
+<span class="lineNum">     789 </span>            :  * The return value indicates the number of classes. If zero, neither outparam
+<span class="lineNum">     790 </span>            :  * is valid. If one, the class_ outparam is filled with the atom of the class.
+<span class="lineNum">     791 </span>            :  * If two or more, the classList outparam is set to point to an array of atoms
+<span class="lineNum">     792 </span>            :  * representing the class list.
+<span class="lineNum">     793 </span>            :  *
+<span class="lineNum">     794 </span>            :  * The array is borrowed and the atoms are not addrefed. These values can be
+<span class="lineNum">     795 </span>            :  * invalidated by any DOM mutation. Use them in a tight scope.
+<span class="lineNum">     796 </span>            :  */
+<a name="797"><span class="lineNum">     797 </span>            : template &lt;typename Implementor&gt;</a>
+<span class="lineNum">     798 </span>            : static uint32_t
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 : ClassOrClassList(Implementor* aElement, nsIAtom** aClass, nsIAtom*** aClassList)</span>
+<span class="lineNum">     800 </span>            : {
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :   const nsAttrValue* attr = aElement-&gt;GetParsedAttr(nsGkAtoms::_class);</span>
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 :   if (!attr) {</span>
+<span class="lineNum">     803 </span>            :     return 0;
+<span class="lineNum">     804 </span>            :   }
+<span class="lineNum">     805 </span>            : 
+<span class="lineNum">     806 </span>            :   // For class values with only whitespace, Gecko just stores a string. For the
+<span class="lineNum">     807 </span>            :   // purposes of the style system, there is no class in this case.
+<span class="lineNum">     808 </span><span class="lineNoCov">          0 :   if (attr-&gt;Type() == nsAttrValue::eString) {</span>
+<span class="lineNum">     809 </span>            :     MOZ_ASSERT(nsContentUtils::TrimWhitespace&lt;nsContentUtils::IsHTMLWhitespace&gt;(
+<span class="lineNum">     810 </span>            :                  attr-&gt;GetStringValue()).IsEmpty());
+<span class="lineNum">     811 </span>            :     return 0;
+<span class="lineNum">     812 </span>            :   }
+<span class="lineNum">     813 </span>            : 
+<span class="lineNum">     814 </span>            :   // Single tokens are generally stored as an atom. Check that case.
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :   if (attr-&gt;Type() == nsAttrValue::eAtom) {</span>
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :     *aClass = attr-&gt;GetAtomValue();</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     818 </span>            :   }
+<span class="lineNum">     819 </span>            : 
+<span class="lineNum">     820 </span>            :   // At this point we should have an atom array. It is likely, but not
+<span class="lineNum">     821 </span>            :   // guaranteed, that we have two or more elements in the array.
+<span class="lineNum">     822 </span>            :   MOZ_ASSERT(attr-&gt;Type() == nsAttrValue::eAtomArray);
+<span class="lineNum">     823 </span><span class="lineNoCov">          0 :   nsTArray&lt;nsCOMPtr&lt;nsIAtom&gt;&gt;* atomArray = attr-&gt;GetAtomArrayValue();</span>
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :   uint32_t length = atomArray-&gt;Length();</span>
+<span class="lineNum">     825 </span>            : 
+<span class="lineNum">     826 </span>            :   // Special case: zero elements.
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :   if (length == 0) {</span>
+<span class="lineNum">     828 </span>            :     return 0;
+<span class="lineNum">     829 </span>            :   }
+<span class="lineNum">     830 </span>            : 
+<span class="lineNum">     831 </span>            :   // Special case: one element.
+<span class="lineNum">     832 </span><span class="lineNoCov">          0 :   if (length == 1) {</span>
+<span class="lineNum">     833 </span><span class="lineNoCov">          0 :     *aClass = atomArray-&gt;ElementAt(0);</span>
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :     return 1;</span>
+<span class="lineNum">     835 </span>            :   }
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span>            :   // General case: Two or more elements.
+<span class="lineNum">     838 </span>            :   //
+<span class="lineNum">     839 </span>            :   // Note: We could also expose this array as an array of nsCOMPtrs, since
+<span class="lineNum">     840 </span>            :   // bindgen knows what those look like, and eliminate the reinterpret_cast.
+<span class="lineNum">     841 </span>            :   // But it's not obvious that that would be preferable.
+<span class="lineNum">     842 </span>            :   static_assert(sizeof(nsCOMPtr&lt;nsIAtom&gt;) == sizeof(nsIAtom*), &quot;Bad simplification&quot;);
+<span class="lineNum">     843 </span>            :   static_assert(alignof(nsCOMPtr&lt;nsIAtom&gt;) == alignof(nsIAtom*), &quot;Bad simplification&quot;);
+<span class="lineNum">     844 </span>            : 
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :   nsCOMPtr&lt;nsIAtom&gt;* elements = atomArray-&gt;Elements();</span>
+<span class="lineNum">     846 </span><span class="lineNoCov">          0 :   nsIAtom** rawElements = reinterpret_cast&lt;nsIAtom**&gt;(elements);</span>
+<span class="lineNum">     847 </span><span class="lineNoCov">          0 :   *aClassList = rawElements;</span>
+<span class="lineNum">     848 </span><span class="lineNoCov">          0 :   return atomArray-&gt;Length();</span>
+<span class="lineNum">     849 </span>            : }
+<span class="lineNum">     850 </span>            : 
+<span class="lineNum">     851 </span>            : #define SERVO_IMPL_ELEMENT_ATTR_MATCHING_FUNCTIONS(prefix_, implementor_)      \
+<span class="lineNum">     852 </span>            :   nsIAtom* prefix_##AtomAttrValue(implementor_ aElement, nsIAtom* aName)       \
+<span class="lineNum">     853 </span>            :   {                                                                            \
+<span class="lineNum">     854 </span>            :     return AtomAttrValue(aElement, aName);                                     \
+<span class="lineNum">     855 </span>            :   }                                                                            \
+<span class="lineNum">     856 </span>            :   bool prefix_##HasAttr(implementor_ aElement, nsIAtom* aNS, nsIAtom* aName)   \
+<span class="lineNum">     857 </span>            :   {                                                                            \
+<span class="lineNum">     858 </span>            :     return HasAttr(aElement, aNS, aName);                                      \
+<span class="lineNum">     859 </span>            :   }                                                                            \
+<span class="lineNum">     860 </span>            :   bool prefix_##AttrEquals(implementor_ aElement, nsIAtom* aNS,                \
+<span class="lineNum">     861 </span>            :                            nsIAtom* aName, nsIAtom* aStr, bool aIgnoreCase)    \
+<span class="lineNum">     862 </span>            :   {                                                                            \
+<span class="lineNum">     863 </span>            :     return AttrEquals(aElement, aNS, aName, aStr, aIgnoreCase);                \
+<span class="lineNum">     864 </span>            :   }                                                                            \
+<span class="lineNum">     865 </span>            :   bool prefix_##AttrDashEquals(implementor_ aElement, nsIAtom* aNS,            \
+<span class="lineNum">     866 </span>            :                                nsIAtom* aName, nsIAtom* aStr)                  \
+<span class="lineNum">     867 </span>            :   {                                                                            \
+<span class="lineNum">     868 </span>            :     return AttrDashEquals(aElement, aNS, aName, aStr);                         \
+<span class="lineNum">     869 </span>            :   }                                                                            \
+<span class="lineNum">     870 </span>            :   bool prefix_##AttrIncludes(implementor_ aElement, nsIAtom* aNS,              \
+<span class="lineNum">     871 </span>            :                              nsIAtom* aName, nsIAtom* aStr)                    \
+<span class="lineNum">     872 </span>            :   {                                                                            \
+<span class="lineNum">     873 </span>            :     return AttrIncludes(aElement, aNS, aName, aStr);                           \
+<span class="lineNum">     874 </span>            :   }                                                                            \
+<span class="lineNum">     875 </span>            :   bool prefix_##AttrHasSubstring(implementor_ aElement, nsIAtom* aNS,          \
+<span class="lineNum">     876 </span>            :                                  nsIAtom* aName, nsIAtom* aStr)                \
+<span class="lineNum">     877 </span>            :   {                                                                            \
+<span class="lineNum">     878 </span>            :     return AttrHasSubstring(aElement, aNS, aName, aStr);                       \
+<span class="lineNum">     879 </span>            :   }                                                                            \
+<span class="lineNum">     880 </span>            :   bool prefix_##AttrHasPrefix(implementor_ aElement, nsIAtom* aNS,             \
+<span class="lineNum">     881 </span>            :                               nsIAtom* aName, nsIAtom* aStr)                   \
+<span class="lineNum">     882 </span>            :   {                                                                            \
+<span class="lineNum">     883 </span>            :     return AttrHasPrefix(aElement, aNS, aName, aStr);                          \
+<span class="lineNum">     884 </span>            :   }                                                                            \
+<span class="lineNum">     885 </span>            :   bool prefix_##AttrHasSuffix(implementor_ aElement, nsIAtom* aNS,             \
+<span class="lineNum">     886 </span>            :                               nsIAtom* aName, nsIAtom* aStr)                   \
+<span class="lineNum">     887 </span>            :   {                                                                            \
+<span class="lineNum">     888 </span>            :     return AttrHasSuffix(aElement, aNS, aName, aStr);                          \
+<span class="lineNum">     889 </span>            :   }                                                                            \
+<span class="lineNum">     890 </span>            :   uint32_t prefix_##ClassOrClassList(implementor_ aElement, nsIAtom** aClass,  \
+<span class="lineNum">     891 </span>            :                                      nsIAtom*** aClassList)                    \
+<span class="lineNum">     892 </span>            :   {                                                                            \
+<span class="lineNum">     893 </span>            :     return ClassOrClassList(aElement, aClass, aClassList);                     \
+<a name="894"><span class="lineNum">     894 </span>            :   }</a>
+<a name="895"><span class="lineNum">     895 </span>            : </a>
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 : SERVO_IMPL_ELEMENT_ATTR_MATCHING_FUNCTIONS(Gecko_, RawGeckoElementBorrowed)</span>
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 : SERVO_IMPL_ELEMENT_ATTR_MATCHING_FUNCTIONS(Gecko_Snapshot, const ServoElementSnapshot*)</span>
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span>            : #undef SERVO_IMPL_ELEMENT_ATTR_MATCHING_FUNCTIONS
+<a name="900"><span class="lineNum">     900 </span>            : </a>
+<span class="lineNum">     901 </span>            : nsIAtom*
+<span class="lineNum">     902 </span><span class="lineNoCov">          0 : Gecko_Atomize(const char* aString, uint32_t aLength)</span>
+<span class="lineNum">     903 </span>            : {
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :   return NS_Atomize(nsDependentCSubstring(aString, aLength)).take();</span>
+<span class="lineNum">     905 </span>            : }
+<a name="906"><span class="lineNum">     906 </span>            : </a>
+<span class="lineNum">     907 </span>            : void
+<span class="lineNum">     908 </span><span class="lineNoCov">          0 : Gecko_AddRefAtom(nsIAtom* aAtom)</span>
+<span class="lineNum">     909 </span>            : {
+<span class="lineNum">     910 </span><span class="lineNoCov">          0 :   NS_ADDREF(aAtom);</span>
+<span class="lineNum">     911 </span><span class="lineNoCov">          0 : }</span>
+<a name="912"><span class="lineNum">     912 </span>            : </a>
+<span class="lineNum">     913 </span>            : void
+<span class="lineNum">     914 </span><span class="lineNoCov">          0 : Gecko_ReleaseAtom(nsIAtom* aAtom)</span>
+<span class="lineNum">     915 </span>            : {
+<span class="lineNum">     916 </span><span class="lineNoCov">          0 :   NS_RELEASE(aAtom);</span>
+<span class="lineNum">     917 </span><span class="lineNoCov">          0 : }</span>
+<a name="918"><span class="lineNum">     918 </span>            : </a>
+<span class="lineNum">     919 </span>            : const uint16_t*
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 : Gecko_GetAtomAsUTF16(nsIAtom* aAtom, uint32_t* aLength)</span>
+<span class="lineNum">     921 </span>            : {
+<span class="lineNum">     922 </span>            :   static_assert(sizeof(char16_t) == sizeof(uint16_t), &quot;Servo doesn't know what a char16_t is&quot;);
+<span class="lineNum">     923 </span>            :   MOZ_ASSERT(aAtom);
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :   *aLength = aAtom-&gt;GetLength();</span>
+<span class="lineNum">     925 </span>            : 
+<span class="lineNum">     926 </span>            :   // We need to manually cast from char16ptr_t to const char16_t* to handle the
+<span class="lineNum">     927 </span>            :   // MOZ_USE_CHAR16_WRAPPER we use on WIndows.
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :   return reinterpret_cast&lt;const uint16_t*&gt;(static_cast&lt;const char16_t*&gt;(aAtom-&gt;GetUTF16String()));</span>
+<span class="lineNum">     929 </span>            : }
+<a name="930"><span class="lineNum">     930 </span>            : </a>
+<span class="lineNum">     931 </span>            : bool
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 : Gecko_AtomEqualsUTF8(nsIAtom* aAtom, const char* aString, uint32_t aLength)</span>
+<span class="lineNum">     933 </span>            : {
+<span class="lineNum">     934 </span>            :   // XXXbholley: We should be able to do this without converting, I just can't
+<span class="lineNum">     935 </span>            :   // find the right thing to call.
+<span class="lineNum">     936 </span>            :   nsDependentAtomString atomStr(aAtom);
+<span class="lineNum">     937 </span><span class="lineNoCov">          0 :   NS_ConvertUTF8toUTF16 inStr(nsDependentCSubstring(aString, aLength));</span>
+<span class="lineNum">     938 </span><span class="lineNoCov">          0 :   return atomStr.Equals(inStr);</span>
+<span class="lineNum">     939 </span>            : }
+<a name="940"><span class="lineNum">     940 </span>            : </a>
+<span class="lineNum">     941 </span>            : bool
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 : Gecko_AtomEqualsUTF8IgnoreCase(nsIAtom* aAtom, const char* aString, uint32_t aLength)</span>
+<span class="lineNum">     943 </span>            : {
+<span class="lineNum">     944 </span>            :   // XXXbholley: We should be able to do this without converting, I just can't
+<span class="lineNum">     945 </span>            :   // find the right thing to call.
+<span class="lineNum">     946 </span>            :   nsDependentAtomString atomStr(aAtom);
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :   NS_ConvertUTF8toUTF16 inStr(nsDependentCSubstring(aString, aLength));</span>
+<span class="lineNum">     948 </span><span class="lineNoCov">          0 :   return nsContentUtils::EqualsIgnoreASCIICase(atomStr, inStr);</span>
+<span class="lineNum">     949 </span>            : }
+<a name="950"><span class="lineNum">     950 </span>            : </a>
+<span class="lineNum">     951 </span>            : void
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 : Gecko_FontFamilyList_Clear(FontFamilyList* aList) {</span>
+<span class="lineNum">     953 </span>            :   aList-&gt;Clear();
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 : }</span>
+<a name="955"><span class="lineNum">     955 </span>            : </a>
+<span class="lineNum">     956 </span>            : void
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 : Gecko_FontFamilyList_AppendNamed(FontFamilyList* aList, nsIAtom* aName, bool aQuoted)</span>
+<span class="lineNum">     958 </span>            : {
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :   FontFamilyName family;</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :   aName-&gt;ToString(family.mName);</span>
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :   if (aQuoted) {</span>
+<span class="lineNum">     962 </span><span class="lineNoCov">          0 :     family.mType = eFamily_named_quoted;</span>
+<span class="lineNum">     963 </span>            :   }
+<span class="lineNum">     964 </span>            : 
+<span class="lineNum">     965 </span>            :   aList-&gt;Append(family);
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 : }</span>
+<a name="967"><span class="lineNum">     967 </span>            : </a>
+<span class="lineNum">     968 </span>            : void
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 : Gecko_FontFamilyList_AppendGeneric(FontFamilyList* aList, FontFamilyType aType)</span>
+<span class="lineNum">     970 </span>            : {
+<span class="lineNum">     971 </span><span class="lineNoCov">          0 :   aList-&gt;Append(FontFamilyName(aType));</span>
+<span class="lineNum">     972 </span><span class="lineNoCov">          0 : }</span>
+<a name="973"><span class="lineNum">     973 </span>            : </a>
+<span class="lineNum">     974 </span>            : void
+<span class="lineNum">     975 </span><span class="lineNoCov">          0 : Gecko_CopyFontFamilyFrom(nsFont* dst, const nsFont* src)</span>
+<span class="lineNum">     976 </span>            : {
+<span class="lineNum">     977 </span><span class="lineNoCov">          0 :   dst-&gt;fontlist = src-&gt;fontlist;</span>
+<span class="lineNum">     978 </span><span class="lineNoCov">          0 : }</span>
+<a name="979"><span class="lineNum">     979 </span>            : </a>
+<span class="lineNum">     980 </span>            : void
+<span class="lineNum">     981 </span><span class="lineNoCov">          0 : Gecko_SetImageOrientation(nsStyleVisibility* aVisibility,</span>
+<span class="lineNum">     982 </span>            :                           double aRadians, bool aFlip)
+<span class="lineNum">     983 </span>            : {
+<span class="lineNum">     984 </span>            :   aVisibility-&gt;mImageOrientation =
+<span class="lineNum">     985 </span><span class="lineNoCov">          0 :     nsStyleImageOrientation::CreateAsAngleAndFlip(aRadians, aFlip);</span>
+<span class="lineNum">     986 </span><span class="lineNoCov">          0 : }</span>
+<a name="987"><span class="lineNum">     987 </span>            : </a>
+<span class="lineNum">     988 </span>            : void
+<span class="lineNum">     989 </span><span class="lineNoCov">          0 : Gecko_SetImageOrientationAsFromImage(nsStyleVisibility* aVisibility)</span>
+<span class="lineNum">     990 </span>            : {
+<span class="lineNum">     991 </span><span class="lineNoCov">          0 :   aVisibility-&gt;mImageOrientation = nsStyleImageOrientation::CreateAsFromImage();</span>
+<span class="lineNum">     992 </span><span class="lineNoCov">          0 : }</span>
+<a name="993"><span class="lineNum">     993 </span>            : </a>
+<span class="lineNum">     994 </span>            : void
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 : Gecko_CopyImageOrientationFrom(nsStyleVisibility* aDst,</span>
+<span class="lineNum">     996 </span>            :                                const nsStyleVisibility* aSrc)
+<span class="lineNum">     997 </span>            : {
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :   aDst-&gt;mImageOrientation = aSrc-&gt;mImageOrientation;</span>
+<span class="lineNum">     999 </span><span class="lineNoCov">          0 : }</span>
+<a name="1000"><span class="lineNum">    1000 </span>            : </a>
+<span class="lineNum">    1001 </span>            : void
+<span class="lineNum">    1002 </span><span class="lineNoCov">          0 : Gecko_SetListStyleType(nsStyleList* style_struct, uint32_t type)</span>
+<span class="lineNum">    1003 </span>            : {
+<span class="lineNum">    1004 </span>            :   // Builtin counter styles are static and use no-op refcounting, and thus are
+<span class="lineNum">    1005 </span>            :   // safe to use off-main-thread.
+<span class="lineNum">    1006 </span><span class="lineNoCov">          0 :   style_struct-&gt;SetCounterStyle(CounterStyleManager::GetBuiltinStyle(type));</span>
+<span class="lineNum">    1007 </span><span class="lineNoCov">          0 : }</span>
+<a name="1008"><span class="lineNum">    1008 </span>            : </a>
+<span class="lineNum">    1009 </span>            : void
+<span class="lineNum">    1010 </span><span class="lineNoCov">          0 : Gecko_CopyListStyleTypeFrom(nsStyleList* dst, const nsStyleList* src)</span>
+<span class="lineNum">    1011 </span>            : {
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 :   dst-&gt;SetCounterStyle(src-&gt;GetCounterStyle());</span>
+<span class="lineNum">    1013 </span><span class="lineNoCov">          0 : }</span>
+<a name="1014"><span class="lineNum">    1014 </span>            : </a>
+<span class="lineNum">    1015 </span>            : already_AddRefed&lt;css::URLValue&gt;
+<span class="lineNum">    1016 </span><span class="lineNoCov">          0 : ServoBundledURI::IntoCssUrl()</span>
+<span class="lineNum">    1017 </span>            : {
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :   if (!mURLString) {</span>
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">    1020 </span>            :   }
+<span class="lineNum">    1021 </span>            : 
+<span class="lineNum">    1022 </span>            :   MOZ_ASSERT(mExtraData-&gt;GetReferrer());
+<span class="lineNum">    1023 </span>            :   MOZ_ASSERT(mExtraData-&gt;GetPrincipal());
+<span class="lineNum">    1024 </span>            : 
+<span class="lineNum">    1025 </span>            :   NS_ConvertUTF8toUTF16 url(reinterpret_cast&lt;const char*&gt;(mURLString),
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :                             mURLStringLength);</span>
+<span class="lineNum">    1027 </span>            : 
+<span class="lineNum">    1028 </span>            :   RefPtr&lt;css::URLValue&gt; urlValue =
+<span class="lineNum">    1029 </span><span class="lineNoCov">          0 :     new css::URLValue(url, do_AddRef(mExtraData));</span>
+<span class="lineNum">    1030 </span>            :   return urlValue.forget();
+<span class="lineNum">    1031 </span>            : }
+<a name="1032"><span class="lineNum">    1032 </span>            : </a>
+<span class="lineNum">    1033 </span>            : void
+<span class="lineNum">    1034 </span><span class="lineNoCov">          0 : Gecko_SetNullImageValue(nsStyleImage* aImage)</span>
+<span class="lineNum">    1035 </span>            : {
+<span class="lineNum">    1036 </span>            :   MOZ_ASSERT(aImage);
+<span class="lineNum">    1037 </span><span class="lineNoCov">          0 :   aImage-&gt;SetNull();</span>
+<span class="lineNum">    1038 </span><span class="lineNoCov">          0 : }</span>
+<a name="1039"><span class="lineNum">    1039 </span>            : </a>
+<span class="lineNum">    1040 </span>            : void
+<span class="lineNum">    1041 </span><span class="lineNoCov">          0 : Gecko_SetGradientImageValue(nsStyleImage* aImage, nsStyleGradient* aGradient)</span>
+<span class="lineNum">    1042 </span>            : {
+<span class="lineNum">    1043 </span>            :   MOZ_ASSERT(aImage);
+<span class="lineNum">    1044 </span><span class="lineNoCov">          0 :   aImage-&gt;SetGradientData(aGradient);</span>
+<span class="lineNum">    1045 </span><span class="lineNoCov">          0 : }</span>
+<a name="1046"><span class="lineNum">    1046 </span>            : </a>
+<span class="lineNum">    1047 </span>            : static already_AddRefed&lt;nsStyleImageRequest&gt;
+<span class="lineNum">    1048 </span><span class="lineNoCov">          0 : CreateStyleImageRequest(nsStyleImageRequest::Mode aModeFlags,</span>
+<span class="lineNum">    1049 </span>            :                         ServoBundledURI aURI)
+<span class="lineNum">    1050 </span>            : {
+<span class="lineNum">    1051 </span>            :   MOZ_ASSERT(aURI.mURLString);
+<span class="lineNum">    1052 </span>            :   MOZ_ASSERT(aURI.mExtraData-&gt;GetReferrer());
+<span class="lineNum">    1053 </span>            :   MOZ_ASSERT(aURI.mExtraData-&gt;GetPrincipal());
+<span class="lineNum">    1054 </span>            : 
+<span class="lineNum">    1055 </span>            :   NS_ConvertUTF8toUTF16 url(reinterpret_cast&lt;const char*&gt;(aURI.mURLString),
+<span class="lineNum">    1056 </span><span class="lineNoCov">          0 :                             aURI.mURLStringLength);</span>
+<span class="lineNum">    1057 </span>            : 
+<span class="lineNum">    1058 </span>            :   RefPtr&lt;nsStyleImageRequest&gt; req =
+<span class="lineNum">    1059 </span><span class="lineNoCov">          0 :     new nsStyleImageRequest(aModeFlags, url, do_AddRef(aURI.mExtraData));</span>
+<span class="lineNum">    1060 </span><span class="lineNoCov">          0 :   return req.forget();</span>
+<span class="lineNum">    1061 </span>            : }
+<a name="1062"><span class="lineNum">    1062 </span>            : </a>
+<span class="lineNum">    1063 </span>            : void
+<span class="lineNum">    1064 </span><span class="lineNoCov">          0 : Gecko_SetUrlImageValue(nsStyleImage* aImage, ServoBundledURI aURI)</span>
+<span class="lineNum">    1065 </span>            : {
+<span class="lineNum">    1066 </span>            :   RefPtr&lt;nsStyleImageRequest&gt; req =
+<span class="lineNum">    1067 </span><span class="lineNoCov">          0 :     CreateStyleImageRequest(nsStyleImageRequest::Mode::Track, aURI);</span>
+<span class="lineNum">    1068 </span><span class="lineNoCov">          0 :   aImage-&gt;SetImageRequest(req.forget());</span>
+<span class="lineNum">    1069 </span><span class="lineNoCov">          0 : }</span>
+<a name="1070"><span class="lineNum">    1070 </span>            : </a>
+<span class="lineNum">    1071 </span>            : void
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 : Gecko_SetImageElement(nsStyleImage* aImage, nsIAtom* aAtom) {</span>
+<span class="lineNum">    1073 </span>            :   MOZ_ASSERT(aImage);
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :   aImage-&gt;SetElementId(do_AddRef(aAtom));</span>
+<span class="lineNum">    1075 </span><span class="lineNoCov">          0 : }</span>
+<a name="1076"><span class="lineNum">    1076 </span>            : </a>
+<span class="lineNum">    1077 </span>            : void
+<span class="lineNum">    1078 </span><span class="lineNoCov">          0 : Gecko_CopyImageValueFrom(nsStyleImage* aImage, const nsStyleImage* aOther)</span>
+<span class="lineNum">    1079 </span>            : {
+<span class="lineNum">    1080 </span>            :   MOZ_ASSERT(aImage);
+<span class="lineNum">    1081 </span>            :   MOZ_ASSERT(aOther);
+<span class="lineNum">    1082 </span>            : 
+<span class="lineNum">    1083 </span><span class="lineNoCov">          0 :   *aImage = *aOther;</span>
+<span class="lineNum">    1084 </span><span class="lineNoCov">          0 : }</span>
+<a name="1085"><span class="lineNum">    1085 </span>            : </a>
+<span class="lineNum">    1086 </span>            : void
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 : Gecko_InitializeImageCropRect(nsStyleImage* aImage)</span>
+<span class="lineNum">    1088 </span>            : {
+<span class="lineNum">    1089 </span>            :   MOZ_ASSERT(aImage);
+<span class="lineNum">    1090 </span><span class="lineNoCov">          0 :   aImage-&gt;SetCropRect(MakeUnique&lt;nsStyleSides&gt;());</span>
+<span class="lineNum">    1091 </span><span class="lineNoCov">          0 : }</span>
+<a name="1092"><span class="lineNum">    1092 </span>            : </a>
+<span class="lineNum">    1093 </span>            : void
+<span class="lineNum">    1094 </span><span class="lineNoCov">          0 : Gecko_SetCursorArrayLength(nsStyleUserInterface* aStyleUI, size_t aLen)</span>
+<span class="lineNum">    1095 </span>            : {
+<span class="lineNum">    1096 </span><span class="lineNoCov">          0 :   aStyleUI-&gt;mCursorImages.Clear();</span>
+<span class="lineNum">    1097 </span><span class="lineNoCov">          0 :   aStyleUI-&gt;mCursorImages.SetLength(aLen);</span>
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 : }</span>
+<a name="1099"><span class="lineNum">    1099 </span>            : </a>
+<span class="lineNum">    1100 </span>            : void
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 : Gecko_SetCursorImage(nsCursorImage* aCursor, ServoBundledURI aURI)</span>
+<span class="lineNum">    1102 </span>            : {
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :   aCursor-&gt;mImage =</span>
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :     CreateStyleImageRequest(nsStyleImageRequest::Mode::Discard, aURI);</span>
+<span class="lineNum">    1105 </span><span class="lineNoCov">          0 : }</span>
+<a name="1106"><span class="lineNum">    1106 </span>            : </a>
+<span class="lineNum">    1107 </span>            : void
+<span class="lineNum">    1108 </span><span class="lineNoCov">          0 : Gecko_CopyCursorArrayFrom(nsStyleUserInterface* aDest,</span>
+<span class="lineNum">    1109 </span>            :                           const nsStyleUserInterface* aSrc)
+<span class="lineNum">    1110 </span>            : {
+<span class="lineNum">    1111 </span><span class="lineNoCov">          0 :   aDest-&gt;mCursorImages = aSrc-&gt;mCursorImages;</span>
+<span class="lineNum">    1112 </span><span class="lineNoCov">          0 : }</span>
+<a name="1113"><span class="lineNum">    1113 </span>            : </a>
+<span class="lineNum">    1114 </span>            : void
+<span class="lineNum">    1115 </span><span class="lineNoCov">          0 : Gecko_SetContentDataImage(nsStyleContentData* aContent, ServoBundledURI aURI)</span>
+<span class="lineNum">    1116 </span>            : {
+<span class="lineNum">    1117 </span><span class="lineNoCov">          0 :   RefPtr&lt;nsStyleImageRequest&gt; req = CreateStyleImageRequest(nsStyleImageRequest::Mode::Track, aURI);</span>
+<span class="lineNum">    1118 </span><span class="lineNoCov">          0 :   aContent-&gt;SetImageRequest(req.forget());</span>
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 : }</span>
+<a name="1120"><span class="lineNum">    1120 </span>            : </a>
+<span class="lineNum">    1121 </span>            : void
+<span class="lineNum">    1122 </span><span class="lineNoCov">          0 : Gecko_SetContentDataArray(nsStyleContentData* aContent,</span>
+<span class="lineNum">    1123 </span>            :                           nsStyleContentType aType, uint32_t aLen)
+<span class="lineNum">    1124 </span>            : {
+<span class="lineNum">    1125 </span><span class="lineNoCov">          0 :   nsCSSValue::Array* arr = nsCSSValue::Array::Create(aLen);</span>
+<span class="lineNum">    1126 </span>            :   aContent-&gt;SetCounters(aType, arr);
+<span class="lineNum">    1127 </span><span class="lineNoCov">          0 : }</span>
+<a name="1128"><span class="lineNum">    1128 </span>            : </a>
+<span class="lineNum">    1129 </span>            : nsStyleGradient*
+<span class="lineNum">    1130 </span><span class="lineNoCov">          0 : Gecko_CreateGradient(uint8_t aShape,</span>
+<span class="lineNum">    1131 </span>            :                      uint8_t aSize,
+<span class="lineNum">    1132 </span>            :                      bool aRepeating,
+<span class="lineNum">    1133 </span>            :                      bool aLegacySyntax,
+<span class="lineNum">    1134 </span>            :                      uint32_t aStopCount)
+<span class="lineNum">    1135 </span>            : {
+<span class="lineNum">    1136 </span><span class="lineNoCov">          0 :   nsStyleGradient* result = new nsStyleGradient();</span>
+<span class="lineNum">    1137 </span>            : 
+<span class="lineNum">    1138 </span><span class="lineNoCov">          0 :   result-&gt;mShape = aShape;</span>
+<span class="lineNum">    1139 </span><span class="lineNoCov">          0 :   result-&gt;mSize = aSize;</span>
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :   result-&gt;mRepeating = aRepeating;</span>
+<span class="lineNum">    1141 </span><span class="lineNoCov">          0 :   result-&gt;mLegacySyntax = aLegacySyntax;</span>
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 :   result-&gt;mAngle.SetNoneValue();</span>
+<span class="lineNum">    1144 </span><span class="lineNoCov">          0 :   result-&gt;mBgPosX.SetNoneValue();</span>
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :   result-&gt;mBgPosY.SetNoneValue();</span>
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :   result-&gt;mRadiusX.SetNoneValue();</span>
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :   result-&gt;mRadiusY.SetNoneValue();</span>
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span><span class="lineNoCov">          0 :   nsStyleGradientStop dummyStop;</span>
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :   dummyStop.mLocation.SetNoneValue();</span>
+<span class="lineNum">    1151 </span><span class="lineNoCov">          0 :   dummyStop.mColor = NS_RGB(0, 0, 0);</span>
+<span class="lineNum">    1152 </span><span class="lineNoCov">          0 :   dummyStop.mIsInterpolationHint = 0;</span>
+<span class="lineNum">    1153 </span>            : 
+<span class="lineNum">    1154 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; i &lt; aStopCount; i++) {</span>
+<span class="lineNum">    1155 </span><span class="lineNoCov">          0 :     result-&gt;mStops.AppendElement(dummyStop);</span>
+<span class="lineNum">    1156 </span>            :   }
+<span class="lineNum">    1157 </span>            : 
+<span class="lineNum">    1158 </span><span class="lineNoCov">          0 :   return result;</span>
+<span class="lineNum">    1159 </span>            : }
+<a name="1160"><span class="lineNum">    1160 </span>            : </a>
+<span class="lineNum">    1161 </span>            : void
+<span class="lineNum">    1162 </span><span class="lineNoCov">          0 : Gecko_SetListStyleImageNone(nsStyleList* aList)</span>
+<span class="lineNum">    1163 </span>            : {
+<span class="lineNum">    1164 </span><span class="lineNoCov">          0 :   aList-&gt;mListStyleImage = nullptr;</span>
+<span class="lineNum">    1165 </span><span class="lineNoCov">          0 : }</span>
+<a name="1166"><span class="lineNum">    1166 </span>            : </a>
+<span class="lineNum">    1167 </span>            : void
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 : Gecko_SetListStyleImage(nsStyleList* aList,</span>
+<span class="lineNum">    1169 </span>            :                         ServoBundledURI aURI)
+<span class="lineNum">    1170 </span>            : {
+<span class="lineNum">    1171 </span><span class="lineNoCov">          0 :   aList-&gt;mListStyleImage =</span>
+<span class="lineNum">    1172 </span><span class="lineNoCov">          0 :     CreateStyleImageRequest(nsStyleImageRequest::Mode(0), aURI);</span>
+<span class="lineNum">    1173 </span><span class="lineNoCov">          0 : }</span>
+<a name="1174"><span class="lineNum">    1174 </span>            : </a>
+<span class="lineNum">    1175 </span>            : void
+<span class="lineNum">    1176 </span><span class="lineNoCov">          0 : Gecko_CopyListStyleImageFrom(nsStyleList* aList, const nsStyleList* aSource)</span>
+<span class="lineNum">    1177 </span>            : {
+<span class="lineNum">    1178 </span><span class="lineNoCov">          0 :   aList-&gt;mListStyleImage = aSource-&gt;mListStyleImage;</span>
+<span class="lineNum">    1179 </span><span class="lineNoCov">          0 : }</span>
+<a name="1180"><span class="lineNum">    1180 </span>            : </a>
+<span class="lineNum">    1181 </span>            : void
+<span class="lineNum">    1182 </span><span class="lineNoCov">          0 : Gecko_EnsureTArrayCapacity(void* aArray, size_t aCapacity, size_t aElemSize)</span>
+<span class="lineNum">    1183 </span>            : {
+<span class="lineNum">    1184 </span>            :   auto base =
+<span class="lineNum">    1185 </span>            :     reinterpret_cast&lt;nsTArray_base&lt;nsTArrayInfallibleAllocator,
+<span class="lineNum">    1186 </span><span class="lineNoCov">          0 :                                    nsTArray_CopyWithMemutils&gt;*&gt;(aArray);</span>
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span><span class="lineNoCov">          0 :   base-&gt;EnsureCapacity&lt;nsTArrayInfallibleAllocator&gt;(aCapacity, aElemSize);</span>
+<span class="lineNum">    1189 </span><span class="lineNoCov">          0 : }</span>
+<a name="1190"><span class="lineNum">    1190 </span>            : </a>
+<span class="lineNum">    1191 </span>            : void
+<span class="lineNum">    1192 </span><span class="lineNoCov">          0 : Gecko_ClearPODTArray(void* aArray, size_t aElementSize, size_t aElementAlign)</span>
+<span class="lineNum">    1193 </span>            : {
+<span class="lineNum">    1194 </span>            :   auto base =
+<span class="lineNum">    1195 </span>            :     reinterpret_cast&lt;nsTArray_base&lt;nsTArrayInfallibleAllocator,
+<span class="lineNum">    1196 </span><span class="lineNoCov">          0 :                                    nsTArray_CopyWithMemutils&gt;*&gt;(aArray);</span>
+<span class="lineNum">    1197 </span>            : 
+<span class="lineNum">    1198 </span>            :   base-&gt;template ShiftData&lt;nsTArrayInfallibleAllocator&gt;(0, base-&gt;Length(), 0,
+<span class="lineNum">    1199 </span><span class="lineNoCov">          0 :                                                         aElementSize, aElementAlign);</span>
+<span class="lineNum">    1200 </span><span class="lineNoCov">          0 : }</span>
+<a name="1201"><span class="lineNum">    1201 </span>            : </a>
+<span class="lineNum">    1202 </span>            : void
+<span class="lineNum">    1203 </span><span class="lineNoCov">          0 : Gecko_CopyStyleGridTemplateValues(nsStyleGridTemplate* aGridTemplate,</span>
+<span class="lineNum">    1204 </span>            :                                   const nsStyleGridTemplate* aOther)
+<span class="lineNum">    1205 </span>            : {
+<span class="lineNum">    1206 </span><span class="lineNoCov">          0 :   *aGridTemplate = *aOther;</span>
+<span class="lineNum">    1207 </span><span class="lineNoCov">          0 : }</span>
+<a name="1208"><span class="lineNum">    1208 </span>            : </a>
+<span class="lineNum">    1209 </span>            : void
+<span class="lineNum">    1210 </span><span class="lineNoCov">          0 : Gecko_ClearAndResizeStyleContents(nsStyleContent* aContent, uint32_t aHowMany)</span>
+<span class="lineNum">    1211 </span>            : {
+<span class="lineNum">    1212 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateContents(aHowMany);</span>
+<span class="lineNum">    1213 </span><span class="lineNoCov">          0 : }</span>
+<a name="1214"><span class="lineNum">    1214 </span>            : </a>
+<span class="lineNum">    1215 </span>            : void
+<span class="lineNum">    1216 </span><span class="lineNoCov">          0 : Gecko_CopyStyleContentsFrom(nsStyleContent* aContent, const nsStyleContent* aOther)</span>
+<span class="lineNum">    1217 </span>            : {
+<span class="lineNum">    1218 </span><span class="lineNoCov">          0 :   uint32_t count = aOther-&gt;ContentCount();</span>
+<span class="lineNum">    1219 </span>            : 
+<span class="lineNum">    1220 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateContents(count);</span>
+<span class="lineNum">    1221 </span>            : 
+<span class="lineNum">    1222 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; i &lt; count; ++i) {</span>
+<span class="lineNum">    1223 </span><span class="lineNoCov">          0 :     aContent-&gt;ContentAt(i) = aOther-&gt;ContentAt(i);</span>
+<span class="lineNum">    1224 </span>            :   }
+<span class="lineNum">    1225 </span><span class="lineNoCov">          0 : }</span>
+<a name="1226"><span class="lineNum">    1226 </span>            : </a>
+<span class="lineNum">    1227 </span>            : void
+<span class="lineNum">    1228 </span><span class="lineNoCov">          0 : Gecko_ClearAndResizeCounterIncrements(nsStyleContent* aContent, uint32_t aHowMany)</span>
+<span class="lineNum">    1229 </span>            : {
+<span class="lineNum">    1230 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateCounterIncrements(aHowMany);</span>
+<span class="lineNum">    1231 </span><span class="lineNoCov">          0 : }</span>
+<a name="1232"><span class="lineNum">    1232 </span>            : </a>
+<span class="lineNum">    1233 </span>            : void
+<span class="lineNum">    1234 </span><span class="lineNoCov">          0 : Gecko_CopyCounterIncrementsFrom(nsStyleContent* aContent, const nsStyleContent* aOther)</span>
+<span class="lineNum">    1235 </span>            : {
+<span class="lineNum">    1236 </span><span class="lineNoCov">          0 :   uint32_t count = aOther-&gt;CounterIncrementCount();</span>
+<span class="lineNum">    1237 </span>            : 
+<span class="lineNum">    1238 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateCounterIncrements(count);</span>
+<span class="lineNum">    1239 </span>            : 
+<span class="lineNum">    1240 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; i &lt; count; ++i) {</span>
+<span class="lineNum">    1241 </span><span class="lineNoCov">          0 :     const nsStyleCounterData&amp; data = aOther-&gt;CounterIncrementAt(i);</span>
+<span class="lineNum">    1242 </span><span class="lineNoCov">          0 :     aContent-&gt;SetCounterIncrementAt(i, data.mCounter, data.mValue);</span>
+<span class="lineNum">    1243 </span>            :   }
+<span class="lineNum">    1244 </span><span class="lineNoCov">          0 : }</span>
+<a name="1245"><span class="lineNum">    1245 </span>            : </a>
+<span class="lineNum">    1246 </span>            : void
+<span class="lineNum">    1247 </span><span class="lineNoCov">          0 : Gecko_ClearAndResizeCounterResets(nsStyleContent* aContent, uint32_t aHowMany)</span>
+<span class="lineNum">    1248 </span>            : {
+<span class="lineNum">    1249 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateCounterResets(aHowMany);</span>
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 : }</span>
+<a name="1251"><span class="lineNum">    1251 </span>            : </a>
+<span class="lineNum">    1252 </span>            : void
+<span class="lineNum">    1253 </span><span class="lineNoCov">          0 : Gecko_CopyCounterResetsFrom(nsStyleContent* aContent, const nsStyleContent* aOther)</span>
+<span class="lineNum">    1254 </span>            : {
+<span class="lineNum">    1255 </span><span class="lineNoCov">          0 :   uint32_t count = aOther-&gt;CounterResetCount();</span>
+<span class="lineNum">    1256 </span>            : 
+<span class="lineNum">    1257 </span><span class="lineNoCov">          0 :   aContent-&gt;AllocateCounterResets(count);</span>
+<span class="lineNum">    1258 </span>            : 
+<span class="lineNum">    1259 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; i &lt; count; ++i) {</span>
+<span class="lineNum">    1260 </span><span class="lineNoCov">          0 :     const nsStyleCounterData&amp; data = aOther-&gt;CounterResetAt(i);</span>
+<span class="lineNum">    1261 </span><span class="lineNoCov">          0 :     aContent-&gt;SetCounterResetAt(i, data.mCounter, data.mValue);</span>
+<span class="lineNum">    1262 </span>            :   }
+<span class="lineNum">    1263 </span><span class="lineNoCov">          0 : }</span>
+<a name="1264"><span class="lineNum">    1264 </span>            : </a>
+<span class="lineNum">    1265 </span>            : void
+<span class="lineNum">    1266 </span><span class="lineNoCov">          0 : Gecko_EnsureImageLayersLength(nsStyleImageLayers* aLayers, size_t aLen,</span>
+<span class="lineNum">    1267 </span>            :                               nsStyleImageLayers::LayerType aLayerType)
+<span class="lineNum">    1268 </span>            : {
+<span class="lineNum">    1269 </span><span class="lineNoCov">          0 :   size_t oldLength = aLayers-&gt;mLayers.Length();</span>
+<span class="lineNum">    1270 </span>            : 
+<span class="lineNum">    1271 </span><span class="lineNoCov">          0 :   aLayers-&gt;mLayers.EnsureLengthAtLeast(aLen);</span>
+<span class="lineNum">    1272 </span>            : 
+<span class="lineNum">    1273 </span><span class="lineNoCov">          0 :   for (size_t i = oldLength; i &lt; aLen; ++i) {</span>
+<span class="lineNum">    1274 </span><span class="lineNoCov">          0 :     aLayers-&gt;mLayers[i].Initialize(aLayerType);</span>
+<span class="lineNum">    1275 </span>            :   }
+<span class="lineNum">    1276 </span><span class="lineNoCov">          0 : }</span>
+<a name="1277"><span class="lineNum">    1277 </span>            : </a>
+<span class="lineNum">    1278 </span>            : void
+<span class="lineNum">    1279 </span><span class="lineNoCov">          0 : Gecko_EnsureStyleAnimationArrayLength(void* aArray, size_t aLen)</span>
+<span class="lineNum">    1280 </span>            : {
+<span class="lineNum">    1281 </span>            :   auto base =
+<span class="lineNum">    1282 </span><span class="lineNoCov">          0 :     static_cast&lt;nsStyleAutoArray&lt;StyleAnimation&gt;*&gt;(aArray);</span>
+<span class="lineNum">    1283 </span>            : 
+<span class="lineNum">    1284 </span><span class="lineNoCov">          0 :   size_t oldLength = base-&gt;Length();</span>
+<span class="lineNum">    1285 </span>            : 
+<span class="lineNum">    1286 </span><span class="lineNoCov">          0 :   base-&gt;EnsureLengthAtLeast(aLen);</span>
+<span class="lineNum">    1287 </span>            : 
+<span class="lineNum">    1288 </span><span class="lineNoCov">          0 :   for (size_t i = oldLength; i &lt; aLen; ++i) {</span>
+<span class="lineNum">    1289 </span><span class="lineNoCov">          0 :     (*base)[i].SetInitialValues();</span>
+<span class="lineNum">    1290 </span>            :   }
+<span class="lineNum">    1291 </span><span class="lineNoCov">          0 : }</span>
+<a name="1292"><span class="lineNum">    1292 </span>            : </a>
+<span class="lineNum">    1293 </span>            : void
+<span class="lineNum">    1294 </span><span class="lineNoCov">          0 : Gecko_EnsureStyleTransitionArrayLength(void* aArray, size_t aLen)</span>
+<span class="lineNum">    1295 </span>            : {
+<span class="lineNum">    1296 </span>            :   auto base =
+<span class="lineNum">    1297 </span><span class="lineNoCov">          0 :     reinterpret_cast&lt;nsStyleAutoArray&lt;StyleTransition&gt;*&gt;(aArray);</span>
+<span class="lineNum">    1298 </span>            : 
+<span class="lineNum">    1299 </span><span class="lineNoCov">          0 :   size_t oldLength = base-&gt;Length();</span>
+<span class="lineNum">    1300 </span>            : 
+<span class="lineNum">    1301 </span><span class="lineNoCov">          0 :   base-&gt;EnsureLengthAtLeast(aLen);</span>
+<span class="lineNum">    1302 </span>            : 
+<span class="lineNum">    1303 </span><span class="lineNoCov">          0 :   for (size_t i = oldLength; i &lt; aLen; ++i) {</span>
+<span class="lineNum">    1304 </span><span class="lineNoCov">          0 :     (*base)[i].SetInitialValues();</span>
+<span class="lineNum">    1305 </span>            :   }
+<span class="lineNum">    1306 </span><span class="lineNoCov">          0 : }</span>
+<a name="1307"><span class="lineNum">    1307 </span>            : </a>
+<span class="lineNum">    1308 </span>            : void
+<span class="lineNum">    1309 </span><span class="lineNoCov">          0 : Gecko_ClearWillChange(nsStyleDisplay* aDisplay, size_t aLength)</span>
+<span class="lineNum">    1310 </span>            : {
+<span class="lineNum">    1311 </span><span class="lineNoCov">          0 :   aDisplay-&gt;mWillChange.Clear();</span>
+<span class="lineNum">    1312 </span><span class="lineNoCov">          0 :   aDisplay-&gt;mWillChange.SetCapacity(aLength);</span>
+<span class="lineNum">    1313 </span><span class="lineNoCov">          0 : }</span>
+<a name="1314"><span class="lineNum">    1314 </span>            : </a>
+<span class="lineNum">    1315 </span>            : void
+<span class="lineNum">    1316 </span><span class="lineNoCov">          0 : Gecko_AppendWillChange(nsStyleDisplay* aDisplay, nsIAtom* aAtom)</span>
+<span class="lineNum">    1317 </span>            : {
+<span class="lineNum">    1318 </span><span class="lineNoCov">          0 :   aDisplay-&gt;mWillChange.AppendElement(aAtom);</span>
+<span class="lineNum">    1319 </span><span class="lineNoCov">          0 : }</span>
+<a name="1320"><span class="lineNum">    1320 </span>            : </a>
+<span class="lineNum">    1321 </span>            : void
+<span class="lineNum">    1322 </span><span class="lineNoCov">          0 : Gecko_CopyWillChangeFrom(nsStyleDisplay* aDest, nsStyleDisplay* aSrc)</span>
+<span class="lineNum">    1323 </span>            : {
+<span class="lineNum">    1324 </span><span class="lineNoCov">          0 :   aDest-&gt;mWillChange.Clear();</span>
+<span class="lineNum">    1325 </span><span class="lineNoCov">          0 :   aDest-&gt;mWillChange.AppendElements(aSrc-&gt;mWillChange);</span>
+<span class="lineNum">    1326 </span><span class="lineNoCov">          0 : }</span>
+<a name="1327"><span class="lineNum">    1327 </span>            : </a>
+<span class="lineNum">    1328 </span>            : Keyframe*
+<span class="lineNum">    1329 </span><span class="lineNoCov">          0 : Gecko_AnimationAppendKeyframe(RawGeckoKeyframeListBorrowedMut aKeyframes,</span>
+<span class="lineNum">    1330 </span>            :                               float aOffset,
+<span class="lineNum">    1331 </span>            :                               const nsTimingFunction* aTimingFunction)
+<span class="lineNum">    1332 </span>            : {
+<span class="lineNum">    1333 </span><span class="lineNoCov">          0 :   Keyframe* keyframe = aKeyframes-&gt;AppendElement();</span>
+<span class="lineNum">    1334 </span><span class="lineNoCov">          0 :   keyframe-&gt;mOffset.emplace(aOffset);</span>
+<span class="lineNum">    1335 </span><span class="lineNoCov">          0 :   if (aTimingFunction &amp;&amp;</span>
+<span class="lineNum">    1336 </span><span class="lineNoCov">          0 :       aTimingFunction-&gt;mType != nsTimingFunction::Type::Linear) {</span>
+<span class="lineNum">    1337 </span><span class="lineNoCov">          0 :     keyframe-&gt;mTimingFunction.emplace();</span>
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :     keyframe-&gt;mTimingFunction-&gt;Init(*aTimingFunction);</span>
+<span class="lineNum">    1339 </span>            :   }
+<span class="lineNum">    1340 </span>            : 
+<span class="lineNum">    1341 </span><span class="lineNoCov">          0 :   return keyframe;</span>
+<span class="lineNum">    1342 </span>            : }
+<a name="1343"><span class="lineNum">    1343 </span>            : </a>
+<span class="lineNum">    1344 </span>            : void
+<span class="lineNum">    1345 </span><span class="lineNoCov">          0 : Gecko_ResetStyleCoord(nsStyleUnit* aUnit, nsStyleUnion* aValue)</span>
+<span class="lineNum">    1346 </span>            : {
+<span class="lineNum">    1347 </span><span class="lineNoCov">          0 :   nsStyleCoord::Reset(*aUnit, *aValue);</span>
+<span class="lineNum">    1348 </span><span class="lineNoCov">          0 : }</span>
+<a name="1349"><span class="lineNum">    1349 </span>            : </a>
+<span class="lineNum">    1350 </span>            : void
+<span class="lineNum">    1351 </span><span class="lineNoCov">          0 : Gecko_SetStyleCoordCalcValue(nsStyleUnit* aUnit, nsStyleUnion* aValue, nsStyleCoord::CalcValue aCalc)</span>
+<span class="lineNum">    1352 </span>            : {
+<span class="lineNum">    1353 </span>            :   // Calc units should be cleaned up first
+<span class="lineNum">    1354 </span>            :   MOZ_ASSERT(*aUnit != nsStyleUnit::eStyleUnit_Calc);
+<span class="lineNum">    1355 </span><span class="lineNoCov">          0 :   nsStyleCoord::Calc* calcRef = new nsStyleCoord::Calc();</span>
+<span class="lineNum">    1356 </span><span class="lineNoCov">          0 :   calcRef-&gt;mLength = aCalc.mLength;</span>
+<span class="lineNum">    1357 </span><span class="lineNoCov">          0 :   calcRef-&gt;mPercent = aCalc.mPercent;</span>
+<span class="lineNum">    1358 </span><span class="lineNoCov">          0 :   calcRef-&gt;mHasPercent = aCalc.mHasPercent;</span>
+<span class="lineNum">    1359 </span><span class="lineNoCov">          0 :   *aUnit = nsStyleUnit::eStyleUnit_Calc;</span>
+<span class="lineNum">    1360 </span><span class="lineNoCov">          0 :   aValue-&gt;mPointer = calcRef;</span>
+<span class="lineNum">    1361 </span><span class="lineNoCov">          0 :   calcRef-&gt;AddRef();</span>
+<span class="lineNum">    1362 </span><span class="lineNoCov">          0 : }</span>
+<a name="1363"><span class="lineNum">    1363 </span>            : </a>
+<span class="lineNum">    1364 </span>            : void
+<span class="lineNum">    1365 </span><span class="lineNoCov">          0 : Gecko_CopyShapeSourceFrom(mozilla::StyleShapeSource* aDst, const mozilla::StyleShapeSource* aSrc)</span>
+<span class="lineNum">    1366 </span>            : {
+<span class="lineNum">    1367 </span>            :   MOZ_ASSERT(aDst);
+<span class="lineNum">    1368 </span>            :   MOZ_ASSERT(aSrc);
+<span class="lineNum">    1369 </span>            : 
+<span class="lineNum">    1370 </span><span class="lineNoCov">          0 :   *aDst = *aSrc;</span>
+<span class="lineNum">    1371 </span><span class="lineNoCov">          0 : }</span>
+<a name="1372"><span class="lineNum">    1372 </span>            : </a>
+<span class="lineNum">    1373 </span>            : void
+<span class="lineNum">    1374 </span><span class="lineNoCov">          0 : Gecko_DestroyShapeSource(mozilla::StyleShapeSource* aShape)</span>
+<span class="lineNum">    1375 </span>            : {
+<span class="lineNum">    1376 </span>            :   aShape-&gt;~StyleShapeSource();
+<span class="lineNum">    1377 </span><span class="lineNoCov">          0 : }</span>
+<a name="1378"><span class="lineNum">    1378 </span>            : </a>
+<span class="lineNum">    1379 </span>            : void
+<span class="lineNum">    1380 </span><span class="lineNoCov">          0 : Gecko_StyleShapeSource_SetURLValue(mozilla::StyleShapeSource* aShape, ServoBundledURI aURI)</span>
+<span class="lineNum">    1381 </span>            : {
+<span class="lineNum">    1382 </span><span class="lineNoCov">          0 :   RefPtr&lt;css::URLValue&gt; url = aURI.IntoCssUrl();</span>
+<span class="lineNum">    1383 </span><span class="lineNoCov">          0 :   aShape-&gt;SetURL(url.get());</span>
+<span class="lineNum">    1384 </span><span class="lineNoCov">          0 : }</span>
+<a name="1385"><span class="lineNum">    1385 </span>            : </a>
+<span class="lineNum">    1386 </span>            : mozilla::StyleBasicShape*
+<span class="lineNum">    1387 </span><span class="lineNoCov">          0 : Gecko_NewBasicShape(mozilla::StyleBasicShapeType aType)</span>
+<span class="lineNum">    1388 </span>            : {
+<span class="lineNum">    1389 </span><span class="lineNoCov">          0 :   RefPtr&lt;StyleBasicShape&gt; ptr = new mozilla::StyleBasicShape(aType);</span>
+<span class="lineNum">    1390 </span><span class="lineNoCov">          0 :   return ptr.forget().take();</span>
+<span class="lineNum">    1391 </span>            : }
+<a name="1392"><span class="lineNum">    1392 </span>            : </a>
+<span class="lineNum">    1393 </span>            : void
+<span class="lineNum">    1394 </span><span class="lineNoCov">          0 : Gecko_ResetFilters(nsStyleEffects* effects, size_t new_len)</span>
+<span class="lineNum">    1395 </span>            : {
+<span class="lineNum">    1396 </span><span class="lineNoCov">          0 :   effects-&gt;mFilters.Clear();</span>
+<span class="lineNum">    1397 </span><span class="lineNoCov">          0 :   effects-&gt;mFilters.SetLength(new_len);</span>
+<span class="lineNum">    1398 </span><span class="lineNoCov">          0 : }</span>
+<a name="1399"><span class="lineNum">    1399 </span>            : </a>
+<span class="lineNum">    1400 </span>            : void
+<span class="lineNum">    1401 </span><span class="lineNoCov">          0 : Gecko_CopyFiltersFrom(nsStyleEffects* aSrc, nsStyleEffects* aDest)</span>
+<span class="lineNum">    1402 </span>            : {
+<span class="lineNum">    1403 </span><span class="lineNoCov">          0 :   aDest-&gt;mFilters = aSrc-&gt;mFilters;</span>
+<span class="lineNum">    1404 </span><span class="lineNoCov">          0 : }</span>
+<a name="1405"><span class="lineNum">    1405 </span>            : </a>
+<span class="lineNum">    1406 </span>            : void
+<span class="lineNum">    1407 </span><span class="lineNoCov">          0 : Gecko_nsStyleFilter_SetURLValue(nsStyleFilter* aEffects, ServoBundledURI aURI)</span>
+<span class="lineNum">    1408 </span>            : {
+<span class="lineNum">    1409 </span><span class="lineNoCov">          0 :   RefPtr&lt;css::URLValue&gt; url = aURI.IntoCssUrl();</span>
+<span class="lineNum">    1410 </span><span class="lineNoCov">          0 :   aEffects-&gt;SetURL(url.get());</span>
+<span class="lineNum">    1411 </span><span class="lineNoCov">          0 : }</span>
+<a name="1412"><span class="lineNum">    1412 </span>            : </a>
+<span class="lineNum">    1413 </span>            : void
+<span class="lineNum">    1414 </span><span class="lineNoCov">          0 : Gecko_nsStyleSVGPaint_CopyFrom(nsStyleSVGPaint* aDest, const nsStyleSVGPaint* aSrc)</span>
+<span class="lineNum">    1415 </span>            : {
+<span class="lineNum">    1416 </span><span class="lineNoCov">          0 :   *aDest = *aSrc;</span>
+<span class="lineNum">    1417 </span><span class="lineNoCov">          0 : }</span>
+<a name="1418"><span class="lineNum">    1418 </span>            : </a>
+<span class="lineNum">    1419 </span>            : void
+<span class="lineNum">    1420 </span><span class="lineNoCov">          0 : Gecko_nsStyleSVGPaint_SetURLValue(nsStyleSVGPaint* aPaint, ServoBundledURI aURI)</span>
+<span class="lineNum">    1421 </span>            : {
+<span class="lineNum">    1422 </span><span class="lineNoCov">          0 :   RefPtr&lt;css::URLValue&gt; url = aURI.IntoCssUrl();</span>
+<span class="lineNum">    1423 </span><span class="lineNoCov">          0 :   aPaint-&gt;SetPaintServer(url.get(), NS_RGB(0, 0, 0));</span>
+<a name="1424"><span class="lineNum">    1424 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">    1425 </span>            : 
+<span class="lineNum">    1426 </span><span class="lineNoCov">          0 : void Gecko_nsStyleSVGPaint_Reset(nsStyleSVGPaint* aPaint)</span>
+<span class="lineNum">    1427 </span>            : {
+<span class="lineNum">    1428 </span><span class="lineNoCov">          0 :   aPaint-&gt;SetNone();</span>
+<span class="lineNum">    1429 </span><span class="lineNoCov">          0 : }</span>
+<a name="1430"><span class="lineNum">    1430 </span>            : </a>
+<span class="lineNum">    1431 </span>            : void
+<span class="lineNum">    1432 </span><span class="lineNoCov">          0 : Gecko_nsStyleSVG_SetDashArrayLength(nsStyleSVG* aSvg, uint32_t aLen)</span>
+<span class="lineNum">    1433 </span>            : {
+<span class="lineNum">    1434 </span><span class="lineNoCov">          0 :   aSvg-&gt;mStrokeDasharray.Clear();</span>
+<span class="lineNum">    1435 </span><span class="lineNoCov">          0 :   aSvg-&gt;mStrokeDasharray.SetLength(aLen);</span>
+<span class="lineNum">    1436 </span><span class="lineNoCov">          0 : }</span>
+<a name="1437"><span class="lineNum">    1437 </span>            : </a>
+<span class="lineNum">    1438 </span>            : void
+<span class="lineNum">    1439 </span><span class="lineNoCov">          0 : Gecko_nsStyleSVG_CopyDashArray(nsStyleSVG* aDst, const nsStyleSVG* aSrc)</span>
+<span class="lineNum">    1440 </span>            : {
+<span class="lineNum">    1441 </span><span class="lineNoCov">          0 :   aDst-&gt;mStrokeDasharray = aSrc-&gt;mStrokeDasharray;</span>
+<span class="lineNum">    1442 </span><span class="lineNoCov">          0 : }</span>
+<a name="1443"><span class="lineNum">    1443 </span>            : </a>
+<span class="lineNum">    1444 </span>            : css::URLValue*
+<span class="lineNum">    1445 </span><span class="lineNoCov">          0 : Gecko_NewURLValue(ServoBundledURI aURI)</span>
+<span class="lineNum">    1446 </span>            : {
+<span class="lineNum">    1447 </span><span class="lineNoCov">          0 :   RefPtr&lt;css::URLValue&gt; url = aURI.IntoCssUrl();</span>
+<span class="lineNum">    1448 </span><span class="lineNoCov">          0 :   return url.forget().take();</span>
+<a name="1449"><span class="lineNum">    1449 </span>            : }</a>
+<span class="lineNum">    1450 </span>            : 
+<a name="1451"><span class="lineNum">    1451 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(css::URLValue, CSSURLValue);</span></a>
+<span class="lineNum">    1452 </span>            : 
+<a name="1453"><span class="lineNum">    1453 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(URLExtraData, URLExtraData);</span></a>
+<span class="lineNum">    1454 </span>            : 
+<span class="lineNum">    1455 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(nsStyleCoord::Calc, Calc);</span>
+<a name="1456"><span class="lineNum">    1456 </span>            : </a>
+<span class="lineNum">    1457 </span>            : nsCSSShadowArray*
+<span class="lineNum">    1458 </span><span class="lineNoCov">          0 : Gecko_NewCSSShadowArray(uint32_t aLen)</span>
+<span class="lineNum">    1459 </span>            : {
+<span class="lineNum">    1460 </span><span class="lineNoCov">          0 :   RefPtr&lt;nsCSSShadowArray&gt; arr = new(aLen) nsCSSShadowArray(aLen);</span>
+<span class="lineNum">    1461 </span><span class="lineNoCov">          0 :   return arr.forget().take();</span>
+<a name="1462"><span class="lineNum">    1462 </span>            : }</a>
+<span class="lineNum">    1463 </span>            : 
+<span class="lineNum">    1464 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(nsCSSShadowArray, CSSShadowArray);</span>
+<a name="1465"><span class="lineNum">    1465 </span>            : </a>
+<span class="lineNum">    1466 </span>            : nsStyleQuoteValues*
+<span class="lineNum">    1467 </span><span class="lineNoCov">          0 : Gecko_NewStyleQuoteValues(uint32_t aLen)</span>
+<span class="lineNum">    1468 </span>            : {
+<span class="lineNum">    1469 </span><span class="lineNoCov">          0 :   RefPtr&lt;nsStyleQuoteValues&gt; values = new nsStyleQuoteValues;</span>
+<span class="lineNum">    1470 </span><span class="lineNoCov">          0 :   values-&gt;mQuotePairs.SetLength(aLen);</span>
+<span class="lineNum">    1471 </span><span class="lineNoCov">          0 :   return values.forget().take();</span>
+<a name="1472"><span class="lineNum">    1472 </span>            : }</a>
+<span class="lineNum">    1473 </span>            : 
+<span class="lineNum">    1474 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(nsStyleQuoteValues, QuoteValues);</span>
+<a name="1475"><span class="lineNum">    1475 </span>            : </a>
+<span class="lineNum">    1476 </span>            : nsCSSValueSharedList*
+<span class="lineNum">    1477 </span><span class="lineNoCov">          0 : Gecko_NewCSSValueSharedList(uint32_t aLen)</span>
+<span class="lineNum">    1478 </span>            : {
+<span class="lineNum">    1479 </span><span class="lineNoCov">          0 :   RefPtr&lt;nsCSSValueSharedList&gt; list = new nsCSSValueSharedList;</span>
+<span class="lineNum">    1480 </span><span class="lineNoCov">          0 :   if (aLen == 0) {</span>
+<span class="lineNum">    1481 </span><span class="lineNoCov">          0 :     return list.forget().take();</span>
+<span class="lineNum">    1482 </span>            :   }
+<span class="lineNum">    1483 </span>            : 
+<span class="lineNum">    1484 </span><span class="lineNoCov">          0 :   list-&gt;mHead = new nsCSSValueList;</span>
+<span class="lineNum">    1485 </span><span class="lineNoCov">          0 :   nsCSSValueList* cur = list-&gt;mHead;</span>
+<span class="lineNum">    1486 </span><span class="lineNoCov">          0 :   for (uint32_t i = 0; i &lt; aLen - 1; i++) {</span>
+<span class="lineNum">    1487 </span><span class="lineNoCov">          0 :     cur-&gt;mNext = new nsCSSValueList;</span>
+<span class="lineNum">    1488 </span><span class="lineNoCov">          0 :     cur = cur-&gt;mNext;</span>
+<span class="lineNum">    1489 </span>            :   }
+<span class="lineNum">    1490 </span>            : 
+<span class="lineNum">    1491 </span><span class="lineNoCov">          0 :   return list.forget().take();</span>
+<span class="lineNum">    1492 </span>            : }
+<a name="1493"><span class="lineNum">    1493 </span>            : </a>
+<span class="lineNum">    1494 </span>            : void
+<span class="lineNum">    1495 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetAbsoluteLength(nsCSSValueBorrowedMut aCSSValue, nscoord aLen)</span>
+<span class="lineNum">    1496 </span>            : {
+<span class="lineNum">    1497 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Null || aCSSValue-&gt;IsLengthUnit());
+<span class="lineNum">    1498 </span>            :   // The call below could trigger refcounting if aCSSValue were a
+<span class="lineNum">    1499 </span>            :   // FontFamilyList, but we just asserted that it's not. So we can
+<span class="lineNum">    1500 </span>            :   // whitelist this for static analysis.
+<span class="lineNum">    1501 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetIntegerCoordValue(aLen);</span>
+<span class="lineNum">    1502 </span><span class="lineNoCov">          0 : }</span>
+<a name="1503"><span class="lineNum">    1503 </span>            : </a>
+<span class="lineNum">    1504 </span>            : nscoord
+<span class="lineNum">    1505 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetAbsoluteLength(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1506 </span>            : {
+<span class="lineNum">    1507 </span>            :   // SetIntegerCoordValue() which is used in Gecko_CSSValue_SetAbsoluteLength()
+<span class="lineNum">    1508 </span>            :   // converts values by nsPresContext::AppUnitsToFloatCSSPixels() and stores
+<span class="lineNum">    1509 </span>            :   // values in eCSSUnit_Pixel unit. We need to convert the values back to app
+<span class="lineNum">    1510 </span>            :   // units by GetPixelLength().
+<span class="lineNum">    1511 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Pixel,
+<span class="lineNum">    1512 </span>            :              &quot;The unit should be eCSSUnit_Pixel&quot;);
+<span class="lineNum">    1513 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetPixelLength();</span>
+<span class="lineNum">    1514 </span>            : }
+<a name="1515"><span class="lineNum">    1515 </span>            : </a>
+<span class="lineNum">    1516 </span>            : void
+<span class="lineNum">    1517 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetNormal(nsCSSValueBorrowedMut aCSSValue)</span>
+<span class="lineNum">    1518 </span>            : {
+<span class="lineNum">    1519 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetNormalValue();</span>
+<span class="lineNum">    1520 </span><span class="lineNoCov">          0 : }</span>
+<a name="1521"><span class="lineNum">    1521 </span>            : </a>
+<span class="lineNum">    1522 </span>            : void
+<span class="lineNum">    1523 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetNumber(nsCSSValueBorrowedMut aCSSValue, float aNumber)</span>
+<span class="lineNum">    1524 </span>            : {
+<span class="lineNum">    1525 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetFloatValue(aNumber, eCSSUnit_Number);</span>
+<span class="lineNum">    1526 </span><span class="lineNoCov">          0 : }</span>
+<a name="1527"><span class="lineNum">    1527 </span>            : </a>
+<span class="lineNum">    1528 </span>            : float
+<span class="lineNum">    1529 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetNumber(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1530 </span>            : {
+<span class="lineNum">    1531 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetFloatValue();</span>
+<span class="lineNum">    1532 </span>            : }
+<a name="1533"><span class="lineNum">    1533 </span>            : </a>
+<span class="lineNum">    1534 </span>            : void
+<span class="lineNum">    1535 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetKeyword(nsCSSValueBorrowedMut aCSSValue, nsCSSKeyword aKeyword)</span>
+<span class="lineNum">    1536 </span>            : {
+<span class="lineNum">    1537 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetEnumValue(aKeyword);</span>
+<span class="lineNum">    1538 </span><span class="lineNoCov">          0 : }</span>
+<a name="1539"><span class="lineNum">    1539 </span>            : </a>
+<span class="lineNum">    1540 </span>            : nsCSSKeyword
+<span class="lineNum">    1541 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetKeyword(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1542 </span>            : {
+<span class="lineNum">    1543 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetKeywordValue();</span>
+<span class="lineNum">    1544 </span>            : }
+<a name="1545"><span class="lineNum">    1545 </span>            : </a>
+<span class="lineNum">    1546 </span>            : void
+<span class="lineNum">    1547 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetPercentage(nsCSSValueBorrowedMut aCSSValue, float aPercent)</span>
+<span class="lineNum">    1548 </span>            : {
+<span class="lineNum">    1549 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetPercentValue(aPercent);</span>
+<span class="lineNum">    1550 </span><span class="lineNoCov">          0 : }</span>
+<a name="1551"><span class="lineNum">    1551 </span>            : </a>
+<span class="lineNum">    1552 </span>            : float
+<span class="lineNum">    1553 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetPercentage(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1554 </span>            : {
+<span class="lineNum">    1555 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetPercentValue();</span>
+<span class="lineNum">    1556 </span>            : }
+<a name="1557"><span class="lineNum">    1557 </span>            : </a>
+<span class="lineNum">    1558 </span>            : void
+<span class="lineNum">    1559 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetAngle(nsCSSValueBorrowedMut aCSSValue, float aRadians)</span>
+<span class="lineNum">    1560 </span>            : {
+<span class="lineNum">    1561 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetFloatValue(aRadians, eCSSUnit_Radian);</span>
+<span class="lineNum">    1562 </span><span class="lineNoCov">          0 : }</span>
+<a name="1563"><span class="lineNum">    1563 </span>            : </a>
+<span class="lineNum">    1564 </span>            : float
+<span class="lineNum">    1565 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetAngle(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1566 </span>            : {
+<span class="lineNum">    1567 </span>            :   // Unfortunately nsCSSValue.GetAngleValueInRadians() returns double,
+<span class="lineNum">    1568 </span>            :   // so we use GetAngleValue() instead.
+<span class="lineNum">    1569 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Radian,
+<span class="lineNum">    1570 </span>            :              &quot;The unit should be eCSSUnit_Radian&quot;);
+<span class="lineNum">    1571 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetAngleValue();</span>
+<span class="lineNum">    1572 </span>            : }
+<a name="1573"><span class="lineNum">    1573 </span>            : </a>
+<span class="lineNum">    1574 </span>            : void
+<span class="lineNum">    1575 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetCalc(nsCSSValueBorrowedMut aCSSValue, nsStyleCoord::CalcValue aCalc)</span>
+<span class="lineNum">    1576 </span>            : {
+<span class="lineNum">    1577 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetCalcValue(&amp;aCalc);</span>
+<span class="lineNum">    1578 </span><span class="lineNoCov">          0 : }</span>
+<a name="1579"><span class="lineNum">    1579 </span>            : </a>
+<span class="lineNum">    1580 </span>            : nsStyleCoord::CalcValue
+<span class="lineNum">    1581 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetCalc(nsCSSValueBorrowed aCSSValue)</span>
+<span class="lineNum">    1582 </span>            : {
+<span class="lineNum">    1583 </span><span class="lineNoCov">          0 :   return aCSSValue-&gt;GetCalcValue();</span>
+<span class="lineNum">    1584 </span>            : }
+<a name="1585"><span class="lineNum">    1585 </span>            : </a>
+<span class="lineNum">    1586 </span>            : void
+<span class="lineNum">    1587 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetFunction(nsCSSValueBorrowedMut aCSSValue, int32_t aLen)</span>
+<span class="lineNum">    1588 </span>            : {
+<span class="lineNum">    1589 </span><span class="lineNoCov">          0 :   nsCSSValue::Array* arr = nsCSSValue::Array::Create(aLen);</span>
+<span class="lineNum">    1590 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetArrayValue(arr, eCSSUnit_Function);</span>
+<span class="lineNum">    1591 </span><span class="lineNoCov">          0 : }</span>
+<a name="1592"><span class="lineNum">    1592 </span>            : </a>
+<span class="lineNum">    1593 </span>            : void
+<span class="lineNum">    1594 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetString(nsCSSValueBorrowedMut aCSSValue,</span>
+<span class="lineNum">    1595 </span>            :                          const uint8_t* aString, uint32_t aLength,
+<span class="lineNum">    1596 </span>            :                          nsCSSUnit aUnit)
+<span class="lineNum">    1597 </span>            : {
+<span class="lineNum">    1598 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Null);
+<span class="lineNum">    1599 </span>            :   nsString string;
+<span class="lineNum">    1600 </span>            :   nsDependentCSubstring slice(reinterpret_cast&lt;const char*&gt;(aString),
+<span class="lineNum">    1601 </span>            :                                   aLength);
+<span class="lineNum">    1602 </span><span class="lineNoCov">          0 :   AppendUTF8toUTF16(slice, string);</span>
+<span class="lineNum">    1603 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetStringValue(string, aUnit);</span>
+<span class="lineNum">    1604 </span><span class="lineNoCov">          0 : }</span>
+<a name="1605"><span class="lineNum">    1605 </span>            : </a>
+<span class="lineNum">    1606 </span>            : void
+<span class="lineNum">    1607 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetStringFromAtom(nsCSSValueBorrowedMut aCSSValue,</span>
+<span class="lineNum">    1608 </span>            :                                  nsIAtom* aAtom, nsCSSUnit aUnit)
+<span class="lineNum">    1609 </span>            : {
+<span class="lineNum">    1610 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetStringValue(nsDependentAtomString(aAtom), aUnit);</span>
+<span class="lineNum">    1611 </span><span class="lineNoCov">          0 : }</span>
+<a name="1612"><span class="lineNum">    1612 </span>            : </a>
+<span class="lineNum">    1613 </span>            : void
+<span class="lineNum">    1614 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetArray(nsCSSValueBorrowedMut aCSSValue, int32_t aLength)</span>
+<span class="lineNum">    1615 </span>            : {
+<span class="lineNum">    1616 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Null);
+<span class="lineNum">    1617 </span>            :   RefPtr&lt;nsCSSValue::Array&gt; array
+<span class="lineNum">    1618 </span><span class="lineNoCov">          0 :     = nsCSSValue::Array::Create(aLength);</span>
+<span class="lineNum">    1619 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetArrayValue(array, eCSSUnit_Array);</span>
+<span class="lineNum">    1620 </span><span class="lineNoCov">          0 : }</span>
+<a name="1621"><span class="lineNum">    1621 </span>            : </a>
+<span class="lineNum">    1622 </span>            : void
+<span class="lineNum">    1623 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetURL(nsCSSValueBorrowedMut aCSSValue,</span>
+<span class="lineNum">    1624 </span>            :                       ServoBundledURI aURI)
+<span class="lineNum">    1625 </span>            : {
+<span class="lineNum">    1626 </span>            :   MOZ_ASSERT(aCSSValue-&gt;GetUnit() == eCSSUnit_Null);
+<span class="lineNum">    1627 </span><span class="lineNoCov">          0 :   RefPtr&lt;css::URLValue&gt; url = aURI.IntoCssUrl();</span>
+<span class="lineNum">    1628 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetURLValue(url.get());</span>
+<span class="lineNum">    1629 </span><span class="lineNoCov">          0 : }</span>
+<a name="1630"><span class="lineNum">    1630 </span>            : </a>
+<span class="lineNum">    1631 </span>            : void
+<span class="lineNum">    1632 </span><span class="lineNoCov">          0 : Gecko_CSSValue_SetInt(nsCSSValueBorrowedMut aCSSValue,</span>
+<span class="lineNum">    1633 </span>            :                       int32_t aInteger, nsCSSUnit aUnit)
+<span class="lineNum">    1634 </span>            : {
+<span class="lineNum">    1635 </span><span class="lineNoCov">          0 :   aCSSValue-&gt;SetIntValue(aInteger, aUnit);</span>
+<span class="lineNum">    1636 </span><span class="lineNoCov">          0 : }</span>
+<a name="1637"><span class="lineNum">    1637 </span>            : </a>
+<span class="lineNum">    1638 </span>            : nsCSSValueBorrowedMut
+<span class="lineNum">    1639 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetArrayItem(nsCSSValueBorrowedMut aCSSValue, int32_t aIndex)</span>
+<span class="lineNum">    1640 </span>            : {
+<span class="lineNum">    1641 </span><span class="lineNoCov">          0 :   return &amp;aCSSValue-&gt;GetArrayValue()-&gt;Item(aIndex);</span>
+<span class="lineNum">    1642 </span>            : }
+<a name="1643"><span class="lineNum">    1643 </span>            : </a>
+<span class="lineNum">    1644 </span>            : nsCSSValueBorrowed
+<span class="lineNum">    1645 </span><span class="lineNoCov">          0 : Gecko_CSSValue_GetArrayItemConst(nsCSSValueBorrowed aCSSValue, int32_t aIndex)</span>
+<span class="lineNum">    1646 </span>            : {
+<span class="lineNum">    1647 </span><span class="lineNoCov">          0 :   return &amp;aCSSValue-&gt;GetArrayValue()-&gt;Item(aIndex);</span>
+<span class="lineNum">    1648 </span>            : }
+<span class="lineNum">    1649 </span>            : 
+<a name="1650"><span class="lineNum">    1650 </span>            : </a>
+<span class="lineNum">    1651 </span>            : bool
+<span class="lineNum">    1652 </span><span class="lineNoCov">          0 : Gecko_PropertyId_IsPrefEnabled(nsCSSPropertyID id)</span>
+<span class="lineNum">    1653 </span>            : {
+<span class="lineNum">    1654 </span><span class="lineNoCov">          0 :   return nsCSSProps::IsEnabled(id);</span>
+<span class="lineNum">    1655 </span>            : }
+<a name="1656"><span class="lineNum">    1656 </span>            : </a>
+<span class="lineNum">    1657 </span>            : void
+<span class="lineNum">    1658 </span><span class="lineNoCov">          0 : Gecko_CSSValue_Drop(nsCSSValueBorrowedMut aCSSValue)</span>
+<span class="lineNum">    1659 </span>            : {
+<span class="lineNum">    1660 </span>            :   aCSSValue-&gt;~nsCSSValue();
+<span class="lineNum">    1661 </span><span class="lineNoCov">          0 : }</span>
+<a name="1662"><span class="lineNum">    1662 </span>            : </a>
+<span class="lineNum">    1663 </span>            : void
+<span class="lineNum">    1664 </span><span class="lineNoCov">          0 : Gecko_nsStyleFont_SetLang(nsStyleFont* aFont, nsIAtom* aAtom)</span>
+<span class="lineNum">    1665 </span>            : {
+<span class="lineNum">    1666 </span>            :   already_AddRefed&lt;nsIAtom&gt; atom = already_AddRefed&lt;nsIAtom&gt;(aAtom);
+<span class="lineNum">    1667 </span><span class="lineNoCov">          0 :   aFont-&gt;mLanguage = atom;</span>
+<span class="lineNum">    1668 </span><span class="lineNoCov">          0 :   aFont-&gt;mExplicitLanguage = true;</span>
+<span class="lineNum">    1669 </span><span class="lineNoCov">          0 : }</span>
+<a name="1670"><span class="lineNum">    1670 </span>            : </a>
+<span class="lineNum">    1671 </span>            : void
+<span class="lineNum">    1672 </span><span class="lineNoCov">          0 : Gecko_nsStyleFont_CopyLangFrom(nsStyleFont* aFont, const nsStyleFont* aSource)</span>
+<span class="lineNum">    1673 </span>            : {
+<span class="lineNum">    1674 </span><span class="lineNoCov">          0 :   aFont-&gt;mLanguage = aSource-&gt;mLanguage;</span>
+<span class="lineNum">    1675 </span><span class="lineNoCov">          0 : }</span>
+<a name="1676"><span class="lineNum">    1676 </span>            : </a>
+<span class="lineNum">    1677 </span>            : void
+<span class="lineNum">    1678 </span><span class="lineNoCov">          0 : FontSizePrefs::CopyFrom(const LangGroupFontPrefs&amp; prefs)</span>
+<span class="lineNum">    1679 </span>            : {
+<span class="lineNum">    1680 </span><span class="lineNoCov">          0 :   mDefaultVariableSize = prefs.mDefaultVariableFont.size;</span>
+<span class="lineNum">    1681 </span><span class="lineNoCov">          0 :   mDefaultFixedSize = prefs.mDefaultFixedFont.size;</span>
+<span class="lineNum">    1682 </span><span class="lineNoCov">          0 :   mDefaultSerifSize = prefs.mDefaultSerifFont.size;</span>
+<span class="lineNum">    1683 </span><span class="lineNoCov">          0 :   mDefaultSansSerifSize = prefs.mDefaultSansSerifFont.size;</span>
+<span class="lineNum">    1684 </span><span class="lineNoCov">          0 :   mDefaultMonospaceSize = prefs.mDefaultMonospaceFont.size;</span>
+<span class="lineNum">    1685 </span><span class="lineNoCov">          0 :   mDefaultCursiveSize = prefs.mDefaultCursiveFont.size;</span>
+<span class="lineNum">    1686 </span><span class="lineNoCov">          0 :   mDefaultFantasySize = prefs.mDefaultFantasyFont.size;</span>
+<span class="lineNum">    1687 </span><span class="lineNoCov">          0 : }</span>
+<a name="1688"><span class="lineNum">    1688 </span>            : </a>
+<span class="lineNum">    1689 </span>            : FontSizePrefs
+<span class="lineNum">    1690 </span><span class="lineNoCov">          0 : Gecko_GetBaseSize(nsIAtom* aLanguage)</span>
+<span class="lineNum">    1691 </span>            : {
+<span class="lineNum">    1692 </span><span class="lineNoCov">          0 :   LangGroupFontPrefs prefs;</span>
+<span class="lineNum">    1693 </span><span class="lineNoCov">          0 :   nsCOMPtr&lt;nsIAtom&gt; langGroupAtom = StaticPresData::Get()-&gt;GetUncachedLangGroup(aLanguage);</span>
+<span class="lineNum">    1694 </span>            : 
+<span class="lineNum">    1695 </span><span class="lineNoCov">          0 :   prefs.Initialize(langGroupAtom);</span>
+<span class="lineNum">    1696 </span>            :   FontSizePrefs sizes;
+<span class="lineNum">    1697 </span><span class="lineNoCov">          0 :   sizes.CopyFrom(prefs);</span>
+<span class="lineNum">    1698 </span>            : 
+<span class="lineNum">    1699 </span><span class="lineNoCov">          0 :   return sizes;</span>
+<span class="lineNum">    1700 </span>            : }
+<span class="lineNum">    1701 </span>            : 
+<span class="lineNum">    1702 </span>            : static Mutex* sServoFontMetricsLock = nullptr;
+<a name="1703"><span class="lineNum">    1703 </span>            : </a>
+<span class="lineNum">    1704 </span>            : void
+<span class="lineNum">    1705 </span><span class="lineNoCov">          0 : InitializeServo()</span>
+<span class="lineNum">    1706 </span>            : {
+<span class="lineNum">    1707 </span><span class="lineNoCov">          0 :   URLExtraData::InitDummy();</span>
+<span class="lineNum">    1708 </span><span class="lineNoCov">          0 :   Servo_Initialize(URLExtraData::Dummy());</span>
+<span class="lineNum">    1709 </span>            : 
+<span class="lineNum">    1710 </span>            :   sServoFontMetricsLock = new Mutex(&quot;Gecko_GetFontMetrics&quot;);
+<span class="lineNum">    1711 </span>            : }
+<a name="1712"><span class="lineNum">    1712 </span>            : </a>
+<span class="lineNum">    1713 </span>            : void
+<span class="lineNum">    1714 </span><span class="lineNoCov">          0 : ShutdownServo()</span>
+<span class="lineNum">    1715 </span>            : {
+<span class="lineNum">    1716 </span><span class="lineNoCov">          0 :   delete sServoFontMetricsLock;</span>
+<span class="lineNum">    1717 </span><span class="lineNoCov">          0 :   Servo_Shutdown();</span>
+<span class="lineNum">    1718 </span>            : }
+<a name="1719"><span class="lineNum">    1719 </span>            : </a>
+<span class="lineNum">    1720 </span>            : GeckoFontMetrics
+<span class="lineNum">    1721 </span><span class="lineNoCov">          0 : Gecko_GetFontMetrics(RawGeckoPresContextBorrowed aPresContext,</span>
+<span class="lineNum">    1722 </span>            :                      bool aIsVertical,
+<span class="lineNum">    1723 </span>            :                      const nsStyleFont* aFont,
+<span class="lineNum">    1724 </span>            :                      nscoord aFontSize,
+<span class="lineNum">    1725 </span>            :                      bool aUseUserFontSet)
+<span class="lineNum">    1726 </span>            : {
+<span class="lineNum">    1727 </span><span class="lineNoCov">          0 :   MutexAutoLock lock(*sServoFontMetricsLock);</span>
+<span class="lineNum">    1728 </span>            :   GeckoFontMetrics ret;
+<span class="lineNum">    1729 </span>            :   // Safe because we are locked, and this function is only
+<span class="lineNum">    1730 </span>            :   // ever called from Servo parallel traversal or the main thread
+<span class="lineNum">    1731 </span><span class="lineNoCov">          0 :   nsPresContext* presContext = const_cast&lt;nsPresContext*&gt;(aPresContext);</span>
+<span class="lineNum">    1732 </span>            :   presContext-&gt;SetUsesExChUnits(true);
+<span class="lineNum">    1733 </span>            :   RefPtr&lt;nsFontMetrics&gt; fm = nsRuleNode::GetMetricsFor(presContext, aIsVertical,
+<span class="lineNum">    1734 </span>            :                                                        aFont, aFontSize,
+<span class="lineNum">    1735 </span><span class="lineNoCov">          0 :                                                        aUseUserFontSet);</span>
+<span class="lineNum">    1736 </span><span class="lineNoCov">          0 :   ret.mXSize = fm-&gt;XHeight();</span>
+<span class="lineNum">    1737 </span><span class="lineNoCov">          0 :   gfxFloat zeroWidth = fm-&gt;GetThebesFontGroup()-&gt;GetFirstValidFont()-&gt;</span>
+<span class="lineNum">    1738 </span><span class="lineNoCov">          0 :                            GetMetrics(fm-&gt;Orientation()).zeroOrAveCharWidth;</span>
+<span class="lineNum">    1739 </span><span class="lineNoCov">          0 :   ret.mChSize = ceil(aPresContext-&gt;AppUnitsPerDevPixel() * zeroWidth);</span>
+<span class="lineNum">    1740 </span><span class="lineNoCov">          0 :   return ret;</span>
+<span class="lineNum">    1741 </span>            : }
+<a name="1742"><span class="lineNum">    1742 </span>            : </a>
+<span class="lineNum">    1743 </span>            : void
+<span class="lineNum">    1744 </span><span class="lineNoCov">          0 : Gecko_LoadStyleSheet(css::Loader* aLoader,</span>
+<span class="lineNum">    1745 </span>            :                      ServoStyleSheet* aParent,
+<span class="lineNum">    1746 </span>            :                      RawServoStyleSheetBorrowed aChildSheet,
+<span class="lineNum">    1747 </span>            :                      RawGeckoURLExtraData* aBaseURLData,
+<span class="lineNum">    1748 </span>            :                      const uint8_t* aURLString,
+<span class="lineNum">    1749 </span>            :                      uint32_t aURLStringLength,
+<span class="lineNum">    1750 </span>            :                      RawServoMediaListStrong aMediaList)
+<span class="lineNum">    1751 </span>            : {
+<span class="lineNum">    1752 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">    1753 </span>            :   MOZ_ASSERT(aLoader, &quot;Should've catched this before&quot;);
+<span class="lineNum">    1754 </span>            :   MOZ_ASSERT(aParent, &quot;Only used for @import, so parent should exist!&quot;);
+<span class="lineNum">    1755 </span>            :   MOZ_ASSERT(aURLString, &quot;Invalid URLs shouldn't be loaded!&quot;);
+<span class="lineNum">    1756 </span>            :   MOZ_ASSERT(aBaseURLData, &quot;Need base URL data&quot;);
+<span class="lineNum">    1757 </span><span class="lineNoCov">          0 :   RefPtr&lt;dom::MediaList&gt; media = new ServoMediaList(aMediaList.Consume());</span>
+<span class="lineNum">    1758 </span>            : 
+<span class="lineNum">    1759 </span>            :   nsDependentCSubstring urlSpec(reinterpret_cast&lt;const char*&gt;(aURLString),
+<span class="lineNum">    1760 </span>            :                                 aURLStringLength);
+<span class="lineNum">    1761 </span>            :   nsCOMPtr&lt;nsIURI&gt; uri;
+<span class="lineNum">    1762 </span>            :   nsresult rv = NS_NewURI(getter_AddRefs(uri), urlSpec, nullptr,
+<span class="lineNum">    1763 </span><span class="lineNoCov">          0 :                           aBaseURLData-&gt;BaseURI());</span>
+<span class="lineNum">    1764 </span>            : 
+<span class="lineNum">    1765 </span><span class="lineNoCov">          0 :   if (NS_FAILED(rv)) {</span>
+<span class="lineNum">    1766 </span>            :     // Servo and Gecko have different ideas of what a valid URL is, so we might
+<span class="lineNum">    1767 </span>            :     // get in here with a URL string that NS_NewURI can't handle.  If so,
+<span class="lineNum">    1768 </span>            :     // silently do nothing.  Eventually we should be able to assert that the
+<span class="lineNum">    1769 </span>            :     // NS_NewURI succeeds, here.
+<span class="lineNum">    1770 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">    1771 </span>            :   }
+<span class="lineNum">    1772 </span>            : 
+<span class="lineNum">    1773 </span><span class="lineNoCov">          0 :   aLoader-&gt;LoadChildSheet(aParent, uri, media, nullptr, aChildSheet, nullptr);</span>
+<span class="lineNum">    1774 </span>            : }
+<a name="1775"><span class="lineNum">    1775 </span>            : </a>
+<span class="lineNum">    1776 </span>            : const nsMediaFeature*
+<span class="lineNum">    1777 </span><span class="lineNoCov">          0 : Gecko_GetMediaFeatures()</span>
+<span class="lineNum">    1778 </span>            : {
+<span class="lineNum">    1779 </span><span class="lineNoCov">          0 :   return nsMediaFeatures::features;</span>
+<span class="lineNum">    1780 </span>            : }
+<a name="1781"><span class="lineNum">    1781 </span>            : </a>
+<span class="lineNum">    1782 </span>            : nsCSSKeyword
+<span class="lineNum">    1783 </span><span class="lineNoCov">          0 : Gecko_LookupCSSKeyword(const uint8_t* aString, uint32_t aLength)</span>
+<span class="lineNum">    1784 </span>            : {
+<span class="lineNum">    1785 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">    1786 </span>            : 
+<span class="lineNum">    1787 </span>            :   nsDependentCSubstring keyword(reinterpret_cast&lt;const char*&gt;(aString), aLength);
+<span class="lineNum">    1788 </span><span class="lineNoCov">          0 :   return nsCSSKeywords::LookupKeyword(keyword);</span>
+<span class="lineNum">    1789 </span>            : }
+<a name="1790"><span class="lineNum">    1790 </span>            : </a>
+<span class="lineNum">    1791 </span>            : const char*
+<span class="lineNum">    1792 </span><span class="lineNoCov">          0 : Gecko_CSSKeywordString(nsCSSKeyword aKeyword, uint32_t* aLength)</span>
+<span class="lineNum">    1793 </span>            : {
+<span class="lineNum">    1794 </span>            :   MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">    1795 </span>            :   MOZ_ASSERT(aLength);
+<span class="lineNum">    1796 </span><span class="lineNoCov">          0 :   const nsAFlatCString&amp; value = nsCSSKeywords::GetStringValue(aKeyword);</span>
+<span class="lineNum">    1797 </span><span class="lineNoCov">          0 :   *aLength = value.Length();</span>
+<span class="lineNum">    1798 </span><span class="lineNoCov">          0 :   return value.get();</span>
+<span class="lineNum">    1799 </span>            : }
+<a name="1800"><span class="lineNum">    1800 </span>            : </a>
+<span class="lineNum">    1801 </span>            : nsCSSFontFaceRule*
+<span class="lineNum">    1802 </span><span class="lineNoCov">          0 : Gecko_CSSFontFaceRule_Create()</span>
+<span class="lineNum">    1803 </span>            : {
+<span class="lineNum">    1804 </span><span class="lineNoCov">          0 :   RefPtr&lt;nsCSSFontFaceRule&gt; rule = new nsCSSFontFaceRule(0, 0);</span>
+<span class="lineNum">    1805 </span><span class="lineNoCov">          0 :   return rule.forget().take();</span>
+<span class="lineNum">    1806 </span>            : }
+<a name="1807"><span class="lineNum">    1807 </span>            : </a>
+<span class="lineNum">    1808 </span>            : void
+<span class="lineNum">    1809 </span><span class="lineNoCov">          0 : Gecko_CSSFontFaceRule_GetCssText(const nsCSSFontFaceRule* aRule,</span>
+<span class="lineNum">    1810 </span>            :                                  nsAString* aResult)
+<span class="lineNum">    1811 </span>            : {
+<span class="lineNum">    1812 </span><span class="lineNoCov">          0 :   aRule-&gt;GetCssText(*aResult);</span>
+<a name="1813"><span class="lineNum">    1813 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">    1814 </span>            : 
+<a name="1815"><span class="lineNum">    1815 </span><span class="lineNoCov">          0 : NS_IMPL_FFI_REFCOUNTING(nsCSSFontFaceRule, CSSFontFaceRule);</span></a>
+<span class="lineNum">    1816 </span>            : 
+<span class="lineNum">    1817 </span><span class="lineNoCov">          0 : NS_IMPL_THREADSAFE_FFI_REFCOUNTING(nsCSSValueSharedList, CSSValueSharedList);</span>
+<span class="lineNum">    1818 </span>            : 
+<span class="lineNum">    1819 </span>            : #define STYLE_STRUCT(name, checkdata_cb)                                      \
+<span class="lineNum">    1820 </span>            :                                                                               \
+<span class="lineNum">    1821 </span>            : void                                                                          \
+<span class="lineNum">    1822 </span>            : Gecko_Construct_Default_nsStyle##name(nsStyle##name* ptr,                     \
+<span class="lineNum">    1823 </span>            :                                       const nsPresContext* pres_context)      \
+<span class="lineNum">    1824 </span>            : {                                                                             \
+<span class="lineNum">    1825 </span>            :   new (ptr) nsStyle##name(pres_context);                                      \
+<span class="lineNum">    1826 </span>            : }                                                                             \
+<span class="lineNum">    1827 </span>            :                                                                               \
+<span class="lineNum">    1828 </span>            : void                                                                          \
+<span class="lineNum">    1829 </span>            : Gecko_CopyConstruct_nsStyle##name(nsStyle##name* ptr,                         \
+<span class="lineNum">    1830 </span>            :                                   const nsStyle##name* other)                 \
+<span class="lineNum">    1831 </span>            : {                                                                             \
+<span class="lineNum">    1832 </span>            :   new (ptr) nsStyle##name(*other);                                            \
+<span class="lineNum">    1833 </span>            : }                                                                             \
+<span class="lineNum">    1834 </span>            :                                                                               \
+<span class="lineNum">    1835 </span>            : void                                                                          \
+<span class="lineNum">    1836 </span>            : Gecko_Destroy_nsStyle##name(nsStyle##name* ptr)                               \
+<span class="lineNum">    1837 </span>            : {                                                                             \
+<span class="lineNum">    1838 </span>            :   ptr-&gt;~nsStyle##name();                                                      \
+<span class="lineNum">    1839 </span>            : }
+<a name="1840"><span class="lineNum">    1840 </span>            : </a>
+<span class="lineNum">    1841 </span>            : void
+<span class="lineNum">    1842 </span><span class="lineNoCov">          0 : Gecko_Construct_nsStyleVariables(nsStyleVariables* ptr)</span>
+<span class="lineNum">    1843 </span>            : {
+<span class="lineNum">    1844 </span><span class="lineNoCov">          0 :   new (ptr) nsStyleVariables();</span>
+<span class="lineNum">    1845 </span><span class="lineNoCov">          0 : }</span>
+<a name="1846"><span class="lineNum">    1846 </span>            : </a>
+<span class="lineNum">    1847 </span>            : void
+<span class="lineNum">    1848 </span><span class="lineNoCov">          0 : Gecko_RegisterProfilerThread(const char* name)</span>
+<span class="lineNum">    1849 </span>            : {
+<span class="lineNum">    1850 </span>            :   char stackTop;
+<span class="lineNum">    1851 </span><span class="lineNoCov">          0 :   profiler_register_thread(name, &amp;stackTop);</span>
+<span class="lineNum">    1852 </span><span class="lineNoCov">          0 : }</span>
+<a name="1853"><span class="lineNum">    1853 </span>            : </a>
+<span class="lineNum">    1854 </span>            : void
+<span class="lineNum">    1855 </span><span class="lineNoCov">          0 : Gecko_UnregisterProfilerThread()</span>
+<span class="lineNum">    1856 </span>            : {
+<span class="lineNum">    1857 </span><span class="lineNoCov">          0 :   profiler_unregister_thread();</span>
+<span class="lineNum">    1858 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1859 </span>            : 
+<span class="lineNum">    1860 </span>            : #include &quot;nsStyleStructList.h&quot;
+<span class="lineNum">    1861 </span>            : 
+<span class="lineNum">    1862 </span>            : #undef STYLE_STRUCT
+<span class="lineNum">    1863 </span>            : 
+<span class="lineNum">    1864 </span>            : #ifndef MOZ_STYLO
+<span class="lineNum">    1865 </span>            : #define SERVO_BINDING_FUNC(name_, return_, ...)                               \
+<span class="lineNum">    1866 </span>            :   return_ name_(__VA_ARGS__) {                                                \
+<span class="lineNum">    1867 </span>            :     MOZ_CRASH(&quot;stylo: shouldn't be calling &quot; #name_ &quot;in a non-stylo build&quot;);  \
+<span class="lineNum">    1868 </span>            :   }
+<span class="lineNum">    1869 </span>            : #include &quot;ServoBindingList.h&quot;
+<span class="lineNum">    1870 </span>            : #undef SERVO_BINDING_FUNC
+<span class="lineNum">    1871 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

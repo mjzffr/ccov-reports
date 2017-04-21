@@ -1,0 +1,931 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - gfx/layers/client/TextureClient.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">gfx/layers/client</a> - TextureClient.h<span style="font-size: 80%;"> (source / <a href="TextureClient.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntryLo">30.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryLo">19.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 20; indent-tabs-mode: nil; c-basic-offset: 2 -*-</a>
+<span class="lineNum">       2 </span>            : //  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #ifndef MOZILLA_GFX_TEXTURECLIENT_H
+<span class="lineNum">       7 </span>            : #define MOZILLA_GFX_TEXTURECLIENT_H
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;stddef.h&gt;                     // for size_t
+<span class="lineNum">      10 </span>            : #include &lt;stdint.h&gt;                     // for uint32_t, uint8_t, uint64_t
+<span class="lineNum">      11 </span>            : #include &quot;GLTextureImage.h&quot;             // for TextureImage
+<span class="lineNum">      12 </span>            : #include &quot;ImageTypes.h&quot;                 // for StereoMode
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/Assertions.h&quot;         // for MOZ_ASSERT, etc
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Attributes.h&quot;         // for override
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/DebugOnly.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/RefPtr.h&quot;             // for RefPtr, RefCounted
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/gfx/2D.h&quot;             // for DrawTarget
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/gfx/Point.h&quot;          // for IntSize
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/gfx/Types.h&quot;          // for SurfaceFormat
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/ipc/Shmem.h&quot;          // for Shmem
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/layers/AtomicRefCountedWithFinalize.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;mozilla/layers/CompositorTypes.h&quot;  // for TextureFlags, etc
+<span class="lineNum">      23 </span>            : #include &quot;mozilla/layers/ISurfaceAllocator.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;mozilla/layers/LayersTypes.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;mozilla/layers/LayersSurfaces.h&quot;  // for SurfaceDescriptor
+<span class="lineNum">      26 </span>            : #include &quot;mozilla/mozalloc.h&quot;           // for operator delete
+<span class="lineNum">      27 </span>            : #include &quot;mozilla/gfx/CriticalSection.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;nsCOMPtr.h&quot;                   // for already_AddRefed
+<span class="lineNum">      29 </span>            : #include &quot;nsISupportsImpl.h&quot;            // for TextureImage::AddRef, etc
+<span class="lineNum">      30 </span>            : #include &quot;GfxTexturesReporter.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;pratom.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsThreadUtils.h&quot;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : class gfxImageSurface;
+<span class="lineNum">      35 </span>            : struct ID3D11Device;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : namespace mozilla {
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : // When defined, we track which pool the tile came from and test for
+<span class="lineNum">      40 </span>            : // any inconsistencies.  This can be defined in release build as well.
+<span class="lineNum">      41 </span>            : #ifdef DEBUG
+<span class="lineNum">      42 </span>            : #define GFX_DEBUG_TRACK_CLIENTS_IN_POOL 1
+<span class="lineNum">      43 </span>            : #endif
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : namespace layers {
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : class AsyncTransactionWaiter;
+<span class="lineNum">      48 </span>            : class BufferTextureData;
+<span class="lineNum">      49 </span>            : class CompositableForwarder;
+<span class="lineNum">      50 </span>            : class KnowsCompositor;
+<span class="lineNum">      51 </span>            : class LayersIPCChannel;
+<span class="lineNum">      52 </span>            : class CompositableClient;
+<span class="lineNum">      53 </span>            : struct PlanarYCbCrData;
+<span class="lineNum">      54 </span>            : class Image;
+<span class="lineNum">      55 </span>            : class PTextureChild;
+<span class="lineNum">      56 </span>            : class TextureChild;
+<span class="lineNum">      57 </span>            : class TextureData;
+<span class="lineNum">      58 </span>            : class GPUVideoTextureData;
+<span class="lineNum">      59 </span>            : struct RawTextureBuffer;
+<span class="lineNum">      60 </span>            : class RawYCbCrTextureBuffer;
+<span class="lineNum">      61 </span>            : class TextureClient;
+<span class="lineNum">      62 </span>            : class ITextureClientRecycleAllocator;
+<span class="lineNum">      63 </span>            : #ifdef GFX_DEBUG_TRACK_CLIENTS_IN_POOL
+<span class="lineNum">      64 </span>            : class TextureClientPool;
+<span class="lineNum">      65 </span>            : #endif
+<span class="lineNum">      66 </span>            : class TextureForwarder;
+<span class="lineNum">      67 </span>            : class KeepAlive;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : /**
+<span class="lineNum">      70 </span>            :  * TextureClient is the abstraction that allows us to share data between the
+<span class="lineNum">      71 </span>            :  * content and the compositor side.
+<span class="lineNum">      72 </span>            :  */
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : enum TextureAllocationFlags {
+<span class="lineNum">      75 </span>            :   ALLOC_DEFAULT = 0,
+<span class="lineNum">      76 </span>            :   ALLOC_CLEAR_BUFFER = 1 &lt;&lt; 1,  // Clear the buffer to whatever is best for the draw target
+<span class="lineNum">      77 </span>            :   ALLOC_CLEAR_BUFFER_WHITE = 1 &lt;&lt; 2,  // explicit all white
+<span class="lineNum">      78 </span>            :   ALLOC_CLEAR_BUFFER_BLACK = 1 &lt;&lt; 3,  // explicit all black
+<span class="lineNum">      79 </span>            :   ALLOC_DISALLOW_BUFFERTEXTURECLIENT = 1 &lt;&lt; 4,
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   // Allocate the texture for out-of-band content updates. This is mostly for
+<span class="lineNum">      82 </span>            :   // TextureClientD3D11, which may otherwise choose D3D10 or non-KeyedMutex
+<span class="lineNum">      83 </span>            :   // surfaces when used on the main thread.
+<span class="lineNum">      84 </span>            :   ALLOC_FOR_OUT_OF_BAND_CONTENT = 1 &lt;&lt; 5,
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :   // Disable any cross-device synchronization. This is also for TextureClientD3D11,
+<span class="lineNum">      87 </span>            :   // and creates a texture without KeyedMutex.
+<span class="lineNum">      88 </span>            :   ALLOC_MANUAL_SYNCHRONIZATION = 1 &lt;&lt; 6,
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :   // The texture is going to be updated using UpdateFromSurface and needs to support
+<span class="lineNum">      91 </span>            :   // that call.
+<span class="lineNum">      92 </span>            :   ALLOC_UPDATE_FROM_SURFACE = 1 &lt;&lt; 7,
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : #ifdef XP_WIN
+<span class="lineNum">      96 </span>            : typedef void* SyncHandle;
+<span class="lineNum">      97 </span>            : #else
+<span class="lineNum">      98 </span>            : typedef uintptr_t SyncHandle;
+<span class="lineNum">      99 </span>            : #endif // XP_WIN
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : class SyncObject : public RefCounted&lt;SyncObject&gt;
+<span class="lineNum">     102 </span>            : {
+<span class="lineNum">     103 </span>            : public:
+<span class="lineNum">     104 </span>            :   MOZ_DECLARE_REFCOUNTED_VIRTUAL_TYPENAME(SyncObject)
+<span class="lineNum">     105 </span>            :   virtual ~SyncObject() { }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   static already_AddRefed&lt;SyncObject&gt; CreateSyncObject(SyncHandle aHandle
+<span class="lineNum">     108 </span>            : #ifdef XP_WIN
+<span class="lineNum">     109 </span>            :                                                        , ID3D11Device* aDevice = nullptr
+<span class="lineNum">     110 </span>            : #endif
+<span class="lineNum">     111 </span>            :                                                        );
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   enum class SyncType {
+<span class="lineNum">     114 </span>            :     D3D11,
+<span class="lineNum">     115 </span>            :   };
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :   virtual SyncType GetSyncType() = 0;
+<span class="lineNum">     118 </span>            :   virtual void FinalizeFrame() = 0;
+<span class="lineNum">     119 </span>            :   virtual bool IsSyncObjectValid() = 0;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : protected:
+<span class="lineNum">     122 </span>            :   SyncObject() { }
+<span class="lineNum">     123 </span>            : };
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : /**
+<span class="lineNum">     126 </span>            :  * This class may be used to asynchronously receive an update when the content
+<span class="lineNum">     127 </span>            :  * drawn to this texture client is available for reading in CPU memory. This
+<span class="lineNum">     128 </span>            :  * can only be used on texture clients that support draw target creation.
+<span class="lineNum">     129 </span>            :  */
+<a name="130"><span class="lineNum">     130 </span>            : class TextureReadbackSink</a>
+<span class="lineNum">     131 </span>            : {
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :   NS_INLINE_DECL_THREADSAFE_REFCOUNTING(TextureReadbackSink)</span>
+<span class="lineNum">     133 </span>            : public:
+<span class="lineNum">     134 </span>            :   /**
+<span class="lineNum">     135 </span>            :    * Callback function to implement in order to receive a DataSourceSurface
+<span class="lineNum">     136 </span>            :    * containing the data read back from the texture client. This will always
+<span class="lineNum">     137 </span>            :    * be called on the main thread, and this may not hold on to the
+<span class="lineNum">     138 </span>            :    * DataSourceSurface beyond the execution of this function.
+<span class="lineNum">     139 </span>            :    */
+<span class="lineNum">     140 </span>            :   virtual void ProcessReadback(gfx::DataSourceSurface *aSourceSurface) = 0;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : protected:
+<span class="lineNum">     143 </span>            :   virtual ~TextureReadbackSink() {}
+<span class="lineNum">     144 </span>            : };
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : enum class BackendSelector
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span>            :   Content,
+<span class="lineNum">     149 </span>            :   Canvas
+<span class="lineNum">     150 </span>            : };
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : /// Temporary object providing direct access to a Texture's memory.
+<span class="lineNum">     153 </span>            : ///
+<span class="lineNum">     154 </span>            : /// see TextureClient::CanExposeMappedData() and TextureClient::BorrowMappedData().
+<span class="lineNum">     155 </span>            : struct MappedTextureData
+<span class="lineNum">     156 </span>            : {
+<span class="lineNum">     157 </span>            :   uint8_t* data;
+<span class="lineNum">     158 </span>            :   gfx::IntSize size;
+<span class="lineNum">     159 </span>            :   int32_t stride;
+<span class="lineNum">     160 </span>            :   gfx::SurfaceFormat format;
+<span class="lineNum">     161 </span>            : };
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : struct MappedYCbCrChannelData
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span>            :   uint8_t* data;
+<span class="lineNum">     166 </span>            :   gfx::IntSize size;
+<span class="lineNum">     167 </span>            :   int32_t stride;
+<span class="lineNum">     168 </span>            :   int32_t skip;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :   bool CopyInto(MappedYCbCrChannelData&amp; aDst);
+<span class="lineNum">     171 </span>            : };
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            : struct MappedYCbCrTextureData {
+<span class="lineNum">     174 </span>            :   MappedYCbCrChannelData y;
+<span class="lineNum">     175 </span>            :   MappedYCbCrChannelData cb;
+<span class="lineNum">     176 </span>            :   MappedYCbCrChannelData cr;
+<span class="lineNum">     177 </span>            :   // Sad but because of how SharedPlanarYCbCrData is used we have to expose this for now.
+<span class="lineNum">     178 </span>            :   uint8_t* metadata;
+<span class="lineNum">     179 </span>            :   StereoMode stereoMode;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   bool CopyInto(MappedYCbCrTextureData&amp; aDst)
+<span class="lineNum">     182 </span>            :   {
+<span class="lineNum">     183 </span>            :     return y.CopyInto(aDst.y)
+<span class="lineNum">     184 </span>            :         &amp;&amp; cb.CopyInto(aDst.cb)
+<span class="lineNum">     185 </span>            :         &amp;&amp; cr.CopyInto(aDst.cr);
+<span class="lineNum">     186 </span>            :   }
+<span class="lineNum">     187 </span>            : };
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : class ReadLockDescriptor;
+<span class="lineNum">     190 </span>            : class NonBlockingTextureReadLock;
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : // A class to help implement copy-on-write semantics for shared textures.
+<span class="lineNum">     193 </span>            : //
+<span class="lineNum">     194 </span>            : // A TextureClient/Host pair can opt into using a ReadLock by calling
+<span class="lineNum">     195 </span>            : // TextureClient::EnableReadLock. This will equip the TextureClient with a
+<span class="lineNum">     196 </span>            : // ReadLock object that will be automatically ReadLock()'ed by the texture itself
+<span class="lineNum">     197 </span>            : // when it is written into (see TextureClient::Unlock).
+<span class="lineNum">     198 </span>            : // A TextureReadLock's counter starts at 1 and is expected to be equal to 1 when the
+<span class="lineNum">     199 </span>            : // lock is destroyed. See ShmemTextureReadLock for explanations about why we use
+<span class="lineNum">     200 </span>            : // 1 instead of 0 as the initial state.
+<span class="lineNum">     201 </span>            : // TextureReadLock is mostly internally managed by the TextureClient/Host pair,
+<span class="lineNum">     202 </span>            : // and the compositable only has to forward it during updates. If an update message
+<span class="lineNum">     203 </span>            : // contains a null_t lock, it means that the texture was not written into on the
+<span class="lineNum">     204 </span>            : // content side, and there is no synchronization required on the compositor side
+<span class="lineNum">     205 </span>            : // (or it means that the texture pair did not opt into using ReadLocks).
+<span class="lineNum">     206 </span>            : // On the compositor side, the TextureHost can receive a ReadLock during a
+<span class="lineNum">     207 </span>            : // transaction, and will both ReadUnlock() it and drop it as soon as the shared
+<span class="lineNum">     208 </span>            : // data is available again for writing (the texture upload is done, or the compositor
+<span class="lineNum">     209 </span>            : // not reading the texture anymore). The lock is dropped to make sure it is
+<span class="lineNum">     210 </span>            : // ReadUnlock()'ed only once.
+<span class="lineNum">     211 </span>            : class TextureReadLock {
+<span class="lineNum">     212 </span>            : protected:
+<span class="lineNum">     213 </span>            :   virtual ~TextureReadLock() {}
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : public:
+<span class="lineNum">     216 </span>            :   NS_INLINE_DECL_THREADSAFE_REFCOUNTING(TextureReadLock)
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   virtual bool ReadLock() = 0;
+<span class="lineNum">     219 </span>            :   virtual bool TryReadLock(TimeDuration aTimeout) { return ReadLock(); }
+<span class="lineNum">     220 </span>            :   virtual int32_t ReadUnlock() = 0;
+<span class="lineNum">     221 </span>            :   virtual bool IsValid() const = 0;
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :   static already_AddRefed&lt;TextureReadLock&gt;
+<span class="lineNum">     224 </span>            :   Deserialize(const ReadLockDescriptor&amp; aDescriptor, ISurfaceAllocator* aAllocator);
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   virtual bool Serialize(ReadLockDescriptor&amp; aOutput, base::ProcessId aOther) = 0;
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :   enum LockType {
+<span class="lineNum">     229 </span>            :     TYPE_NONBLOCKING_MEMORY,
+<span class="lineNum">     230 </span>            :     TYPE_NONBLOCKING_SHMEM,
+<span class="lineNum">     231 </span>            :     TYPE_CROSS_PROCESS_SEMAPHORE
+<span class="lineNum">     232 </span>            :   };
+<span class="lineNum">     233 </span>            :   virtual LockType GetType() = 0;
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :   virtual NonBlockingTextureReadLock* AsNonBlockingLock() { return nullptr; }
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : protected:
+<span class="lineNum">     238 </span>            :   NS_DECL_OWNINGTHREAD
+<span class="lineNum">     239 </span>            : };
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : class NonBlockingTextureReadLock : public TextureReadLock {
+<span class="lineNum">     242 </span>            : public:
+<span class="lineNum">     243 </span>            :   virtual int32_t GetReadCount() = 0;
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :   static already_AddRefed&lt;TextureReadLock&gt;
+<span class="lineNum">     246 </span>            :   Create(LayersIPCChannel* aAllocator);
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :   virtual NonBlockingTextureReadLock* AsNonBlockingLock() override { return this; }
+<span class="lineNum">     249 </span>            : };
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            : #ifdef XP_WIN
+<span class="lineNum">     252 </span>            : class D3D11TextureData;
+<span class="lineNum">     253 </span>            : #endif
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            : class TextureData {
+<span class="lineNum">     256 </span>            : public:
+<span class="lineNum">     257 </span>            :   struct Info {
+<span class="lineNum">     258 </span>            :     gfx::IntSize size;
+<span class="lineNum">     259 </span>            :     gfx::SurfaceFormat format;
+<span class="lineNum">     260 </span>            :     bool hasIntermediateBuffer;
+<span class="lineNum">     261 </span>            :     bool hasSynchronization;
+<span class="lineNum">     262 </span>            :     bool supportsMoz2D;
+<span class="lineNum">     263 </span>            :     bool canExposeMappedData;
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :     Info()
+<span class="lineNum">     266 </span>            :     : format(gfx::SurfaceFormat::UNKNOWN)
+<span class="lineNum">     267 </span>            :     , hasIntermediateBuffer(false)
+<span class="lineNum">     268 </span>            :     , hasSynchronization(false)
+<span class="lineNum">     269 </span>            :     , supportsMoz2D(false)
+<span class="lineNum">     270 </span>            :     , canExposeMappedData(false)
+<span class="lineNum">     271 </span>            :     {}
+<span class="lineNum">     272 </span>            :   };
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineCov">          1 :   TextureData() { MOZ_COUNT_CTOR(TextureData); }</span>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineCov">          1 :   virtual ~TextureData() { MOZ_COUNT_DTOR(TextureData); }</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :   virtual void FillInfo(TextureData::Info&amp; aInfo) const = 0;
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :   virtual bool Lock(OpenMode aMode) = 0;
+<span class="lineNum">     281 </span>            : 
+<a name="282"><span class="lineNum">     282 </span>            :   virtual void Unlock() = 0;</a>
+<span class="lineNum">     283 </span>            : 
+<a name="284"><span class="lineNum">     284 </span><span class="lineNoCov">          0 :   virtual already_AddRefed&lt;gfx::DrawTarget&gt; BorrowDrawTarget() { return nullptr; }</span></a>
+<span class="lineNum">     285 </span>            : 
+<a name="286"><span class="lineNum">     286 </span><span class="lineNoCov">          0 :   virtual bool BorrowMappedData(MappedTextureData&amp;) { return false; }</span></a>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :   virtual bool BorrowMappedYCbCrData(MappedYCbCrTextureData&amp;) { return false; }</span>
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   virtual void Deallocate(LayersIPCChannel* aAllocator) = 0;
+<a name="291"><span class="lineNum">     291 </span>            : </a>
+<span class="lineNum">     292 </span>            :   /// Depending on the texture's flags either Deallocate or Forget is called.
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   virtual void Forget(LayersIPCChannel* aAllocator) {}</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :   virtual bool Serialize(SurfaceDescriptor&amp; aDescriptor) = 0;
+<a name="296"><span class="lineNum">     296 </span>            : </a>
+<span class="lineNum">     297 </span>            :   virtual TextureData*
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   CreateSimilar(LayersIPCChannel* aAllocator,</span>
+<span class="lineNum">     299 </span>            :                 LayersBackend aLayersBackend,
+<span class="lineNum">     300 </span>            :                 TextureFlags aFlags = TextureFlags::DEFAULT,
+<a name="301"><span class="lineNum">     301 </span><span class="lineNoCov">          0 :                 TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT) const { return nullptr; }</span></a>
+<span class="lineNum">     302 </span>            : 
+<a name="303"><span class="lineNum">     303 </span><span class="lineNoCov">          0 :   virtual bool UpdateFromSurface(gfx::SourceSurface* aSurface) { return false; };</span></a>
+<span class="lineNum">     304 </span>            : 
+<a name="305"><span class="lineNum">     305 </span><span class="lineNoCov">          0 :   virtual bool ReadBack(TextureReadbackSink* aReadbackSink) { return false; }</span></a>
+<span class="lineNum">     306 </span>            : 
+<a name="307"><span class="lineNum">     307 </span><span class="lineNoCov">          0 :   virtual void SyncWithObject(SyncObject* aFence) {};</span></a>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   virtual TextureFlags GetTextureFlags() const { return TextureFlags::NO_FLAGS; }</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            : #ifdef XP_WIN
+<span class="lineNum">     312 </span>            :   virtual D3D11TextureData* AsD3D11TextureData() {
+<span class="lineNum">     313 </span>            :     return nullptr;
+<span class="lineNum">     314 </span>            :   }
+<a name="315"><span class="lineNum">     315 </span>            : #endif</a>
+<span class="lineNum">     316 </span>            : 
+<a name="317"><span class="lineNum">     317 </span><span class="lineNoCov">          0 :   virtual BufferTextureData* AsBufferTextureData() { return nullptr; }</span></a>
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :   virtual GPUVideoTextureData* AsGPUVideoTextureData() { return nullptr; }</span>
+<span class="lineNum">     320 </span>            : };
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            : /**
+<span class="lineNum">     323 </span>            :  * TextureClient is a thin abstraction over texture data that need to be shared
+<span class="lineNum">     324 </span>            :  * between the content process and the compositor process. It is the
+<span class="lineNum">     325 </span>            :  * content-side half of a TextureClient/TextureHost pair. A corresponding
+<span class="lineNum">     326 </span>            :  * TextureHost lives on the compositor-side.
+<span class="lineNum">     327 </span>            :  *
+<span class="lineNum">     328 </span>            :  * TextureClient's primary purpose is to present texture data in a way that is
+<span class="lineNum">     329 </span>            :  * understood by the IPC system. There are two ways to use it:
+<span class="lineNum">     330 </span>            :  * - Use it to serialize image data that is not IPC-friendly (most likely
+<span class="lineNum">     331 </span>            :  * involving a copy into shared memory)
+<span class="lineNum">     332 </span>            :  * - preallocate it and paint directly into it, which avoids copy but requires
+<span class="lineNum">     333 </span>            :  * the painting code to be aware of TextureClient (or at least the underlying
+<span class="lineNum">     334 </span>            :  * shared memory).
+<span class="lineNum">     335 </span>            :  *
+<span class="lineNum">     336 </span>            :  * There is always one and only one TextureClient per TextureHost, and the
+<span class="lineNum">     337 </span>            :  * TextureClient/Host pair only owns one buffer of image data through its
+<span class="lineNum">     338 </span>            :  * lifetime. This means that the lifetime of the underlying shared data
+<span class="lineNum">     339 </span>            :  * matches the lifetime of the TextureClient/Host pair. It also means
+<span class="lineNum">     340 </span>            :  * TextureClient/Host do not implement double buffering, which is the
+<span class="lineNum">     341 </span>            :  * responsibility of the compositable (which would use two Texture pairs).
+<span class="lineNum">     342 </span>            :  * In order to send several different buffers to the compositor side, use
+<span class="lineNum">     343 </span>            :  * several TextureClients.
+<span class="lineNum">     344 </span>            :  */
+<span class="lineNum">     345 </span>            : class TextureClient
+<span class="lineNum">     346 </span>            :   : public AtomicRefCountedWithFinalize&lt;TextureClient&gt;
+<span class="lineNum">     347 </span>            : {
+<span class="lineNum">     348 </span>            : public:
+<span class="lineNum">     349 </span>            :   explicit TextureClient(TextureData* aData, TextureFlags aFlags, LayersIPCChannel* aAllocator);
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :   virtual ~TextureClient();
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     354 </span>            :   CreateWithData(TextureData* aData, TextureFlags aFlags, LayersIPCChannel* aAllocator);
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :   // Creates and allocates a TextureClient usable with Moz2D.
+<span class="lineNum">     357 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     358 </span>            :   CreateForDrawing(KnowsCompositor* aAllocator,
+<span class="lineNum">     359 </span>            :                    gfx::SurfaceFormat aFormat,
+<span class="lineNum">     360 </span>            :                    gfx::IntSize aSize,
+<span class="lineNum">     361 </span>            :                    BackendSelector aSelector,
+<span class="lineNum">     362 </span>            :                    TextureFlags aTextureFlags,
+<span class="lineNum">     363 </span>            :                    TextureAllocationFlags flags = ALLOC_DEFAULT);
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     366 </span>            :   CreateFromSurface(KnowsCompositor* aAllocator,
+<span class="lineNum">     367 </span>            :                     gfx::SourceSurface* aSurface,
+<span class="lineNum">     368 </span>            :                     BackendSelector aSelector,
+<span class="lineNum">     369 </span>            :                     TextureFlags aTextureFlags,
+<span class="lineNum">     370 </span>            :                     TextureAllocationFlags aAllocFlags);
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :   // Creates and allocates a TextureClient supporting the YCbCr format.
+<span class="lineNum">     373 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     374 </span>            :   CreateForYCbCr(KnowsCompositor* aAllocator,
+<span class="lineNum">     375 </span>            :                  gfx::IntSize aYSize,
+<span class="lineNum">     376 </span>            :                  gfx::IntSize aCbCrSize,
+<span class="lineNum">     377 </span>            :                  StereoMode aStereoMode,
+<span class="lineNum">     378 </span>            :                  YUVColorSpace aYUVColorSpace,
+<span class="lineNum">     379 </span>            :                  TextureFlags aTextureFlags);
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :   // Creates and allocates a TextureClient (can be accessed through raw
+<span class="lineNum">     382 </span>            :   // pointers).
+<span class="lineNum">     383 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     384 </span>            :   CreateForRawBufferAccess(KnowsCompositor* aAllocator,
+<span class="lineNum">     385 </span>            :                            gfx::SurfaceFormat aFormat,
+<span class="lineNum">     386 </span>            :                            gfx::IntSize aSize,
+<span class="lineNum">     387 </span>            :                            gfx::BackendType aMoz2dBackend,
+<span class="lineNum">     388 </span>            :                            TextureFlags aTextureFlags,
+<span class="lineNum">     389 </span>            :                            TextureAllocationFlags flags = ALLOC_DEFAULT);
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            :   // Creates and allocates a TextureClient (can beaccessed through raw
+<span class="lineNum">     392 </span>            :   // pointers) with a certain buffer size. It's unfortunate that we need this.
+<span class="lineNum">     393 </span>            :   // providing format and sizes could let us do more optimization.
+<span class="lineNum">     394 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     395 </span>            :   CreateForYCbCrWithBufferSize(KnowsCompositor* aAllocator,
+<span class="lineNum">     396 </span>            :                                size_t aSize,
+<span class="lineNum">     397 </span>            :                                YUVColorSpace aYUVColorSpace,
+<span class="lineNum">     398 </span>            :                                TextureFlags aTextureFlags);
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :   // Creates and allocates a TextureClient of the same type.
+<span class="lineNum">     401 </span>            :   already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     402 </span>            :   CreateSimilar(LayersBackend aLayersBackend = LayersBackend::LAYERS_NONE,
+<span class="lineNum">     403 </span>            :                 TextureFlags aFlags = TextureFlags::DEFAULT,
+<span class="lineNum">     404 </span>            :                 TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT) const;
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span>            :   /**
+<span class="lineNum">     407 </span>            :    * Locks the shared data, allowing the caller to get access to it.
+<span class="lineNum">     408 </span>            :    *
+<span class="lineNum">     409 </span>            :    * Please always lock/unlock when accessing the shared data.
+<span class="lineNum">     410 </span>            :    * If Lock() returns false, you should not attempt to access the shared data.
+<span class="lineNum">     411 </span>            :    */
+<span class="lineNum">     412 </span>            :   bool Lock(OpenMode aMode);
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :   void Unlock();
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :   bool IsLocked() const { return mIsLocked; }
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineCov">          1 :   gfx::IntSize GetSize() const { return mInfo.size; }</span>
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            :   gfx::SurfaceFormat GetFormat() const { return mInfo.format; }
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            :   /**
+<span class="lineNum">     423 </span>            :    * Returns true if this texture has a synchronization mechanism (mutex, fence, etc.).
+<span class="lineNum">     424 </span>            :    * Textures that do not implement synchronization should be immutable or should
+<span class="lineNum">     425 </span>            :    * use immediate uploads (see TextureFlags in CompositorTypes.h)
+<span class="lineNum">     426 </span>            :    * Even if a texture does not implement synchronization, Lock and Unlock need
+<span class="lineNum">     427 </span>            :    * to be used appropriately since the latter are also there to map/numap data.
+<span class="lineNum">     428 </span>            :    */
+<span class="lineNum">     429 </span>            :   bool HasSynchronization() const { return mInfo.hasSynchronization; }
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :   /**
+<span class="lineNum">     432 </span>            :    * Indicates whether the TextureClient implementation is backed by an
+<span class="lineNum">     433 </span>            :    * in-memory buffer. The consequence of this is that locking the
+<span class="lineNum">     434 </span>            :    * TextureClient does not contend with locking the texture on the host side.
+<span class="lineNum">     435 </span>            :    */
+<span class="lineNum">     436 </span>            :   bool HasIntermediateBuffer() const { return mInfo.hasIntermediateBuffer; }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            :   bool CanExposeDrawTarget() const { return mInfo.supportsMoz2D; }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            :   bool CanExposeMappedData() const { return mInfo.canExposeMappedData; }
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            :   /**
+<span class="lineNum">     443 </span>            :    * Returns a DrawTarget to draw into the TextureClient.
+<span class="lineNum">     444 </span>            :    * This function should never be called when not on the main thread!
+<span class="lineNum">     445 </span>            :    *
+<span class="lineNum">     446 </span>            :    * This must never be called on a TextureClient that is not sucessfully locked.
+<span class="lineNum">     447 </span>            :    * When called several times within one Lock/Unlock pair, this method should
+<span class="lineNum">     448 </span>            :    * return the same DrawTarget.
+<span class="lineNum">     449 </span>            :    * The DrawTarget is automatically flushed by the TextureClient when the latter
+<span class="lineNum">     450 </span>            :    * is unlocked, and the DrawTarget that will be returned within the next
+<span class="lineNum">     451 </span>            :    * lock/unlock pair may or may not be the same object.
+<span class="lineNum">     452 </span>            :    * Do not keep references to the DrawTarget outside of the lock/unlock pair.
+<span class="lineNum">     453 </span>            :    *
+<span class="lineNum">     454 </span>            :    * This is typically used as follows:
+<span class="lineNum">     455 </span>            :    *
+<span class="lineNum">     456 </span>            :    * if (!texture-&gt;Lock(OpenMode::OPEN_READ_WRITE)) {
+<span class="lineNum">     457 </span>            :    *   return false;
+<span class="lineNum">     458 </span>            :    * }
+<span class="lineNum">     459 </span>            :    * {
+<span class="lineNum">     460 </span>            :    *   // Restrict this code's scope to ensure all references to dt are gone
+<span class="lineNum">     461 </span>            :    *   // when Unlock is called.
+<span class="lineNum">     462 </span>            :    *   DrawTarget* dt = texture-&gt;BorrowDrawTarget();
+<span class="lineNum">     463 </span>            :    *   // use the draw target ...
+<span class="lineNum">     464 </span>            :    * }
+<span class="lineNum">     465 </span>            :    * texture-&gt;Unlock();
+<span class="lineNum">     466 </span>            :    *
+<span class="lineNum">     467 </span>            :    */
+<span class="lineNum">     468 </span>            :   gfx::DrawTarget* BorrowDrawTarget();
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            :   /**
+<span class="lineNum">     471 </span>            :    * Similar to BorrowDrawTarget but provides direct access to the texture's bits
+<span class="lineNum">     472 </span>            :    * instead of a DrawTarget.
+<span class="lineNum">     473 </span>            :    */
+<span class="lineNum">     474 </span>            :   bool BorrowMappedData(MappedTextureData&amp;);
+<span class="lineNum">     475 </span>            :   bool BorrowMappedYCbCrData(MappedYCbCrTextureData&amp;);
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :   /**
+<span class="lineNum">     478 </span>            :    * This function can be used to update the contents of the TextureClient
+<span class="lineNum">     479 </span>            :    * off the main thread.
+<span class="lineNum">     480 </span>            :    */
+<span class="lineNum">     481 </span>            :   void UpdateFromSurface(gfx::SourceSurface* aSurface);
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :   /**
+<span class="lineNum">     484 </span>            :    * This method is strictly for debugging. It causes locking and
+<span class="lineNum">     485 </span>            :    * needless copies.
+<span class="lineNum">     486 </span>            :    */
+<span class="lineNum">     487 </span>            :   already_AddRefed&lt;gfx::DataSourceSurface&gt; GetAsSurface();
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :   virtual void PrintInfo(std::stringstream&amp; aStream, const char* aPrefix);
+<span class="lineNum">     490 </span>            : 
+<span class="lineNum">     491 </span>            :   /**
+<span class="lineNum">     492 </span>            :    * Copies a rectangle from this texture client to a position in aTarget.
+<span class="lineNum">     493 </span>            :    * It is assumed that the necessary locks are in place; so this should at
+<span class="lineNum">     494 </span>            :    * least have a read lock and aTarget should at least have a write lock.
+<span class="lineNum">     495 </span>            :    */
+<span class="lineNum">     496 </span>            :   bool CopyToTextureClient(TextureClient* aTarget,
+<span class="lineNum">     497 </span>            :                            const gfx::IntRect* aRect,
+<span class="lineNum">     498 </span>            :                            const gfx::IntPoint* aPoint);
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span>            :   /**
+<span class="lineNum">     501 </span>            :    * Allocate and deallocate a TextureChild actor.
+<span class="lineNum">     502 </span>            :    *
+<span class="lineNum">     503 </span>            :    * TextureChild is an implementation detail of TextureClient that is not
+<span class="lineNum">     504 </span>            :    * exposed to the rest of the code base. CreateIPDLActor and DestroyIPDLActor
+<span class="lineNum">     505 </span>            :    * are for use with the managing IPDL protocols only (so that they can
+<span class="lineNum">     506 </span>            :    * implement AllocPextureChild and DeallocPTextureChild).
+<span class="lineNum">     507 </span>            :    */
+<span class="lineNum">     508 </span>            :   static PTextureChild* CreateIPDLActor();
+<span class="lineNum">     509 </span>            :   static bool DestroyIPDLActor(PTextureChild* actor);
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :   /**
+<span class="lineNum">     512 </span>            :    * Get the TextureClient corresponding to the actor passed in parameter.
+<span class="lineNum">     513 </span>            :    */
+<span class="lineNum">     514 </span>            :   static already_AddRefed&lt;TextureClient&gt; AsTextureClient(PTextureChild* actor);
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            :   /**
+<span class="lineNum">     517 </span>            :    * TextureFlags contain important information about various aspects
+<span class="lineNum">     518 </span>            :    * of the texture, like how its liferime is managed, and how it
+<span class="lineNum">     519 </span>            :    * should be displayed.
+<span class="lineNum">     520 </span>            :    * See TextureFlags in CompositorTypes.h.
+<span class="lineNum">     521 </span>            :    */
+<span class="lineNum">     522 </span>            :   TextureFlags GetFlags() const { return mFlags; }
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            :   bool HasFlags(TextureFlags aFlags) const
+<span class="lineNum">     525 </span>            :   {
+<span class="lineNum">     526 </span>            :     return (mFlags &amp; aFlags) == aFlags;
+<span class="lineNum">     527 </span>            :   }
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :   void AddFlags(TextureFlags aFlags);
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            :   void RemoveFlags(TextureFlags aFlags);
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span>            :   // Must not be called when TextureClient is in use by CompositableClient.
+<span class="lineNum">     534 </span>            :   void RecycleTexture(TextureFlags aFlags);
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span>            :   /**
+<span class="lineNum">     537 </span>            :    * After being shared with the compositor side, an immutable texture is never
+<span class="lineNum">     538 </span>            :    * modified, it can only be read. It is safe to not Lock/Unlock immutable
+<span class="lineNum">     539 </span>            :    * textures.
+<span class="lineNum">     540 </span>            :    */
+<span class="lineNum">     541 </span>            :   bool IsImmutable() const { return !!(mFlags &amp; TextureFlags::IMMUTABLE); }
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            :   void MarkImmutable() { AddFlags(TextureFlags::IMMUTABLE); }
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            :   bool IsSharedWithCompositor() const;
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span>            :   /**
+<span class="lineNum">     548 </span>            :    * If this method returns false users of TextureClient are not allowed
+<span class="lineNum">     549 </span>            :    * to access the shared data.
+<span class="lineNum">     550 </span>            :    */
+<span class="lineNum">     551 </span>            :   bool IsValid() const { return !!mData; }
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            :   /**
+<span class="lineNum">     554 </span>            :    * Called when TextureClient is added to CompositableClient.
+<span class="lineNum">     555 </span>            :    */
+<span class="lineNum">     556 </span>            :   void SetAddedToCompositableClient();
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span>            :   /**
+<span class="lineNum">     559 </span>            :    * If this method retuns false, TextureClient is already added to CompositableClient,
+<span class="lineNum">     560 </span>            :    * since its creation or recycling.
+<span class="lineNum">     561 </span>            :    */
+<span class="lineNum">     562 </span>            :   bool IsAddedToCompositableClient() const { return mAddedToCompositableClient; }
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span>            :   /**
+<span class="lineNum">     565 </span>            :   * Create and init the TextureChild/Parent IPDL actor pair
+<span class="lineNum">     566 </span>            :   * with a CompositableForwarder.
+<span class="lineNum">     567 </span>            :   *
+<span class="lineNum">     568 </span>            :   * Should be called only once per TextureClient.
+<span class="lineNum">     569 </span>            :   * The TextureClient must not be locked when calling this method.
+<span class="lineNum">     570 </span>            :   */
+<span class="lineNum">     571 </span>            :   bool InitIPDLActor(CompositableForwarder* aForwarder);
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span>            :   /**
+<span class="lineNum">     574 </span>            :    * Create and init the TextureChild/Parent IPDL actor pair
+<span class="lineNum">     575 </span>            :    * with a TextureForwarder.
+<span class="lineNum">     576 </span>            :    *
+<span class="lineNum">     577 </span>            :    * Should be called only once per TextureClient.
+<span class="lineNum">     578 </span>            :    * The TextureClient must not be locked when calling this method.
+<span class="lineNum">     579 </span>            :    */
+<span class="lineNum">     580 </span>            :   bool InitIPDLActor(KnowsCompositor* aForwarder);
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            :   /**
+<span class="lineNum">     583 </span>            :    * Return a pointer to the IPDLActor.
+<span class="lineNum">     584 </span>            :    *
+<span class="lineNum">     585 </span>            :    * This is to be used with IPDL messages only. Do not store the returned
+<span class="lineNum">     586 </span>            :    * pointer.
+<span class="lineNum">     587 </span>            :    */
+<span class="lineNum">     588 </span>            :   PTextureChild* GetIPDLActor();
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            :   /**
+<span class="lineNum">     591 </span>            :    * Triggers the destruction of the shared data and the corresponding TextureHost.
+<span class="lineNum">     592 </span>            :    *
+<span class="lineNum">     593 </span>            :    * If the texture flags contain TextureFlags::DEALLOCATE_CLIENT, the destruction
+<span class="lineNum">     594 </span>            :    * will be synchronously coordinated with the compositor side, otherwise it
+<span class="lineNum">     595 </span>            :    * will be done asynchronously.
+<span class="lineNum">     596 </span>            :    */
+<span class="lineNum">     597 </span>            :   void Destroy();
+<span class="lineNum">     598 </span>            : 
+<span class="lineNum">     599 </span>            :   /**
+<span class="lineNum">     600 </span>            :    * Track how much of this texture is wasted.
+<span class="lineNum">     601 </span>            :    * For example we might allocate a 256x256 tile but only use 10x10.
+<span class="lineNum">     602 </span>            :    */
+<span class="lineNum">     603 </span>            :   void SetWaste(int aWasteArea) {
+<span class="lineNum">     604 </span>            :     mWasteTracker.Update(aWasteArea, BytesPerPixel(GetFormat()));
+<span class="lineNum">     605 </span>            :   }
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :   /**
+<span class="lineNum">     608 </span>            :    * This sets the readback sink that this texture is to use. This will
+<span class="lineNum">     609 </span>            :    * receive the data for this texture as soon as it becomes available after
+<a name="610"><span class="lineNum">     610 </span>            :    * texture unlock.</a>
+<span class="lineNum">     611 </span>            :    */
+<span class="lineNum">     612 </span><span class="lineNoCov">          0 :   virtual void SetReadbackSink(TextureReadbackSink* aReadbackSink) {</span>
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :     mReadbackSink = aReadbackSink;</span>
+<a name="614"><span class="lineNum">     614 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :   void SyncWithObject(SyncObject* aFence) { mData-&gt;SyncWithObject(aFence); }</span>
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span><span class="lineCov">          1 :   LayersIPCChannel* GetAllocator() { return mAllocator; }</span>
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            :   ITextureClientRecycleAllocator* GetRecycleAllocator() { return mRecycleAllocator; }
+<span class="lineNum">     621 </span>            :   void SetRecycleAllocator(ITextureClientRecycleAllocator* aAllocator);
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span>            :   /// If you add new code that uses this method, you are probably doing something wrong.
+<span class="lineNum">     624 </span>            :   TextureData* GetInternalData() { return mData; }
+<span class="lineNum">     625 </span>            :   const TextureData* GetInternalData() const { return mData; }
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span>            :   uint64_t GetSerial() const { return mSerial; }
+<span class="lineNum">     628 </span>            : 
+<span class="lineNum">     629 </span>            :   void CancelWaitForRecycle();
+<span class="lineNum">     630 </span>            : 
+<span class="lineNum">     631 </span>            :   /**
+<span class="lineNum">     632 </span>            :    * Set last transaction id of CompositableForwarder.
+<span class="lineNum">     633 </span>            :    * 
+<span class="lineNum">     634 </span>            :    * Called when TextureClient has TextureFlags::RECYCLE flag.
+<span class="lineNum">     635 </span>            :    * When CompositableForwarder forwards the TextureClient with
+<span class="lineNum">     636 </span>            :    * TextureFlags::RECYCLE, it holds TextureClient's ref until host side
+<span class="lineNum">     637 </span>            :    * releases it. The host side sends TextureClient release message.
+<span class="lineNum">     638 </span>            :    * The id is used to check if the message is for the last TextureClient
+<span class="lineNum">     639 </span>            :    * forwarding.
+<span class="lineNum">     640 </span>            :    */
+<span class="lineNum">     641 </span>            :   void SetLastFwdTransactionId(uint64_t aTransactionId)
+<span class="lineNum">     642 </span>            :   {
+<span class="lineNum">     643 </span>            :     MOZ_ASSERT(mFwdTransactionId &lt;= aTransactionId);
+<span class="lineNum">     644 </span>            :     mFwdTransactionId = aTransactionId;
+<span class="lineNum">     645 </span>            :   }
+<span class="lineNum">     646 </span>            : 
+<span class="lineNum">     647 </span>            :   uint64_t GetLastFwdTransactionId() { return mFwdTransactionId; }
+<span class="lineNum">     648 </span>            : 
+<span class="lineNum">     649 </span>            :   void EnableReadLock();
+<span class="lineNum">     650 </span>            :   void EnableBlockingReadLock();
+<span class="lineNum">     651 </span>            : 
+<span class="lineNum">     652 </span>            :   TextureReadLock* GetReadLock() { return mReadLock; }
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            :   bool IsReadLocked() const;
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span>            :   bool TryReadLock();
+<span class="lineNum">     657 </span>            :   void ReadUnlock();
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            :   bool SerializeReadLock(ReadLockDescriptor&amp; aDescriptor);
+<span class="lineNum">     660 </span>            : 
+<span class="lineNum">     661 </span>            : private:
+<span class="lineNum">     662 </span>            :   static void TextureClientRecycleCallback(TextureClient* aClient, void* aClosure);
+<span class="lineNum">     663 </span>            :  
+<span class="lineNum">     664 </span>            :   // Internal helpers for creating texture clients using the actual forwarder instead
+<span class="lineNum">     665 </span>            :   // of KnowsCompositor. TextureClientPool uses these to let it cache texture clients
+<span class="lineNum">     666 </span>            :   // per-process instead of per ShadowLayerForwarder, but everyone else should
+<span class="lineNum">     667 </span>            :   // use the public functions instead.
+<span class="lineNum">     668 </span>            :   friend class TextureClientPool;
+<span class="lineNum">     669 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     670 </span>            :   CreateForDrawing(TextureForwarder* aAllocator,
+<span class="lineNum">     671 </span>            :                    gfx::SurfaceFormat aFormat,
+<span class="lineNum">     672 </span>            :                    gfx::IntSize aSize,
+<span class="lineNum">     673 </span>            :                    LayersBackend aLayersBackend,
+<span class="lineNum">     674 </span>            :                    int32_t aMaxTextureSize,
+<span class="lineNum">     675 </span>            :                    BackendSelector aSelector,
+<span class="lineNum">     676 </span>            :                    TextureFlags aTextureFlags,
+<span class="lineNum">     677 </span>            :                    TextureAllocationFlags aAllocFlags = ALLOC_DEFAULT);
+<span class="lineNum">     678 </span>            :   
+<span class="lineNum">     679 </span>            :   static already_AddRefed&lt;TextureClient&gt;
+<span class="lineNum">     680 </span>            :   CreateForRawBufferAccess(LayersIPCChannel* aAllocator,
+<span class="lineNum">     681 </span>            :                            gfx::SurfaceFormat aFormat,
+<span class="lineNum">     682 </span>            :                            gfx::IntSize aSize,
+<span class="lineNum">     683 </span>            :                            gfx::BackendType aMoz2dBackend,
+<span class="lineNum">     684 </span>            :                            LayersBackend aLayersBackend,
+<span class="lineNum">     685 </span>            :                            TextureFlags aTextureFlags,
+<span class="lineNum">     686 </span>            :                            TextureAllocationFlags flags = ALLOC_DEFAULT);
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            :   /**
+<span class="lineNum">     689 </span>            :    * Called once, during the destruction of the Texture, on the thread in which
+<span class="lineNum">     690 </span>            :    * texture's reference count reaches 0 (could be any thread).
+<span class="lineNum">     691 </span>            :    *
+<span class="lineNum">     692 </span>            :    * Here goes the shut-down code that uses virtual methods.
+<span class="lineNum">     693 </span>            :    * Must only be called by Release().
+<span class="lineNum">     694 </span>            :    */
+<span class="lineNum">     695 </span>            :   void Finalize() {}
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span>            :   friend class AtomicRefCountedWithFinalize&lt;TextureClient&gt;;
+<span class="lineNum">     698 </span>            : protected:
+<span class="lineNum">     699 </span>            :   /**
+<span class="lineNum">     700 </span>            :    * Should only be called *once* per texture, in TextureClient::InitIPDLActor.
+<span class="lineNum">     701 </span>            :    * Some texture implementations rely on the fact that the descriptor will be
+<span class="lineNum">     702 </span>            :    * deserialized.
+<span class="lineNum">     703 </span>            :    * Calling ToSurfaceDescriptor again after it has already returned true,
+<span class="lineNum">     704 </span>            :    * or never constructing a TextureHost with aDescriptor may result in a memory
+<span class="lineNum">     705 </span>            :    * leak (see TextureClientD3D9 for example).
+<span class="lineNum">     706 </span>            :    */
+<span class="lineNum">     707 </span>            :   bool ToSurfaceDescriptor(SurfaceDescriptor&amp; aDescriptor);
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span>            :   void LockActor() const;
+<span class="lineNum">     710 </span>            :   void UnlockActor() const;
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span>            :   TextureData::Info mInfo;
+<span class="lineNum">     713 </span>            : 
+<span class="lineNum">     714 </span>            :   RefPtr&lt;LayersIPCChannel&gt; mAllocator;
+<span class="lineNum">     715 </span>            :   RefPtr&lt;TextureChild&gt; mActor;
+<span class="lineNum">     716 </span>            :   RefPtr&lt;ITextureClientRecycleAllocator&gt; mRecycleAllocator;
+<span class="lineNum">     717 </span>            :   RefPtr&lt;TextureReadLock&gt; mReadLock;
+<span class="lineNum">     718 </span>            : 
+<span class="lineNum">     719 </span>            :   TextureData* mData;
+<span class="lineNum">     720 </span>            :   RefPtr&lt;gfx::DrawTarget&gt; mBorrowedDrawTarget;
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            :   TextureFlags mFlags;
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span>            :   gl::GfxTextureWasteTracker mWasteTracker;
+<span class="lineNum">     725 </span>            : 
+<span class="lineNum">     726 </span>            :   OpenMode mOpenMode;
+<span class="lineNum">     727 </span>            : #ifdef DEBUG
+<span class="lineNum">     728 </span>            :   uint32_t mExpectedDtRefs;
+<span class="lineNum">     729 </span>            : #endif
+<span class="lineNum">     730 </span>            :   bool mIsLocked;
+<span class="lineNum">     731 </span>            :   bool mIsReadLocked;
+<span class="lineNum">     732 </span>            :   // This member tracks that the texture was written into until the update
+<span class="lineNum">     733 </span>            :   // is sent to the compositor. We need this remember to lock mReadLock on
+<span class="lineNum">     734 </span>            :   // behalf of the compositor just before sending the notification.
+<span class="lineNum">     735 </span>            :   bool mUpdated;
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span>            :   // Used when TextureClient is recycled with TextureFlags::RECYCLE flag.
+<span class="lineNum">     738 </span>            :   bool mAddedToCompositableClient;
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :   bool mWorkaroundAnnoyingSharedSurfaceLifetimeIssues;
+<span class="lineNum">     741 </span>            :   bool mWorkaroundAnnoyingSharedSurfaceOwnershipIssues;
+<span class="lineNum">     742 </span>            : 
+<span class="lineNum">     743 </span>            :   RefPtr&lt;TextureReadbackSink&gt; mReadbackSink;
+<span class="lineNum">     744 </span>            : 
+<span class="lineNum">     745 </span>            :   uint64_t mFwdTransactionId;
+<span class="lineNum">     746 </span>            : 
+<span class="lineNum">     747 </span>            :   // Serial id of TextureClient. It is unique in current process.
+<span class="lineNum">     748 </span>            :   const uint64_t mSerial;
+<span class="lineNum">     749 </span>            :   // Used to assign serial ids of TextureClient.
+<span class="lineNum">     750 </span>            :   static mozilla::Atomic&lt;uint64_t&gt; sSerialCounter;
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span>            :   friend class TextureChild;
+<span class="lineNum">     753 </span>            :   friend void TestTextureClientSurface(TextureClient*, gfxImageSurface*);
+<span class="lineNum">     754 </span>            :   friend void TestTextureClientYCbCr(TextureClient*, PlanarYCbCrData&amp;);
+<span class="lineNum">     755 </span>            :   friend already_AddRefed&lt;TextureHost&gt; CreateTextureHostWithBackend(
+<span class="lineNum">     756 </span>            :     TextureClient*, LayersBackend&amp;);
+<span class="lineNum">     757 </span>            : 
+<span class="lineNum">     758 </span>            : #ifdef GFX_DEBUG_TRACK_CLIENTS_IN_POOL
+<span class="lineNum">     759 </span>            : public:
+<span class="lineNum">     760 </span>            :   // Pointer to the pool this tile came from.
+<span class="lineNum">     761 </span>            :   TextureClientPool* mPoolTracker;
+<span class="lineNum">     762 </span>            : #endif
+<span class="lineNum">     763 </span>            : };
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span>            : /**
+<a name="766"><span class="lineNum">     766 </span>            :  * Task that releases TextureClient pointer on a specified thread.</a>
+<span class="lineNum">     767 </span>            :  */
+<span class="lineNum">     768 </span><span class="lineCov">          1 : class TextureClientReleaseTask : public Runnable</span>
+<a name="769"><span class="lineNum">     769 </span>            : {</a>
+<span class="lineNum">     770 </span>            : public:
+<span class="lineNum">     771 </span><span class="lineCov">          1 :     explicit TextureClientReleaseTask(TextureClient* aClient)</span>
+<span class="lineNum">     772 </span><span class="lineCov">          1 :         : mTextureClient(aClient) {</span>
+<a name="773"><span class="lineNum">     773 </span><span class="lineCov">          1 :     }</span></a>
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span><span class="lineCov">          1 :     NS_IMETHOD Run() override</span>
+<span class="lineNum">     776 </span>            :     {
+<span class="lineNum">     777 </span><span class="lineCov">          1 :         mTextureClient = nullptr;</span>
+<span class="lineNum">     778 </span><span class="lineCov">          1 :         return NS_OK;</span>
+<span class="lineNum">     779 </span>            :     }
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span>            : private:
+<span class="lineNum">     782 </span>            :     RefPtr&lt;TextureClient&gt; mTextureClient;
+<span class="lineNum">     783 </span>            : };
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            : // Automatically lock and unlock a texture. Since texture locking is fallible,
+<span class="lineNum">     786 </span>            : // Succeeded() must be checked on the guard object before proceeding.
+<span class="lineNum">     787 </span>            : class MOZ_RAII TextureClientAutoLock
+<span class="lineNum">     788 </span>            : {
+<span class="lineNum">     789 </span>            :   MOZ_DECL_USE_GUARD_OBJECT_NOTIFIER;
+<a name="790"><span class="lineNum">     790 </span>            : </a>
+<span class="lineNum">     791 </span>            : public:
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :   TextureClientAutoLock(TextureClient* aTexture, OpenMode aMode</span>
+<span class="lineNum">     793 </span>            :                         MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     794 </span>            :    : mTexture(aTexture),
+<span class="lineNum">     795 </span><span class="lineNoCov">          0 :      mSucceeded(false)</span>
+<span class="lineNum">     796 </span>            :   {
+<span class="lineNum">     797 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :     mSucceeded = mTexture-&gt;Lock(aMode);</span>
+<span class="lineNum">     800 </span>            : #ifdef DEBUG
+<span class="lineNum">     801 </span>            :     mChecked = false;
+<a name="802"><span class="lineNum">     802 </span>            : #endif</a>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :   ~TextureClientAutoLock() {</span>
+<span class="lineNum">     805 </span>            :     MOZ_ASSERT(mChecked);
+<span class="lineNum">     806 </span><span class="lineNoCov">          0 :     if (mSucceeded) {</span>
+<span class="lineNum">     807 </span><span class="lineNoCov">          0 :       mTexture-&gt;Unlock();</span>
+<span class="lineNum">     808 </span>            :     }
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span>            :   bool Succeeded() {
+<span class="lineNum">     812 </span>            : #ifdef DEBUG
+<span class="lineNum">     813 </span>            :     mChecked = true;
+<span class="lineNum">     814 </span>            : #endif
+<span class="lineNum">     815 </span>            :     return mSucceeded;
+<span class="lineNum">     816 </span>            :   }
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span>            : private:
+<span class="lineNum">     819 </span>            :   TextureClient* mTexture;
+<span class="lineNum">     820 </span>            : #ifdef DEBUG
+<span class="lineNum">     821 </span>            :   bool mChecked;
+<span class="lineNum">     822 </span>            : #endif
+<span class="lineNum">     823 </span>            :   bool mSucceeded;
+<span class="lineNum">     824 </span>            : };
+<span class="lineNum">     825 </span>            : 
+<span class="lineNum">     826 </span>            : class KeepAlive
+<span class="lineNum">     827 </span>            : {
+<span class="lineNum">     828 </span>            : public:
+<span class="lineNum">     829 </span>            :   virtual ~KeepAlive() {}
+<span class="lineNum">     830 </span>            : };
+<span class="lineNum">     831 </span>            : 
+<span class="lineNum">     832 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     833 </span>            : class TKeepAlive : public KeepAlive
+<span class="lineNum">     834 </span>            : {
+<span class="lineNum">     835 </span>            : public:
+<span class="lineNum">     836 </span>            :   explicit TKeepAlive(T* aData) : mData(aData) {}
+<span class="lineNum">     837 </span>            : protected:
+<span class="lineNum">     838 </span>            :   RefPtr&lt;T&gt; mData;
+<span class="lineNum">     839 </span>            : };
+<span class="lineNum">     840 </span>            : 
+<span class="lineNum">     841 </span>            : /// Convenience function to set the content of ycbcr texture.
+<span class="lineNum">     842 </span>            : bool UpdateYCbCrTextureClient(TextureClient* aTexture, const PlanarYCbCrData&amp; aData);
+<span class="lineNum">     843 </span>            : 
+<span class="lineNum">     844 </span>            : } // namespace layers
+<span class="lineNum">     845 </span>            : } // namespace mozilla
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

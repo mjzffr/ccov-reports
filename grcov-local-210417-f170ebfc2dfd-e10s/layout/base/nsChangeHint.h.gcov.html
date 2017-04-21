@@ -1,0 +1,686 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - layout/base/nsChangeHint.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">layout/base</a> - nsChangeHint.h<span style="font-size: 80%;"> (source / <a href="nsChangeHint.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:24:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /* constants for what needs to be recomputed in response to style changes */
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #ifndef nsChangeHint_h___
+<span class="lineNum">       9 </span>            : #define nsChangeHint_h___
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/Types.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsDebug.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : struct nsCSSSelector;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : // Defines for various style related constants
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : enum nsChangeHint {
+<span class="lineNum">      20 </span>            :   nsChangeHint_Empty = 0,
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :   // change was visual only (e.g., COLOR=)
+<span class="lineNum">      23 </span>            :   // Invalidates all descendant frames (including following
+<span class="lineNum">      24 </span>            :   // placeholders to out-of-flow frames).
+<span class="lineNum">      25 </span>            :   nsChangeHint_RepaintFrame = 1 &lt;&lt; 0,
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   // For reflow, we want flags to give us arbitrary FrameNeedsReflow behavior.
+<span class="lineNum">      28 </span>            :   // just do a FrameNeedsReflow.
+<span class="lineNum">      29 </span>            :   nsChangeHint_NeedReflow = 1 &lt;&lt; 1,
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   // Invalidate intrinsic widths on the frame's ancestors.  Must not be set
+<span class="lineNum">      32 </span>            :   // without setting nsChangeHint_NeedReflow.
+<span class="lineNum">      33 </span>            :   nsChangeHint_ClearAncestorIntrinsics = 1 &lt;&lt; 2,
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   // Invalidate intrinsic widths on the frame's descendants.  Must not be set
+<span class="lineNum">      36 </span>            :   // without also setting nsChangeHint_ClearAncestorIntrinsics,
+<span class="lineNum">      37 </span>            :   // nsChangeHint_NeedDirtyReflow and nsChangeHint_NeedReflow.
+<span class="lineNum">      38 </span>            :   nsChangeHint_ClearDescendantIntrinsics = 1 &lt;&lt; 3,
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :   // Force unconditional reflow of all descendants.  Must not be set without
+<span class="lineNum">      41 </span>            :   // setting nsChangeHint_NeedReflow, but can be set regardless of whether the
+<span class="lineNum">      42 </span>            :   // Clear*Intrinsics flags are set.
+<span class="lineNum">      43 </span>            :   nsChangeHint_NeedDirtyReflow = 1 &lt;&lt; 4,
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   // change requires view to be updated, if there is one (e.g., clip:).
+<span class="lineNum">      46 </span>            :   // Updates all descendants (including following placeholders to out-of-flows).
+<span class="lineNum">      47 </span>            :   nsChangeHint_SyncFrameView = 1 &lt;&lt; 5,
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   // The currently shown mouse cursor needs to be updated
+<span class="lineNum">      50 </span>            :   nsChangeHint_UpdateCursor = 1 &lt;&lt; 6,
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :   /**
+<span class="lineNum">      53 </span>            :    * Used when the computed value (a URI) of one or more of an element's
+<span class="lineNum">      54 </span>            :    * filter/mask/clip/etc CSS properties changes, causing the element's frame
+<span class="lineNum">      55 </span>            :    * to start/stop referencing (or reference different) SVG resource elements.
+<span class="lineNum">      56 </span>            :    * (_Not_ used to handle changes to referenced resource elements.) Using this
+<span class="lineNum">      57 </span>            :    * hint results in nsSVGEffects::UpdateEffects being called on the element's
+<span class="lineNum">      58 </span>            :    * frame.
+<span class="lineNum">      59 </span>            :    */
+<span class="lineNum">      60 </span>            :   nsChangeHint_UpdateEffects = 1 &lt;&lt; 7,
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :   /**
+<span class="lineNum">      63 </span>            :    * Visual change only, but the change can be handled entirely by
+<span class="lineNum">      64 </span>            :    * updating the layer(s) for the frame.
+<span class="lineNum">      65 </span>            :    * Updates all descendants (including following placeholders to out-of-flows).
+<span class="lineNum">      66 </span>            :    */
+<span class="lineNum">      67 </span>            :   nsChangeHint_UpdateOpacityLayer = 1 &lt;&lt; 8,
+<span class="lineNum">      68 </span>            :   /**
+<span class="lineNum">      69 </span>            :    * Updates all descendants. Any placeholder descendants' out-of-flows
+<span class="lineNum">      70 </span>            :    * are also descendants of the transformed frame, so they're updated.
+<span class="lineNum">      71 </span>            :    */
+<span class="lineNum">      72 </span>            :   nsChangeHint_UpdateTransformLayer = 1 &lt;&lt; 9,
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   /**
+<span class="lineNum">      75 </span>            :    * Change requires frame change (e.g., display:).
+<span class="lineNum">      76 </span>            :    * Reconstructs all frame descendants, including following placeholders
+<span class="lineNum">      77 </span>            :    * to out-of-flows.
+<span class="lineNum">      78 </span>            :    *
+<span class="lineNum">      79 </span>            :    * Note that this subsumes all the other change hints. (see
+<span class="lineNum">      80 </span>            :    * RestyleManager::ProcessRestyledFrames for details).
+<span class="lineNum">      81 </span>            :    */
+<span class="lineNum">      82 </span>            :   nsChangeHint_ReconstructFrame = 1 &lt;&lt; 10,
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   /**
+<span class="lineNum">      85 </span>            :    * The frame's overflow area has changed. Does not update any descendant
+<span class="lineNum">      86 </span>            :    * frames.
+<span class="lineNum">      87 </span>            :    */
+<span class="lineNum">      88 </span>            :   nsChangeHint_UpdateOverflow = 1 &lt;&lt; 11,
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :   /**
+<span class="lineNum">      91 </span>            :    * The overflow area of the frame and all of its descendants has changed. This
+<span class="lineNum">      92 </span>            :    * can happen through a text-decoration change.   
+<span class="lineNum">      93 </span>            :    */
+<span class="lineNum">      94 </span>            :   nsChangeHint_UpdateSubtreeOverflow = 1 &lt;&lt; 12,
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   /**
+<span class="lineNum">      97 </span>            :    * The frame's overflow area has changed, through a change in its transform.
+<span class="lineNum">      98 </span>            :    * In other words, the frame's pre-transform overflow is unchanged, but
+<span class="lineNum">      99 </span>            :    * its post-transform overflow has changed, and thus its effect on its
+<span class="lineNum">     100 </span>            :    * parent's overflow has changed.  If the pre-transform overflow has
+<span class="lineNum">     101 </span>            :    * changed, see nsChangeHint_UpdateOverflow.
+<span class="lineNum">     102 </span>            :    * Does not update any descendant frames.
+<span class="lineNum">     103 </span>            :    */
+<span class="lineNum">     104 </span>            :   nsChangeHint_UpdatePostTransformOverflow = 1 &lt;&lt; 13,
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :   /**
+<span class="lineNum">     107 </span>            :    * This frame's effect on its parent's overflow area has changed.
+<span class="lineNum">     108 </span>            :    * (But neither its pre-transform nor post-transform overflow have
+<span class="lineNum">     109 </span>            :    * changed; if those are the case, see
+<span class="lineNum">     110 </span>            :    * nsChangeHint_UpdatePostTransformOverflow.)
+<span class="lineNum">     111 </span>            :    */
+<span class="lineNum">     112 </span>            :   nsChangeHint_UpdateParentOverflow = 1 &lt;&lt; 14,
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :   /**
+<span class="lineNum">     115 </span>            :    * The children-only transform of an SVG frame changed, requiring the
+<span class="lineNum">     116 </span>            :    * overflow rects of the frame's immediate children to be updated.
+<span class="lineNum">     117 </span>            :    */
+<span class="lineNum">     118 </span>            :   nsChangeHint_ChildrenOnlyTransform = 1 &lt;&lt; 15,
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :   /**
+<span class="lineNum">     121 </span>            :    * The frame's offsets have changed, while its dimensions might have
+<span class="lineNum">     122 </span>            :    * changed as well.  This hint is used for positioned frames if their
+<span class="lineNum">     123 </span>            :    * offset changes.  If we decide that the dimensions are likely to
+<span class="lineNum">     124 </span>            :    * change, this will trigger a reflow.
+<span class="lineNum">     125 </span>            :    *
+<span class="lineNum">     126 </span>            :    * Note that this should probably be used in combination with
+<span class="lineNum">     127 </span>            :    * nsChangeHint_UpdateOverflow in order to get the overflow areas of
+<span class="lineNum">     128 </span>            :    * the ancestors updated as well.
+<span class="lineNum">     129 </span>            :    */
+<span class="lineNum">     130 </span>            :   nsChangeHint_RecomputePosition = 1 &lt;&lt; 16,
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :   /**
+<span class="lineNum">     133 </span>            :    * Behaves like ReconstructFrame, but only if the frame has descendants
+<span class="lineNum">     134 </span>            :    * that are absolutely or fixed position. Use this hint when a style change
+<span class="lineNum">     135 </span>            :    * has changed whether the frame is a container for fixed-pos or abs-pos
+<span class="lineNum">     136 </span>            :    * elements, but reframing is otherwise not needed.
+<span class="lineNum">     137 </span>            :    *
+<span class="lineNum">     138 </span>            :    * Note that nsStyleContext::CalcStyleDifference adjusts results
+<span class="lineNum">     139 </span>            :    * returned by style struct CalcDifference methods to return this hint
+<span class="lineNum">     140 </span>            :    * only if there was a change to whether the element's overall style
+<span class="lineNum">     141 </span>            :    * indicates that it establishes a containing block.
+<span class="lineNum">     142 </span>            :    */
+<span class="lineNum">     143 </span>            :   nsChangeHint_UpdateContainingBlock = 1 &lt;&lt; 17,
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :   /**
+<span class="lineNum">     146 </span>            :    * This change hint has *no* change handling behavior.  However, it
+<span class="lineNum">     147 </span>            :    * exists to be a non-inherited hint, because when the border-style
+<span class="lineNum">     148 </span>            :    * changes, and it's inherited by a child, that might require a reflow
+<span class="lineNum">     149 </span>            :    * due to the border-width change on the child.
+<span class="lineNum">     150 </span>            :    */
+<span class="lineNum">     151 </span>            :   nsChangeHint_BorderStyleNoneChange = 1 &lt;&lt; 18,
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   /**
+<span class="lineNum">     154 </span>            :    * SVG textPath needs to be recomputed because the path has changed.
+<span class="lineNum">     155 </span>            :    * This means that the glyph positions of the text need to be recomputed.
+<span class="lineNum">     156 </span>            :    */
+<span class="lineNum">     157 </span>            :   nsChangeHint_UpdateTextPath = 1 &lt;&lt; 19,
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   /**
+<span class="lineNum">     160 </span>            :    * This will schedule an invalidating paint. This is useful if something
+<span class="lineNum">     161 </span>            :    * has changed which will be invalidated by DLBI.
+<span class="lineNum">     162 </span>            :    */
+<span class="lineNum">     163 </span>            :   nsChangeHint_SchedulePaint = 1 &lt;&lt; 20,
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   /**
+<span class="lineNum">     166 </span>            :    * A hint reflecting that style data changed with no change handling
+<span class="lineNum">     167 </span>            :    * behavior.  We need to return this, rather than nsChangeHint(0),
+<span class="lineNum">     168 </span>            :    * so that certain optimizations that manipulate the style context tree are
+<span class="lineNum">     169 </span>            :    * correct.
+<span class="lineNum">     170 </span>            :    *
+<span class="lineNum">     171 </span>            :    * nsChangeHint_NeutralChange must be returned by CalcDifference on a given
+<span class="lineNum">     172 </span>            :    * style struct if the data in the style structs are meaningfully different
+<span class="lineNum">     173 </span>            :    * and if no other change hints are returned.  If any other change hints are
+<span class="lineNum">     174 </span>            :    * set, then nsChangeHint_NeutralChange need not also be included, but it is
+<span class="lineNum">     175 </span>            :    * safe to do so.  (An example of style structs having non-meaningfully
+<span class="lineNum">     176 </span>            :    * different data would be cached information that would be re-calculated
+<span class="lineNum">     177 </span>            :    * to the same values, such as nsStyleBorder::mSubImages.)
+<span class="lineNum">     178 </span>            :    */
+<span class="lineNum">     179 </span>            :   nsChangeHint_NeutralChange = 1 &lt;&lt; 21,
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   /**
+<span class="lineNum">     182 </span>            :    * This will cause rendering observers to be invalidated.
+<span class="lineNum">     183 </span>            :    */
+<span class="lineNum">     184 </span>            :   nsChangeHint_InvalidateRenderingObservers = 1 &lt;&lt; 22,
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :   /**
+<span class="lineNum">     187 </span>            :    * Indicates that the reflow changes the size or position of the
+<span class="lineNum">     188 </span>            :    * element, and thus the reflow must start from at least the frame's
+<span class="lineNum">     189 </span>            :    * parent.  Must be not be set without also setting nsChangeHint_NeedReflow
+<span class="lineNum">     190 </span>            :    * and nsChangeHint_ClearAncestorIntrinsics.
+<span class="lineNum">     191 </span>            :    */
+<span class="lineNum">     192 </span>            :   nsChangeHint_ReflowChangesSizeOrPosition = 1 &lt;&lt; 23,
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :   /**
+<span class="lineNum">     195 </span>            :    * Indicates that the style changes the computed BSize --- e.g. 'height'.
+<span class="lineNum">     196 </span>            :    * Must not be set without also setting nsChangeHint_NeedReflow.
+<span class="lineNum">     197 </span>            :    */
+<span class="lineNum">     198 </span>            :   nsChangeHint_UpdateComputedBSize = 1 &lt;&lt; 24,
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :   /**
+<span class="lineNum">     201 </span>            :    * Indicates that the 'opacity' property changed between 1 and non-1.
+<span class="lineNum">     202 </span>            :    *
+<span class="lineNum">     203 </span>            :    * Used as extra data for handling UpdateOpacityLayer hints.
+<span class="lineNum">     204 </span>            :    *
+<span class="lineNum">     205 </span>            :    * Note that we do not send this hint if the non-1 value was 0.99 or
+<span class="lineNum">     206 </span>            :    * greater, since in that case we send a RepaintFrame hint instead.
+<span class="lineNum">     207 </span>            :    */
+<span class="lineNum">     208 </span>            :   nsChangeHint_UpdateUsesOpacity = 1 &lt;&lt; 25,
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   /**
+<span class="lineNum">     211 </span>            :    * Indicates that the 'background-position' property changed.
+<span class="lineNum">     212 </span>            :    * Regular frames can invalidate these changes using DLBI, but
+<span class="lineNum">     213 </span>            :    * for some frame types we need to repaint the whole frame because
+<span class="lineNum">     214 </span>            :    * the frame does not build individual background image display items
+<span class="lineNum">     215 </span>            :    * for each background layer.
+<span class="lineNum">     216 </span>            :    */
+<span class="lineNum">     217 </span>            :   nsChangeHint_UpdateBackgroundPosition = 1 &lt;&lt; 26,
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   /**
+<span class="lineNum">     220 </span>            :    * Indicates that a frame has changed to or from having the CSS
+<span class="lineNum">     221 </span>            :    * transform property set.
+<span class="lineNum">     222 </span>            :    */
+<span class="lineNum">     223 </span>            :   nsChangeHint_AddOrRemoveTransform = 1 &lt;&lt; 27,
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   // IMPORTANT NOTE: When adding a new hint, you will need to add it to
+<span class="lineNum">     226 </span>            :   // one of:
+<span class="lineNum">     227 </span>            :   //
+<span class="lineNum">     228 </span>            :   //   * nsChangeHint_Hints_NeverHandledForDescendants
+<span class="lineNum">     229 </span>            :   //   * nsChangeHint_Hints_AlwaysHandledForDescendants
+<span class="lineNum">     230 </span>            :   //   * nsChangeHint_Hints_SometimesHandledForDescendants
+<span class="lineNum">     231 </span>            :   //
+<span class="lineNum">     232 </span>            :   // and you also may need to handle it in NS_HintsNotHandledForDescendantsIn.
+<span class="lineNum">     233 </span>            :   //
+<span class="lineNum">     234 </span>            :   // Please also add it to RestyleManager::ChangeHintToString and
+<span class="lineNum">     235 </span>            :   // modify nsChangeHint_AllHints below accordingly.
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   /**
+<span class="lineNum">     238 </span>            :    * Dummy hint value for all hints. It exists for compile time check.
+<span class="lineNum">     239 </span>            :    */
+<span class="lineNum">     240 </span>            :   nsChangeHint_AllHints = (1 &lt;&lt; 28) - 1,
+<span class="lineNum">     241 </span>            : };
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            : // Redefine these operators to return nothing. This will catch any use
+<span class="lineNum">     244 </span>            : // of these operators on hints. We should not be using these operators
+<span class="lineNum">     245 </span>            : // on nsChangeHints
+<span class="lineNum">     246 </span>            : inline void operator&lt;(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     247 </span>            : inline void operator&gt;(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     248 </span>            : inline void operator!=(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     249 </span>            : inline void operator==(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     250 </span>            : inline void operator&lt;=(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     251 </span>            : inline void operator&gt;=(nsChangeHint s1, nsChangeHint s2) {}
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : // Operators on nsChangeHints
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            : // Returns true iff the second hint contains all the hints of the first hint
+<span class="lineNum">     256 </span>            : inline bool NS_IsHintSubset(nsChangeHint aSubset, nsChangeHint aSuperSet) {
+<span class="lineNum">     257 </span><span class="lineCov">          1 :   return (aSubset &amp; aSuperSet) == aSubset;</span>
+<span class="lineNum">     258 </span>            : }
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            : // The functions below need an integral type to cast to to avoid
+<span class="lineNum">     261 </span>            : // infinite recursion.
+<span class="lineNum">     262 </span>            : typedef decltype(nsChangeHint(0) + nsChangeHint(0)) nsChangeHint_size_t;
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : inline nsChangeHint constexpr
+<span class="lineNum">     265 </span>            : operator|(nsChangeHint aLeft, nsChangeHint aRight)
+<span class="lineNum">     266 </span>            : {
+<span class="lineNum">     267 </span><span class="lineCov">          1 :   return nsChangeHint(nsChangeHint_size_t(aLeft) | nsChangeHint_size_t(aRight));</span>
+<span class="lineNum">     268 </span>            : }
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            : inline nsChangeHint constexpr
+<span class="lineNum">     271 </span>            : operator&amp;(nsChangeHint aLeft, nsChangeHint aRight)
+<span class="lineNum">     272 </span>            : {
+<span class="lineNum">     273 </span><span class="lineCov">          1 :   return nsChangeHint(nsChangeHint_size_t(aLeft) &amp; nsChangeHint_size_t(aRight));</span>
+<span class="lineNum">     274 </span>            : }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            : inline nsChangeHint&amp; operator|=(nsChangeHint&amp; aLeft, nsChangeHint aRight)
+<span class="lineNum">     277 </span>            : {
+<span class="lineNum">     278 </span><span class="lineCov">          1 :   return aLeft = aLeft | aRight;</span>
+<span class="lineNum">     279 </span>            : }
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            : inline nsChangeHint&amp; operator&amp;=(nsChangeHint&amp; aLeft, nsChangeHint aRight)
+<span class="lineNum">     282 </span>            : {
+<span class="lineNum">     283 </span><span class="lineCov">          1 :   return aLeft = aLeft &amp; aRight;</span>
+<span class="lineNum">     284 </span>            : }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            : inline nsChangeHint constexpr
+<span class="lineNum">     287 </span>            : operator~(nsChangeHint aArg)
+<span class="lineNum">     288 </span>            : {
+<span class="lineNum">     289 </span><span class="lineCov">          1 :   return nsChangeHint(~nsChangeHint_size_t(aArg));</span>
+<span class="lineNum">     290 </span>            : }
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            : inline nsChangeHint constexpr
+<span class="lineNum">     293 </span>            : operator^(nsChangeHint aLeft, nsChangeHint aRight)
+<span class="lineNum">     294 </span>            : {
+<span class="lineNum">     295 </span>            :   return nsChangeHint(nsChangeHint_size_t(aLeft) ^ nsChangeHint_size_t(aRight));
+<span class="lineNum">     296 </span>            : }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : inline nsChangeHint operator^=(nsChangeHint&amp; aLeft, nsChangeHint aRight)
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span>            :   return aLeft = aLeft ^ aRight;
+<span class="lineNum">     301 </span>            : }
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            : /**
+<span class="lineNum">     304 </span>            :  * We have an optimization when processing change hints which prevents
+<span class="lineNum">     305 </span>            :  * us from visiting the descendants of a node when a hint on that node
+<span class="lineNum">     306 </span>            :  * is being processed.  This optimization does not apply in some of the
+<span class="lineNum">     307 </span>            :  * cases where applying a hint to an element does not necessarily result
+<span class="lineNum">     308 </span>            :  * in the same hint being handled on the descendants.
+<span class="lineNum">     309 </span>            :  */
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            : // The change hints that are always handled for descendants.
+<span class="lineNum">     312 </span>            : #define nsChangeHint_Hints_AlwaysHandledForDescendants (   \
+<span class="lineNum">     313 </span>            :   nsChangeHint_ClearDescendantIntrinsics |                 \
+<span class="lineNum">     314 </span>            :   nsChangeHint_NeedDirtyReflow |                           \
+<span class="lineNum">     315 </span>            :   nsChangeHint_NeutralChange |                             \
+<span class="lineNum">     316 </span>            :   nsChangeHint_ReconstructFrame |                          \
+<span class="lineNum">     317 </span>            :   nsChangeHint_RepaintFrame |                              \
+<span class="lineNum">     318 </span>            :   nsChangeHint_SchedulePaint |                             \
+<span class="lineNum">     319 </span>            :   nsChangeHint_SyncFrameView |                             \
+<span class="lineNum">     320 </span>            :   nsChangeHint_UpdateCursor |                              \
+<span class="lineNum">     321 </span>            :   nsChangeHint_UpdateSubtreeOverflow |                     \
+<span class="lineNum">     322 </span>            :   nsChangeHint_UpdateTextPath                              \
+<span class="lineNum">     323 </span>            : )
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : // The change hints that are never handled for descendants.
+<span class="lineNum">     326 </span>            : #define nsChangeHint_Hints_NeverHandledForDescendants (    \
+<span class="lineNum">     327 </span>            :   nsChangeHint_BorderStyleNoneChange |                     \
+<span class="lineNum">     328 </span>            :   nsChangeHint_ChildrenOnlyTransform |                     \
+<span class="lineNum">     329 </span>            :   nsChangeHint_InvalidateRenderingObservers |              \
+<span class="lineNum">     330 </span>            :   nsChangeHint_RecomputePosition |                         \
+<span class="lineNum">     331 </span>            :   nsChangeHint_UpdateBackgroundPosition |                  \
+<span class="lineNum">     332 </span>            :   nsChangeHint_UpdateComputedBSize |                       \
+<span class="lineNum">     333 </span>            :   nsChangeHint_UpdateContainingBlock |                     \
+<span class="lineNum">     334 </span>            :   nsChangeHint_UpdateEffects |                             \
+<span class="lineNum">     335 </span>            :   nsChangeHint_UpdateOpacityLayer |                        \
+<span class="lineNum">     336 </span>            :   nsChangeHint_UpdateOverflow |                            \
+<span class="lineNum">     337 </span>            :   nsChangeHint_UpdateParentOverflow |                      \
+<span class="lineNum">     338 </span>            :   nsChangeHint_UpdatePostTransformOverflow |               \
+<span class="lineNum">     339 </span>            :   nsChangeHint_UpdateTransformLayer |                      \
+<span class="lineNum">     340 </span>            :   nsChangeHint_UpdateUsesOpacity |                         \
+<span class="lineNum">     341 </span>            :   nsChangeHint_AddOrRemoveTransform                        \
+<span class="lineNum">     342 </span>            : )
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            : // The change hints that are sometimes considered to be handled for descendants.
+<span class="lineNum">     345 </span>            : #define nsChangeHint_Hints_SometimesHandledForDescendants (\
+<span class="lineNum">     346 </span>            :   nsChangeHint_ClearAncestorIntrinsics |                   \
+<span class="lineNum">     347 </span>            :   nsChangeHint_NeedReflow |                                \
+<span class="lineNum">     348 </span>            :   nsChangeHint_ReflowChangesSizeOrPosition                 \
+<span class="lineNum">     349 </span>            : )
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            : static_assert(!(nsChangeHint_Hints_AlwaysHandledForDescendants &amp;
+<span class="lineNum">     352 </span>            :                 nsChangeHint_Hints_NeverHandledForDescendants) &amp;&amp;
+<span class="lineNum">     353 </span>            :               !(nsChangeHint_Hints_AlwaysHandledForDescendants &amp;
+<span class="lineNum">     354 </span>            :                 nsChangeHint_Hints_SometimesHandledForDescendants) &amp;&amp;
+<span class="lineNum">     355 </span>            :               !(nsChangeHint_Hints_NeverHandledForDescendants &amp;
+<span class="lineNum">     356 </span>            :                 nsChangeHint_Hints_SometimesHandledForDescendants) &amp;&amp;
+<span class="lineNum">     357 </span>            :               !(nsChangeHint_AllHints ^
+<span class="lineNum">     358 </span>            :                 nsChangeHint_Hints_AlwaysHandledForDescendants ^
+<span class="lineNum">     359 </span>            :                 nsChangeHint_Hints_NeverHandledForDescendants ^
+<span class="lineNum">     360 </span>            :                 nsChangeHint_Hints_SometimesHandledForDescendants),
+<span class="lineNum">     361 </span>            :               &quot;change hints must be present in exactly one of &quot;
+<span class="lineNum">     362 </span>            :               &quot;nsChangeHint_Hints_{Always,Never,Sometimes}&quot;
+<span class="lineNum">     363 </span>            :               &quot;HandledForDescendants&quot;);
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            : // The most hints that NS_HintsNotHandledForDescendantsIn could possibly return:
+<span class="lineNum">     366 </span>            : #define nsChangeHint_Hints_NotHandledForDescendants (      \
+<span class="lineNum">     367 </span>            :   nsChangeHint_Hints_NeverHandledForDescendants |          \
+<span class="lineNum">     368 </span>            :   nsChangeHint_Hints_SometimesHandledForDescendants        \
+<span class="lineNum">     369 </span>            : )
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            : // Redefine the old NS_STYLE_HINT constants in terms of the new hint structure
+<span class="lineNum">     372 </span>            : #define NS_STYLE_HINT_VISUAL \
+<span class="lineNum">     373 </span>            :   nsChangeHint(nsChangeHint_RepaintFrame | nsChangeHint_SyncFrameView | \
+<span class="lineNum">     374 </span>            :                nsChangeHint_SchedulePaint)
+<span class="lineNum">     375 </span>            : #define nsChangeHint_AllReflowHints                     \
+<span class="lineNum">     376 </span>            :   nsChangeHint(nsChangeHint_NeedReflow |                \
+<span class="lineNum">     377 </span>            :                nsChangeHint_ReflowChangesSizeOrPosition|\
+<span class="lineNum">     378 </span>            :                nsChangeHint_ClearAncestorIntrinsics |   \
+<span class="lineNum">     379 </span>            :                nsChangeHint_ClearDescendantIntrinsics | \
+<span class="lineNum">     380 </span>            :                nsChangeHint_NeedDirtyReflow)
+<span class="lineNum">     381 </span>            : #define NS_STYLE_HINT_REFLOW \
+<span class="lineNum">     382 </span>            :   nsChangeHint(NS_STYLE_HINT_VISUAL | nsChangeHint_AllReflowHints)
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            : #define nsChangeHint_Hints_CanIgnoreIfNotVisible   \
+<span class="lineNum">     385 </span>            :   nsChangeHint(NS_STYLE_HINT_VISUAL |              \
+<span class="lineNum">     386 </span>            :                nsChangeHint_NeutralChange |        \
+<span class="lineNum">     387 </span>            :                nsChangeHint_UpdateOpacityLayer |   \
+<span class="lineNum">     388 </span>            :                nsChangeHint_UpdateTransformLayer | \
+<span class="lineNum">     389 </span>            :                nsChangeHint_UpdateUsesOpacity)
+<span class="lineNum">     390 </span>            : 
+<a name="391"><span class="lineNum">     391 </span>            : // NB: Once we drop support for the old style system, this logic should be</a>
+<span class="lineNum">     392 </span>            : // inlined in the Servo style system to eliminate the FFI call.
+<span class="lineNum">     393 </span><span class="lineCov">          1 : inline nsChangeHint NS_HintsNotHandledForDescendantsIn(nsChangeHint aChangeHint) {</span>
+<span class="lineNum">     394 </span>            :   nsChangeHint result =
+<span class="lineNum">     395 </span><span class="lineCov">          1 :     aChangeHint &amp; nsChangeHint_Hints_NeverHandledForDescendants;</span>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineCov">          1 :   if (!NS_IsHintSubset(nsChangeHint_NeedDirtyReflow, aChangeHint)) {</span>
+<span class="lineNum">     398 </span><span class="lineCov">          1 :     if (NS_IsHintSubset(nsChangeHint_NeedReflow, aChangeHint)) {</span>
+<span class="lineNum">     399 </span>            :       // If NeedDirtyReflow is *not* set, then NeedReflow is a
+<span class="lineNum">     400 </span>            :       // non-inherited hint.
+<span class="lineNum">     401 </span>            :       result |= nsChangeHint_NeedReflow;
+<span class="lineNum">     402 </span>            :     }
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span><span class="lineCov">          1 :     if (NS_IsHintSubset(nsChangeHint_ReflowChangesSizeOrPosition,</span>
+<span class="lineNum">     405 </span>            :                         aChangeHint)) {
+<span class="lineNum">     406 </span>            :       // If NeedDirtyReflow is *not* set, then ReflowChangesSizeOrPosition is a
+<span class="lineNum">     407 </span>            :       // non-inherited hint.
+<span class="lineNum">     408 </span>            :       result |= nsChangeHint_ReflowChangesSizeOrPosition;
+<span class="lineNum">     409 </span>            :     }
+<span class="lineNum">     410 </span>            :   }
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span><span class="lineCov">          1 :   if (!NS_IsHintSubset(nsChangeHint_ClearDescendantIntrinsics, aChangeHint) &amp;&amp;</span>
+<span class="lineNum">     413 </span>            :       NS_IsHintSubset(nsChangeHint_ClearAncestorIntrinsics, aChangeHint)) {
+<span class="lineNum">     414 </span>            :     // If ClearDescendantIntrinsics is *not* set, then
+<span class="lineNum">     415 </span>            :     // ClearAncestorIntrinsics is a non-inherited hint.
+<span class="lineNum">     416 </span>            :     result |= nsChangeHint_ClearAncestorIntrinsics;
+<span class="lineNum">     417 </span>            :   }
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            :   MOZ_ASSERT(NS_IsHintSubset(result,
+<span class="lineNum">     420 </span>            :                              nsChangeHint_Hints_NotHandledForDescendants),
+<span class="lineNum">     421 </span>            :              &quot;something is inconsistent&quot;);
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">          1 :   return result;</span>
+<span class="lineNum">     424 </span>            : }
+<a name="425"><span class="lineNum">     425 </span>            : </a>
+<span class="lineNum">     426 </span>            : inline nsChangeHint
+<span class="lineNum">     427 </span><span class="lineCov">          1 : NS_HintsHandledForDescendantsIn(nsChangeHint aChangeHint)</span>
+<span class="lineNum">     428 </span>            : {
+<span class="lineNum">     429 </span><span class="lineCov">          1 :   return aChangeHint &amp; ~NS_HintsNotHandledForDescendantsIn(aChangeHint);</span>
+<span class="lineNum">     430 </span>            : }
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            : // Returns the change hints in aOurChange that are not subsumed by those
+<a name="433"><span class="lineNum">     433 </span>            : // in aHintsHandled (which are hints that have been handled by an ancestor).</a>
+<span class="lineNum">     434 </span>            : inline nsChangeHint
+<span class="lineNum">     435 </span><span class="lineCov">          1 : NS_RemoveSubsumedHints(nsChangeHint aOurChange, nsChangeHint aHintsHandled)</span>
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span>            :   nsChangeHint result =
+<span class="lineNum">     438 </span><span class="lineCov">          1 :     aOurChange &amp; ~NS_HintsHandledForDescendantsIn(aHintsHandled);</span>
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineCov">          1 :   if (result &amp; (nsChangeHint_ClearAncestorIntrinsics |</span>
+<span class="lineNum">     441 </span>            :                 nsChangeHint_ClearDescendantIntrinsics |
+<span class="lineNum">     442 </span>            :                 nsChangeHint_NeedDirtyReflow |
+<span class="lineNum">     443 </span>            :                 nsChangeHint_ReflowChangesSizeOrPosition |
+<span class="lineNum">     444 </span>            :                 nsChangeHint_UpdateComputedBSize)) {
+<span class="lineNum">     445 </span>            :     result |= nsChangeHint_NeedReflow;
+<span class="lineNum">     446 </span>            :   }
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">          1 :   if (result &amp; (nsChangeHint_ClearDescendantIntrinsics)) {</span>
+<span class="lineNum">     449 </span>            :     MOZ_ASSERT(result &amp; nsChangeHint_ClearAncestorIntrinsics);
+<span class="lineNum">     450 </span>            :     result |= // nsChangeHint_ClearAncestorIntrinsics |
+<span class="lineNum">     451 </span>            :               nsChangeHint_NeedDirtyReflow;
+<span class="lineNum">     452 </span>            :   }
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineCov">          1 :   return result;</span>
+<span class="lineNum">     455 </span>            : }
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : /**
+<span class="lineNum">     458 </span>            :  * |nsRestyleHint| is a bitfield for the result of
+<span class="lineNum">     459 </span>            :  * |HasStateDependentStyle| and |HasAttributeDependentStyle|.  When no
+<span class="lineNum">     460 </span>            :  * restyling is necessary, use |nsRestyleHint(0)|.
+<span class="lineNum">     461 </span>            :  *
+<span class="lineNum">     462 </span>            :  * Without eRestyle_Force or eRestyle_ForceDescendants, the restyling process
+<span class="lineNum">     463 </span>            :  * can stop processing at a frame when it detects no style changes and it is
+<span class="lineNum">     464 </span>            :  * known that the styles of the subtree beneath it will not change, leaving
+<span class="lineNum">     465 </span>            :  * the old style context on the frame.  eRestyle_Force can be used to skip this
+<span class="lineNum">     466 </span>            :  * optimization on a frame, and to force its new style context to be used.
+<span class="lineNum">     467 </span>            :  *
+<span class="lineNum">     468 </span>            :  * Similarly, eRestyle_ForceDescendants will cause the frame and all of its
+<span class="lineNum">     469 </span>            :  * descendants to be traversed and for the new style contexts that are created
+<span class="lineNum">     470 </span>            :  * to be set on the frames.
+<span class="lineNum">     471 </span>            :  *
+<span class="lineNum">     472 </span>            :  * NOTE: When adding new restyle hints, please also add them to
+<span class="lineNum">     473 </span>            :  * RestyleManager::RestyleHintToString.
+<span class="lineNum">     474 </span>            :  */
+<span class="lineNum">     475 </span>            : enum nsRestyleHint {
+<span class="lineNum">     476 </span>            :   // Rerun selector matching on the element.  If a new style context
+<span class="lineNum">     477 </span>            :   // results, update the style contexts of descendants.  (Irrelevant if
+<span class="lineNum">     478 </span>            :   // eRestyle_Subtree is also set, since that implies a superset of the
+<span class="lineNum">     479 </span>            :   // work.)
+<span class="lineNum">     480 </span>            :   eRestyle_Self = 1 &lt;&lt; 0,
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            :   // Rerun selector matching on descendants of the element that match
+<span class="lineNum">     483 </span>            :   // a given selector.
+<span class="lineNum">     484 </span>            :   eRestyle_SomeDescendants = 1 &lt;&lt; 1,
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :   // Rerun selector matching on the element and all of its descendants.
+<span class="lineNum">     487 </span>            :   // (Implies eRestyle_ForceDescendants, which ensures that we continue
+<span class="lineNum">     488 </span>            :   // the restyling process for all descendants, but doesn't cause
+<span class="lineNum">     489 </span>            :   // selector matching.)
+<span class="lineNum">     490 </span>            :   eRestyle_Subtree = 1 &lt;&lt; 2,
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :   // Rerun selector matching on all later siblings of the element and
+<span class="lineNum">     493 </span>            :   // all of their descendants.
+<span class="lineNum">     494 </span>            :   eRestyle_LaterSiblings = 1 &lt;&lt; 3,
+<span class="lineNum">     495 </span>            : 
+<span class="lineNum">     496 </span>            :   // Replace the style data coming from CSS transitions without updating
+<span class="lineNum">     497 </span>            :   // any other style data.  If a new style context results, update style
+<span class="lineNum">     498 </span>            :   // contexts on the descendants.  (Irrelevant if eRestyle_Self or
+<span class="lineNum">     499 </span>            :   // eRestyle_Subtree is also set, since those imply a superset of the
+<span class="lineNum">     500 </span>            :   // work.)
+<span class="lineNum">     501 </span>            :   eRestyle_CSSTransitions = 1 &lt;&lt; 4,
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span>            :   // Replace the style data coming from CSS animations without updating
+<span class="lineNum">     504 </span>            :   // any other style data.  If a new style context results, update style
+<span class="lineNum">     505 </span>            :   // contexts on the descendants.  (Irrelevant if eRestyle_Self or
+<span class="lineNum">     506 </span>            :   // eRestyle_Subtree is also set, since those imply a superset of the
+<span class="lineNum">     507 </span>            :   // work.)
+<span class="lineNum">     508 </span>            :   eRestyle_CSSAnimations = 1 &lt;&lt; 5,
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            :   // Replace the style data coming from inline style without updating
+<span class="lineNum">     511 </span>            :   // any other style data.  If a new style context results, update style
+<span class="lineNum">     512 </span>            :   // contexts on the descendants.  (Irrelevant if eRestyle_Self or
+<span class="lineNum">     513 </span>            :   // eRestyle_Subtree is also set, since those imply a superset of the
+<span class="lineNum">     514 </span>            :   // work.)  Supported only for element style contexts and not for
+<span class="lineNum">     515 </span>            :   // pseudo-elements or anonymous boxes, on which it converts to
+<span class="lineNum">     516 </span>            :   // eRestyle_Self.
+<span class="lineNum">     517 </span>            :   // If the change is for the advance of a declarative animation, use
+<span class="lineNum">     518 </span>            :   // the value below instead.
+<span class="lineNum">     519 </span>            :   eRestyle_StyleAttribute = 1 &lt;&lt; 6,
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            :   // Same as eRestyle_StyleAttribute, but for when the change results
+<span class="lineNum">     522 </span>            :   // from the advance of a declarative animation.
+<span class="lineNum">     523 </span>            :   eRestyle_StyleAttribute_Animations = 1 &lt;&lt; 7,
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :   // Continue the restyling process to the current frame's children even
+<span class="lineNum">     526 </span>            :   // if this frame's restyling resulted in no style changes.
+<span class="lineNum">     527 </span>            :   eRestyle_Force = 1 &lt;&lt; 8,
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            :   // Continue the restyling process to all of the current frame's
+<span class="lineNum">     530 </span>            :   // descendants, even if any frame's restyling resulted in no style
+<span class="lineNum">     531 </span>            :   // changes.  (Implies eRestyle_Force.)  Note that this is weaker than
+<span class="lineNum">     532 </span>            :   // eRestyle_Subtree, which makes us rerun selector matching on all
+<span class="lineNum">     533 </span>            :   // descendants rather than just continuing the restyling process.
+<span class="lineNum">     534 </span>            :   eRestyle_ForceDescendants = 1 &lt;&lt; 9,
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span>            :   // Useful unions:
+<span class="lineNum">     537 </span>            :   eRestyle_AllHintsWithAnimations = eRestyle_CSSTransitions |
+<span class="lineNum">     538 </span>            :                                     eRestyle_CSSAnimations |
+<span class="lineNum">     539 </span>            :                                     eRestyle_StyleAttribute_Animations,
+<span class="lineNum">     540 </span>            : };
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : // The functions below need an integral type to cast to to avoid
+<span class="lineNum">     543 </span>            : // infinite recursion.
+<span class="lineNum">     544 </span>            : typedef decltype(nsRestyleHint(0) + nsRestyleHint(0)) nsRestyleHint_size_t;
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span>            : inline constexpr nsRestyleHint operator|(nsRestyleHint aLeft,
+<span class="lineNum">     547 </span>            :                                              nsRestyleHint aRight)
+<span class="lineNum">     548 </span>            : {
+<span class="lineNum">     549 </span><span class="lineCov">          1 :   return nsRestyleHint(nsRestyleHint_size_t(aLeft) |</span>
+<span class="lineNum">     550 </span><span class="lineCov">          1 :                        nsRestyleHint_size_t(aRight));</span>
+<span class="lineNum">     551 </span>            : }
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            : inline constexpr nsRestyleHint operator&amp;(nsRestyleHint aLeft,
+<span class="lineNum">     554 </span>            :                                              nsRestyleHint aRight)
+<span class="lineNum">     555 </span>            : {
+<span class="lineNum">     556 </span><span class="lineCov">          1 :   return nsRestyleHint(nsRestyleHint_size_t(aLeft) &amp;</span>
+<span class="lineNum">     557 </span><span class="lineCov">          1 :                        nsRestyleHint_size_t(aRight));</span>
+<span class="lineNum">     558 </span>            : }
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            : inline nsRestyleHint&amp; operator|=(nsRestyleHint&amp; aLeft, nsRestyleHint aRight)
+<span class="lineNum">     561 </span>            : {
+<span class="lineNum">     562 </span><span class="lineCov">          1 :   return aLeft = aLeft | aRight;</span>
+<span class="lineNum">     563 </span>            : }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            : inline nsRestyleHint&amp; operator&amp;=(nsRestyleHint&amp; aLeft, nsRestyleHint aRight)
+<span class="lineNum">     566 </span>            : {
+<span class="lineNum">     567 </span><span class="lineCov">          1 :   return aLeft = aLeft &amp; aRight;</span>
+<span class="lineNum">     568 </span>            : }
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            : inline constexpr nsRestyleHint operator~(nsRestyleHint aArg)
+<span class="lineNum">     571 </span>            : {
+<span class="lineNum">     572 </span><span class="lineCov">          1 :   return nsRestyleHint(~nsRestyleHint_size_t(aArg));</span>
+<span class="lineNum">     573 </span>            : }
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span>            : inline constexpr nsRestyleHint operator^(nsRestyleHint aLeft,
+<span class="lineNum">     576 </span>            :                                              nsRestyleHint aRight)
+<span class="lineNum">     577 </span>            : {
+<span class="lineNum">     578 </span>            :   return nsRestyleHint(nsRestyleHint_size_t(aLeft) ^
+<span class="lineNum">     579 </span>            :                        nsRestyleHint_size_t(aRight));
+<span class="lineNum">     580 </span>            : }
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            : inline nsRestyleHint operator^=(nsRestyleHint&amp; aLeft, nsRestyleHint aRight)
+<span class="lineNum">     583 </span>            : {
+<span class="lineNum">     584 </span>            :   return aLeft = aLeft ^ aRight;
+<span class="lineNum">     585 </span>            : }
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            : namespace mozilla {
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            : /**
+<span class="lineNum">     590 </span>            :  * Additional data used in conjunction with an nsRestyleHint to control the
+<span class="lineNum">     591 </span>            :  * restyle process.
+<span class="lineNum">     592 </span>            :  */
+<span class="lineNum">     593 </span><span class="lineCov">          1 : struct RestyleHintData</span>
+<span class="lineNum">     594 </span>            : {
+<span class="lineNum">     595 </span>            :   // When eRestyle_SomeDescendants is used, this array contains the selectors
+<span class="lineNum">     596 </span>            :   // that identify which descendants will be restyled.
+<span class="lineNum">     597 </span>            :   nsTArray&lt;nsCSSSelector*&gt; mSelectorsForDescendants;
+<span class="lineNum">     598 </span>            : };
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span>            : } // namespace mozilla
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : #endif /* nsChangeHint_h___ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,900 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - gfx/layers/wr/WebRenderBridgeParent.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">gfx/layers/wr</a> - WebRenderBridgeParent.cpp<span style="font-size: 80%;"> (source / <a href="WebRenderBridgeParent.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">275</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:59:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set sw=4 ts=8 et tw=80 : */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &quot;mozilla/layers/WebRenderBridgeParent.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;CompositableHost.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;GLContext.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;GLContextProvider.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/Range.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/layers/Compositor.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/layers/CompositorBridgeParent.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/layers/CompositorThread.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/layers/CompositorVsyncScheduler.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/layers/ImageBridgeParent.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/layers/ImageDataSerializer.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/layers/TextureHost.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/layers/WebRenderCompositableHolder.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/layers/WebRenderTextureHost.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;mozilla/webrender/RenderThread.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;mozilla/widget/CompositorWidget.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #if defined(MOZ_WIDGET_ANDROID)
+<span class="lineNum">      26 </span>            : # include &quot;mozilla/widget/AndroidCompositorWidget.h&quot;
+<a name="27"><span class="lineNum">      27 </span>            : #endif</a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 : bool is_in_main_thread()</span>
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :   return NS_IsMainThread();</span>
+<a name="32"><span class="lineNum">      32 </span>            : }</a>
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 : bool is_in_compositor_thread()</span>
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   return mozilla::layers::CompositorThreadHolder::IsInCompositorThread();</span>
+<a name="37"><span class="lineNum">      37 </span>            : }</a>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 : bool is_in_render_thread()</span>
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   return mozilla::wr::RenderThread::IsInRenderThread();</span>
+<a name="42"><span class="lineNum">      42 </span>            : }</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : bool is_glcontext_egl(void* glcontext_ptr)</span>
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            :   MOZ_ASSERT(glcontext_ptr);
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :   mozilla::gl::GLContext* glcontext = reinterpret_cast&lt;mozilla::gl::GLContext*&gt;(glcontext_ptr);</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   if (!glcontext) {</span>
+<span class="lineNum">      50 </span>            :     return false;
+<span class="lineNum">      51 </span>            :   }
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   return glcontext-&gt;GetContextType() == mozilla::gl::GLContextType::EGL;</span>
+<a name="53"><span class="lineNum">      53 </span>            : }</a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 : void gfx_critical_note(const char* msg)</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   gfxCriticalNote &lt;&lt; msg;</span>
+<a name="58"><span class="lineNum">      58 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 : void* get_proc_address_from_glcontext(void* glcontext_ptr, const char* procname)</span>
+<span class="lineNum">      61 </span>            : {
+<span class="lineNum">      62 </span>            :   MOZ_ASSERT(glcontext_ptr);
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :   mozilla::gl::GLContext* glcontext = reinterpret_cast&lt;mozilla::gl::GLContext*&gt;(glcontext_ptr);</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   if (!glcontext) {</span>
+<span class="lineNum">      66 </span>            :     return nullptr;
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   PRFuncPtr p = glcontext-&gt;LookupSymbol(procname);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   return reinterpret_cast&lt;void*&gt;(p);</span>
+<span class="lineNum">      70 </span>            : }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : namespace mozilla {
+<span class="lineNum">      73 </span>            : namespace layers {
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : using namespace mozilla::gfx;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : class MOZ_STACK_CLASS AutoWebRenderBridgeParentAsyncMessageSender
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span>            : public:
+<span class="lineNum">      80 </span>            :   explicit AutoWebRenderBridgeParentAsyncMessageSender(WebRenderBridgeParent* aWebRenderBridgeParent,
+<span class="lineNum">      81 </span>            :                                                        InfallibleTArray&lt;OpDestroy&gt;* aDestroyActors = nullptr)
+<span class="lineNum">      82 </span>            :     : mWebRenderBridgeParent(aWebRenderBridgeParent)
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     , mActorsToDestroy(aDestroyActors)</span>
+<span class="lineNum">      84 </span>            :   {
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     mWebRenderBridgeParent-&gt;SetAboutToSendAsyncMessages();</span>
+<a name="86"><span class="lineNum">      86 </span>            :   }</a>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   ~AutoWebRenderBridgeParentAsyncMessageSender()</span>
+<span class="lineNum">      89 </span>            :   {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     mWebRenderBridgeParent-&gt;SendPendingAsyncMessages();</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     if (mActorsToDestroy) {</span>
+<span class="lineNum">      92 </span>            :       // Destroy the actors after sending the async messages because the latter may contain
+<span class="lineNum">      93 </span>            :       // references to some actors.
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :       for (const auto&amp; op : *mActorsToDestroy) {</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :         mWebRenderBridgeParent-&gt;DestroyActor(op);</span>
+<span class="lineNum">      96 </span>            :       }
+<span class="lineNum">      97 </span>            :     }
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      99 </span>            : private:
+<span class="lineNum">     100 </span>            :   WebRenderBridgeParent* mWebRenderBridgeParent;
+<span class="lineNum">     101 </span>            :   InfallibleTArray&lt;OpDestroy&gt;* mActorsToDestroy;
+<span class="lineNum">     102 </span>            : };
+<span class="lineNum">     103 </span>            : 
+<a name="104"><span class="lineNum">     104 </span>            : /* static */ uint32_t WebRenderBridgeParent::sIdNameSpace = 0;</a>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::WebRenderBridgeParent(CompositorBridgeParentBase* aCompositorBridge,</span>
+<span class="lineNum">     107 </span>            :                                              const wr::PipelineId&amp; aPipelineId,
+<span class="lineNum">     108 </span>            :                                              widget::CompositorWidget* aWidget,
+<span class="lineNum">     109 </span>            :                                              CompositorVsyncScheduler* aScheduler,
+<span class="lineNum">     110 </span>            :                                              RefPtr&lt;wr::WebRenderAPI&gt;&amp;&amp; aApi,
+<span class="lineNum">     111 </span>            :                                              RefPtr&lt;WebRenderCompositableHolder&gt;&amp;&amp; aHolder)
+<span class="lineNum">     112 </span>            :   : mCompositorBridge(aCompositorBridge)
+<span class="lineNum">     113 </span>            :   , mPipelineId(aPipelineId)
+<span class="lineNum">     114 </span>            :   , mWidget(aWidget)
+<span class="lineNum">     115 </span>            :   , mApi(aApi)
+<span class="lineNum">     116 </span>            :   , mCompositableHolder(aHolder)
+<span class="lineNum">     117 </span>            :   , mCompositorScheduler(aScheduler)
+<span class="lineNum">     118 </span>            :   , mChildLayerObserverEpoch(0)
+<span class="lineNum">     119 </span>            :   , mParentLayerObserverEpoch(0)
+<span class="lineNum">     120 </span>            :   , mWrEpoch(0)
+<span class="lineNum">     121 </span>            :   , mIdNameSpace(++sIdNameSpace)
+<span class="lineNum">     122 </span>            :   , mPaused(false)
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :   , mDestroyed(false)</span>
+<span class="lineNum">     124 </span>            : {
+<span class="lineNum">     125 </span>            :   MOZ_ASSERT(mCompositableHolder);
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   mCompositableHolder-&gt;AddPipeline(mPipelineId);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :   if (mWidget) {</span>
+<span class="lineNum">     128 </span>            :     MOZ_ASSERT(!mCompositorScheduler);
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     mCompositorScheduler = new CompositorVsyncScheduler(this, mWidget);</span>
+<span class="lineNum">     130 </span>            :   }
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     132 </span>            : 
+<a name="133"><span class="lineNum">     133 </span>            : </a>
+<span class="lineNum">     134 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvCreate(const gfx::IntSize&amp; aSize)</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     138 </span>            :     return IPC_OK();
+<span class="lineNum">     139 </span>            :   }
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            : #ifdef MOZ_WIDGET_ANDROID
+<span class="lineNum">     144 </span>            :   // XXX temporary hack.
+<span class="lineNum">     145 </span>            :   // XXX Remove it when APZ is supported.
+<span class="lineNum">     146 </span>            :   widget::AndroidCompositorWidget* widget = mWidget-&gt;AsAndroid();
+<span class="lineNum">     147 </span>            :   if (widget) {
+<span class="lineNum">     148 </span>            :     widget-&gt;SetFirstPaintViewport(LayerIntPoint(0, 0), CSSToLayerScale(), CSSRect(0, 0, aSize.width, aSize.height));
+<span class="lineNum">     149 </span>            :   }
+<span class="lineNum">     150 </span>            : #endif
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :   return IPC_OK();
+<span class="lineNum">     153 </span>            : }
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvShutdown()</span>
+<span class="lineNum">     157 </span>            : {
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     159 </span>            :     return IPC_OK();
+<span class="lineNum">     160 </span>            :   }
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   Destroy();</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   if (!Send__delete__(this)) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     164 </span>            :   }
+<span class="lineNum">     165 </span>            :   return IPC_OK();
+<span class="lineNum">     166 </span>            : }
+<a name="167"><span class="lineNum">     167 </span>            : </a>
+<span class="lineNum">     168 </span>            : void
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::Destroy()</span>
+<span class="lineNum">     170 </span>            : {
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     173 </span>            :   }
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   mDestroyed = true;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   ClearResources();</span>
+<span class="lineNum">     176 </span>            : }
+<a name="177"><span class="lineNum">     177 </span>            : </a>
+<span class="lineNum">     178 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvAddImage(const wr::ImageKey&amp; aImageKey,</span>
+<span class="lineNum">     180 </span>            :                                     const gfx::IntSize&amp; aSize,
+<span class="lineNum">     181 </span>            :                                     const uint32_t&amp; aStride,
+<span class="lineNum">     182 </span>            :                                     const gfx::SurfaceFormat&amp; aFormat,
+<span class="lineNum">     183 </span>            :                                     const ByteBuffer&amp; aBuffer)
+<span class="lineNum">     184 </span>            : {
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     186 </span>            :     return IPC_OK();
+<span class="lineNum">     187 </span>            :   }
+<span class="lineNum">     188 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   wr::ImageDescriptor descriptor(aSize, aStride, aFormat);</span>
+<span class="lineNum">     190 </span>            :   mApi-&gt;AddImage(aImageKey, descriptor,
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                  aBuffer.AsSlice());</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :   return IPC_OK();
+<span class="lineNum">     194 </span>            : }
+<a name="195"><span class="lineNum">     195 </span>            : </a>
+<span class="lineNum">     196 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvAddBlobImage(const wr::ImageKey&amp; aImageKey,</span>
+<span class="lineNum">     198 </span>            :                                                                 const gfx::IntSize&amp; aSize,
+<span class="lineNum">     199 </span>            :                                         const uint32_t&amp; aStride,
+<span class="lineNum">     200 </span>            :                                         const gfx::SurfaceFormat&amp; aFormat,
+<span class="lineNum">     201 </span>            :                                         const ByteBuffer&amp; aBuffer)
+<span class="lineNum">     202 </span>            : {
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     204 </span>            :     return IPC_OK();
+<span class="lineNum">     205 </span>            :   }
+<span class="lineNum">     206 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :   wr::ImageDescriptor descriptor(aSize, aStride, aFormat);</span>
+<span class="lineNum">     208 </span>            :   mApi-&gt;AddBlobImage(aImageKey, descriptor,
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :                      aBuffer.AsSlice());</span>
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   return IPC_OK();
+<span class="lineNum">     212 </span>            : }
+<a name="213"><span class="lineNum">     213 </span>            : </a>
+<span class="lineNum">     214 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvAddRawFont(const wr::FontKey&amp; aFontKey,</span>
+<span class="lineNum">     216 </span>            :                                       const ByteBuffer&amp; aBuffer,
+<span class="lineNum">     217 </span>            :                                       const uint32_t&amp; aFontIndex)
+<span class="lineNum">     218 </span>            : {
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     220 </span>            :     return IPC_OK();
+<span class="lineNum">     221 </span>            :   }
+<span class="lineNum">     222 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :   auto slice = aBuffer.AsSlice();</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :   mApi-&gt;AddRawFont(aFontKey, slice);</span>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   return IPC_OK();
+<span class="lineNum">     227 </span>            : }
+<a name="228"><span class="lineNum">     228 </span>            : </a>
+<span class="lineNum">     229 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDeleteFont(const wr::FontKey&amp; aFontKey)</span>
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     233 </span>            :     return IPC_OK();
+<span class="lineNum">     234 </span>            :   }
+<span class="lineNum">     235 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :   mApi-&gt;DeleteFont(aFontKey);</span>
+<span class="lineNum">     237 </span>            :   return IPC_OK();
+<span class="lineNum">     238 </span>            : }
+<a name="239"><span class="lineNum">     239 </span>            : </a>
+<span class="lineNum">     240 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvUpdateImage(const wr::ImageKey&amp; aImageKey,</span>
+<span class="lineNum">     242 </span>            :                                        const gfx::IntSize&amp; aSize,
+<span class="lineNum">     243 </span>            :                                        const gfx::SurfaceFormat&amp; aFormat,
+<span class="lineNum">     244 </span>            :                                        const ByteBuffer&amp; aBuffer)
+<span class="lineNum">     245 </span>            : {
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     247 </span>            :     return IPC_OK();
+<span class="lineNum">     248 </span>            :   }
+<span class="lineNum">     249 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :   wr::ImageDescriptor descriptor(aSize, aFormat);</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :   mApi-&gt;UpdateImageBuffer(aImageKey, descriptor, aBuffer.AsSlice());</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            :   return IPC_OK();
+<span class="lineNum">     254 </span>            : }
+<a name="255"><span class="lineNum">     255 </span>            : </a>
+<span class="lineNum">     256 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDeleteImage(const wr::ImageKey&amp; aImageKey)</span>
+<span class="lineNum">     258 </span>            : {
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     260 </span>            :     return IPC_OK();
+<span class="lineNum">     261 </span>            :   }
+<span class="lineNum">     262 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :   if (mActiveKeys.Get(wr::AsUint64(aImageKey), nullptr)) {</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :     mActiveKeys.Remove(wr::AsUint64(aImageKey));</span>
+<span class="lineNum">     265 </span>            :   }
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :   mKeysToDelete.push_back(aImageKey);</span>
+<span class="lineNum">     267 </span>            :   return IPC_OK();
+<span class="lineNum">     268 </span>            : }
+<a name="269"><span class="lineNum">     269 </span>            : </a>
+<span class="lineNum">     270 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDPBegin(const gfx::IntSize&amp; aSize)</span>
+<span class="lineNum">     272 </span>            : {
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     274 </span>            :     return IPC_OK();
+<span class="lineNum">     275 </span>            :   }
+<span class="lineNum">     276 </span>            :   return IPC_OK();
+<span class="lineNum">     277 </span>            : }
+<a name="278"><span class="lineNum">     278 </span>            : </a>
+<span class="lineNum">     279 </span>            : void
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::HandleDPEnd(const gfx::IntSize&amp; aSize,</span>
+<span class="lineNum">     281 </span>            :                                  InfallibleTArray&lt;WebRenderParentCommand&gt;&amp;&amp; aCommands,
+<span class="lineNum">     282 </span>            :                                  InfallibleTArray&lt;OpDestroy&gt;&amp;&amp; aToDestroy,
+<span class="lineNum">     283 </span>            :                                  const uint64_t&amp; aFwdTransactionId,
+<span class="lineNum">     284 </span>            :                                  const uint64_t&amp; aTransactionId,
+<span class="lineNum">     285 </span>            :                                  const ByteBuffer&amp; dl,
+<span class="lineNum">     286 </span>            :                                  const WrBuiltDisplayListDescriptor&amp; dlDesc,
+<span class="lineNum">     287 </span>            :                                  const ByteBuffer&amp; aux,
+<span class="lineNum">     288 </span>            :                                  const WrAuxiliaryListsDescriptor&amp; auxDesc)
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :   UpdateFwdTransactionId(aFwdTransactionId);</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   AutoClearReadLocks clearLocks(mReadLocks);</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     for (const auto&amp; op : aToDestroy) {</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :       DestroyActor(op);</span>
+<span class="lineNum">     296 </span>            :     }
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     298 </span>            :   }
+<span class="lineNum">     299 </span>            :   // This ensures that destroy operations are always processed. It is not safe
+<span class="lineNum">     300 </span>            :   // to early-return from RecvDPEnd without doing so.
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   AutoWebRenderBridgeParentAsyncMessageSender autoAsyncMessageSender(this, &amp;aToDestroy);</span>
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   ++mWrEpoch; // Update webrender epoch</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :   ProcessWebRenderCommands(aSize, aCommands, wr::NewEpoch(mWrEpoch),</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :                            dl, dlDesc, aux, auxDesc);</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   HoldPendingTransactionId(mWrEpoch, aTransactionId);</span>
+<span class="lineNum">     307 </span>            : }
+<a name="308"><span class="lineNum">     308 </span>            : </a>
+<span class="lineNum">     309 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDPEnd(const gfx::IntSize&amp; aSize,</span>
+<span class="lineNum">     311 </span>            :                                  InfallibleTArray&lt;WebRenderParentCommand&gt;&amp;&amp; aCommands,
+<span class="lineNum">     312 </span>            :                                  InfallibleTArray&lt;OpDestroy&gt;&amp;&amp; aToDestroy,
+<span class="lineNum">     313 </span>            :                                  const uint64_t&amp; aFwdTransactionId,
+<span class="lineNum">     314 </span>            :                                  const uint64_t&amp; aTransactionId,
+<span class="lineNum">     315 </span>            :                                  const ByteBuffer&amp; dl,
+<span class="lineNum">     316 </span>            :                                  const WrBuiltDisplayListDescriptor&amp; dlDesc,
+<span class="lineNum">     317 </span>            :                                  const ByteBuffer&amp; aux,
+<span class="lineNum">     318 </span>            :                                  const WrAuxiliaryListsDescriptor&amp; auxDesc)
+<span class="lineNum">     319 </span>            : {
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :   HandleDPEnd(aSize, Move(aCommands), Move(aToDestroy), aFwdTransactionId, aTransactionId,</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :               dl, dlDesc, aux, auxDesc);</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     323 </span>            : }
+<a name="324"><span class="lineNum">     324 </span>            : </a>
+<span class="lineNum">     325 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDPSyncEnd(const gfx::IntSize &amp;aSize,</span>
+<span class="lineNum">     327 </span>            :                                      InfallibleTArray&lt;WebRenderParentCommand&gt;&amp;&amp; aCommands,
+<span class="lineNum">     328 </span>            :                                      InfallibleTArray&lt;OpDestroy&gt;&amp;&amp; aToDestroy,
+<span class="lineNum">     329 </span>            :                                      const uint64_t&amp; aFwdTransactionId,
+<span class="lineNum">     330 </span>            :                                      const uint64_t&amp; aTransactionId,
+<span class="lineNum">     331 </span>            :                                      const ByteBuffer&amp; dl,
+<span class="lineNum">     332 </span>            :                                      const WrBuiltDisplayListDescriptor&amp; dlDesc,
+<span class="lineNum">     333 </span>            :                                      const ByteBuffer&amp; aux,
+<span class="lineNum">     334 </span>            :                                      const WrAuxiliaryListsDescriptor&amp; auxDesc)
+<span class="lineNum">     335 </span>            : {
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :   HandleDPEnd(aSize, Move(aCommands), Move(aToDestroy), aFwdTransactionId, aTransactionId,</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :               dl, dlDesc, aux, auxDesc);</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     339 </span>            : }
+<a name="340"><span class="lineNum">     340 </span>            : </a>
+<span class="lineNum">     341 </span>            : void
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::ProcessWebRenderCommands(const gfx::IntSize &amp;aSize,</span>
+<span class="lineNum">     343 </span>            :                                                 InfallibleTArray&lt;WebRenderParentCommand&gt;&amp; aCommands, const wr::Epoch&amp; aEpoch,
+<span class="lineNum">     344 </span>            :                                                 const ByteBuffer&amp; dl,
+<span class="lineNum">     345 </span>            :                                                 const WrBuiltDisplayListDescriptor&amp; dlDesc,
+<span class="lineNum">     346 </span>            :                                                 const ByteBuffer&amp; aux,
+<span class="lineNum">     347 </span>            :                                                 const WrAuxiliaryListsDescriptor&amp; auxDesc)
+<span class="lineNum">     348 </span>            : {
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :   for (InfallibleTArray&lt;WebRenderParentCommand&gt;::index_type i = 0; i &lt; aCommands.Length(); ++i) {</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :     const WebRenderParentCommand&amp; cmd = aCommands[i];</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :     switch (cmd.type()) {</span>
+<span class="lineNum">     353 </span>            :       case WebRenderParentCommand::TOpAddExternalImage: {
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :         const OpAddExternalImage&amp; op = cmd.get_OpAddExternalImage();</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :         wr::ImageKey key = op.key();</span>
+<span class="lineNum">     356 </span>            :         MOZ_ASSERT(mExternalImageIds.Get(op.externalImageId()).get());
+<span class="lineNum">     357 </span>            :         MOZ_ASSERT(!mActiveKeys.Get(wr::AsUint64(key), nullptr));
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         mActiveKeys.Put(wr::AsUint64(key), key);</span>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :         RefPtr&lt;CompositableHost&gt; host = mExternalImageIds.Get(op.externalImageId());</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :         if (!host) {</span>
+<span class="lineNum">     362 </span>            :           NS_ERROR(&quot;CompositableHost does not exist&quot;);
+<span class="lineNum">     363 </span>            :           break;
+<span class="lineNum">     364 </span>            :         }
+<span class="lineNum">     365 </span>            :         // XXX select Texture for video in CompositeToTarget().
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :         TextureHost* texture = host-&gt;GetAsTextureHost();</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :         if (!texture) {</span>
+<span class="lineNum">     368 </span>            :           NS_ERROR(&quot;TextureHost does not exist&quot;);
+<span class="lineNum">     369 </span>            :           break;
+<span class="lineNum">     370 </span>            :         }
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :         WebRenderTextureHost* wrTexture = texture-&gt;AsWebRenderTextureHost();</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :         if (wrTexture) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :           if (wrTexture-&gt;IsWrappingNativeHandle()) {</span>
+<span class="lineNum">     374 </span>            :             // XXX only for MacIOSurface right now.
+<span class="lineNum">     375 </span>            :             // XXX remove the redundant codes for both native handle and yuv case.
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :             wr::ImageDescriptor descriptor(wrTexture-&gt;GetSize(), wrTexture-&gt;GetReadFormat());</span>
+<span class="lineNum">     377 </span>            :             mApi-&gt;AddExternalImageHandle(key,
+<span class="lineNum">     378 </span>            :                                          descriptor,
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :                                          wrTexture-&gt;GetExternalImageKey());</span>
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :             mCompositableHolder-&gt;HoldExternalImage(mPipelineId, aEpoch, texture-&gt;AsWebRenderTextureHost());</span>
+<span class="lineNum">     381 </span>            :           } else {
+<span class="lineNum">     382 </span>            :             // XXX handling YUV
+<span class="lineNum">     383 </span>            :             gfx::SurfaceFormat format =
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :               wrTexture-&gt;GetFormat() == SurfaceFormat::YUV ? SurfaceFormat::B8G8R8A8 : wrTexture-&gt;GetFormat();</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :             wr::ImageDescriptor descriptor(wrTexture-&gt;GetSize(), wrTexture-&gt;GetRGBStride(), format);</span>
+<span class="lineNum">     386 </span>            :             mApi-&gt;AddExternalImageBuffer(key,
+<span class="lineNum">     387 </span>            :                                          descriptor,
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :                                          wrTexture-&gt;GetExternalImageKey());</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :             mCompositableHolder-&gt;HoldExternalImage(mPipelineId, aEpoch, texture-&gt;AsWebRenderTextureHost());</span>
+<span class="lineNum">     390 </span>            :           }
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            :           break;
+<span class="lineNum">     393 </span>            :         }
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :         RefPtr&lt;DataSourceSurface&gt; dSurf = host-&gt;GetAsSurface();</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :         if (!dSurf) {</span>
+<span class="lineNum">     396 </span>            :           break;
+<span class="lineNum">     397 </span>            :         }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :         DataSourceSurface::MappedSurface map;
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :         if (!dSurf-&gt;Map(gfx::DataSourceSurface::MapType::READ, &amp;map)) {</span>
+<span class="lineNum">     401 </span>            :           break;
+<span class="lineNum">     402 </span>            :         }
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :         IntSize size = dSurf-&gt;GetSize();</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :         wr::ImageDescriptor descriptor(size, map.mStride, dSurf-&gt;GetFormat());</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :         auto slice = Range&lt;uint8_t&gt;(map.mData, size.height * map.mStride);</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :         mApi-&gt;AddImage(key, descriptor, slice);</span>
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :         dSurf-&gt;Unmap();</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     411 </span>            :       }
+<span class="lineNum">     412 </span>            :       case WebRenderParentCommand::TCompositableOperation: {
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :         if (!ReceiveCompositableUpdate(cmd.get_CompositableOperation())) {</span>
+<span class="lineNum">     414 </span>            :           NS_ERROR(&quot;ReceiveCompositableUpdate failed&quot;);
+<span class="lineNum">     415 </span>            :         }
+<span class="lineNum">     416 </span>            :         break;
+<span class="lineNum">     417 </span>            :       }
+<span class="lineNum">     418 </span>            :       default: {
+<span class="lineNum">     419 </span>            :         // other commands are handle on the child
+<span class="lineNum">     420 </span>            :         break;
+<span class="lineNum">     421 </span>            :       }
+<span class="lineNum">     422 </span>            :     }
+<span class="lineNum">     423 </span>            :   }
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :   if (mWidget) {</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :     LayoutDeviceIntSize size = mWidget-&gt;GetClientSize();</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :     mApi-&gt;SetWindowParameters(size);</span>
+<span class="lineNum">     427 </span>            :   }
+<span class="lineNum">     428 </span>            :   mApi-&gt;SetRootDisplayList(gfx::Color(0.3f, 0.f, 0.f, 1.f), aEpoch, LayerSize(aSize.width, aSize.height),
+<span class="lineNum">     429 </span>            :                            mPipelineId,
+<span class="lineNum">     430 </span>            :                            dlDesc, dl.mData, dl.mLength,
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :                            auxDesc, aux.mData, aux.mLength);</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :   ScheduleComposition();</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :   DeleteOldImages();</span>
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :   if (ShouldParentObserveEpoch()) {</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :     mCompositorBridge-&gt;ObserveLayerUpdate(wr::AsUint64(mPipelineId), GetChildLayerObserverEpoch(), true);</span>
+<span class="lineNum">     438 </span>            :   }
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 : }</span>
+<a name="440"><span class="lineNum">     440 </span>            : </a>
+<span class="lineNum">     441 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvDPGetSnapshot(PTextureParent* aTexture)</span>
+<span class="lineNum">     443 </span>            : {
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     445 </span>            :     return IPC_OK();
+<span class="lineNum">     446 </span>            :   }
+<span class="lineNum">     447 </span>            :   MOZ_ASSERT(!mPaused);
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :   RefPtr&lt;TextureHost&gt; texture = TextureHost::AsTextureHost(aTexture);</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :   if (!texture) {</span>
+<span class="lineNum">     451 </span>            :     // We kill the content process rather than have it continue with an invalid
+<span class="lineNum">     452 </span>            :     // snapshot, that may be too harsh and we could decide to return some sort
+<span class="lineNum">     453 </span>            :     // of error to the child process and let it deal with it...
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     455 </span>            :   }
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            :   // XXX Add other TextureHost supports.
+<span class="lineNum">     458 </span>            :   // Only BufferTextureHost is supported now.
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :   BufferTextureHost* bufferTexture = texture-&gt;AsBufferTextureHost();</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :   if (!bufferTexture) {</span>
+<span class="lineNum">     461 </span>            :     // We kill the content process rather than have it continue with an invalid
+<span class="lineNum">     462 </span>            :     // snapshot, that may be too harsh and we could decide to return some sort
+<span class="lineNum">     463 </span>            :     // of error to the child process and let it deal with it...
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     465 </span>            :   }
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :   MOZ_ASSERT(bufferTexture-&gt;GetBufferDescriptor().type() == BufferDescriptor::TRGBDescriptor);
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :   DebugOnly&lt;uint32_t&gt; stride = ImageDataSerializer::GetRGBStride(bufferTexture-&gt;GetBufferDescriptor().get_RGBDescriptor());</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :   uint8_t* buffer = bufferTexture-&gt;GetBuffer();</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :   IntSize size = bufferTexture-&gt;GetSize();</span>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span>            :   // We only support B8G8R8A8 for now.
+<span class="lineNum">     473 </span>            :   MOZ_ASSERT(buffer);
+<span class="lineNum">     474 </span>            :   MOZ_ASSERT(bufferTexture-&gt;GetFormat() == SurfaceFormat::B8G8R8A8);
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :   uint32_t buffer_size = size.width * size.height * 4;</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :   // Assert the stride of the buffer is what webrender expects
+<span class="lineNum">     478 </span>            :   MOZ_ASSERT((uint32_t)(size.width * 4) == stride);
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :   if (mCompositorScheduler-&gt;NeedsComposite()) {</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :     mCompositorScheduler-&gt;CancelCurrentCompositeTask();</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     mCompositorScheduler-&gt;ForceComposeToTarget(nullptr, nullptr);</span>
+<span class="lineNum">     483 </span>            :   }
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :   mApi-&gt;Readback(size, buffer, buffer_size);</span>
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     488 </span>            : }
+<a name="489"><span class="lineNum">     489 </span>            : </a>
+<span class="lineNum">     490 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvAddExternalImageId(const uint64_t&amp; aImageId,</span>
+<span class="lineNum">     492 </span>            :                                               const CompositableHandle&amp; aHandle)
+<span class="lineNum">     493 </span>            : {
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     495 </span>            :     return IPC_OK();
+<span class="lineNum">     496 </span>            :   }
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span>            :   MOZ_ASSERT(!mExternalImageIds.Get(aImageId).get());
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :   ImageBridgeParent* imageBridge = ImageBridgeParent::GetInstance(OtherPid());</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :   if (!imageBridge) {</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :      return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     503 </span>            :   }
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :   RefPtr&lt;CompositableHost&gt; host = imageBridge-&gt;FindCompositable(aHandle);</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :   if (!host) {</span>
+<span class="lineNum">     506 </span>            :     NS_ERROR(&quot;CompositableHost not found in the map!&quot;);
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     508 </span>            :   }
+<span class="lineNum">     509 </span>            :   MOZ_ASSERT(host-&gt;AsWebRenderImageHost());
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :   if (!host-&gt;AsWebRenderImageHost()) {</span>
+<span class="lineNum">     511 </span>            :     NS_ERROR(&quot;Incompatible CompositableHost&quot;);
+<span class="lineNum">     512 </span>            :     return IPC_OK();
+<span class="lineNum">     513 </span>            :   }
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :   mExternalImageIds.Put(aImageId, host);</span>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     518 </span>            : }
+<a name="519"><span class="lineNum">     519 </span>            : </a>
+<span class="lineNum">     520 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvAddExternalImageIdForCompositable(const uint64_t&amp; aImageId,</span>
+<span class="lineNum">     522 </span>            :                                                              const CompositableHandle&amp; aHandle)
+<span class="lineNum">     523 </span>            : {
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     525 </span>            :     return IPC_OK();
+<span class="lineNum">     526 </span>            :   }
+<span class="lineNum">     527 </span>            :   MOZ_ASSERT(!mExternalImageIds.Get(aImageId).get());
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :   RefPtr&lt;CompositableHost&gt; host = FindCompositable(aHandle);</span>
+<span class="lineNum">     530 </span>            :   MOZ_ASSERT(host-&gt;AsWebRenderImageHost());
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :   if (!host-&gt;AsWebRenderImageHost()) {</span>
+<span class="lineNum">     532 </span>            :     NS_ERROR(&quot;Incompatible CompositableHost&quot;);
+<span class="lineNum">     533 </span>            :     return IPC_OK();
+<span class="lineNum">     534 </span>            :   }
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :   mExternalImageIds.Put(aImageId, host);</span>
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     539 </span>            : }
+<a name="540"><span class="lineNum">     540 </span>            : </a>
+<span class="lineNum">     541 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvRemoveExternalImageId(const uint64_t&amp; aImageId)</span>
+<span class="lineNum">     543 </span>            : {
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     545 </span>            :     return IPC_OK();
+<span class="lineNum">     546 </span>            :   }
+<span class="lineNum">     547 </span>            :   MOZ_ASSERT(mExternalImageIds.Get(aImageId).get());
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 :   mExternalImageIds.Remove(aImageId);</span>
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            :   return IPC_OK();
+<span class="lineNum">     551 </span>            : }
+<a name="552"><span class="lineNum">     552 </span>            : </a>
+<span class="lineNum">     553 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvSetLayerObserverEpoch(const uint64_t&amp; aLayerObserverEpoch)</span>
+<span class="lineNum">     555 </span>            : {
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :   mChildLayerObserverEpoch = aLayerObserverEpoch;</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     558 </span>            : }
+<a name="559"><span class="lineNum">     559 </span>            : </a>
+<span class="lineNum">     560 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvClearCachedResources()</span>
+<span class="lineNum">     562 </span>            : {
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :   mCompositorBridge-&gt;ObserveLayerUpdate(wr::AsUint64(mPipelineId), GetChildLayerObserverEpoch(), false);</span>
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     565 </span>            : }
+<a name="566"><span class="lineNum">     566 </span>            : </a>
+<span class="lineNum">     567 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvForceComposite()</span>
+<span class="lineNum">     569 </span>            : {
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :   if (mDestroyed) {</span>
+<span class="lineNum">     571 </span>            :     return IPC_OK();
+<span class="lineNum">     572 </span>            :   }
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :   ScheduleComposition();</span>
+<span class="lineNum">     574 </span>            :   return IPC_OK();
+<span class="lineNum">     575 </span>            : }
+<a name="576"><span class="lineNum">     576 </span>            : </a>
+<span class="lineNum">     577 </span>            : void
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::ActorDestroy(ActorDestroyReason aWhy)</span>
+<span class="lineNum">     579 </span>            : {
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :   Destroy();</span>
+<span class="lineNum">     581 </span><span class="lineNoCov">          0 : }</span>
+<a name="582"><span class="lineNum">     582 </span>            : </a>
+<span class="lineNum">     583 </span>            : void
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::CompositeToTarget(gfx::DrawTarget* aTarget, const gfx::IntRect* aRect)</span>
+<span class="lineNum">     585 </span>            : {
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :   if (mPaused) {</span>
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     588 </span>            :   }
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :   mApi-&gt;GenerateFrame();</span>
+<span class="lineNum">     590 </span>            : }
+<a name="591"><span class="lineNum">     591 </span>            : </a>
+<span class="lineNum">     592 </span>            : void
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::HoldPendingTransactionId(uint32_t aWrEpoch, uint64_t aTransactionId)</span>
+<span class="lineNum">     594 </span>            : {
+<span class="lineNum">     595 </span>            :   // The transaction ID might get reset to 1 if the page gets reloaded, see
+<span class="lineNum">     596 </span>            :   // https://bugzilla.mozilla.org/show_bug.cgi?id=1145295#c41
+<span class="lineNum">     597 </span>            :   // Otherwise, it should be continually increasing.
+<span class="lineNum">     598 </span>            :   MOZ_ASSERT(aTransactionId == 1 || aTransactionId &gt; LastPendingTransactionId());
+<span class="lineNum">     599 </span>            :   // Handle TransactionIdAllocator(RefreshDriver) change.
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :   if (aTransactionId == 1) {</span>
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :     FlushPendingTransactionIds();</span>
+<span class="lineNum">     602 </span>            :   }
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :   mPendingTransactionIds.push(PendingTransactionId(wr::NewEpoch(aWrEpoch), aTransactionId));</span>
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 : }</span>
+<a name="605"><span class="lineNum">     605 </span>            : </a>
+<span class="lineNum">     606 </span>            : uint64_t
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::LastPendingTransactionId()</span>
+<span class="lineNum">     608 </span>            : {
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :   uint64_t id = 0;</span>
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :   if (!mPendingTransactionIds.empty()) {</span>
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :     id = mPendingTransactionIds.back().mId;</span>
+<span class="lineNum">     612 </span>            :   }
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :   return id;</span>
+<span class="lineNum">     614 </span>            : }
+<a name="615"><span class="lineNum">     615 </span>            : </a>
+<span class="lineNum">     616 </span>            : uint64_t
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::FlushPendingTransactionIds()</span>
+<span class="lineNum">     618 </span>            : {
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :   uint64_t id = 0;</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :   while (!mPendingTransactionIds.empty()) {</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :     id = mPendingTransactionIds.front().mId;</span>
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :     mPendingTransactionIds.pop();</span>
+<span class="lineNum">     623 </span>            :   }
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :   return id;</span>
+<span class="lineNum">     625 </span>            : }
+<a name="626"><span class="lineNum">     626 </span>            : </a>
+<span class="lineNum">     627 </span>            : uint64_t
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::FlushTransactionIdsForEpoch(const wr::Epoch&amp; aEpoch)</span>
+<span class="lineNum">     629 </span>            : {
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :   uint64_t id = 0;</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :   while (!mPendingTransactionIds.empty()) {</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :     id = mPendingTransactionIds.front().mId;</span>
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :     if (mPendingTransactionIds.front().mEpoch == aEpoch) {</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :       mPendingTransactionIds.pop();</span>
+<span class="lineNum">     635 </span>            :       break;
+<span class="lineNum">     636 </span>            :     }
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :     mPendingTransactionIds.pop();</span>
+<span class="lineNum">     638 </span>            :   }
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :   return id;</span>
+<a name="640"><span class="lineNum">     640 </span>            : }</a>
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::~WebRenderBridgeParent()</span>
+<span class="lineNum">     643 </span>            : {
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 : }</span>
+<a name="645"><span class="lineNum">     645 </span>            : </a>
+<span class="lineNum">     646 </span>            : void
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::DeleteOldImages()</span>
+<span class="lineNum">     648 </span>            : {
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :   for (wr::ImageKey key : mKeysToDelete) {</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :     mApi-&gt;DeleteImage(key);</span>
+<span class="lineNum">     651 </span>            :   }
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :   mKeysToDelete.clear();</span>
+<span class="lineNum">     653 </span><span class="lineNoCov">          0 : }</span>
+<a name="654"><span class="lineNum">     654 </span>            : </a>
+<span class="lineNum">     655 </span>            : void
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::ScheduleComposition()</span>
+<span class="lineNum">     657 </span>            : {
+<span class="lineNum">     658 </span><span class="lineNoCov">          0 :   if (mCompositorScheduler) {</span>
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :     mCompositorScheduler-&gt;ScheduleComposition();</span>
+<span class="lineNum">     660 </span>            :   }
+<span class="lineNum">     661 </span><span class="lineNoCov">          0 : }</span>
+<a name="662"><span class="lineNum">     662 </span>            : </a>
+<span class="lineNum">     663 </span>            : void
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::Pause()</span>
+<span class="lineNum">     665 </span>            : {
+<span class="lineNum">     666 </span>            :   MOZ_ASSERT(mWidget);
+<span class="lineNum">     667 </span>            : #ifdef MOZ_WIDGET_ANDROID
+<span class="lineNum">     668 </span>            :   if (!mWidget || mDestroyed) {
+<span class="lineNum">     669 </span>            :     return;
+<span class="lineNum">     670 </span>            :   }
+<span class="lineNum">     671 </span>            :   mApi-&gt;Pause();
+<span class="lineNum">     672 </span>            : #endif
+<span class="lineNum">     673 </span><span class="lineNoCov">          0 :   mPaused = true;</span>
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 : }</span>
+<a name="675"><span class="lineNum">     675 </span>            : </a>
+<span class="lineNum">     676 </span>            : bool
+<span class="lineNum">     677 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::Resume()</span>
+<span class="lineNum">     678 </span>            : {
+<span class="lineNum">     679 </span>            :   MOZ_ASSERT(mWidget);
+<span class="lineNum">     680 </span>            : #ifdef MOZ_WIDGET_ANDROID
+<span class="lineNum">     681 </span>            :   if (!mWidget || mDestroyed) {
+<span class="lineNum">     682 </span>            :     return false;
+<span class="lineNum">     683 </span>            :   }
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            :   if (!mApi-&gt;Resume()) {
+<span class="lineNum">     686 </span>            :     return false;
+<span class="lineNum">     687 </span>            :   }
+<span class="lineNum">     688 </span>            : #endif
+<span class="lineNum">     689 </span><span class="lineNoCov">          0 :   mPaused = false;</span>
+<span class="lineNum">     690 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     691 </span>            : }
+<a name="692"><span class="lineNum">     692 </span>            : </a>
+<span class="lineNum">     693 </span>            : void
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::ClearResources()</span>
+<span class="lineNum">     695 </span>            : {
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 :   if (mApi) {</span>
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :     ++mWrEpoch; // Update webrender epoch</span>
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :     mApi-&gt;ClearRootDisplayList(wr::NewEpoch(mWrEpoch), mPipelineId);</span>
+<span class="lineNum">     699 </span><span class="lineNoCov">          0 :     for (auto iter = mActiveKeys.Iter(); !iter.Done(); iter.Next()) {</span>
+<span class="lineNum">     700 </span><span class="lineNoCov">          0 :       mKeysToDelete.push_back(iter.Data());</span>
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :       iter.Remove();</span>
+<span class="lineNum">     702 </span>            :     }
+<span class="lineNum">     703 </span><span class="lineNoCov">          0 :     if (!mKeysToDelete.empty()) {</span>
+<span class="lineNum">     704 </span>            :       // XXX Sync wait.
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :       mApi-&gt;WaitFlushed();</span>
+<span class="lineNum">     706 </span><span class="lineNoCov">          0 :       DeleteOldImages();</span>
+<span class="lineNum">     707 </span>            :     }
+<span class="lineNum">     708 </span>            :   }
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :   mCompositableHolder-&gt;RemovePipeline(mPipelineId);</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :   mExternalImageIds.Clear();</span>
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :   if (mWidget &amp;&amp; mCompositorScheduler) {</span>
+<span class="lineNum">     713 </span><span class="lineNoCov">          0 :     mCompositorScheduler-&gt;Destroy();</span>
+<span class="lineNum">     714 </span>            :   }
+<span class="lineNum">     715 </span><span class="lineNoCov">          0 :   mCompositorScheduler = nullptr;</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :   mApi = nullptr;</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :   mCompositorBridge = nullptr;</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 : }</span>
+<a name="719"><span class="lineNum">     719 </span>            : </a>
+<span class="lineNum">     720 </span>            : bool
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::ShouldParentObserveEpoch()</span>
+<span class="lineNum">     722 </span>            : {
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :   if (mParentLayerObserverEpoch == mChildLayerObserverEpoch) {</span>
+<span class="lineNum">     724 </span>            :     return false;
+<span class="lineNum">     725 </span>            :   }
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :   mParentLayerObserverEpoch = mChildLayerObserverEpoch;</span>
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     729 </span>            : }
+<a name="730"><span class="lineNum">     730 </span>            : </a>
+<span class="lineNum">     731 </span>            : void
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::SendAsyncMessage(const InfallibleTArray&lt;AsyncParentMessageData&gt;&amp; aMessage)</span>
+<span class="lineNum">     733 </span>            : {
+<span class="lineNum">     734 </span>            :   MOZ_ASSERT_UNREACHABLE(&quot;unexpected to be called&quot;);
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 : }</span>
+<a name="736"><span class="lineNum">     736 </span>            : </a>
+<span class="lineNum">     737 </span>            : void
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::SendPendingAsyncMessages()</span>
+<span class="lineNum">     739 </span>            : {
+<span class="lineNum">     740 </span>            :   MOZ_ASSERT(mCompositorBridge);
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :   mCompositorBridge-&gt;SendPendingAsyncMessages();</span>
+<span class="lineNum">     742 </span><span class="lineNoCov">          0 : }</span>
+<a name="743"><span class="lineNum">     743 </span>            : </a>
+<span class="lineNum">     744 </span>            : void
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::SetAboutToSendAsyncMessages()</span>
+<span class="lineNum">     746 </span>            : {
+<span class="lineNum">     747 </span>            :   MOZ_ASSERT(mCompositorBridge);
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :   mCompositorBridge-&gt;SetAboutToSendAsyncMessages();</span>
+<span class="lineNum">     749 </span><span class="lineNoCov">          0 : }</span>
+<a name="750"><span class="lineNum">     750 </span>            : </a>
+<span class="lineNum">     751 </span>            : void
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::NotifyNotUsed(PTextureParent* aTexture, uint64_t aTransactionId)</span>
+<span class="lineNum">     753 </span>            : {
+<span class="lineNum">     754 </span>            :   MOZ_ASSERT_UNREACHABLE(&quot;unexpected to be called&quot;);
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 : }</span>
+<a name="756"><span class="lineNum">     756 </span>            : </a>
+<span class="lineNum">     757 </span>            : base::ProcessId
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::GetChildProcessId()</span>
+<span class="lineNum">     759 </span>            : {
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :   return OtherPid();</span>
+<span class="lineNum">     761 </span>            : }
+<a name="762"><span class="lineNum">     762 </span>            : </a>
+<span class="lineNum">     763 </span>            : bool
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::IsSameProcess() const</span>
+<span class="lineNum">     765 </span>            : {
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :   return OtherPid() == base::GetCurrentProcId();</span>
+<span class="lineNum">     767 </span>            : }
+<a name="768"><span class="lineNum">     768 </span>            : </a>
+<span class="lineNum">     769 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvNewCompositable(const CompositableHandle&amp; aHandle,</span>
+<span class="lineNum">     771 </span>            :                                            const TextureInfo&amp; aInfo)
+<span class="lineNum">     772 </span>            : {
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :   if (!AddCompositable(aHandle, aInfo)) {</span>
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     775 </span>            :   }
+<span class="lineNum">     776 </span>            :   return IPC_OK();
+<span class="lineNum">     777 </span>            : }
+<a name="778"><span class="lineNum">     778 </span>            : </a>
+<span class="lineNum">     779 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvReleaseCompositable(const CompositableHandle&amp; aHandle)</span>
+<span class="lineNum">     781 </span>            : {
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :   ReleaseCompositable(aHandle);</span>
+<span class="lineNum">     783 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     784 </span>            : }
+<a name="785"><span class="lineNum">     785 </span>            : </a>
+<span class="lineNum">     786 </span>            : mozilla::ipc::IPCResult
+<span class="lineNum">     787 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::RecvInitReadLocks(ReadLockArray&amp;&amp; aReadLocks)</span>
+<span class="lineNum">     788 </span>            : {
+<span class="lineNum">     789 </span><span class="lineNoCov">          0 :   if (!AddReadLocks(Move(aReadLocks))) {</span>
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 :     return IPC_FAIL_NO_REASON(this);</span>
+<span class="lineNum">     791 </span>            :   }
+<span class="lineNum">     792 </span>            :   return IPC_OK();
+<span class="lineNum">     793 </span>            : }
+<a name="794"><span class="lineNum">     794 </span>            : </a>
+<span class="lineNum">     795 </span>            : void
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::SetWebRenderProfilerEnabled(bool aEnabled)</span>
+<span class="lineNum">     797 </span>            : {
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :   if (mWidget) {</span>
+<span class="lineNum">     799 </span>            :     // Only set the flag to &quot;root&quot; WebRenderBridgeParent.
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :     mApi-&gt;SetProfilerEnabled(aEnabled);</span>
+<span class="lineNum">     801 </span>            :   }
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 : }</span>
+<a name="803"><span class="lineNum">     803 </span>            : </a>
+<span class="lineNum">     804 </span>            : TextureFactoryIdentifier
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 : WebRenderBridgeParent::GetTextureFactoryIdentifier()</span>
+<span class="lineNum">     806 </span>            : {
+<span class="lineNum">     807 </span>            :   MOZ_ASSERT(mApi);
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            :   return TextureFactoryIdentifier(LayersBackend::LAYERS_WR,
+<span class="lineNum">     810 </span>            :                                   XRE_GetProcessType(),
+<span class="lineNum">     811 </span>            :                                   mApi-&gt;GetMaxTextureSize(),
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :                                   mApi-&gt;GetUseANGLE());</span>
+<span class="lineNum">     813 </span>            : }
+<span class="lineNum">     814 </span>            : 
+<span class="lineNum">     815 </span>            : } // namespace layers
+<span class="lineNum">     816 </span>            : } // namespace mozilla
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

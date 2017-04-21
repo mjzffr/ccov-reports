@@ -1,0 +1,545 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - security/sandbox/chromium/base/memory/ref_counted.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium/base/memory</a> - ref_counted.h<span style="font-size: 80%;"> (source / <a href="ref_counted.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:24:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright (c) 2012 The Chromium Authors. All rights reserved.</a>
+<span class="lineNum">       2 </span>            : // Use of this source code is governed by a BSD-style license that can be
+<span class="lineNum">       3 </span>            : // found in the LICENSE file.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef BASE_MEMORY_REF_COUNTED_H_
+<span class="lineNum">       6 </span>            : #define BASE_MEMORY_REF_COUNTED_H_
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;cassert&gt;
+<span class="lineNum">      11 </span>            : #include &lt;iosfwd&gt;
+<span class="lineNum">      12 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &quot;base/atomic_ref_count.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;base/base_export.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;base/compiler_specific.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;base/logging.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;base/macros.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;base/threading/thread_collision_warner.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;build/build_config.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : namespace base {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : namespace subtle {
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : class BASE_EXPORT RefCountedBase {
+<span class="lineNum">      27 </span>            :  public:
+<span class="lineNum">      28 </span>            :   bool HasOneRef() const { return ref_count_ == 1; }
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :  protected:
+<span class="lineNum">      31 </span>            :   RefCountedBase()
+<span class="lineNum">      32 </span>            :       : ref_count_(0)
+<span class="lineNum">      33 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      34 </span>            :         , in_dtor_(false)
+<span class="lineNum">      35 </span>            : #endif
+<span class="lineNum">      36 </span>            :   {
+<span class="lineNum">      37 </span>            :   }
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :   ~RefCountedBase() {
+<span class="lineNum">      40 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      41 </span>            :     DCHECK(in_dtor_) &lt;&lt; &quot;RefCounted object deleted without calling Release()&quot;;
+<span class="lineNum">      42 </span>            : #endif
+<span class="lineNum">      43 </span>            :   }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :   void AddRef() const {
+<span class="lineNum">      47 </span>            :     // TODO(maruel): Add back once it doesn't assert 500 times/sec.
+<span class="lineNum">      48 </span>            :     // Current thread books the critical section &quot;AddRelease&quot;
+<span class="lineNum">      49 </span>            :     // without release it.
+<span class="lineNum">      50 </span>            :     // DFAKE_SCOPED_LOCK_THREAD_LOCKED(add_release_);
+<span class="lineNum">      51 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      52 </span>            :     DCHECK(!in_dtor_);
+<span class="lineNum">      53 </span>            : #endif
+<span class="lineNum">      54 </span>            :     ++ref_count_;
+<span class="lineNum">      55 </span>            :   }
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   // Returns true if the object should self-delete.
+<span class="lineNum">      58 </span>            :   bool Release() const {
+<span class="lineNum">      59 </span>            :     // TODO(maruel): Add back once it doesn't assert 500 times/sec.
+<span class="lineNum">      60 </span>            :     // Current thread books the critical section &quot;AddRelease&quot;
+<span class="lineNum">      61 </span>            :     // without release it.
+<span class="lineNum">      62 </span>            :     // DFAKE_SCOPED_LOCK_THREAD_LOCKED(add_release_);
+<span class="lineNum">      63 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      64 </span>            :     DCHECK(!in_dtor_);
+<span class="lineNum">      65 </span>            : #endif
+<span class="lineNum">      66 </span>            :     if (--ref_count_ == 0) {
+<span class="lineNum">      67 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      68 </span>            :       in_dtor_ = true;
+<span class="lineNum">      69 </span>            : #endif
+<span class="lineNum">      70 </span>            :       return true;
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span>            :     return false;
+<span class="lineNum">      73 </span>            :   }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :  private:
+<span class="lineNum">      76 </span>            :   mutable size_t ref_count_;
+<span class="lineNum">      77 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">      78 </span>            :   mutable bool in_dtor_;
+<span class="lineNum">      79 </span>            : #endif
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   DFAKE_MUTEX(add_release_);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :   DISALLOW_COPY_AND_ASSIGN(RefCountedBase);
+<span class="lineNum">      84 </span>            : };
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : class BASE_EXPORT RefCountedThreadSafeBase {
+<span class="lineNum">      87 </span>            :  public:
+<span class="lineNum">      88 </span>            :   bool HasOneRef() const;
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :  protected:
+<span class="lineNum">      91 </span>            :   RefCountedThreadSafeBase();
+<span class="lineNum">      92 </span>            :   ~RefCountedThreadSafeBase();
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   void AddRef() const;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   // Returns true if the object should self-delete.
+<span class="lineNum">      97 </span>            :   bool Release() const;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :  private:
+<span class="lineNum">     100 </span>            :   mutable AtomicRefCount ref_count_;
+<span class="lineNum">     101 </span>            : #if DCHECK_IS_ON()
+<span class="lineNum">     102 </span>            :   mutable bool in_dtor_;
+<span class="lineNum">     103 </span>            : #endif
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   DISALLOW_COPY_AND_ASSIGN(RefCountedThreadSafeBase);
+<span class="lineNum">     106 </span>            : };
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : }  // namespace subtle
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : //
+<span class="lineNum">     111 </span>            : // A base class for reference counted classes.  Otherwise, known as a cheap
+<span class="lineNum">     112 </span>            : // knock-off of WebKit's RefCounted&lt;T&gt; class.  To use this, just extend your
+<span class="lineNum">     113 </span>            : // class from it like so:
+<span class="lineNum">     114 </span>            : //
+<span class="lineNum">     115 </span>            : //   class MyFoo : public base::RefCounted&lt;MyFoo&gt; {
+<span class="lineNum">     116 </span>            : //    ...
+<span class="lineNum">     117 </span>            : //    private:
+<span class="lineNum">     118 </span>            : //     friend class base::RefCounted&lt;MyFoo&gt;;
+<span class="lineNum">     119 </span>            : //     ~MyFoo();
+<span class="lineNum">     120 </span>            : //   };
+<span class="lineNum">     121 </span>            : //
+<span class="lineNum">     122 </span>            : // You should always make your destructor non-public, to avoid any code deleting
+<span class="lineNum">     123 </span>            : // the object accidently while there are references to it.
+<span class="lineNum">     124 </span>            : template &lt;class T&gt;
+<span class="lineNum">     125 </span>            : class RefCounted : public subtle::RefCountedBase {
+<span class="lineNum">     126 </span>            :  public:
+<span class="lineNum">     127 </span>            :   RefCounted() = default;
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :   void AddRef() const {
+<span class="lineNum">     130 </span>            :     subtle::RefCountedBase::AddRef();
+<span class="lineNum">     131 </span>            :   }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :   void Release() const {
+<span class="lineNum">     134 </span>            :     if (subtle::RefCountedBase::Release()) {
+<span class="lineNum">     135 </span>            :       delete static_cast&lt;const T*&gt;(this);
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            :   }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :  protected:
+<span class="lineNum">     140 </span>            :   ~RefCounted() = default;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :  private:
+<span class="lineNum">     143 </span>            :   DISALLOW_COPY_AND_ASSIGN(RefCounted&lt;T&gt;);
+<span class="lineNum">     144 </span>            : };
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : // Forward declaration.
+<span class="lineNum">     147 </span>            : template &lt;class T, typename Traits&gt; class RefCountedThreadSafe;
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : // Default traits for RefCountedThreadSafe&lt;T&gt;.  Deletes the object when its ref
+<span class="lineNum">     150 </span>            : // count reaches 0.  Overload to delete it on a different thread etc.
+<span class="lineNum">     151 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     152 </span>            : struct DefaultRefCountedThreadSafeTraits {
+<span class="lineNum">     153 </span>            :   static void Destruct(const T* x) {
+<span class="lineNum">     154 </span>            :     // Delete through RefCountedThreadSafe to make child classes only need to be
+<span class="lineNum">     155 </span>            :     // friend with RefCountedThreadSafe instead of this struct, which is an
+<span class="lineNum">     156 </span>            :     // implementation detail.
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     RefCountedThreadSafe&lt;T,</span>
+<span class="lineNum">     158 </span>            :                          DefaultRefCountedThreadSafeTraits&gt;::DeleteInternal(x);
+<span class="lineNum">     159 </span>            :   }
+<span class="lineNum">     160 </span>            : };
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            : //
+<span class="lineNum">     163 </span>            : // A thread-safe variant of RefCounted&lt;T&gt;
+<span class="lineNum">     164 </span>            : //
+<span class="lineNum">     165 </span>            : //   class MyFoo : public base::RefCountedThreadSafe&lt;MyFoo&gt; {
+<span class="lineNum">     166 </span>            : //    ...
+<span class="lineNum">     167 </span>            : //   };
+<span class="lineNum">     168 </span>            : //
+<span class="lineNum">     169 </span>            : // If you're using the default trait, then you should add compile time
+<span class="lineNum">     170 </span>            : // asserts that no one else is deleting your object.  i.e.
+<span class="lineNum">     171 </span>            : //    private:
+<span class="lineNum">     172 </span>            : //     friend class base::RefCountedThreadSafe&lt;MyFoo&gt;;
+<span class="lineNum">     173 </span>            : //     ~MyFoo();
+<span class="lineNum">     174 </span>            : template &lt;class T, typename Traits = DefaultRefCountedThreadSafeTraits&lt;T&gt; &gt;
+<span class="lineNum">     175 </span>            : class RefCountedThreadSafe : public subtle::RefCountedThreadSafeBase {
+<span class="lineNum">     176 </span>            :  public:
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   RefCountedThreadSafe() = default;</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :   void AddRef() const {
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     subtle::RefCountedThreadSafeBase::AddRef();</span>
+<a name="181"><span class="lineNum">     181 </span>            :   }</a>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :   void Release() const {</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     if (subtle::RefCountedThreadSafeBase::Release()) {</span>
+<span class="lineNum">     185 </span>            :       Traits::Destruct(static_cast&lt;const T*&gt;(this));
+<span class="lineNum">     186 </span>            :     }
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :  protected:
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   ~RefCountedThreadSafe() = default;</span>
+<span class="lineNum">     191 </span>            : 
+<a name="192"><span class="lineNum">     192 </span>            :  private:</a>
+<span class="lineNum">     193 </span>            :   friend struct DefaultRefCountedThreadSafeTraits&lt;T&gt;;
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :   static void DeleteInternal(const T* x) { delete x; }</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   DISALLOW_COPY_AND_ASSIGN(RefCountedThreadSafe);
+<span class="lineNum">     197 </span>            : };
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : //
+<span class="lineNum">     200 </span>            : // A thread-safe wrapper for some piece of data so we can place other
+<span class="lineNum">     201 </span>            : // things in scoped_refptrs&lt;&gt;.
+<span class="lineNum">     202 </span>            : //
+<span class="lineNum">     203 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     204 </span>            : class RefCountedData
+<span class="lineNum">     205 </span>            :     : public base::RefCountedThreadSafe&lt; base::RefCountedData&lt;T&gt; &gt; {
+<span class="lineNum">     206 </span>            :  public:
+<span class="lineNum">     207 </span>            :   RefCountedData() : data() {}
+<span class="lineNum">     208 </span>            :   RefCountedData(const T&amp; in_value) : data(in_value) {}
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   T data;
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :  private:
+<span class="lineNum">     213 </span>            :   friend class base::RefCountedThreadSafe&lt;base::RefCountedData&lt;T&gt; &gt;;
+<span class="lineNum">     214 </span>            :   ~RefCountedData() = default;
+<span class="lineNum">     215 </span>            : };
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : }  // namespace base
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            : //
+<span class="lineNum">     220 </span>            : // A smart pointer class for reference counted objects.  Use this class instead
+<span class="lineNum">     221 </span>            : // of calling AddRef and Release manually on a reference counted object to
+<span class="lineNum">     222 </span>            : // avoid common memory leaks caused by forgetting to Release an object
+<span class="lineNum">     223 </span>            : // reference.  Sample usage:
+<span class="lineNum">     224 </span>            : //
+<span class="lineNum">     225 </span>            : //   class MyFoo : public RefCounted&lt;MyFoo&gt; {
+<span class="lineNum">     226 </span>            : //    ...
+<span class="lineNum">     227 </span>            : //   };
+<span class="lineNum">     228 </span>            : //
+<span class="lineNum">     229 </span>            : //   void some_function() {
+<span class="lineNum">     230 </span>            : //     scoped_refptr&lt;MyFoo&gt; foo = new MyFoo();
+<span class="lineNum">     231 </span>            : //     foo-&gt;Method(param);
+<span class="lineNum">     232 </span>            : //     // |foo| is released when this function returns
+<span class="lineNum">     233 </span>            : //   }
+<span class="lineNum">     234 </span>            : //
+<span class="lineNum">     235 </span>            : //   void some_other_function() {
+<span class="lineNum">     236 </span>            : //     scoped_refptr&lt;MyFoo&gt; foo = new MyFoo();
+<span class="lineNum">     237 </span>            : //     ...
+<span class="lineNum">     238 </span>            : //     foo = nullptr;  // explicitly releases |foo|
+<span class="lineNum">     239 </span>            : //     ...
+<span class="lineNum">     240 </span>            : //     if (foo)
+<span class="lineNum">     241 </span>            : //       foo-&gt;Method(param);
+<span class="lineNum">     242 </span>            : //   }
+<span class="lineNum">     243 </span>            : //
+<span class="lineNum">     244 </span>            : // The above examples show how scoped_refptr&lt;T&gt; acts like a pointer to T.
+<span class="lineNum">     245 </span>            : // Given two scoped_refptr&lt;T&gt; classes, it is also possible to exchange
+<span class="lineNum">     246 </span>            : // references between the two objects, like so:
+<span class="lineNum">     247 </span>            : //
+<span class="lineNum">     248 </span>            : //   {
+<span class="lineNum">     249 </span>            : //     scoped_refptr&lt;MyFoo&gt; a = new MyFoo();
+<span class="lineNum">     250 </span>            : //     scoped_refptr&lt;MyFoo&gt; b;
+<span class="lineNum">     251 </span>            : //
+<span class="lineNum">     252 </span>            : //     b.swap(a);
+<span class="lineNum">     253 </span>            : //     // now, |b| references the MyFoo object, and |a| references nullptr.
+<span class="lineNum">     254 </span>            : //   }
+<span class="lineNum">     255 </span>            : //
+<span class="lineNum">     256 </span>            : // To make both |a| and |b| in the above example reference the same MyFoo
+<span class="lineNum">     257 </span>            : // object, simply use the assignment operator:
+<span class="lineNum">     258 </span>            : //
+<span class="lineNum">     259 </span>            : //   {
+<span class="lineNum">     260 </span>            : //     scoped_refptr&lt;MyFoo&gt; a = new MyFoo();
+<span class="lineNum">     261 </span>            : //     scoped_refptr&lt;MyFoo&gt; b;
+<span class="lineNum">     262 </span>            : //
+<span class="lineNum">     263 </span>            : //     b = a;
+<span class="lineNum">     264 </span>            : //     // now, |a| and |b| each own a reference to the same MyFoo object.
+<span class="lineNum">     265 </span>            : //   }
+<span class="lineNum">     266 </span>            : //
+<span class="lineNum">     267 </span>            : template &lt;class T&gt;
+<span class="lineNum">     268 </span>            : class scoped_refptr {
+<span class="lineNum">     269 </span>            :  public:
+<span class="lineNum">     270 </span>            :   typedef T element_type;
+<span class="lineNum">     271 </span>            : 
+<a name="272"><span class="lineNum">     272 </span>            :   scoped_refptr() {}</a>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :   scoped_refptr(T* p) : ptr_(p) {</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :     if (ptr_)</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :       AddRef(ptr_);</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :   }</span>
+<a name="278"><span class="lineNum">     278 </span>            : </a>
+<span class="lineNum">     279 </span>            :   // Copy constructor.
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   scoped_refptr(const scoped_refptr&lt;T&gt;&amp; r) : ptr_(r.ptr_) {</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :     if (ptr_)</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       AddRef(ptr_);</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :   // Copy conversion constructor.
+<span class="lineNum">     286 </span>            :   template &lt;typename U,
+<span class="lineNum">     287 </span>            :             typename = typename std::enable_if&lt;
+<span class="lineNum">     288 </span>            :                 std::is_convertible&lt;U*, T*&gt;::value&gt;::type&gt;
+<span class="lineNum">     289 </span>            :   scoped_refptr(const scoped_refptr&lt;U&gt;&amp; r) : ptr_(r.get()) {
+<span class="lineNum">     290 </span>            :     if (ptr_)
+<span class="lineNum">     291 </span>            :       AddRef(ptr_);
+<span class="lineNum">     292 </span>            :   }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :   // Move constructor. This is required in addition to the conversion
+<span class="lineNum">     295 </span>            :   // constructor below in order for clang to warn about pessimizing moves.
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :   scoped_refptr(scoped_refptr&amp;&amp; r) : ptr_(r.get()) { r.ptr_ = nullptr; }</span>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :   // Move conversion constructor.
+<span class="lineNum">     299 </span>            :   template &lt;typename U,
+<span class="lineNum">     300 </span>            :             typename = typename std::enable_if&lt;
+<span class="lineNum">     301 </span>            :                 std::is_convertible&lt;U*, T*&gt;::value&gt;::type&gt;
+<span class="lineNum">     302 </span>            :   scoped_refptr(scoped_refptr&lt;U&gt;&amp;&amp; r) : ptr_(r.get()) {
+<span class="lineNum">     303 </span>            :     r.ptr_ = nullptr;
+<a name="304"><span class="lineNum">     304 </span>            :   }</a>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :   ~scoped_refptr() {</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :     if (ptr_)</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :       Release(ptr_);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :   T* get() const { return ptr_; }</span>
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            :   T&amp; operator*() const {
+<span class="lineNum">     314 </span>            :     assert(ptr_ != nullptr);
+<span class="lineNum">     315 </span>            :     return *ptr_;
+<span class="lineNum">     316 </span>            :   }
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            :   T* operator-&gt;() const {
+<span class="lineNum">     319 </span>            :     assert(ptr_ != nullptr);
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :     return ptr_;</span>
+<a name="321"><span class="lineNum">     321 </span>            :   }</a>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :   scoped_refptr&lt;T&gt;&amp; operator=(T* p) {</span>
+<span class="lineNum">     324 </span>            :     // AddRef first so that self assignment should work
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :     if (p)</span>
+<span class="lineNum">     326 </span>            :       AddRef(p);
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :     T* old_ptr = ptr_;</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     ptr_ = p;</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :     if (old_ptr)</span>
+<span class="lineNum">     330 </span>            :       Release(old_ptr);
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :     return *this;</span>
+<a name="332"><span class="lineNum">     332 </span>            :   }</a>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :   scoped_refptr&lt;T&gt;&amp; operator=(const scoped_refptr&lt;T&gt;&amp; r) {</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :     return *this = r.ptr_;</span>
+<span class="lineNum">     336 </span>            :   }
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     339 </span>            :   scoped_refptr&lt;T&gt;&amp; operator=(const scoped_refptr&lt;U&gt;&amp; r) {
+<span class="lineNum">     340 </span>            :     return *this = r.get();
+<a name="341"><span class="lineNum">     341 </span>            :   }</a>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :   scoped_refptr&lt;T&gt;&amp; operator=(scoped_refptr&lt;T&gt;&amp;&amp; r) {</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :     scoped_refptr&lt;T&gt;(std::move(r)).swap(*this);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :     return *this;</span>
+<span class="lineNum">     346 </span>            :   }
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     349 </span>            :   scoped_refptr&lt;T&gt;&amp; operator=(scoped_refptr&lt;U&gt;&amp;&amp; r) {
+<span class="lineNum">     350 </span>            :     scoped_refptr&lt;T&gt;(std::move(r)).swap(*this);
+<span class="lineNum">     351 </span>            :     return *this;
+<span class="lineNum">     352 </span>            :   }
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            :   void swap(T** pp) {
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :     T* p = ptr_;</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :     ptr_ = *pp;</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :     *pp = p;</span>
+<span class="lineNum">     358 </span>            :   }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :   void swap(scoped_refptr&lt;T&gt;&amp; r) {
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :     swap(&amp;r.ptr_);</span>
+<span class="lineNum">     362 </span>            :   }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :   explicit operator bool() const { return ptr_ != nullptr; }
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     367 </span>            :   bool operator==(const scoped_refptr&lt;U&gt;&amp; rhs) const {
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :     return ptr_ == rhs.get();</span>
+<span class="lineNum">     369 </span>            :   }
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     372 </span>            :   bool operator!=(const scoped_refptr&lt;U&gt;&amp; rhs) const {
+<span class="lineNum">     373 </span>            :     return !operator==(rhs);
+<span class="lineNum">     374 </span>            :   }
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     377 </span>            :   bool operator&lt;(const scoped_refptr&lt;U&gt;&amp; rhs) const {
+<span class="lineNum">     378 </span>            :     return ptr_ &lt; rhs.get();
+<span class="lineNum">     379 </span>            :   }
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span>            :  protected:
+<span class="lineNum">     382 </span>            :   T* ptr_ = nullptr;
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            :  private:
+<span class="lineNum">     385 </span>            :   // Friend required for move constructors that set r.ptr_ to null.
+<span class="lineNum">     386 </span>            :   template &lt;typename U&gt;
+<span class="lineNum">     387 </span>            :   friend class scoped_refptr;
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            :   // Non-inline helpers to allow:
+<span class="lineNum">     390 </span>            :   //     class Opaque;
+<span class="lineNum">     391 </span>            :   //     extern template class scoped_refptr&lt;Opaque&gt;;
+<span class="lineNum">     392 </span>            :   // Otherwise the compiler will complain that Opaque is an incomplete type.
+<span class="lineNum">     393 </span>            :   static void AddRef(T* ptr);
+<span class="lineNum">     394 </span>            :   static void Release(T* ptr);
+<span class="lineNum">     395 </span>            : };
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            : // static
+<span class="lineNum">     398 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     399 </span>            : void scoped_refptr&lt;T&gt;::AddRef(T* ptr) {
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :   ptr-&gt;AddRef();</span>
+<span class="lineNum">     401 </span>            : }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : // static
+<span class="lineNum">     404 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     405 </span>            : void scoped_refptr&lt;T&gt;::Release(T* ptr) {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :   ptr-&gt;Release();</span>
+<span class="lineNum">     407 </span>            : }
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            : // Handy utility for creating a scoped_refptr&lt;T&gt; out of a T* explicitly without
+<span class="lineNum">     410 </span>            : // having to retype all the template arguments
+<span class="lineNum">     411 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     412 </span>            : scoped_refptr&lt;T&gt; make_scoped_refptr(T* t) {
+<span class="lineNum">     413 </span>            :   return scoped_refptr&lt;T&gt;(t);
+<span class="lineNum">     414 </span>            : }
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     417 </span>            : bool operator==(const scoped_refptr&lt;T&gt;&amp; lhs, const U* rhs) {
+<span class="lineNum">     418 </span>            :   return lhs.get() == rhs;
+<span class="lineNum">     419 </span>            : }
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     422 </span>            : bool operator==(const T* lhs, const scoped_refptr&lt;U&gt;&amp; rhs) {
+<span class="lineNum">     423 </span>            :   return lhs == rhs.get();
+<span class="lineNum">     424 </span>            : }
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     427 </span>            : bool operator==(const scoped_refptr&lt;T&gt;&amp; lhs, std::nullptr_t null) {
+<span class="lineNum">     428 </span>            :   return !static_cast&lt;bool&gt;(lhs);
+<span class="lineNum">     429 </span>            : }
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     432 </span>            : bool operator==(std::nullptr_t null, const scoped_refptr&lt;T&gt;&amp; rhs) {
+<span class="lineNum">     433 </span>            :   return !static_cast&lt;bool&gt;(rhs);
+<span class="lineNum">     434 </span>            : }
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     437 </span>            : bool operator!=(const scoped_refptr&lt;T&gt;&amp; lhs, const U* rhs) {
+<span class="lineNum">     438 </span>            :   return !operator==(lhs, rhs);
+<span class="lineNum">     439 </span>            : }
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            : template &lt;typename T, typename U&gt;
+<span class="lineNum">     442 </span>            : bool operator!=(const T* lhs, const scoped_refptr&lt;U&gt;&amp; rhs) {
+<span class="lineNum">     443 </span>            :   return !operator==(lhs, rhs);
+<span class="lineNum">     444 </span>            : }
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     447 </span>            : bool operator!=(const scoped_refptr&lt;T&gt;&amp; lhs, std::nullptr_t null) {
+<span class="lineNum">     448 </span>            :   return !operator==(lhs, null);
+<span class="lineNum">     449 </span>            : }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     452 </span>            : bool operator!=(std::nullptr_t null, const scoped_refptr&lt;T&gt;&amp; rhs) {
+<span class="lineNum">     453 </span>            :   return !operator==(null, rhs);
+<span class="lineNum">     454 </span>            : }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     457 </span>            : std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, const scoped_refptr&lt;T&gt;&amp; p) {
+<span class="lineNum">     458 </span>            :   return out &lt;&lt; p.get();
+<span class="lineNum">     459 </span>            : }
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            : #endif  // BASE_MEMORY_REF_COUNTED_H_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

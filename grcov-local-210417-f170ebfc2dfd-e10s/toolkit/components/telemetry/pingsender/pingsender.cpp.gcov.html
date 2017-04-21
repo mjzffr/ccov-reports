@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - output.info - toolkit/components/telemetry/pingsender/pingsender.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">toolkit/components/telemetry/pingsender</a> - pingsender.cpp<span style="font-size: 80%;"> (source / <a href="pingsender.cpp.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">output.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">52</td>
+            <td class="headerCovTableEntry">62</td>
+            <td class="headerCovTableEntryMed">83.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21 12:24:28</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">       7 </span>            : #include &lt;ctime&gt;
+<span class="lineNum">       8 </span>            : #include &lt;fstream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;iomanip&gt;
+<span class="lineNum">      10 </span>            : #include &lt;string&gt;
+<span class="lineNum">      11 </span>            : #include &lt;zlib.h&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &quot;pingsender.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using std::ifstream;
+<span class="lineNum">      16 </span>            : using std::ios;
+<span class="lineNum">      17 </span>            : using std::string;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : namespace PingSender {
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : const char* kUserAgent = &quot;pingsender/1.0&quot;;
+<span class="lineNum">      22 </span>            : const char* kCustomVersionHeader = &quot;X-PingSender-Version: 1.0&quot;;
+<span class="lineNum">      23 </span>            : const char* kContentEncodingHeader = &quot;Content-Encoding: gzip&quot;;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  * This shared function returns a Date header string for use in HTTP requests.
+<span class="lineNum">      27 </span>            :  * See &quot;RFC 7231, section 7.1.1.2: Date&quot; for its specifications.
+<a name="28"><span class="lineNum">      28 </span>            :  */</a>
+<span class="lineNum">      29 </span>            : std::string
+<span class="lineNum">      30 </span><span class="lineCov">          1 : GenerateDateHeader()</span>
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span>            :   char buffer[128];
+<span class="lineNum">      33 </span><span class="lineCov">          1 :   std::time_t t = std::time(nullptr);</span>
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   strftime(buffer, sizeof(buffer), &quot;Date: %a, %d %b %Y %H:%M:%S GMT&quot;, std::gmtime(&amp;t));</span>
+<span class="lineNum">      35 </span><span class="lineCov">          1 :   return string(buffer);</span>
+<span class="lineNum">      36 </span>            : }
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : /**
+<span class="lineNum">      39 </span>            :  * Read the ping contents from the specified file
+<a name="40"><span class="lineNum">      40 </span>            :  */</a>
+<span class="lineNum">      41 </span>            : static std::string
+<span class="lineNum">      42 </span><span class="lineCov">          1 : ReadPing(const string&amp; aPingPath)</span>
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span>            :   string ping;
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   ifstream file;</span>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   file.open(aPingPath.c_str(), ios::in | ios::binary);</span>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   if (!file.is_open()) {</span>
+<span class="lineNum">      50 </span>            :     PINGSENDER_LOG(&quot;ERROR: Could not open ping file\n&quot;);
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     return &quot;&quot;;</span>
+<span class="lineNum">      52 </span>            :   }
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   do {</span>
+<span class="lineNum">      55 </span>            :     char buff[4096];
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineCov">          1 :     file.read(buff, sizeof(buff));</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">          1 :     if (file.bad()) {</span>
+<span class="lineNum">      60 </span>            :       PINGSENDER_LOG(&quot;ERROR: Could not read ping contents\n&quot;);
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       return &quot;&quot;;</span>
+<span class="lineNum">      62 </span>            :     }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          1 :     ping.append(buff, file.gcount());</span>
+<span class="lineNum">      65 </span>            :   } while (!file.eof());
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   return ping;</span>
+<span class="lineNum">      68 </span>            : }
+<a name="69"><span class="lineNum">      69 </span>            : </a>
+<span class="lineNum">      70 </span>            : std::string
+<span class="lineNum">      71 </span><span class="lineCov">          1 : GzipCompress(const std::string&amp; rawData)</span>
+<span class="lineNum">      72 </span>            : {
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   z_stream deflater = {};</span>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :   // Use the maximum window size when compressing: this also tells zlib to
+<span class="lineNum">      76 </span>            :   // generate a gzip header.
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   const int32_t kWindowSize = MAX_WBITS + 16;</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   if (deflateInit2(&amp;deflater, Z_DEFAULT_COMPRESSION, Z_DEFLATED, kWindowSize, 8,</span>
+<span class="lineNum">      79 </span>            :                    Z_DEFAULT_STRATEGY) != Z_OK) {
+<span class="lineNum">      80 </span>            :     PINGSENDER_LOG(&quot;ERROR: Could not initialize zlib deflating\n&quot;);
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     return &quot;&quot;;</span>
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   // Initialize the output buffer. The size of the buffer is the same
+<span class="lineNum">      85 </span>            :   // as defined by the ZIP_BUFLEN macro in Gecko.
+<span class="lineNum">      86 </span><span class="lineCov">          1 :   const uint32_t kBufferSize = 4 * 1024 - 1;</span>
+<span class="lineNum">      87 </span>            :   unsigned char outputBuffer[kBufferSize];
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   deflater.next_out = outputBuffer;</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :   deflater.avail_out = kBufferSize;</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   // Let zlib know about the input data.
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   deflater.avail_in = rawData.size();</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   deflater.next_in = reinterpret_cast&lt;Bytef*&gt;(const_cast&lt;char*&gt;(rawData.c_str()));</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   // Compress and append chunk by chunk.
+<span class="lineNum">      96 </span>            :   std::string gzipData;
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   int err = Z_OK;</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">          1 :   while (deflater.avail_in &gt; 0 &amp;&amp; err == Z_OK) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :     err = deflate(&amp;deflater, Z_NO_FLUSH);</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     // Since we're using the Z_NO_FLUSH policy, zlib can decide how
+<span class="lineNum">     103 </span>            :     // much data to compress. When the buffer is full, we repeadetly
+<span class="lineNum">     104 </span>            :     // flush out.
+<span class="lineNum">     105 </span><span class="lineCov">          1 :     while (deflater.avail_out == 0) {</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :       size_t bytesToWrite = kBufferSize - deflater.avail_out;</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :       if (bytesToWrite == 0) {</span>
+<span class="lineNum">     108 </span>            :         break;
+<span class="lineNum">     109 </span>            :       }
+<span class="lineNum">     110 </span><span class="lineCov">          1 :       gzipData.append(reinterpret_cast&lt;const char*&gt;(outputBuffer), bytesToWrite);</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :       // Update the state and let the deflater know about it.
+<span class="lineNum">     113 </span><span class="lineCov">          1 :       deflater.next_out = outputBuffer;</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :       deflater.avail_out = kBufferSize;</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :       err = deflate(&amp;deflater, Z_NO_FLUSH);</span>
+<span class="lineNum">     116 </span>            :     }
+<span class="lineNum">     117 </span>            :   }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :   // Flush the deflater buffers.
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   while (err == Z_OK) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :     err = deflate(&amp;deflater, Z_FINISH);</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :     size_t bytesToWrite = kBufferSize - deflater.avail_out;</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :     if (bytesToWrite == 0) {</span>
+<span class="lineNum">     124 </span>            :       break;
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span><span class="lineCov">          1 :     gzipData.append(reinterpret_cast&lt;const char*&gt;(outputBuffer), bytesToWrite);</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :     deflater.next_out = outputBuffer;</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     deflater.avail_out = kBufferSize;</span>
+<span class="lineNum">     129 </span>            :   }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :   // Clean up.
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   deflateEnd(&amp;deflater);</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">          1 :   if (err != Z_STREAM_END) {</span>
+<span class="lineNum">     135 </span>            :     PINGSENDER_LOG(&quot;ERROR: There was a problem while compressing the ping\n&quot;);
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :     return &quot;&quot;;</span>
+<span class="lineNum">     137 </span>            :   }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          1 :   return gzipData;</span>
+<span class="lineNum">     140 </span>            : }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : } // namespace PingSender
+<span class="lineNum">     143 </span>            : 
+<a name="144"><span class="lineNum">     144 </span>            : using namespace PingSender;</a>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          1 : int main(int argc, char* argv[])</span>
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span>            :   string url;
+<span class="lineNum">     149 </span>            :   string pingPath;
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   if (argc == 3) {</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :     url = argv[1];</span>
+<span class="lineNum">     153 </span><span class="lineCov">          1 :     pingPath = argv[2];</span>
+<span class="lineNum">     154 </span>            :   } else {
+<span class="lineNum">     155 </span>            :     PINGSENDER_LOG(&quot;Usage: pingsender URL PATH\n&quot;
+<span class="lineNum">     156 </span>            :                    &quot;Send the payload stored in PATH to the specified URL using &quot;
+<span class="lineNum">     157 </span>            :                    &quot;an HTTP POST message\n&quot;
+<span class="lineNum">     158 </span>            :                    &quot;then delete the file after a successful send.\n&quot;);
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span>
+<span class="lineNum">     160 </span>            :   }
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   string ping(ReadPing(pingPath));</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   if (ping.empty()) {</span>
+<span class="lineNum">     165 </span>            :     PINGSENDER_LOG(&quot;ERROR: Ping payload is empty\n&quot;);
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span>
+<span class="lineNum">     167 </span>            :   }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   // Compress the ping using gzip.
+<span class="lineNum">     170 </span><span class="lineCov">          1 :   string gzipPing(GzipCompress(ping));</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :   // In the unlikely event of failure to gzip-compress the ping, don't
+<span class="lineNum">     173 </span>            :   // attempt to send it uncompressed: Telemetry will pick it up and send
+<span class="lineNum">     174 </span>            :   // it compressed.
+<span class="lineNum">     175 </span><span class="lineCov">          1 :   if (gzipPing.empty()) {</span>
+<span class="lineNum">     176 </span>            :     PINGSENDER_LOG(&quot;ERROR: Ping compression failed\n&quot;);
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span>
+<span class="lineNum">     178 </span>            :   }
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineCov">          1 :   if (!Post(url, gzipPing)) {</span>
+<span class="lineNum">     181 </span><span class="lineCov">          1 :     exit(EXIT_FAILURE);</span>
+<span class="lineNum">     182 </span>            :   }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   // If the ping was successfully sent, delete the file.
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   if (!pingPath.empty() &amp;&amp; std::remove(pingPath.c_str())) {</span>
+<span class="lineNum">     186 </span>            :     // We failed to remove the pending ping file.
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :     exit(EXIT_FAILURE);</span>
+<span class="lineNum">     188 </span>            :   }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   exit(EXIT_SUCCESS);</span>
+<span class="lineNum">     191 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
