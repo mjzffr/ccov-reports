@@ -1,0 +1,1582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - js/src/vm/RegExpObject.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">js/src/vm</a> - RegExpObject.cpp<span style="font-size: 80%;"> (source / <a href="RegExpObject.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">181</td>
+            <td class="headerCovTableEntry">376</td>
+            <td class="headerCovTableEntryLo">48.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntry">48</td>
+            <td class="headerCovTableEntryLo">60.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-</a>
+<span class="lineNum">       2 </span>            :  * vim: set ts=8 sts=4 et sw=4 tw=99:
+<span class="lineNum">       3 </span>            :  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &quot;vm/RegExpObject.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;mozilla/MemoryReporting.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/PodOperations.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;jshashutil.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;jsstr.h&quot;
+<span class="lineNum">      14 </span>            : #ifdef DEBUG
+<span class="lineNum">      15 </span>            : #include &quot;jsutil.h&quot;
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &quot;builtin/RegExp.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;frontend/TokenStream.h&quot;
+<span class="lineNum">      20 </span>            : #ifdef DEBUG
+<span class="lineNum">      21 </span>            : #include &quot;irregexp/RegExpBytecode.h&quot;
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : #include &quot;irregexp/RegExpParser.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;vm/MatchPairs.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;vm/RegExpStatics.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;vm/StringBuffer.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;vm/TraceLogging.h&quot;
+<span class="lineNum">      28 </span>            : #ifdef DEBUG
+<span class="lineNum">      29 </span>            : #include &quot;vm/Unicode.h&quot;
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : #include &quot;vm/Xdr.h&quot;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #include &quot;jsobjinlines.h&quot;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #include &quot;vm/NativeObject-inl.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;vm/Shape-inl.h&quot;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : using namespace js;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : using mozilla::ArrayLength;
+<span class="lineNum">      41 </span>            : using mozilla::DebugOnly;
+<span class="lineNum">      42 </span>            : using mozilla::Maybe;
+<span class="lineNum">      43 </span>            : using mozilla::PodCopy;
+<span class="lineNum">      44 </span>            : using js::frontend::TokenStream;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : using JS::AutoCheckCannotGC;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : JS_STATIC_ASSERT(IgnoreCaseFlag == JSREG_FOLD);
+<span class="lineNum">      49 </span>            : JS_STATIC_ASSERT(GlobalFlag == JSREG_GLOB);
+<span class="lineNum">      50 </span>            : JS_STATIC_ASSERT(MultilineFlag == JSREG_MULTILINE);
+<span class="lineNum">      51 </span>            : JS_STATIC_ASSERT(StickyFlag == JSREG_STICKY);
+<span class="lineNum">      52 </span>            : JS_STATIC_ASSERT(UnicodeFlag == JSREG_UNICODE);
+<a name="53"><span class="lineNum">      53 </span>            : </a>
+<span class="lineNum">      54 </span>            : RegExpObject*
+<span class="lineNum">      55 </span><span class="lineCov">        180 : js::RegExpAlloc(JSContext* cx, HandleObject proto /* = nullptr */)</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :     // Note: RegExp objects are always allocated in the tenured heap. This is
+<span class="lineNum">      58 </span>            :     // not strictly required, but simplifies embedding them in jitcode.
+<span class="lineNum">      59 </span>            :     Rooted&lt;RegExpObject*&gt; regexp(cx);
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">        540 :     regexp = NewObjectWithClassProto&lt;RegExpObject&gt;(cx, proto, TenuredObject);</span>
+<span class="lineNum">      62 </span><span class="lineCov">        180 :     if (!regexp)</span>
+<span class="lineNum">      63 </span>            :         return nullptr;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">        180 :     regexp-&gt;initPrivate(nullptr);</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">        180 :     if (!EmptyShape::ensureInitialCustomShape&lt;RegExpObject&gt;(cx, regexp))</span>
+<span class="lineNum">      68 </span>            :         return nullptr;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     MOZ_ASSERT(regexp-&gt;lookupPure(cx-&gt;names().lastIndex)-&gt;slot() ==
+<span class="lineNum">      71 </span>            :                RegExpObject::lastIndexSlot());
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">        180 :     return regexp;</span>
+<span class="lineNum">      74 </span>            : }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : /* MatchPairs */
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span>            : bool
+<span class="lineNum">      79 </span><span class="lineCov">         58 : MatchPairs::initArrayFrom(MatchPairs&amp; copyFrom)</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span>            :     MOZ_ASSERT(copyFrom.pairCount() &gt; 0);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">        116 :     if (!allocOrExpandArray(copyFrom.pairCount()))</span>
+<span class="lineNum">      84 </span>            :         return false;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">         58 :     PodCopy(pairs_, copyFrom.pairs_, pairCount_);</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     return true;
+<span class="lineNum">      89 </span>            : }
+<a name="90"><span class="lineNum">      90 </span>            : </a>
+<span class="lineNum">      91 </span>            : bool
+<span class="lineNum">      92 </span><span class="lineCov">         66 : ScopedMatchPairs::allocOrExpandArray(size_t pairCount)</span>
+<span class="lineNum">      93 </span>            : {
+<span class="lineNum">      94 </span>            :     /* Array expansion is forbidden, but array reuse is acceptable. */
+<span class="lineNum">      95 </span><span class="lineCov">         66 :     if (pairCount_) {</span>
+<span class="lineNum">      96 </span>            :         MOZ_ASSERT(pairs_);
+<span class="lineNum">      97 </span>            :         MOZ_ASSERT(pairCount_ == pairCount);
+<span class="lineNum">      98 </span>            :         return true;
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     MOZ_ASSERT(!pairs_);
+<span class="lineNum">     102 </span><span class="lineCov">        132 :     pairs_ = (MatchPair*)lifoScope_.alloc().alloc(sizeof(MatchPair) * pairCount);</span>
+<span class="lineNum">     103 </span><span class="lineCov">         66 :     if (!pairs_)</span>
+<span class="lineNum">     104 </span>            :         return false;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">         66 :     pairCount_ = pairCount;</span>
+<span class="lineNum">     107 </span><span class="lineCov">         66 :     return true;</span>
+<span class="lineNum">     108 </span>            : }
+<a name="109"><span class="lineNum">     109 </span>            : </a>
+<span class="lineNum">     110 </span>            : bool
+<span class="lineNum">     111 </span><span class="lineCov">         58 : VectorMatchPairs::allocOrExpandArray(size_t pairCount)</span>
+<span class="lineNum">     112 </span>            : {
+<span class="lineNum">     113 </span><span class="lineCov">        116 :     if (!vec_.resizeUninitialized(sizeof(MatchPair) * pairCount))</span>
+<span class="lineNum">     114 </span>            :         return false;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">        116 :     pairs_ = &amp;vec_[0];</span>
+<span class="lineNum">     117 </span><span class="lineCov">         58 :     pairCount_ = pairCount;</span>
+<span class="lineNum">     118 </span><span class="lineCov">         58 :     return true;</span>
+<span class="lineNum">     119 </span>            : }
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : /* RegExpObject */
+<a name="122"><span class="lineNum">     122 </span>            : </a>
+<span class="lineNum">     123 </span>            : /* static */ bool
+<span class="lineNum">     124 </span><span class="lineCov">         88 : RegExpObject::getShared(JSContext* cx, Handle&lt;RegExpObject*&gt; regexp,</span>
+<span class="lineNum">     125 </span>            :                         MutableHandleRegExpShared shared)
+<span class="lineNum">     126 </span>            : {
+<span class="lineNum">     127 </span><span class="lineCov">        176 :     if (regexp-&gt;hasShared()) {</span>
+<span class="lineNum">     128 </span><span class="lineCov">        234 :         shared.set(regexp-&gt;sharedRef());</span>
+<span class="lineNum">     129 </span><span class="lineCov">         78 :         return true;</span>
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">         10 :     return createShared(cx, regexp, shared);</span>
+<span class="lineNum">     133 </span>            : }
+<a name="134"><span class="lineNum">     134 </span>            : </a>
+<span class="lineNum">     135 </span>            : /* static */ bool
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 : RegExpObject::isOriginalFlagGetter(JSNative native, RegExpFlag* mask)</span>
+<span class="lineNum">     137 </span>            : {
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   if (native == regexp_global) {</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       *mask = GlobalFlag;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     141 </span>            :   }
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   if (native == regexp_ignoreCase) {</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       *mask = IgnoreCaseFlag;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     145 </span>            :   }
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :   if (native == regexp_multiline) {</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       *mask = MultilineFlag;</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     149 </span>            :   }
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   if (native == regexp_sticky) {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       *mask = StickyFlag;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     153 </span>            :   }
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   if (native == regexp_unicode) {</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :       *mask = UnicodeFlag;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     157 </span>            :   }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   return false;
+<span class="lineNum">     160 </span>            : }
+<a name="161"><span class="lineNum">     161 </span>            : </a>
+<span class="lineNum">     162 </span>            : /* static */ void
+<span class="lineNum">     163 </span><span class="lineCov">        120 : RegExpObject::trace(JSTracer* trc, JSObject* obj)</span>
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span><span class="lineCov">        120 :     obj-&gt;as&lt;RegExpObject&gt;().trace(trc);</span>
+<span class="lineNum">     166 </span><span class="lineCov">        120 : }</span>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : static inline bool
+<span class="lineNum">     169 </span>            : IsMarkingTrace(JSTracer* trc)
+<span class="lineNum">     170 </span>            : {
+<span class="lineNum">     171 </span>            :     // Determine whether tracing is happening during normal marking.  We need to
+<span class="lineNum">     172 </span>            :     // test all the following conditions, since:
+<span class="lineNum">     173 </span>            :     //
+<span class="lineNum">     174 </span>            :     //   1. During TraceRuntime, CurrentThreadIsHeapBusy() is true, but the
+<span class="lineNum">     175 </span>            :     //      tracer might not be a marking tracer.
+<span class="lineNum">     176 </span>            :     //   2. When a write barrier executes, IsMarkingTracer is true, but
+<a name="177"><span class="lineNum">     177 </span>            :     //      CurrentThreadIsHeapBusy() will be false.</a>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">        240 :     return JS::CurrentThreadIsHeapCollecting() &amp;&amp; trc-&gt;isMarkingTracer();</span>
+<span class="lineNum">     180 </span>            : }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            : void
+<span class="lineNum">     183 </span><span class="lineCov">        120 : RegExpObject::trace(JSTracer* trc)</span>
+<span class="lineNum">     184 </span>            : {
+<span class="lineNum">     185 </span>            :     // When marking the object normally we have the option of unlinking the
+<span class="lineNum">     186 </span>            :     // object from its RegExpShared so that the RegExpShared may be collected.
+<span class="lineNum">     187 </span><span class="lineCov">        360 :     if (IsMarkingTrace(trc) &amp;&amp; !zone()-&gt;isPreservingCode())</span>
+<span class="lineNum">     188 </span><span class="lineCov">        240 :         sharedRef() = nullptr;</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">        120 :     TraceNullableEdge(trc, &amp;sharedRef(), &quot;RegExpObject shared&quot;);</span>
+<span class="lineNum">     191 </span><span class="lineCov">        120 : }</span>
+<a name="192"><span class="lineNum">     192 </span>            : </a>
+<span class="lineNum">     193 </span>            : static JSObject*
+<span class="lineNum">     194 </span><span class="lineCov">        120 : CreateRegExpPrototype(JSContext* cx, JSProtoKey key)</span>
+<span class="lineNum">     195 </span>            : {
+<span class="lineNum">     196 </span><span class="lineCov">        120 :     return GlobalObject::createBlankPrototype(cx, cx-&gt;global(), &amp;RegExpObject::protoClass_);</span>
+<span class="lineNum">     197 </span>            : }
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : static const ClassOps RegExpObjectClassOps = {
+<span class="lineNum">     200 </span>            :     nullptr, /* addProperty */
+<span class="lineNum">     201 </span>            :     nullptr, /* delProperty */
+<span class="lineNum">     202 </span>            :     nullptr, /* getProperty */
+<span class="lineNum">     203 </span>            :     nullptr, /* setProperty */
+<span class="lineNum">     204 </span>            :     nullptr, /* enumerate */
+<span class="lineNum">     205 </span>            :     nullptr, /* resolve */
+<span class="lineNum">     206 </span>            :     nullptr, /* mayResolve */
+<span class="lineNum">     207 </span>            :     nullptr, /* finalize */
+<span class="lineNum">     208 </span>            :     nullptr, /* call */
+<span class="lineNum">     209 </span>            :     nullptr, /* hasInstance */
+<span class="lineNum">     210 </span>            :     nullptr, /* construct */
+<span class="lineNum">     211 </span>            :     RegExpObject::trace,
+<span class="lineNum">     212 </span>            : };
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : static const ClassSpec RegExpObjectClassSpec = {
+<span class="lineNum">     215 </span>            :     GenericCreateConstructor&lt;js::regexp_construct, 2, gc::AllocKind::FUNCTION&gt;,
+<span class="lineNum">     216 </span>            :     CreateRegExpPrototype,
+<span class="lineNum">     217 </span>            :     nullptr,
+<span class="lineNum">     218 </span>            :     js::regexp_static_props,
+<span class="lineNum">     219 </span>            :     js::regexp_methods,
+<span class="lineNum">     220 </span>            :     js::regexp_properties
+<span class="lineNum">     221 </span>            : };
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : const Class RegExpObject::class_ = {
+<span class="lineNum">     224 </span>            :     js_RegExp_str,
+<span class="lineNum">     225 </span>            :     JSCLASS_HAS_PRIVATE |
+<span class="lineNum">     226 </span>            :     JSCLASS_HAS_RESERVED_SLOTS(RegExpObject::RESERVED_SLOTS) |
+<span class="lineNum">     227 </span>            :     JSCLASS_HAS_CACHED_PROTO(JSProto_RegExp),
+<span class="lineNum">     228 </span>            :     &amp;RegExpObjectClassOps,
+<span class="lineNum">     229 </span>            :     &amp;RegExpObjectClassSpec
+<span class="lineNum">     230 </span>            : };
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            : const Class RegExpObject::protoClass_ = {
+<span class="lineNum">     233 </span>            :     js_Object_str,
+<span class="lineNum">     234 </span>            :     JSCLASS_HAS_CACHED_PROTO(JSProto_RegExp),
+<span class="lineNum">     235 </span>            :     JS_NULL_CLASS_OPS,
+<span class="lineNum">     236 </span>            :     &amp;RegExpObjectClassSpec
+<span class="lineNum">     237 </span>            : };
+<a name="238"><span class="lineNum">     238 </span>            : </a>
+<span class="lineNum">     239 </span>            : RegExpObject*
+<span class="lineNum">     240 </span><span class="lineCov">        180 : RegExpObject::create(JSContext* cx, const char16_t* chars, size_t length, RegExpFlag flags,</span>
+<span class="lineNum">     241 </span>            :                      TokenStream* tokenStream, LifoAlloc&amp; alloc)
+<span class="lineNum">     242 </span>            : {
+<span class="lineNum">     243 </span><span class="lineCov">        360 :     RootedAtom source(cx, AtomizeChars(cx, chars, length));</span>
+<span class="lineNum">     244 </span><span class="lineCov">        180 :     if (!source)</span>
+<span class="lineNum">     245 </span>            :         return nullptr;
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span><span class="lineCov">        360 :     return create(cx, source, flags, tokenStream, alloc);</span>
+<span class="lineNum">     248 </span>            : }
+<a name="249"><span class="lineNum">     249 </span>            : </a>
+<span class="lineNum">     250 </span>            : RegExpObject*
+<span class="lineNum">     251 </span><span class="lineCov">        180 : RegExpObject::create(JSContext* cx, HandleAtom source, RegExpFlag flags,</span>
+<span class="lineNum">     252 </span>            :                      TokenStream* tokenStream, LifoAlloc&amp; alloc)
+<span class="lineNum">     253 </span>            : {
+<span class="lineNum">     254 </span>            :     Maybe&lt;CompileOptions&gt; dummyOptions;
+<span class="lineNum">     255 </span>            :     Maybe&lt;TokenStream&gt; dummyTokenStream;
+<span class="lineNum">     256 </span><span class="lineCov">        180 :     if (!tokenStream) {</span>
+<span class="lineNum">     257 </span>            :         dummyOptions.emplace(cx);
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :         dummyTokenStream.emplace(cx, *dummyOptions,</span>
+<span class="lineNum">     259 </span>            :                                    (const char16_t*) nullptr, 0,
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                                    (frontend::StrictModeGetter*) nullptr);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :         tokenStream = dummyTokenStream.ptr();</span>
+<span class="lineNum">     262 </span>            :     }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">        360 :     if (!irregexp::ParsePatternSyntax(*tokenStream, alloc, source, flags &amp; UnicodeFlag))</span>
+<span class="lineNum">     265 </span>            :         return nullptr;
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineCov">        360 :     Rooted&lt;RegExpObject*&gt; regexp(cx, RegExpAlloc(cx));</span>
+<span class="lineNum">     268 </span><span class="lineCov">        180 :     if (!regexp)</span>
+<span class="lineNum">     269 </span>            :         return nullptr;
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">        180 :     regexp-&gt;initAndZeroLastIndex(source, flags, cx);</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">        180 :     return regexp;</span>
+<span class="lineNum">     274 </span>            : }
+<a name="275"><span class="lineNum">     275 </span>            : </a>
+<span class="lineNum">     276 </span>            : /* static */ bool
+<span class="lineNum">     277 </span><span class="lineCov">         10 : RegExpObject::createShared(JSContext* cx, Handle&lt;RegExpObject*&gt; regexp,</span>
+<span class="lineNum">     278 </span>            :                            MutableHandleRegExpShared shared)
+<span class="lineNum">     279 </span>            : {
+<span class="lineNum">     280 </span>            :     MOZ_ASSERT(!regexp-&gt;hasShared());
+<span class="lineNum">     281 </span><span class="lineCov">         30 :     RootedAtom source(cx, regexp-&gt;getSource());</span>
+<span class="lineNum">     282 </span><span class="lineCov">         40 :     if (!cx-&gt;compartment()-&gt;regExps.get(cx, source, regexp-&gt;getFlags(), shared))</span>
+<span class="lineNum">     283 </span>            :         return false;
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">         10 :     regexp-&gt;setShared(*shared);</span>
+<span class="lineNum">     286 </span><span class="lineCov">         10 :     return true;</span>
+<span class="lineNum">     287 </span>            : }
+<a name="288"><span class="lineNum">     288 </span>            : </a>
+<span class="lineNum">     289 </span>            : Shape*
+<span class="lineNum">     290 </span><span class="lineCov">        120 : RegExpObject::assignInitialShape(JSContext* cx, Handle&lt;RegExpObject*&gt; self)</span>
+<span class="lineNum">     291 </span>            : {
+<span class="lineNum">     292 </span>            :     MOZ_ASSERT(self-&gt;empty());
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :     JS_STATIC_ASSERT(LAST_INDEX_SLOT == 0);
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :     /* The lastIndex property alone is writable but non-configurable. */
+<span class="lineNum">     297 </span>            :     return NativeObject::addDataProperty(cx, self, cx-&gt;names().lastIndex, LAST_INDEX_SLOT,
+<span class="lineNum">     298 </span><span class="lineCov">        240 :                                          JSPROP_PERMANENT);</span>
+<span class="lineNum">     299 </span>            : }
+<a name="300"><span class="lineNum">     300 </span>            : </a>
+<span class="lineNum">     301 </span>            : void
+<span class="lineNum">     302 </span><span class="lineCov">        202 : RegExpObject::initIgnoringLastIndex(HandleAtom source, RegExpFlag flags)</span>
+<span class="lineNum">     303 </span>            : {
+<span class="lineNum">     304 </span>            :     // If this is a re-initialization with an existing RegExpShared, 'flags'
+<span class="lineNum">     305 </span>            :     // may not match getShared()-&gt;flags, so forget the RegExpShared.
+<span class="lineNum">     306 </span><span class="lineCov">        202 :     NativeObject::setPrivate(nullptr);</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">        202 :     setSource(source);</span>
+<span class="lineNum">     309 </span><span class="lineCov">        202 :     setFlags(flags);</span>
+<span class="lineNum">     310 </span><span class="lineCov">        202 : }</span>
+<a name="311"><span class="lineNum">     311 </span>            : </a>
+<span class="lineNum">     312 </span>            : void
+<span class="lineNum">     313 </span><span class="lineCov">        202 : RegExpObject::initAndZeroLastIndex(HandleAtom source, RegExpFlag flags, JSContext* cx)</span>
+<span class="lineNum">     314 </span>            : {
+<span class="lineNum">     315 </span><span class="lineCov">        202 :     initIgnoringLastIndex(source, flags);</span>
+<span class="lineNum">     316 </span><span class="lineCov">        202 :     zeroLastIndex(cx);</span>
+<span class="lineNum">     317 </span><span class="lineCov">        202 : }</span>
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            : static MOZ_ALWAYS_INLINE bool
+<a name="320"><span class="lineNum">     320 </span>            : IsLineTerminator(const JS::Latin1Char c)</a>
+<span class="lineNum">     321 </span>            : {
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :     return c == '\n' || c == '\r';</span>
+<span class="lineNum">     323 </span>            : }
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            : static MOZ_ALWAYS_INLINE bool
+<a name="326"><span class="lineNum">     326 </span>            : IsLineTerminator(const char16_t c)</a>
+<span class="lineNum">     327 </span>            : {
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     return c == '\n' || c == '\r' || c == 0x2028 || c == 0x2029;</span>
+<span class="lineNum">     329 </span>            : }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     332 </span>            : AppendEscapedLineTerminator(StringBuffer&amp; sb, const JS::Latin1Char c)
+<span class="lineNum">     333 </span>            : {
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :     switch (c) {</span>
+<span class="lineNum">     335 </span>            :       case '\n':
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         if (!sb.append('n'))</span>
+<span class="lineNum">     337 </span>            :             return false;
+<span class="lineNum">     338 </span>            :         break;
+<span class="lineNum">     339 </span>            :       case '\r':
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :         if (!sb.append('r'))</span>
+<span class="lineNum">     341 </span>            :             return false;
+<span class="lineNum">     342 </span>            :         break;
+<span class="lineNum">     343 </span>            :       default:
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :         MOZ_CRASH(&quot;Bad LineTerminator&quot;);</span>
+<span class="lineNum">     345 </span>            :     }
+<span class="lineNum">     346 </span>            :     return true;
+<span class="lineNum">     347 </span>            : }
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     350 </span>            : AppendEscapedLineTerminator(StringBuffer&amp; sb, const char16_t c)
+<span class="lineNum">     351 </span>            : {
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :     switch (c) {</span>
+<span class="lineNum">     353 </span>            :       case '\n':
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :         if (!sb.append('n'))</span>
+<span class="lineNum">     355 </span>            :             return false;
+<span class="lineNum">     356 </span>            :         break;
+<span class="lineNum">     357 </span>            :       case '\r':
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         if (!sb.append('r'))</span>
+<span class="lineNum">     359 </span>            :             return false;
+<span class="lineNum">     360 </span>            :         break;
+<span class="lineNum">     361 </span>            :       case 0x2028:
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :         if (!sb.append(&quot;u2028&quot;))</span>
+<span class="lineNum">     363 </span>            :             return false;
+<span class="lineNum">     364 </span>            :         break;
+<span class="lineNum">     365 </span>            :       case 0x2029:
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :         if (!sb.append(&quot;u2029&quot;))</span>
+<span class="lineNum">     367 </span>            :             return false;
+<span class="lineNum">     368 </span>            :         break;
+<span class="lineNum">     369 </span>            :       default:
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :         MOZ_CRASH(&quot;Bad LineTerminator&quot;);</span>
+<span class="lineNum">     371 </span>            :     }
+<span class="lineNum">     372 </span>            :     return true;
+<span class="lineNum">     373 </span>            : }
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            : template &lt;typename CharT&gt;
+<span class="lineNum">     376 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     377 </span>            : SetupBuffer(StringBuffer&amp; sb, const CharT* oldChars, size_t oldLen, const CharT* it)
+<span class="lineNum">     378 </span>            : {
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :     if (mozilla::IsSame&lt;CharT, char16_t&gt;::value &amp;&amp; !sb.ensureTwoByteChars())</span>
+<span class="lineNum">     380 </span>            :         return false;
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :     if (!sb.reserve(oldLen + 1))</span>
+<span class="lineNum">     383 </span>            :         return false;
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :     sb.infallibleAppend(oldChars, size_t(it - oldChars));</span>
+<span class="lineNum">     386 </span>            :     return true;
+<span class="lineNum">     387 </span>            : }
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            : // Note: leaves the string buffer empty if no escaping need be performed.
+<span class="lineNum">     390 </span>            : template &lt;typename CharT&gt;
+<span class="lineNum">     391 </span>            : static bool
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 : EscapeRegExpPattern(StringBuffer&amp; sb, const CharT* oldChars, size_t oldLen)</span>
+<span class="lineNum">     393 </span>            : {
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     bool inBrackets = false;</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :     bool previousCharacterWasBackslash = false;</span>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :     for (const CharT* it = oldChars; it &lt; oldChars + oldLen; ++it) {</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :         CharT ch = *it;</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :         if (!previousCharacterWasBackslash) {</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :             if (inBrackets) {</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :                 if (ch == ']')</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :                     inBrackets = false;</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :             } else if (ch == '/') {</span>
+<span class="lineNum">     404 </span>            :                 // There's a forward slash that needs escaping.
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :                 if (sb.empty()) {</span>
+<span class="lineNum">     406 </span>            :                     // This is the first char we've seen that needs escaping,
+<span class="lineNum">     407 </span>            :                     // copy everything up to this point.
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :                     if (!SetupBuffer(sb, oldChars, oldLen, it))</span>
+<span class="lineNum">     409 </span>            :                         return false;
+<span class="lineNum">     410 </span>            :                 }
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                 if (!sb.append('\\'))</span>
+<span class="lineNum">     412 </span>            :                     return false;
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :             } else if (ch == '[') {</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :                 inBrackets = true;</span>
+<span class="lineNum">     415 </span>            :             }
+<span class="lineNum">     416 </span>            :         }
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :         if (IsLineTerminator(ch)) {</span>
+<span class="lineNum">     419 </span>            :             // There's LineTerminator that needs escaping.
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :             if (sb.empty()) {</span>
+<span class="lineNum">     421 </span>            :                 // This is the first char we've seen that needs escaping,
+<span class="lineNum">     422 </span>            :                 // copy everything up to this point.
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :                 if (!SetupBuffer(sb, oldChars, oldLen, it))</span>
+<span class="lineNum">     424 </span>            :                     return false;
+<span class="lineNum">     425 </span>            :             }
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :             if (!previousCharacterWasBackslash) {</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :                 if (!sb.append('\\'))</span>
+<span class="lineNum">     428 </span>            :                     return false;
+<span class="lineNum">     429 </span>            :             }
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :             if (!AppendEscapedLineTerminator(sb, ch))</span>
+<span class="lineNum">     431 </span>            :                 return false;
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :         } else if (!sb.empty()) {</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :             if (!sb.append(ch))</span>
+<span class="lineNum">     434 </span>            :                 return false;
+<span class="lineNum">     435 </span>            :         }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :         if (previousCharacterWasBackslash)</span>
+<span class="lineNum">     438 </span>            :             previousCharacterWasBackslash = false;
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :         else if (ch == '\\')</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :             previousCharacterWasBackslash = true;</span>
+<span class="lineNum">     441 </span>            :     }
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :     return true;
+<span class="lineNum">     444 </span>            : }
+<span class="lineNum">     445 </span>            : 
+<a name="446"><span class="lineNum">     446 </span>            : // ES6 draft rev32 21.2.3.2.4.</a>
+<span class="lineNum">     447 </span>            : JSAtom*
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 : js::EscapeRegExpPattern(JSContext* cx, HandleAtom src)</span>
+<span class="lineNum">     449 </span>            : {
+<span class="lineNum">     450 </span>            :     // Step 2.
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :     if (src-&gt;length() == 0)</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :         return cx-&gt;names().emptyRegExp;</span>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            :     // We may never need to use |sb|. Start using it lazily.
+<span class="lineNum">     455 </span>            :     StringBuffer sb(cx);
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :     if (src-&gt;hasLatin1Chars()) {</span>
+<span class="lineNum">     458 </span>            :         JS::AutoCheckCannotGC nogc;
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :         if (!::EscapeRegExpPattern(sb, src-&gt;latin1Chars(nogc), src-&gt;length()))</span>
+<span class="lineNum">     460 </span>            :             return nullptr;
+<span class="lineNum">     461 </span>            :     } else {
+<span class="lineNum">     462 </span>            :         JS::AutoCheckCannotGC nogc;
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :         if (!::EscapeRegExpPattern(sb, src-&gt;twoByteChars(nogc), src-&gt;length()))</span>
+<span class="lineNum">     464 </span>            :             return nullptr;
+<span class="lineNum">     465 </span>            :     }
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :     // Step 3.
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :     return sb.empty() ? src : sb.finishAtom();</span>
+<span class="lineNum">     469 </span>            : }
+<span class="lineNum">     470 </span>            : 
+<a name="471"><span class="lineNum">     471 </span>            : // ES6 draft rev32 21.2.5.14. Optimized for RegExpObject.</a>
+<span class="lineNum">     472 </span>            : JSFlatString*
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 : RegExpObject::toString(JSContext* cx) const</span>
+<span class="lineNum">     474 </span>            : {
+<span class="lineNum">     475 </span>            :     // Steps 3-4.
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :     RootedAtom src(cx, getSource());</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :     if (!src)</span>
+<span class="lineNum">     478 </span>            :         return nullptr;
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :     RootedAtom escapedSrc(cx, EscapeRegExpPattern(cx, src));</span>
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            :     // Step 7.
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     StringBuffer sb(cx);</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :     size_t len = escapedSrc-&gt;length();</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :     if (!sb.reserve(len + 2))</span>
+<span class="lineNum">     485 </span>            :         return nullptr;
+<span class="lineNum">     486 </span>            :     sb.infallibleAppend('/');
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :     if (!sb.append(escapedSrc))</span>
+<span class="lineNum">     488 </span>            :         return nullptr;
+<span class="lineNum">     489 </span>            :     sb.infallibleAppend('/');
+<span class="lineNum">     490 </span>            : 
+<span class="lineNum">     491 </span>            :     // Steps 5-7.
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :     if (global() &amp;&amp; !sb.append('g'))</span>
+<span class="lineNum">     493 </span>            :         return nullptr;
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :     if (ignoreCase() &amp;&amp; !sb.append('i'))</span>
+<span class="lineNum">     495 </span>            :         return nullptr;
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     if (multiline() &amp;&amp; !sb.append('m'))</span>
+<span class="lineNum">     497 </span>            :         return nullptr;
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :     if (unicode() &amp;&amp; !sb.append('u'))</span>
+<span class="lineNum">     499 </span>            :         return nullptr;
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :     if (sticky() &amp;&amp; !sb.append('y'))</span>
+<span class="lineNum">     501 </span>            :         return nullptr;
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :     return sb.finishString();</span>
+<span class="lineNum">     504 </span>            : }
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            : #ifdef DEBUG
+<span class="lineNum">     507 </span>            : /* static */ bool
+<span class="lineNum">     508 </span>            : RegExpShared::dumpBytecode(JSContext* cx, MutableHandleRegExpShared re, bool match_only,
+<span class="lineNum">     509 </span>            :                            HandleLinearString input)
+<span class="lineNum">     510 </span>            : {
+<span class="lineNum">     511 </span>            :     CompilationMode mode = match_only ? MatchOnly : Normal;
+<span class="lineNum">     512 </span>            :     if (!RegExpShared::compileIfNecessary(cx, re, input, mode, ForceByteCode))
+<span class="lineNum">     513 </span>            :         return false;
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            :     const uint8_t* byteCode = re-&gt;compilation(mode, input-&gt;hasLatin1Chars()).byteCode;
+<span class="lineNum">     516 </span>            :     const uint8_t* pc = byteCode;
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            :     auto Load32Aligned = [](const uint8_t* pc) -&gt; int32_t {
+<span class="lineNum">     519 </span>            :         MOZ_ASSERT((reinterpret_cast&lt;uintptr_t&gt;(pc) &amp; 3) == 0);
+<span class="lineNum">     520 </span>            :         return *reinterpret_cast&lt;const int32_t*&gt;(pc);
+<span class="lineNum">     521 </span>            :     };
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span>            :     auto Load16Aligned = [](const uint8_t* pc) -&gt; int32_t {
+<span class="lineNum">     524 </span>            :         MOZ_ASSERT((reinterpret_cast&lt;uintptr_t&gt;(pc) &amp; 1) == 0);
+<span class="lineNum">     525 </span>            :         return *reinterpret_cast&lt;const uint16_t*&gt;(pc);
+<span class="lineNum">     526 </span>            :     };
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span>            :     int32_t numRegisters = Load32Aligned(pc);
+<span class="lineNum">     529 </span>            :     fprintf(stderr, &quot;numRegisters: %d\n&quot;, numRegisters);
+<span class="lineNum">     530 </span>            :     pc += 4;
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :     fprintf(stderr, &quot;loc     op\n&quot;);
+<span class="lineNum">     533 </span>            :     fprintf(stderr, &quot;-----   --\n&quot;);
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            :     auto DumpLower = [](const char* text) {
+<span class="lineNum">     536 </span>            :         while (*text) {
+<span class="lineNum">     537 </span>            :             fprintf(stderr, &quot;%c&quot;, unicode::ToLowerCase(*text));
+<span class="lineNum">     538 </span>            :             text++;
+<span class="lineNum">     539 </span>            :         }
+<span class="lineNum">     540 </span>            :     };
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : #define BYTECODE(NAME) \
+<span class="lineNum">     543 </span>            :     case irregexp::BC_##NAME: \
+<span class="lineNum">     544 </span>            :       DumpLower(#NAME);
+<span class="lineNum">     545 </span>            : #define ADVANCE(NAME) \
+<span class="lineNum">     546 </span>            :     fprintf(stderr, &quot;\n&quot;); \
+<span class="lineNum">     547 </span>            :     pc += irregexp::BC_##NAME##_LENGTH; \
+<span class="lineNum">     548 </span>            :     maxPc = js::Max(maxPc, pc); \
+<span class="lineNum">     549 </span>            :     break;
+<span class="lineNum">     550 </span>            : #define STOP(NAME) \
+<span class="lineNum">     551 </span>            :     fprintf(stderr, &quot;\n&quot;); \
+<span class="lineNum">     552 </span>            :     pc += irregexp::BC_##NAME##_LENGTH; \
+<span class="lineNum">     553 </span>            :     break;
+<span class="lineNum">     554 </span>            : #define JUMP(NAME, OFFSET) \
+<span class="lineNum">     555 </span>            :     fprintf(stderr, &quot;\n&quot;); \
+<span class="lineNum">     556 </span>            :     maxPc = js::Max(maxPc, byteCode + OFFSET); \
+<span class="lineNum">     557 </span>            :     pc += irregexp::BC_##NAME##_LENGTH; \
+<span class="lineNum">     558 </span>            :     break;
+<span class="lineNum">     559 </span>            : #define BRANCH(NAME, OFFSET) \
+<span class="lineNum">     560 </span>            :     fprintf(stderr, &quot;\n&quot;); \
+<span class="lineNum">     561 </span>            :     pc += irregexp::BC_##NAME##_LENGTH; \
+<span class="lineNum">     562 </span>            :     maxPc = js::Max(maxPc, js::Max(pc, byteCode + OFFSET)); \
+<span class="lineNum">     563 </span>            :     break;
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            :     // Bytecode has no end marker, we need to calculate the bytecode length by
+<span class="lineNum">     566 </span>            :     // tracing jumps and branches.
+<span class="lineNum">     567 </span>            :     const uint8_t* maxPc = pc;
+<span class="lineNum">     568 </span>            :     while (pc &lt;= maxPc) {
+<span class="lineNum">     569 </span>            :         fprintf(stderr, &quot;%05d:  &quot;, int32_t(pc - byteCode));
+<span class="lineNum">     570 </span>            :         int32_t insn = Load32Aligned(pc);
+<span class="lineNum">     571 </span>            :         switch (insn &amp; irregexp::BYTECODE_MASK) {
+<span class="lineNum">     572 </span>            :           BYTECODE(BREAK) {
+<span class="lineNum">     573 </span>            :             STOP(BREAK);
+<span class="lineNum">     574 </span>            :           }
+<span class="lineNum">     575 </span>            :           BYTECODE(PUSH_CP) {
+<span class="lineNum">     576 </span>            :             ADVANCE(PUSH_CP);
+<span class="lineNum">     577 </span>            :           }
+<span class="lineNum">     578 </span>            :           BYTECODE(PUSH_BT) {
+<span class="lineNum">     579 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     580 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     581 </span>            :                     offset);
+<span class="lineNum">     582 </span>            :             // Pushed value is used by POP_BT for jumping.
+<span class="lineNum">     583 </span>            :             // Resolve maxPc here.
+<span class="lineNum">     584 </span>            :             BRANCH(PUSH_BT, offset);
+<span class="lineNum">     585 </span>            :           }
+<span class="lineNum">     586 </span>            :           BYTECODE(PUSH_REGISTER) {
+<span class="lineNum">     587 </span>            :             fprintf(stderr, &quot; reg[%d]&quot;,
+<span class="lineNum">     588 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     589 </span>            :             ADVANCE(PUSH_REGISTER);
+<span class="lineNum">     590 </span>            :           }
+<span class="lineNum">     591 </span>            :           BYTECODE(SET_REGISTER) {
+<span class="lineNum">     592 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     593 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     594 </span>            :                     Load32Aligned(pc + 4));
+<span class="lineNum">     595 </span>            :             ADVANCE(SET_REGISTER);
+<span class="lineNum">     596 </span>            :           }
+<span class="lineNum">     597 </span>            :           BYTECODE(ADVANCE_REGISTER) {
+<span class="lineNum">     598 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     599 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     600 </span>            :                     Load32Aligned(pc + 4));
+<span class="lineNum">     601 </span>            :             ADVANCE(ADVANCE_REGISTER);
+<span class="lineNum">     602 </span>            :           }
+<span class="lineNum">     603 </span>            :           BYTECODE(SET_REGISTER_TO_CP) {
+<span class="lineNum">     604 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     605 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     606 </span>            :                     Load32Aligned(pc + 4));
+<span class="lineNum">     607 </span>            :             ADVANCE(SET_REGISTER_TO_CP);
+<span class="lineNum">     608 </span>            :           }
+<span class="lineNum">     609 </span>            :           BYTECODE(SET_CP_TO_REGISTER) {
+<span class="lineNum">     610 </span>            :             fprintf(stderr, &quot; reg[%d]&quot;,
+<span class="lineNum">     611 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     612 </span>            :             ADVANCE(SET_CP_TO_REGISTER);
+<span class="lineNum">     613 </span>            :           }
+<span class="lineNum">     614 </span>            :           BYTECODE(SET_REGISTER_TO_SP) {
+<span class="lineNum">     615 </span>            :             fprintf(stderr, &quot; reg[%d]&quot;,
+<span class="lineNum">     616 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     617 </span>            :             ADVANCE(SET_REGISTER_TO_SP);
+<span class="lineNum">     618 </span>            :           }
+<span class="lineNum">     619 </span>            :           BYTECODE(SET_SP_TO_REGISTER) {
+<span class="lineNum">     620 </span>            :             fprintf(stderr, &quot; reg[%d]&quot;,
+<span class="lineNum">     621 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     622 </span>            :             ADVANCE(SET_SP_TO_REGISTER);
+<span class="lineNum">     623 </span>            :           }
+<span class="lineNum">     624 </span>            :           BYTECODE(POP_CP) {
+<span class="lineNum">     625 </span>            :             ADVANCE(POP_CP);
+<span class="lineNum">     626 </span>            :           }
+<span class="lineNum">     627 </span>            :           BYTECODE(POP_BT) {
+<span class="lineNum">     628 </span>            :             // Jump is already resolved in PUSH_BT.
+<span class="lineNum">     629 </span>            :             STOP(POP_BT);
+<span class="lineNum">     630 </span>            :           }
+<span class="lineNum">     631 </span>            :           BYTECODE(POP_REGISTER) {
+<span class="lineNum">     632 </span>            :             fprintf(stderr, &quot; reg[%d]&quot;,
+<span class="lineNum">     633 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     634 </span>            :             ADVANCE(POP_REGISTER);
+<span class="lineNum">     635 </span>            :           }
+<span class="lineNum">     636 </span>            :           BYTECODE(FAIL) {
+<span class="lineNum">     637 </span>            :             ADVANCE(FAIL);
+<span class="lineNum">     638 </span>            :           }
+<span class="lineNum">     639 </span>            :           BYTECODE(SUCCEED) {
+<span class="lineNum">     640 </span>            :             ADVANCE(SUCCEED);
+<span class="lineNum">     641 </span>            :           }
+<span class="lineNum">     642 </span>            :           BYTECODE(ADVANCE_CP) {
+<span class="lineNum">     643 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     644 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     645 </span>            :             ADVANCE(ADVANCE_CP);
+<span class="lineNum">     646 </span>            :           }
+<span class="lineNum">     647 </span>            :           BYTECODE(GOTO) {
+<span class="lineNum">     648 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     649 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     650 </span>            :                     offset);
+<span class="lineNum">     651 </span>            :             JUMP(GOTO, offset);
+<span class="lineNum">     652 </span>            :           }
+<span class="lineNum">     653 </span>            :           BYTECODE(ADVANCE_CP_AND_GOTO) {
+<span class="lineNum">     654 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     655 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     656 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     657 </span>            :                     offset);
+<span class="lineNum">     658 </span>            :             JUMP(ADVANCE_CP_AND_GOTO, offset);
+<span class="lineNum">     659 </span>            :           }
+<span class="lineNum">     660 </span>            :           BYTECODE(CHECK_GREEDY) {
+<span class="lineNum">     661 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     662 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     663 </span>            :                     offset);
+<span class="lineNum">     664 </span>            :             BRANCH(CHECK_GREEDY, offset);
+<span class="lineNum">     665 </span>            :           }
+<span class="lineNum">     666 </span>            :           BYTECODE(LOAD_CURRENT_CHAR) {
+<span class="lineNum">     667 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     668 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     669 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     670 </span>            :                     offset);
+<span class="lineNum">     671 </span>            :             BRANCH(LOAD_CURRENT_CHAR, offset);
+<span class="lineNum">     672 </span>            :           }
+<span class="lineNum">     673 </span>            :           BYTECODE(LOAD_CURRENT_CHAR_UNCHECKED) {
+<span class="lineNum">     674 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     675 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     676 </span>            :             ADVANCE(LOAD_CURRENT_CHAR_UNCHECKED);
+<span class="lineNum">     677 </span>            :           }
+<span class="lineNum">     678 </span>            :           BYTECODE(LOAD_2_CURRENT_CHARS) {
+<span class="lineNum">     679 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     680 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     681 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     682 </span>            :                     offset);
+<span class="lineNum">     683 </span>            :             BRANCH(LOAD_2_CURRENT_CHARS, offset);
+<span class="lineNum">     684 </span>            :           }
+<span class="lineNum">     685 </span>            :           BYTECODE(LOAD_2_CURRENT_CHARS_UNCHECKED) {
+<span class="lineNum">     686 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     687 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     688 </span>            :             ADVANCE(LOAD_2_CURRENT_CHARS_UNCHECKED);
+<span class="lineNum">     689 </span>            :           }
+<span class="lineNum">     690 </span>            :           BYTECODE(LOAD_4_CURRENT_CHARS) {
+<span class="lineNum">     691 </span>            :             ADVANCE(LOAD_4_CURRENT_CHARS);
+<span class="lineNum">     692 </span>            :           }
+<span class="lineNum">     693 </span>            :           BYTECODE(LOAD_4_CURRENT_CHARS_UNCHECKED) {
+<span class="lineNum">     694 </span>            :             ADVANCE(LOAD_4_CURRENT_CHARS_UNCHECKED);
+<span class="lineNum">     695 </span>            :           }
+<span class="lineNum">     696 </span>            :           BYTECODE(CHECK_4_CHARS) {
+<span class="lineNum">     697 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     698 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     699 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     700 </span>            :                     offset);
+<span class="lineNum">     701 </span>            :             BRANCH(CHECK_4_CHARS, offset);
+<span class="lineNum">     702 </span>            :           }
+<span class="lineNum">     703 </span>            :           BYTECODE(CHECK_CHAR) {
+<span class="lineNum">     704 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     705 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     706 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     707 </span>            :                     offset);
+<span class="lineNum">     708 </span>            :             BRANCH(CHECK_CHAR, offset);
+<span class="lineNum">     709 </span>            :           }
+<span class="lineNum">     710 </span>            :           BYTECODE(CHECK_NOT_4_CHARS) {
+<span class="lineNum">     711 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     712 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     713 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     714 </span>            :                     offset);
+<span class="lineNum">     715 </span>            :             BRANCH(CHECK_NOT_4_CHARS, offset);
+<span class="lineNum">     716 </span>            :           }
+<span class="lineNum">     717 </span>            :           BYTECODE(CHECK_NOT_CHAR) {
+<span class="lineNum">     718 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     719 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     720 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     721 </span>            :                     offset);
+<span class="lineNum">     722 </span>            :             BRANCH(CHECK_NOT_CHAR, offset);
+<span class="lineNum">     723 </span>            :           }
+<span class="lineNum">     724 </span>            :           BYTECODE(AND_CHECK_4_CHARS) {
+<span class="lineNum">     725 </span>            :             int32_t offset = Load32Aligned(pc + 12);
+<span class="lineNum">     726 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     727 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     728 </span>            :                     Load32Aligned(pc + 8),
+<span class="lineNum">     729 </span>            :                     offset);
+<span class="lineNum">     730 </span>            :             BRANCH(AND_CHECK_4_CHARS, offset);
+<span class="lineNum">     731 </span>            :           }
+<span class="lineNum">     732 </span>            :           BYTECODE(AND_CHECK_CHAR) {
+<span class="lineNum">     733 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     734 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     735 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     736 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     737 </span>            :                     offset);
+<span class="lineNum">     738 </span>            :             BRANCH(AND_CHECK_CHAR, offset);
+<span class="lineNum">     739 </span>            :           }
+<span class="lineNum">     740 </span>            :           BYTECODE(AND_CHECK_NOT_4_CHARS) {
+<span class="lineNum">     741 </span>            :             int32_t offset = Load32Aligned(pc + 12);
+<span class="lineNum">     742 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     743 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     744 </span>            :                     Load32Aligned(pc + 8),
+<span class="lineNum">     745 </span>            :                     offset);
+<span class="lineNum">     746 </span>            :             BRANCH(AND_CHECK_NOT_4_CHARS, offset);
+<span class="lineNum">     747 </span>            :           }
+<span class="lineNum">     748 </span>            :           BYTECODE(AND_CHECK_NOT_CHAR) {
+<span class="lineNum">     749 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     750 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     751 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     752 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     753 </span>            :                     offset);
+<span class="lineNum">     754 </span>            :             BRANCH(AND_CHECK_NOT_CHAR, offset);
+<span class="lineNum">     755 </span>            :           }
+<span class="lineNum">     756 </span>            :           BYTECODE(MINUS_AND_CHECK_NOT_CHAR) {
+<span class="lineNum">     757 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     758 </span>            :             fprintf(stderr, &quot; %d, %d, %d, %d&quot;,
+<span class="lineNum">     759 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     760 </span>            :                     Load16Aligned(pc + 4),
+<span class="lineNum">     761 </span>            :                     Load16Aligned(pc + 6),
+<span class="lineNum">     762 </span>            :                     offset);
+<span class="lineNum">     763 </span>            :             BRANCH(MINUS_AND_CHECK_NOT_CHAR, offset);
+<span class="lineNum">     764 </span>            :           }
+<span class="lineNum">     765 </span>            :           BYTECODE(CHECK_CHAR_IN_RANGE) {
+<span class="lineNum">     766 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     767 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     768 </span>            :                     Load16Aligned(pc + 4),
+<span class="lineNum">     769 </span>            :                     Load16Aligned(pc + 6),
+<span class="lineNum">     770 </span>            :                     offset);
+<span class="lineNum">     771 </span>            :             BRANCH(CHECK_CHAR_IN_RANGE, offset);
+<span class="lineNum">     772 </span>            :           }
+<span class="lineNum">     773 </span>            :           BYTECODE(CHECK_CHAR_NOT_IN_RANGE) {
+<span class="lineNum">     774 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     775 </span>            :             fprintf(stderr, &quot; %d, %d, %d&quot;,
+<span class="lineNum">     776 </span>            :                     Load16Aligned(pc + 4),
+<span class="lineNum">     777 </span>            :                     Load16Aligned(pc + 6),
+<span class="lineNum">     778 </span>            :                     offset);
+<span class="lineNum">     779 </span>            :             BRANCH(CHECK_CHAR_NOT_IN_RANGE, offset);
+<span class="lineNum">     780 </span>            :           }
+<span class="lineNum">     781 </span>            :           BYTECODE(CHECK_BIT_IN_TABLE) {
+<span class="lineNum">     782 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     783 </span>            :             fprintf(stderr, &quot; %d, &quot;
+<span class="lineNum">     784 </span>            :                     &quot;%02x %02x %02x %02x %02x %02x %02x %02x &quot;
+<span class="lineNum">     785 </span>            :                     &quot;%02x %02x %02x %02x %02x %02x %02x %02x&quot;,
+<span class="lineNum">     786 </span>            :                     offset,
+<span class="lineNum">     787 </span>            :                     pc[8], pc[9], pc[10], pc[11],
+<span class="lineNum">     788 </span>            :                     pc[12], pc[13], pc[14], pc[15],
+<span class="lineNum">     789 </span>            :                     pc[16], pc[17], pc[18], pc[19],
+<span class="lineNum">     790 </span>            :                     pc[20], pc[21], pc[22], pc[23]);
+<span class="lineNum">     791 </span>            :             BRANCH(CHECK_BIT_IN_TABLE, offset);
+<span class="lineNum">     792 </span>            :           }
+<span class="lineNum">     793 </span>            :           BYTECODE(CHECK_LT) {
+<span class="lineNum">     794 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     795 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     796 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     797 </span>            :                     offset);
+<span class="lineNum">     798 </span>            :             BRANCH(CHECK_LT, offset);
+<span class="lineNum">     799 </span>            :           }
+<span class="lineNum">     800 </span>            :           BYTECODE(CHECK_GT) {
+<span class="lineNum">     801 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     802 </span>            :             fprintf(stderr, &quot; %d, %d&quot;,
+<span class="lineNum">     803 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     804 </span>            :                     offset);
+<span class="lineNum">     805 </span>            :             BRANCH(CHECK_GT, offset);
+<span class="lineNum">     806 </span>            :           }
+<span class="lineNum">     807 </span>            :           BYTECODE(CHECK_REGISTER_LT) {
+<span class="lineNum">     808 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     809 </span>            :             fprintf(stderr, &quot; reg[%d], %d, %d&quot;,
+<span class="lineNum">     810 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     811 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     812 </span>            :                     offset);
+<span class="lineNum">     813 </span>            :             BRANCH(CHECK_REGISTER_LT, offset);
+<span class="lineNum">     814 </span>            :           }
+<span class="lineNum">     815 </span>            :           BYTECODE(CHECK_REGISTER_GE) {
+<span class="lineNum">     816 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     817 </span>            :             fprintf(stderr, &quot; reg[%d], %d, %d&quot;,
+<span class="lineNum">     818 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     819 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     820 </span>            :                     offset);
+<span class="lineNum">     821 </span>            :             BRANCH(CHECK_REGISTER_GE, offset);
+<span class="lineNum">     822 </span>            :           }
+<span class="lineNum">     823 </span>            :           BYTECODE(CHECK_REGISTER_EQ_POS) {
+<span class="lineNum">     824 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     825 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     826 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     827 </span>            :                     offset);
+<span class="lineNum">     828 </span>            :             BRANCH(CHECK_REGISTER_EQ_POS, offset);
+<span class="lineNum">     829 </span>            :           }
+<span class="lineNum">     830 </span>            :           BYTECODE(CHECK_NOT_REGS_EQUAL) {
+<span class="lineNum">     831 </span>            :             int32_t offset = Load32Aligned(pc + 8);
+<span class="lineNum">     832 </span>            :             fprintf(stderr, &quot; reg[%d], %d, %d&quot;,
+<span class="lineNum">     833 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     834 </span>            :                     Load32Aligned(pc + 4),
+<span class="lineNum">     835 </span>            :                     offset);
+<span class="lineNum">     836 </span>            :             BRANCH(CHECK_NOT_REGS_EQUAL, offset);
+<span class="lineNum">     837 </span>            :           }
+<span class="lineNum">     838 </span>            :           BYTECODE(CHECK_NOT_BACK_REF) {
+<span class="lineNum">     839 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     840 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     841 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     842 </span>            :                     offset);
+<span class="lineNum">     843 </span>            :             BRANCH(CHECK_NOT_BACK_REF, offset);
+<span class="lineNum">     844 </span>            :           }
+<span class="lineNum">     845 </span>            :           BYTECODE(CHECK_NOT_BACK_REF_NO_CASE) {
+<span class="lineNum">     846 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     847 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     848 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     849 </span>            :                     offset);
+<span class="lineNum">     850 </span>            :             BRANCH(CHECK_NOT_BACK_REF_NO_CASE, offset);
+<span class="lineNum">     851 </span>            :           }
+<span class="lineNum">     852 </span>            :           BYTECODE(CHECK_NOT_BACK_REF_NO_CASE_UNICODE) {
+<span class="lineNum">     853 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     854 </span>            :             fprintf(stderr, &quot; reg[%d], %d&quot;,
+<span class="lineNum">     855 </span>            :                     insn &gt;&gt; irregexp::BYTECODE_SHIFT,
+<span class="lineNum">     856 </span>            :                     offset);
+<span class="lineNum">     857 </span>            :             BRANCH(CHECK_NOT_BACK_REF_NO_CASE_UNICODE, offset);
+<span class="lineNum">     858 </span>            :           }
+<span class="lineNum">     859 </span>            :           BYTECODE(CHECK_AT_START) {
+<span class="lineNum">     860 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     861 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     862 </span>            :                     offset);
+<span class="lineNum">     863 </span>            :             BRANCH(CHECK_AT_START, offset);
+<span class="lineNum">     864 </span>            :           }
+<span class="lineNum">     865 </span>            :           BYTECODE(CHECK_NOT_AT_START) {
+<span class="lineNum">     866 </span>            :             int32_t offset = Load32Aligned(pc + 4);
+<span class="lineNum">     867 </span>            :             fprintf(stderr, &quot; %d&quot;,
+<span class="lineNum">     868 </span>            :                     offset);
+<span class="lineNum">     869 </span>            :             BRANCH(CHECK_NOT_AT_START, offset);
+<span class="lineNum">     870 </span>            :           }
+<span class="lineNum">     871 </span>            :           BYTECODE(SET_CURRENT_POSITION_FROM_END) {
+<span class="lineNum">     872 </span>            :             fprintf(stderr, &quot; %u&quot;,
+<span class="lineNum">     873 </span>            :                     static_cast&lt;uint32_t&gt;(insn) &gt;&gt; irregexp::BYTECODE_SHIFT);
+<span class="lineNum">     874 </span>            :             ADVANCE(SET_CURRENT_POSITION_FROM_END);
+<span class="lineNum">     875 </span>            :           }
+<span class="lineNum">     876 </span>            :           default:
+<span class="lineNum">     877 </span>            :             MOZ_CRASH(&quot;Bad bytecode&quot;);
+<span class="lineNum">     878 </span>            :         }
+<span class="lineNum">     879 </span>            :     }
+<span class="lineNum">     880 </span>            : 
+<span class="lineNum">     881 </span>            : #undef BYTECODE
+<span class="lineNum">     882 </span>            : #undef ADVANCE
+<span class="lineNum">     883 </span>            : #undef STOP
+<span class="lineNum">     884 </span>            : #undef JUMP
+<span class="lineNum">     885 </span>            : #undef BRANCH
+<span class="lineNum">     886 </span>            : 
+<span class="lineNum">     887 </span>            :     return true;
+<span class="lineNum">     888 </span>            : }
+<span class="lineNum">     889 </span>            : 
+<span class="lineNum">     890 </span>            : /* static */ bool
+<span class="lineNum">     891 </span>            : RegExpObject::dumpBytecode(JSContext* cx, Handle&lt;RegExpObject*&gt; regexp,
+<span class="lineNum">     892 </span>            :                            bool match_only, HandleLinearString input)
+<span class="lineNum">     893 </span>            : {
+<span class="lineNum">     894 </span>            :     RootedRegExpShared shared(cx);
+<span class="lineNum">     895 </span>            :     if (!getShared(cx, regexp, &amp;shared))
+<span class="lineNum">     896 </span>            :         return false;
+<span class="lineNum">     897 </span>            : 
+<span class="lineNum">     898 </span>            :     return RegExpShared::dumpBytecode(cx, &amp;shared, match_only, input);
+<span class="lineNum">     899 </span>            : }
+<span class="lineNum">     900 </span>            : #endif
+<span class="lineNum">     901 </span>            : 
+<span class="lineNum">     902 </span>            : template &lt;typename CharT&gt;
+<span class="lineNum">     903 </span>            : static MOZ_ALWAYS_INLINE bool
+<a name="904"><span class="lineNum">     904 </span>            : IsRegExpMetaChar(CharT ch)</a>
+<span class="lineNum">     905 </span>            : {
+<span class="lineNum">     906 </span><span class="lineCov">         14 :     switch (ch) {</span>
+<span class="lineNum">     907 </span>            :       /* ES 2016 draft Mar 25, 2016 21.2.1 SyntaxCharacter. */
+<span class="lineNum">     908 </span>            :       case '^': case '$': case '\\': case '.': case '*': case '+':
+<span class="lineNum">     909 </span>            :       case '?': case '(': case ')': case '[': case ']': case '{':
+<span class="lineNum">     910 </span>            :       case '}': case '|':
+<span class="lineNum">     911 </span>            :         return true;
+<span class="lineNum">     912 </span>            :       default:
+<span class="lineNum">     913 </span>            :         return false;
+<span class="lineNum">     914 </span>            :     }
+<span class="lineNum">     915 </span>            : }
+<span class="lineNum">     916 </span>            : 
+<span class="lineNum">     917 </span>            : template &lt;typename CharT&gt;
+<span class="lineNum">     918 </span>            : bool
+<span class="lineNum">     919 </span><span class="lineCov">         14 : js::HasRegExpMetaChars(const CharT* chars, size_t length)</span>
+<span class="lineNum">     920 </span>            : {
+<span class="lineNum">     921 </span><span class="lineCov">         14 :     for (size_t i = 0; i &lt; length; ++i) {</span>
+<span class="lineNum">     922 </span><span class="lineCov">         28 :         if (IsRegExpMetaChar&lt;CharT&gt;(chars[i]))</span>
+<span class="lineNum">     923 </span>            :             return true;
+<span class="lineNum">     924 </span>            :     }
+<span class="lineNum">     925 </span>            :     return false;
+<span class="lineNum">     926 </span>            : }
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            : template bool
+<span class="lineNum">     929 </span>            : js::HasRegExpMetaChars&lt;Latin1Char&gt;(const Latin1Char* chars, size_t length);
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span>            : template bool
+<span class="lineNum">     932 </span>            : js::HasRegExpMetaChars&lt;char16_t&gt;(const char16_t* chars, size_t length);
+<a name="933"><span class="lineNum">     933 </span>            : </a>
+<span class="lineNum">     934 </span>            : bool
+<span class="lineNum">     935 </span><span class="lineCov">         14 : js::StringHasRegExpMetaChars(JSLinearString* str)</span>
+<span class="lineNum">     936 </span>            : {
+<span class="lineNum">     937 </span>            :     AutoCheckCannotGC nogc;
+<span class="lineNum">     938 </span><span class="lineCov">         28 :     if (str-&gt;hasLatin1Chars())</span>
+<span class="lineNum">     939 </span><span class="lineCov">         42 :         return HasRegExpMetaChars(str-&gt;latin1Chars(nogc), str-&gt;length());</span>
+<span class="lineNum">     940 </span>            : 
+<span class="lineNum">     941 </span><span class="lineNoCov">          0 :     return HasRegExpMetaChars(str-&gt;twoByteChars(nogc), str-&gt;length());</span>
+<span class="lineNum">     942 </span>            : }
+<span class="lineNum">     943 </span>            : 
+<a name="944"><span class="lineNum">     944 </span>            : /* RegExpShared */</a>
+<span class="lineNum">     945 </span>            : 
+<span class="lineNum">     946 </span><span class="lineCov">         10 : RegExpShared::RegExpShared(JSAtom* source, RegExpFlag flags)</span>
+<span class="lineNum">     947 </span><span class="lineCov">         60 :   : source(source), flags(flags), canStringMatch(false), parenCount(0)</span>
+<span class="lineNum">     948 </span><span class="lineCov">         10 : {}</span>
+<span class="lineNum">     949 </span>            : 
+<span class="lineNum">     950 </span>            : void
+<span class="lineNum">     951 </span><span class="lineNoCov">          0 : RegExpShared::traceChildren(JSTracer* trc)</span>
+<span class="lineNum">     952 </span>            : {
+<span class="lineNum">     953 </span>            :     // Discard code to avoid holding onto ExecutablePools.
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 :     if (IsMarkingTrace(trc) &amp;&amp; trc-&gt;runtime()-&gt;gc.isShrinkingGC())</span>
+<span class="lineNum">     955 </span>            :         discardJitCode();
+<span class="lineNum">     956 </span>            : 
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :     TraceNullableEdge(trc, &amp;source, &quot;RegExpShared source&quot;);</span>
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :     for (auto&amp; comp : compilationArray)</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :         TraceNullableEdge(trc, &amp;comp.jitCode, &quot;RegExpShared code&quot;);</span>
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 : }</span>
+<a name="961"><span class="lineNum">     961 </span>            : </a>
+<span class="lineNum">     962 </span>            : void
+<span class="lineNum">     963 </span><span class="lineNoCov">          0 : RegExpShared::discardJitCode()</span>
+<span class="lineNum">     964 </span>            : {
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :     for (auto&amp; comp : compilationArray)</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :         comp.jitCode = nullptr;</span>
+<span class="lineNum">     967 </span><span class="lineNoCov">          0 : }</span>
+<a name="968"><span class="lineNum">     968 </span>            : </a>
+<span class="lineNum">     969 </span>            : void
+<span class="lineNum">     970 </span><span class="lineCov">         10 : RegExpShared::finalize(FreeOp* fop)</span>
+<span class="lineNum">     971 </span>            : {
+<span class="lineNum">     972 </span><span class="lineCov">         50 :     for (auto&amp; comp : compilationArray)</span>
+<span class="lineNum">     973 </span><span class="lineCov">         40 :         js_free(comp.byteCode);</span>
+<span class="lineNum">     974 </span><span class="lineCov">          2 :     for (size_t i = 0; i &lt; tables.length(); i++)</span>
+<span class="lineNum">     975 </span><span class="lineCov">          4 :         js_free(tables[i]);</span>
+<span class="lineNum">     976 </span><span class="lineCov">         10 :     tables.~JitCodeTables();</span>
+<span class="lineNum">     977 </span><span class="lineCov">         10 : }</span>
+<a name="978"><span class="lineNum">     978 </span>            : </a>
+<span class="lineNum">     979 </span>            : /* static */ bool
+<span class="lineNum">     980 </span><span class="lineCov">         14 : RegExpShared::compile(JSContext* cx, MutableHandleRegExpShared re, HandleLinearString input,</span>
+<span class="lineNum">     981 </span>            :                       CompilationMode mode, ForceByteCodeEnum force)
+<span class="lineNum">     982 </span>            : {
+<span class="lineNum">     983 </span><span class="lineCov">         14 :     TraceLoggerThread* logger = TraceLoggerForCurrentThread(cx);</span>
+<span class="lineNum">     984 </span>            :     AutoTraceLog logCompile(logger, TraceLogger_IrregexpCompile);
+<span class="lineNum">     985 </span>            : 
+<span class="lineNum">     986 </span><span class="lineCov">         14 :     RootedAtom pattern(cx, re-&gt;source);</span>
+<span class="lineNum">     987 </span><span class="lineCov">         28 :     return compile(cx, re, pattern, input, mode, force);</span>
+<span class="lineNum">     988 </span>            : }
+<a name="989"><span class="lineNum">     989 </span>            : </a>
+<span class="lineNum">     990 </span>            : /* static */ bool
+<span class="lineNum">     991 </span><span class="lineCov">         14 : RegExpShared::compile(JSContext* cx, MutableHandleRegExpShared re, HandleAtom pattern,</span>
+<span class="lineNum">     992 </span>            :                       HandleLinearString input, CompilationMode mode, ForceByteCodeEnum force)
+<span class="lineNum">     993 </span>            : {
+<span class="lineNum">     994 </span><span class="lineCov">         28 :     if (!re-&gt;ignoreCase() &amp;&amp; !StringHasRegExpMetaChars(pattern))</span>
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 :         re-&gt;canStringMatch = true;</span>
+<span class="lineNum">     996 </span>            : 
+<span class="lineNum">     997 </span><span class="lineCov">         14 :     CompileOptions options(cx);</span>
+<span class="lineNum">     998 </span><span class="lineCov">         28 :     TokenStream dummyTokenStream(cx, options, nullptr, 0, nullptr);</span>
+<span class="lineNum">     999 </span>            : 
+<span class="lineNum">    1000 </span><span class="lineCov">         28 :     LifoAllocScope scope(&amp;cx-&gt;tempLifoAlloc());</span>
+<span class="lineNum">    1001 </span>            : 
+<span class="lineNum">    1002 </span>            :     /* Parse the pattern. */
+<span class="lineNum">    1003 </span>            :     irregexp::RegExpCompileData data;
+<span class="lineNum">    1004 </span><span class="lineCov">         14 :     if (!irregexp::ParsePattern(dummyTokenStream, cx-&gt;tempLifoAlloc(), pattern,</span>
+<span class="lineNum">    1005 </span><span class="lineCov">         28 :                                 re-&gt;multiline(), mode == MatchOnly, re-&gt;unicode(),</span>
+<span class="lineNum">    1006 </span><span class="lineCov">         98 :                                 re-&gt;ignoreCase(), re-&gt;global(), re-&gt;sticky(), &amp;data))</span>
+<span class="lineNum">    1007 </span>            :     {
+<span class="lineNum">    1008 </span>            :         return false;
+<span class="lineNum">    1009 </span>            :     }
+<span class="lineNum">    1010 </span>            : 
+<span class="lineNum">    1011 </span><span class="lineCov">         14 :     re-&gt;parenCount = data.capture_count;</span>
+<span class="lineNum">    1012 </span>            : 
+<span class="lineNum">    1013 </span>            :     irregexp::RegExpCode code = irregexp::CompilePattern(cx, re, &amp;data, input,
+<span class="lineNum">    1014 </span>            :                                                          false /* global() */,
+<span class="lineNum">    1015 </span><span class="lineCov">         14 :                                                          re-&gt;ignoreCase(),</span>
+<span class="lineNum">    1016 </span><span class="lineCov">         14 :                                                          input-&gt;hasLatin1Chars(),</span>
+<span class="lineNum">    1017 </span>            :                                                          mode == MatchOnly,
+<span class="lineNum">    1018 </span>            :                                                          force == ForceByteCode,
+<span class="lineNum">    1019 </span><span class="lineCov">         14 :                                                          re-&gt;sticky(),</span>
+<span class="lineNum">    1020 </span><span class="lineCov">         84 :                                                          re-&gt;unicode());</span>
+<span class="lineNum">    1021 </span><span class="lineCov">         14 :     if (code.empty())</span>
+<span class="lineNum">    1022 </span>            :         return false;
+<span class="lineNum">    1023 </span>            : 
+<span class="lineNum">    1024 </span>            :     MOZ_ASSERT(!code.jitCode || !code.byteCode);
+<span class="lineNum">    1025 </span>            :     MOZ_ASSERT_IF(force == ForceByteCode, code.byteCode);
+<span class="lineNum">    1026 </span>            : 
+<span class="lineNum">    1027 </span><span class="lineCov">         42 :     RegExpCompilation&amp; compilation = re-&gt;compilation(mode, input-&gt;hasLatin1Chars());</span>
+<span class="lineNum">    1028 </span><span class="lineCov">         14 :     if (code.jitCode)</span>
+<span class="lineNum">    1029 </span><span class="lineCov">         14 :         compilation.jitCode = code.jitCode;</span>
+<span class="lineNum">    1030 </span><span class="lineNoCov">          0 :     else if (code.byteCode)</span>
+<span class="lineNum">    1031 </span><span class="lineNoCov">          0 :         compilation.byteCode = code.byteCode;</span>
+<span class="lineNum">    1032 </span>            : 
+<span class="lineNum">    1033 </span>            :     return true;
+<span class="lineNum">    1034 </span>            : }
+<a name="1035"><span class="lineNum">    1035 </span>            : </a>
+<span class="lineNum">    1036 </span>            : /* static */ bool
+<span class="lineNum">    1037 </span><span class="lineCov">         66 : RegExpShared::compileIfNecessary(JSContext* cx, MutableHandleRegExpShared re,</span>
+<span class="lineNum">    1038 </span>            :                                  HandleLinearString input, CompilationMode mode,
+<span class="lineNum">    1039 </span>            :                                  ForceByteCodeEnum force)
+<span class="lineNum">    1040 </span>            : {
+<span class="lineNum">    1041 </span><span class="lineCov">        198 :     if (re-&gt;isCompiled(mode, input-&gt;hasLatin1Chars(), force))</span>
+<span class="lineNum">    1042 </span>            :         return true;
+<span class="lineNum">    1043 </span><span class="lineCov">         14 :     return compile(cx, re, input, mode, force);</span>
+<span class="lineNum">    1044 </span>            : }
+<a name="1045"><span class="lineNum">    1045 </span>            : </a>
+<span class="lineNum">    1046 </span>            : /* static */ RegExpRunStatus
+<span class="lineNum">    1047 </span><span class="lineCov">         66 : RegExpShared::execute(JSContext* cx, MutableHandleRegExpShared re, HandleLinearString input,</span>
+<span class="lineNum">    1048 </span>            :                       size_t start, MatchPairs* matches, size_t* endIndex)
+<span class="lineNum">    1049 </span>            : {
+<span class="lineNum">    1050 </span>            :     MOZ_ASSERT_IF(matches, !endIndex);
+<span class="lineNum">    1051 </span>            :     MOZ_ASSERT_IF(!matches, endIndex);
+<span class="lineNum">    1052 </span><span class="lineCov">         66 :     TraceLoggerThread* logger = TraceLoggerForCurrentThread(cx);</span>
+<span class="lineNum">    1053 </span>            : 
+<span class="lineNum">    1054 </span><span class="lineCov">         66 :     CompilationMode mode = matches ? Normal : MatchOnly;</span>
+<span class="lineNum">    1055 </span>            : 
+<span class="lineNum">    1056 </span>            :     /* Compile the code at point-of-use. */
+<span class="lineNum">    1057 </span><span class="lineCov">         66 :     if (!compileIfNecessary(cx, re, input, mode, DontForceByteCode))</span>
+<span class="lineNum">    1058 </span>            :         return RegExpRunStatus_Error;
+<span class="lineNum">    1059 </span>            : 
+<span class="lineNum">    1060 </span>            :     /*
+<span class="lineNum">    1061 </span>            :      * Ensure sufficient memory for output vector.
+<span class="lineNum">    1062 </span>            :      * No need to initialize it. The RegExp engine fills them in on a match.
+<span class="lineNum">    1063 </span>            :      */
+<span class="lineNum">    1064 </span><span class="lineCov">        132 :     if (matches &amp;&amp; !matches-&gt;allocOrExpandArray(re-&gt;pairCount())) {</span>
+<span class="lineNum">    1065 </span><span class="lineNoCov">          0 :         ReportOutOfMemory(cx);</span>
+<span class="lineNum">    1066 </span><span class="lineNoCov">          0 :         return RegExpRunStatus_Error;</span>
+<span class="lineNum">    1067 </span>            :     }
+<span class="lineNum">    1068 </span>            : 
+<span class="lineNum">    1069 </span><span class="lineCov">        132 :     size_t length = input-&gt;length();</span>
+<span class="lineNum">    1070 </span>            : 
+<span class="lineNum">    1071 </span>            :     // Reset the Irregexp backtrack stack if it grows during execution.
+<span class="lineNum">    1072 </span><span class="lineCov">         66 :     irregexp::RegExpStackScope stackScope(cx);</span>
+<span class="lineNum">    1073 </span>            : 
+<span class="lineNum">    1074 </span><span class="lineCov">         66 :     if (re-&gt;canStringMatch) {</span>
+<span class="lineNum">    1075 </span>            :         MOZ_ASSERT(re-&gt;pairCount() == 1);
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :         size_t sourceLength = re-&gt;source-&gt;length();</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :         if (re-&gt;sticky()) {</span>
+<span class="lineNum">    1078 </span>            :             // First part checks size_t overflow.
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :             if (sourceLength + start &lt; sourceLength || sourceLength + start &gt; length)</span>
+<span class="lineNum">    1080 </span>            :                 return RegExpRunStatus_Success_NotFound;
+<span class="lineNum">    1081 </span><span class="lineNoCov">          0 :             if (!HasSubstringAt(input, re-&gt;source, start))</span>
+<span class="lineNum">    1082 </span>            :                 return RegExpRunStatus_Success_NotFound;
+<span class="lineNum">    1083 </span>            : 
+<span class="lineNum">    1084 </span><span class="lineNoCov">          0 :             if (matches) {</span>
+<span class="lineNum">    1085 </span><span class="lineNoCov">          0 :                 (*matches)[0].start = start;</span>
+<span class="lineNum">    1086 </span><span class="lineNoCov">          0 :                 (*matches)[0].limit = start + sourceLength;</span>
+<span class="lineNum">    1087 </span>            : 
+<span class="lineNum">    1088 </span><span class="lineNoCov">          0 :                 matches-&gt;checkAgainst(length);</span>
+<span class="lineNum">    1089 </span><span class="lineNoCov">          0 :             } else if (endIndex) {</span>
+<span class="lineNum">    1090 </span><span class="lineNoCov">          0 :                 *endIndex = start + sourceLength;</span>
+<span class="lineNum">    1091 </span>            :             }
+<span class="lineNum">    1092 </span>            :             return RegExpRunStatus_Success;
+<span class="lineNum">    1093 </span>            :         }
+<span class="lineNum">    1094 </span>            : 
+<span class="lineNum">    1095 </span><span class="lineNoCov">          0 :         int res = StringFindPattern(input, re-&gt;source, start);</span>
+<span class="lineNum">    1096 </span><span class="lineNoCov">          0 :         if (res == -1)</span>
+<span class="lineNum">    1097 </span>            :             return RegExpRunStatus_Success_NotFound;
+<span class="lineNum">    1098 </span>            : 
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :         if (matches) {</span>
+<span class="lineNum">    1100 </span><span class="lineNoCov">          0 :             (*matches)[0].start = res;</span>
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 :             (*matches)[0].limit = res + sourceLength;</span>
+<span class="lineNum">    1102 </span>            : 
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :             matches-&gt;checkAgainst(length);</span>
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :         } else if (endIndex) {</span>
+<span class="lineNum">    1105 </span><span class="lineNoCov">          0 :             *endIndex = res + sourceLength;</span>
+<span class="lineNum">    1106 </span>            :         }
+<span class="lineNum">    1107 </span>            :         return RegExpRunStatus_Success;
+<span class="lineNum">    1108 </span>            :     }
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span>            :     do {
+<span class="lineNum">    1111 </span><span class="lineCov">        264 :         jit::JitCode* code = re-&gt;compilation(mode, input-&gt;hasLatin1Chars()).jitCode;</span>
+<span class="lineNum">    1112 </span><span class="lineCov">         66 :         if (!code)</span>
+<span class="lineNum">    1113 </span>            :             break;
+<span class="lineNum">    1114 </span>            : 
+<span class="lineNum">    1115 </span>            :         RegExpRunStatus result;
+<span class="lineNum">    1116 </span>            :         {
+<span class="lineNum">    1117 </span>            :             AutoTraceLog logJIT(logger, TraceLogger_IrregexpExecute);
+<span class="lineNum">    1118 </span>            :             AutoCheckCannotGC nogc;
+<span class="lineNum">    1119 </span><span class="lineCov">        132 :             if (input-&gt;hasLatin1Chars()) {</span>
+<span class="lineNum">    1120 </span><span class="lineCov">        104 :                 const Latin1Char* chars = input-&gt;latin1Chars(nogc);</span>
+<span class="lineNum">    1121 </span><span class="lineCov">         52 :                 result = irregexp::ExecuteCode(cx, code, chars, start, length, matches, endIndex);</span>
+<span class="lineNum">    1122 </span>            :             } else {
+<span class="lineNum">    1123 </span><span class="lineCov">         28 :                 const char16_t* chars = input-&gt;twoByteChars(nogc);</span>
+<span class="lineNum">    1124 </span><span class="lineCov">         14 :                 result = irregexp::ExecuteCode(cx, code, chars, start, length, matches, endIndex);</span>
+<span class="lineNum">    1125 </span><span class="lineCov">         66 :             }</span>
+<span class="lineNum">    1126 </span>            :         }
+<span class="lineNum">    1127 </span>            : 
+<span class="lineNum">    1128 </span><span class="lineCov">         66 :         if (result == RegExpRunStatus_Error) {</span>
+<span class="lineNum">    1129 </span>            :             // An 'Error' result is returned if a stack overflow guard or
+<span class="lineNum">    1130 </span>            :             // interrupt guard failed. If CheckOverRecursed doesn't throw, break
+<span class="lineNum">    1131 </span>            :             // out and retry the regexp in the bytecode interpreter, which can
+<span class="lineNum">    1132 </span>            :             // execute while tolerating future interrupts. Otherwise, if we keep
+<span class="lineNum">    1133 </span>            :             // getting interrupted we will never finish executing the regexp.
+<span class="lineNum">    1134 </span><span class="lineNoCov">          0 :             if (!jit::CheckOverRecursed(cx))</span>
+<span class="lineNum">    1135 </span>            :                 return RegExpRunStatus_Error;
+<span class="lineNum">    1136 </span>            :             break;
+<span class="lineNum">    1137 </span>            :         }
+<span class="lineNum">    1138 </span>            : 
+<span class="lineNum">    1139 </span><span class="lineCov">         66 :         if (result == RegExpRunStatus_Success_NotFound)</span>
+<span class="lineNum">    1140 </span>            :             return RegExpRunStatus_Success_NotFound;
+<span class="lineNum">    1141 </span>            : 
+<span class="lineNum">    1142 </span>            :         MOZ_ASSERT(result == RegExpRunStatus_Success);
+<span class="lineNum">    1143 </span>            : 
+<span class="lineNum">    1144 </span>            :         if (matches)
+<span class="lineNum">    1145 </span>            :             matches-&gt;checkAgainst(length);
+<span class="lineNum">    1146 </span><span class="lineCov">         58 :         return RegExpRunStatus_Success;</span>
+<span class="lineNum">    1147 </span>            :     } while (false);
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span>            :     // Compile bytecode for the RegExp if necessary.
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :     if (!compileIfNecessary(cx, re, input, mode, ForceByteCode))</span>
+<span class="lineNum">    1151 </span>            :         return RegExpRunStatus_Error;
+<span class="lineNum">    1152 </span>            : 
+<span class="lineNum">    1153 </span><span class="lineNoCov">          0 :     uint8_t* byteCode = re-&gt;compilation(mode, input-&gt;hasLatin1Chars()).byteCode;</span>
+<span class="lineNum">    1154 </span><span class="lineNoCov">          0 :     AutoTraceLog logInterpreter(logger, TraceLogger_IrregexpExecute);</span>
+<span class="lineNum">    1155 </span>            : 
+<span class="lineNum">    1156 </span>            :     AutoStableStringChars inputChars(cx);
+<span class="lineNum">    1157 </span><span class="lineNoCov">          0 :     if (!inputChars.init(cx, input))</span>
+<span class="lineNum">    1158 </span>            :         return RegExpRunStatus_Error;
+<span class="lineNum">    1159 </span>            : 
+<span class="lineNum">    1160 </span>            :     RegExpRunStatus result;
+<span class="lineNum">    1161 </span><span class="lineNoCov">          0 :     if (inputChars.isLatin1()) {</span>
+<span class="lineNum">    1162 </span><span class="lineNoCov">          0 :         const Latin1Char* chars = inputChars.latin1Range().begin().get();</span>
+<span class="lineNum">    1163 </span><span class="lineNoCov">          0 :         result = irregexp::InterpretCode(cx, byteCode, chars, start, length, matches, endIndex);</span>
+<span class="lineNum">    1164 </span>            :     } else {
+<span class="lineNum">    1165 </span><span class="lineNoCov">          0 :         const char16_t* chars = inputChars.twoByteRange().begin().get();</span>
+<span class="lineNum">    1166 </span><span class="lineNoCov">          0 :         result = irregexp::InterpretCode(cx, byteCode, chars, start, length, matches, endIndex);</span>
+<span class="lineNum">    1167 </span>            :     }
+<span class="lineNum">    1168 </span>            : 
+<span class="lineNum">    1169 </span>            :     if (result == RegExpRunStatus_Success &amp;&amp; matches)
+<span class="lineNum">    1170 </span>            :         matches-&gt;checkAgainst(length);
+<span class="lineNum">    1171 </span><span class="lineCov">         66 :     return result;</span>
+<span class="lineNum">    1172 </span>            : }
+<a name="1173"><span class="lineNum">    1173 </span>            : </a>
+<span class="lineNum">    1174 </span>            : size_t
+<span class="lineNum">    1175 </span><span class="lineNoCov">          0 : RegExpShared::sizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf)</span>
+<span class="lineNum">    1176 </span>            : {
+<span class="lineNum">    1177 </span><span class="lineNoCov">          0 :     size_t n = 0;</span>
+<span class="lineNum">    1178 </span>            : 
+<span class="lineNum">    1179 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; ArrayLength(compilationArray); i++) {</span>
+<span class="lineNum">    1180 </span><span class="lineNoCov">          0 :         const RegExpCompilation&amp; compilation = compilationArray[i];</span>
+<span class="lineNum">    1181 </span><span class="lineNoCov">          0 :         if (compilation.byteCode)</span>
+<span class="lineNum">    1182 </span><span class="lineNoCov">          0 :             n += mallocSizeOf(compilation.byteCode);</span>
+<span class="lineNum">    1183 </span>            :     }
+<span class="lineNum">    1184 </span>            : 
+<span class="lineNum">    1185 </span><span class="lineNoCov">          0 :     n += tables.sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">    1186 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; tables.length(); i++)</span>
+<span class="lineNum">    1187 </span><span class="lineNoCov">          0 :         n += mallocSizeOf(tables[i]);</span>
+<span class="lineNum">    1188 </span>            : 
+<span class="lineNum">    1189 </span><span class="lineNoCov">          0 :     return n;</span>
+<span class="lineNum">    1190 </span>            : }
+<span class="lineNum">    1191 </span>            : 
+<span class="lineNum">    1192 </span>            : /* RegExpCompartment */
+<span class="lineNum">    1193 </span>            : 
+<span class="lineNum">    1194 </span><span class="lineCov">        905 : RegExpCompartment::RegExpCompartment(Zone* zone)</span>
+<span class="lineNum">    1195 </span>            :   : set_(zone, Set(zone-&gt;runtimeFromActiveCooperatingThread())),
+<span class="lineNum">    1196 </span>            :     matchResultTemplateObject_(nullptr),
+<span class="lineNum">    1197 </span>            :     optimizableRegExpPrototypeShape_(nullptr),
+<span class="lineNum">    1198 </span><span class="lineCov">       4525 :     optimizableRegExpInstanceShape_(nullptr)</span>
+<a name="1199"><span class="lineNum">    1199 </span><span class="lineCov">        905 : {}</span></a>
+<span class="lineNum">    1200 </span>            : 
+<span class="lineNum">    1201 </span><span class="lineCov">       3620 : RegExpCompartment::~RegExpCompartment()</span>
+<span class="lineNum">    1202 </span>            : {
+<span class="lineNum">    1203 </span>            :     MOZ_ASSERT_IF(set_.initialized(), set_.empty());
+<span class="lineNum">    1204 </span><span class="lineCov">        905 : }</span>
+<a name="1205"><span class="lineNum">    1205 </span>            : </a>
+<span class="lineNum">    1206 </span>            : ArrayObject*
+<span class="lineNum">    1207 </span><span class="lineCov">          7 : RegExpCompartment::createMatchResultTemplateObject(JSContext* cx)</span>
+<span class="lineNum">    1208 </span>            : {
+<span class="lineNum">    1209 </span>            :     MOZ_ASSERT(!matchResultTemplateObject_);
+<span class="lineNum">    1210 </span>            : 
+<span class="lineNum">    1211 </span>            :     /* Create template array object */
+<span class="lineNum">    1212 </span>            :     RootedArrayObject templateObject(cx, NewDenseUnallocatedArray(cx, RegExpObject::MaxPairCount,
+<span class="lineNum">    1213 </span><span class="lineCov">         14 :                                                                   nullptr, TenuredObject));</span>
+<span class="lineNum">    1214 </span><span class="lineCov">          7 :     if (!templateObject)</span>
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :         return matchResultTemplateObject_; // = nullptr</span>
+<span class="lineNum">    1216 </span>            : 
+<span class="lineNum">    1217 </span>            :     // Create a new group for the template.
+<span class="lineNum">    1218 </span><span class="lineCov">         14 :     Rooted&lt;TaggedProto&gt; proto(cx, templateObject-&gt;taggedProto());</span>
+<span class="lineNum">    1219 </span><span class="lineCov">         14 :     ObjectGroup* group = ObjectGroupCompartment::makeGroup(cx, templateObject-&gt;getClass(), proto);</span>
+<span class="lineNum">    1220 </span><span class="lineCov">          7 :     if (!group)</span>
+<span class="lineNum">    1221 </span><span class="lineNoCov">          0 :         return matchResultTemplateObject_; // = nullptr</span>
+<span class="lineNum">    1222 </span><span class="lineCov">          7 :     templateObject-&gt;setGroup(group);</span>
+<span class="lineNum">    1223 </span>            : 
+<span class="lineNum">    1224 </span>            :     /* Set dummy index property */
+<span class="lineNum">    1225 </span><span class="lineCov">         14 :     RootedValue index(cx, Int32Value(0));</span>
+<span class="lineNum">    1226 </span><span class="lineCov">         14 :     if (!NativeDefineProperty(cx, templateObject, cx-&gt;names().index, index, nullptr, nullptr,</span>
+<span class="lineNum">    1227 </span><span class="lineCov">         21 :                               JSPROP_ENUMERATE))</span>
+<span class="lineNum">    1228 </span>            :     {
+<span class="lineNum">    1229 </span><span class="lineNoCov">          0 :         return matchResultTemplateObject_; // = nullptr</span>
+<span class="lineNum">    1230 </span>            :     }
+<span class="lineNum">    1231 </span>            : 
+<span class="lineNum">    1232 </span>            :     /* Set dummy input property */
+<span class="lineNum">    1233 </span><span class="lineCov">         28 :     RootedValue inputVal(cx, StringValue(cx-&gt;runtime()-&gt;emptyString));</span>
+<span class="lineNum">    1234 </span><span class="lineCov">         14 :     if (!NativeDefineProperty(cx, templateObject, cx-&gt;names().input, inputVal, nullptr, nullptr,</span>
+<span class="lineNum">    1235 </span><span class="lineCov">         21 :                               JSPROP_ENUMERATE))</span>
+<span class="lineNum">    1236 </span>            :     {
+<span class="lineNum">    1237 </span><span class="lineNoCov">          0 :         return matchResultTemplateObject_; // = nullptr</span>
+<span class="lineNum">    1238 </span>            :     }
+<span class="lineNum">    1239 </span>            : 
+<span class="lineNum">    1240 </span>            :     // Make sure that the properties are in the right slots.
+<span class="lineNum">    1241 </span><span class="lineCov">         14 :     DebugOnly&lt;Shape*&gt; shape = templateObject-&gt;lastProperty();</span>
+<span class="lineNum">    1242 </span>            :     MOZ_ASSERT(shape-&gt;previous()-&gt;slot() == 0 &amp;&amp;
+<span class="lineNum">    1243 </span>            :                shape-&gt;previous()-&gt;propidRef() == NameToId(cx-&gt;names().index));
+<span class="lineNum">    1244 </span>            :     MOZ_ASSERT(shape-&gt;slot() == 1 &amp;&amp;
+<span class="lineNum">    1245 </span>            :                shape-&gt;propidRef() == NameToId(cx-&gt;names().input));
+<span class="lineNum">    1246 </span>            : 
+<span class="lineNum">    1247 </span>            :     // Make sure type information reflects the indexed properties which might
+<span class="lineNum">    1248 </span>            :     // be added.
+<span class="lineNum">    1249 </span><span class="lineCov">          7 :     AddTypePropertyId(cx, templateObject, JSID_VOID, TypeSet::StringType());</span>
+<span class="lineNum">    1250 </span><span class="lineCov">          7 :     AddTypePropertyId(cx, templateObject, JSID_VOID, TypeSet::UndefinedType());</span>
+<span class="lineNum">    1251 </span>            : 
+<span class="lineNum">    1252 </span><span class="lineCov">          7 :     matchResultTemplateObject_.set(templateObject);</span>
+<span class="lineNum">    1253 </span>            : 
+<span class="lineNum">    1254 </span><span class="lineCov">         14 :     return matchResultTemplateObject_;</span>
+<span class="lineNum">    1255 </span>            : }
+<span class="lineNum">    1256 </span>            : 
+<span class="lineNum">    1257 </span>            : bool
+<span class="lineNum">    1258 </span><span class="lineCov">        905 : RegExpCompartment::init(JSContext* cx)</span>
+<span class="lineNum">    1259 </span>            : {
+<span class="lineNum">    1260 </span><span class="lineCov">       1810 :     if (!set_.init(0)) {</span>
+<span class="lineNum">    1261 </span><span class="lineNoCov">          0 :         if (cx)</span>
+<span class="lineNum">    1262 </span><span class="lineNoCov">          0 :             ReportOutOfMemory(cx);</span>
+<span class="lineNum">    1263 </span>            :         return false;
+<span class="lineNum">    1264 </span>            :     }
+<span class="lineNum">    1265 </span>            : 
+<span class="lineNum">    1266 </span>            :     return true;
+<span class="lineNum">    1267 </span>            : }
+<a name="1268"><span class="lineNum">    1268 </span>            : </a>
+<span class="lineNum">    1269 </span>            : void
+<span class="lineNum">    1270 </span><span class="lineCov">       3427 : RegExpCompartment::sweep(JSRuntime* rt)</span>
+<span class="lineNum">    1271 </span>            : {
+<span class="lineNum">    1272 </span><span class="lineCov">       3434 :     if (matchResultTemplateObject_ &amp;&amp;</span>
+<span class="lineNum">    1273 </span><span class="lineCov">       3434 :         IsAboutToBeFinalized(&amp;matchResultTemplateObject_))</span>
+<span class="lineNum">    1274 </span>            :     {
+<span class="lineNum">    1275 </span><span class="lineCov">          7 :         matchResultTemplateObject_.set(nullptr);</span>
+<span class="lineNum">    1276 </span>            :     }
+<span class="lineNum">    1277 </span>            : 
+<span class="lineNum">    1278 </span><span class="lineCov">       3442 :     if (optimizableRegExpPrototypeShape_ &amp;&amp;</span>
+<span class="lineNum">    1279 </span><span class="lineCov">       3442 :         IsAboutToBeFinalized(&amp;optimizableRegExpPrototypeShape_))</span>
+<span class="lineNum">    1280 </span>            :     {
+<span class="lineNum">    1281 </span><span class="lineCov">          5 :         optimizableRegExpPrototypeShape_.set(nullptr);</span>
+<span class="lineNum">    1282 </span>            :     }
+<span class="lineNum">    1283 </span>            : 
+<span class="lineNum">    1284 </span><span class="lineCov">       3432 :     if (optimizableRegExpInstanceShape_ &amp;&amp;</span>
+<span class="lineNum">    1285 </span><span class="lineCov">       3432 :         IsAboutToBeFinalized(&amp;optimizableRegExpInstanceShape_))</span>
+<span class="lineNum">    1286 </span>            :     {
+<span class="lineNum">    1287 </span><span class="lineCov">          5 :         optimizableRegExpInstanceShape_.set(nullptr);</span>
+<span class="lineNum">    1288 </span>            :     }
+<span class="lineNum">    1289 </span><span class="lineCov">       3427 : }</span>
+<span class="lineNum">    1290 </span>            : 
+<span class="lineNum">    1291 </span>            : bool
+<span class="lineNum">    1292 </span><span class="lineCov">         10 : RegExpCompartment::get(JSContext* cx, HandleAtom source, RegExpFlag flags,</span>
+<span class="lineNum">    1293 </span>            :                        MutableHandleRegExpShared result)
+<span class="lineNum">    1294 </span>            : {
+<span class="lineNum">    1295 </span><span class="lineCov">         30 :     DependentAddPtr&lt;Set&gt; p(cx, set_.get(), Key(source, flags));</span>
+<span class="lineNum">    1296 </span><span class="lineCov">         10 :     if (p) {</span>
+<span class="lineNum">    1297 </span><span class="lineNoCov">          0 :         result.set(*p);</span>
+<span class="lineNum">    1298 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">    1299 </span>            :     }
+<span class="lineNum">    1300 </span>            : 
+<span class="lineNum">    1301 </span><span class="lineCov">         10 :     auto shared = Allocate&lt;RegExpShared&gt;(cx);</span>
+<span class="lineNum">    1302 </span><span class="lineCov">         10 :     if (!shared)</span>
+<span class="lineNum">    1303 </span>            :         return false;
+<span class="lineNum">    1304 </span>            : 
+<span class="lineNum">    1305 </span><span class="lineCov">         10 :     new (shared) RegExpShared(source, flags);</span>
+<span class="lineNum">    1306 </span>            : 
+<span class="lineNum">    1307 </span><span class="lineCov">         20 :     if (!p.add(cx, set_.get(), Key(source, flags), shared)) {</span>
+<span class="lineNum">    1308 </span><span class="lineNoCov">          0 :         ReportOutOfMemory(cx);</span>
+<span class="lineNum">    1309 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">    1310 </span>            :     }
+<span class="lineNum">    1311 </span>            : 
+<span class="lineNum">    1312 </span><span class="lineCov">         10 :     result.set(shared);</span>
+<span class="lineNum">    1313 </span><span class="lineCov">         10 :     return true;</span>
+<span class="lineNum">    1314 </span>            : }
+<a name="1315"><span class="lineNum">    1315 </span>            : </a>
+<span class="lineNum">    1316 </span>            : bool
+<span class="lineNum">    1317 </span><span class="lineNoCov">          0 : RegExpCompartment::get(JSContext* cx, HandleAtom atom, JSString* opt,</span>
+<span class="lineNum">    1318 </span>            :                        MutableHandleRegExpShared shared)
+<span class="lineNum">    1319 </span>            : {
+<span class="lineNum">    1320 </span><span class="lineNoCov">          0 :     RegExpFlag flags = RegExpFlag(0);</span>
+<span class="lineNum">    1321 </span><span class="lineNoCov">          0 :     if (opt &amp;&amp; !ParseRegExpFlags(cx, opt, &amp;flags))</span>
+<span class="lineNum">    1322 </span>            :         return false;
+<span class="lineNum">    1323 </span>            : 
+<span class="lineNum">    1324 </span><span class="lineNoCov">          0 :     return get(cx, atom, flags, shared);</span>
+<span class="lineNum">    1325 </span>            : }
+<span class="lineNum">    1326 </span>            : 
+<span class="lineNum">    1327 </span>            : size_t
+<span class="lineNum">    1328 </span><span class="lineNoCov">          0 : RegExpCompartment::sizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf)</span>
+<span class="lineNum">    1329 </span>            : {
+<span class="lineNum">    1330 </span><span class="lineNoCov">          0 :     return set_.sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">    1331 </span>            : }
+<span class="lineNum">    1332 </span>            : 
+<span class="lineNum">    1333 </span>            : /* Functions */
+<a name="1334"><span class="lineNum">    1334 </span>            : </a>
+<span class="lineNum">    1335 </span>            : JSObject*
+<span class="lineNum">    1336 </span><span class="lineCov">         22 : js::CloneRegExpObject(JSContext* cx, JSObject* obj_)</span>
+<span class="lineNum">    1337 </span>            : {
+<span class="lineNum">    1338 </span><span class="lineCov">         44 :     Rooted&lt;RegExpObject*&gt; regex(cx, &amp;obj_-&gt;as&lt;RegExpObject&gt;());</span>
+<span class="lineNum">    1339 </span>            : 
+<span class="lineNum">    1340 </span>            :     // Unlike RegExpAlloc, all clones must use |regex|'s group.  Allocate
+<span class="lineNum">    1341 </span>            :     // in the tenured heap to simplify embedding them in JIT code.
+<span class="lineNum">    1342 </span><span class="lineCov">         66 :     RootedObjectGroup group(cx, regex-&gt;group());</span>
+<span class="lineNum">    1343 </span><span class="lineCov">         44 :     Rooted&lt;RegExpObject*&gt; clone(cx, NewObjectWithGroup&lt;RegExpObject&gt;(cx, group, TenuredObject));</span>
+<span class="lineNum">    1344 </span><span class="lineCov">         22 :     if (!clone)</span>
+<span class="lineNum">    1345 </span>            :         return nullptr;
+<span class="lineNum">    1346 </span><span class="lineCov">         22 :     clone-&gt;initPrivate(nullptr);</span>
+<span class="lineNum">    1347 </span>            : 
+<span class="lineNum">    1348 </span><span class="lineCov">         22 :     if (!EmptyShape::ensureInitialCustomShape&lt;RegExpObject&gt;(cx, clone))</span>
+<span class="lineNum">    1349 </span>            :         return nullptr;
+<span class="lineNum">    1350 </span>            : 
+<span class="lineNum">    1351 </span><span class="lineCov">         66 :     Rooted&lt;JSAtom*&gt; source(cx, regex-&gt;getSource());</span>
+<span class="lineNum">    1352 </span>            : 
+<span class="lineNum">    1353 </span>            :     RootedRegExpShared shared(cx);
+<span class="lineNum">    1354 </span><span class="lineCov">         22 :     if (!RegExpObject::getShared(cx, regex, &amp;shared))</span>
+<span class="lineNum">    1355 </span>            :         return nullptr;
+<span class="lineNum">    1356 </span>            : 
+<span class="lineNum">    1357 </span><span class="lineCov">         44 :     clone-&gt;initAndZeroLastIndex(source, shared-&gt;getFlags(), cx);</span>
+<span class="lineNum">    1358 </span><span class="lineCov">         22 :     clone-&gt;setShared(*shared);</span>
+<span class="lineNum">    1359 </span>            : 
+<span class="lineNum">    1360 </span><span class="lineCov">         22 :     return clone;</span>
+<span class="lineNum">    1361 </span>            : }
+<span class="lineNum">    1362 </span>            : 
+<span class="lineNum">    1363 </span>            : static bool
+<a name="1364"><span class="lineNum">    1364 </span>            : HandleRegExpFlag(RegExpFlag flag, RegExpFlag* flags)</a>
+<span class="lineNum">    1365 </span>            : {
+<span class="lineNum">    1366 </span><span class="lineNoCov">          0 :     if (*flags &amp; flag)</span>
+<span class="lineNum">    1367 </span>            :         return false;
+<span class="lineNum">    1368 </span><span class="lineNoCov">          0 :     *flags = RegExpFlag(*flags | flag);</span>
+<span class="lineNum">    1369 </span>            :     return true;
+<span class="lineNum">    1370 </span>            : }
+<span class="lineNum">    1371 </span>            : 
+<span class="lineNum">    1372 </span>            : template &lt;typename CharT&gt;
+<span class="lineNum">    1373 </span>            : static size_t
+<span class="lineNum">    1374 </span><span class="lineNoCov">          0 : ParseRegExpFlags(const CharT* chars, size_t length, RegExpFlag* flagsOut, char16_t* lastParsedOut)</span>
+<span class="lineNum">    1375 </span>            : {
+<span class="lineNum">    1376 </span><span class="lineNoCov">          0 :     *flagsOut = RegExpFlag(0);</span>
+<span class="lineNum">    1377 </span>            : 
+<span class="lineNum">    1378 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; length; i++) {</span>
+<span class="lineNum">    1379 </span><span class="lineNoCov">          0 :         *lastParsedOut = chars[i];</span>
+<span class="lineNum">    1380 </span><span class="lineNoCov">          0 :         switch (chars[i]) {</span>
+<span class="lineNum">    1381 </span>            :           case 'i':
+<span class="lineNum">    1382 </span><span class="lineNoCov">          0 :             if (!HandleRegExpFlag(IgnoreCaseFlag, flagsOut))</span>
+<span class="lineNum">    1383 </span>            :                 return false;
+<span class="lineNum">    1384 </span>            :             break;
+<span class="lineNum">    1385 </span>            :           case 'g':
+<span class="lineNum">    1386 </span><span class="lineNoCov">          0 :             if (!HandleRegExpFlag(GlobalFlag, flagsOut))</span>
+<span class="lineNum">    1387 </span>            :                 return false;
+<span class="lineNum">    1388 </span>            :             break;
+<span class="lineNum">    1389 </span>            :           case 'm':
+<span class="lineNum">    1390 </span><span class="lineNoCov">          0 :             if (!HandleRegExpFlag(MultilineFlag, flagsOut))</span>
+<span class="lineNum">    1391 </span>            :                 return false;
+<span class="lineNum">    1392 </span>            :             break;
+<span class="lineNum">    1393 </span>            :           case 'y':
+<span class="lineNum">    1394 </span><span class="lineNoCov">          0 :             if (!HandleRegExpFlag(StickyFlag, flagsOut))</span>
+<span class="lineNum">    1395 </span>            :                 return false;
+<span class="lineNum">    1396 </span>            :             break;
+<span class="lineNum">    1397 </span>            :           case 'u':
+<span class="lineNum">    1398 </span><span class="lineNoCov">          0 :             if (!HandleRegExpFlag(UnicodeFlag, flagsOut))</span>
+<span class="lineNum">    1399 </span>            :                 return false;
+<span class="lineNum">    1400 </span>            :             break;
+<span class="lineNum">    1401 </span>            :           default:
+<span class="lineNum">    1402 </span>            :             return false;
+<span class="lineNum">    1403 </span>            :         }
+<span class="lineNum">    1404 </span>            :     }
+<span class="lineNum">    1405 </span>            : 
+<span class="lineNum">    1406 </span>            :     return true;
+<span class="lineNum">    1407 </span>            : }
+<a name="1408"><span class="lineNum">    1408 </span>            : </a>
+<span class="lineNum">    1409 </span>            : bool
+<span class="lineNum">    1410 </span><span class="lineNoCov">          0 : js::ParseRegExpFlags(JSContext* cx, JSString* flagStr, RegExpFlag* flagsOut)</span>
+<span class="lineNum">    1411 </span>            : {
+<span class="lineNum">    1412 </span><span class="lineNoCov">          0 :     JSLinearString* linear = flagStr-&gt;ensureLinear(cx);</span>
+<span class="lineNum">    1413 </span><span class="lineNoCov">          0 :     if (!linear)</span>
+<span class="lineNum">    1414 </span>            :         return false;
+<span class="lineNum">    1415 </span>            : 
+<span class="lineNum">    1416 </span><span class="lineNoCov">          0 :     size_t len = linear-&gt;length();</span>
+<span class="lineNum">    1417 </span>            : 
+<span class="lineNum">    1418 </span>            :     bool ok;
+<span class="lineNum">    1419 </span>            :     char16_t lastParsed;
+<span class="lineNum">    1420 </span><span class="lineNoCov">          0 :     if (linear-&gt;hasLatin1Chars()) {</span>
+<span class="lineNum">    1421 </span>            :         AutoCheckCannotGC nogc;
+<span class="lineNum">    1422 </span><span class="lineNoCov">          0 :         ok = ::ParseRegExpFlags(linear-&gt;latin1Chars(nogc), len, flagsOut, &amp;lastParsed);</span>
+<span class="lineNum">    1423 </span>            :     } else {
+<span class="lineNum">    1424 </span>            :         AutoCheckCannotGC nogc;
+<span class="lineNum">    1425 </span><span class="lineNoCov">          0 :         ok = ::ParseRegExpFlags(linear-&gt;twoByteChars(nogc), len, flagsOut, &amp;lastParsed);</span>
+<span class="lineNum">    1426 </span>            :     }
+<span class="lineNum">    1427 </span>            : 
+<span class="lineNum">    1428 </span><span class="lineNoCov">          0 :     if (!ok) {</span>
+<span class="lineNum">    1429 </span>            :         TwoByteChars range(&amp;lastParsed, 1);
+<span class="lineNum">    1430 </span><span class="lineNoCov">          0 :         UniqueChars utf8(JS::CharsToNewUTF8CharsZ(nullptr, range).c_str());</span>
+<span class="lineNum">    1431 </span><span class="lineNoCov">          0 :         if (!utf8)</span>
+<span class="lineNum">    1432 </span>            :             return false;
+<span class="lineNum">    1433 </span>            :         JS_ReportErrorFlagsAndNumberUTF8(cx, JSREPORT_ERROR, GetErrorMessage, nullptr,
+<span class="lineNum">    1434 </span><span class="lineNoCov">          0 :                                          JSMSG_BAD_REGEXP_FLAG, utf8.get());</span>
+<span class="lineNum">    1435 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">    1436 </span>            :     }
+<span class="lineNum">    1437 </span>            : 
+<span class="lineNum">    1438 </span>            :     return true;
+<span class="lineNum">    1439 </span>            : }
+<span class="lineNum">    1440 </span>            : 
+<a name="1441"><span class="lineNum">    1441 </span>            : template&lt;XDRMode mode&gt;</a>
+<span class="lineNum">    1442 </span>            : bool
+<span class="lineNum">    1443 </span><span class="lineNoCov">          0 : js::XDRScriptRegExpObject(XDRState&lt;mode&gt;* xdr, MutableHandle&lt;RegExpObject*&gt; objp)</span>
+<span class="lineNum">    1444 </span>            : {
+<span class="lineNum">    1445 </span>            :     /* NB: Keep this in sync with CloneScriptRegExpObject. */
+<span class="lineNum">    1446 </span>            : 
+<span class="lineNum">    1447 </span><span class="lineNoCov">          0 :     RootedAtom source(xdr-&gt;cx());</span>
+<span class="lineNum">    1448 </span><span class="lineNoCov">          0 :     uint32_t flagsword = 0;</span>
+<span class="lineNum">    1449 </span>            : 
+<span class="lineNum">    1450 </span>            :     if (mode == XDR_ENCODE) {
+<span class="lineNum">    1451 </span>            :         MOZ_ASSERT(objp);
+<span class="lineNum">    1452 </span><span class="lineNoCov">          0 :         RegExpObject&amp; reobj = *objp;</span>
+<span class="lineNum">    1453 </span><span class="lineNoCov">          0 :         source = reobj.getSource();</span>
+<span class="lineNum">    1454 </span><span class="lineNoCov">          0 :         flagsword = reobj.getFlags();</span>
+<span class="lineNum">    1455 </span>            :     }
+<span class="lineNum">    1456 </span><span class="lineNoCov">          0 :     if (!XDRAtom(xdr, &amp;source) || !xdr-&gt;codeUint32(&amp;flagsword))</span>
+<span class="lineNum">    1457 </span>            :         return false;
+<span class="lineNum">    1458 </span>            :     if (mode == XDR_DECODE) {
+<span class="lineNum">    1459 </span><span class="lineNoCov">          0 :         RegExpFlag flags = RegExpFlag(flagsword);</span>
+<span class="lineNum">    1460 </span>            :         RegExpObject* reobj = RegExpObject::create(xdr-&gt;cx(), source, flags, nullptr,
+<span class="lineNum">    1461 </span><span class="lineNoCov">          0 :                                                    xdr-&gt;lifoAlloc());</span>
+<span class="lineNum">    1462 </span><span class="lineNoCov">          0 :         if (!reobj)</span>
+<span class="lineNum">    1463 </span>            :             return false;
+<span class="lineNum">    1464 </span>            : 
+<span class="lineNum">    1465 </span><span class="lineNoCov">          0 :         objp.set(reobj);</span>
+<span class="lineNum">    1466 </span>            :     }
+<span class="lineNum">    1467 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">    1468 </span>            : }
+<span class="lineNum">    1469 </span>            : 
+<span class="lineNum">    1470 </span>            : template bool
+<span class="lineNum">    1471 </span>            : js::XDRScriptRegExpObject(XDRState&lt;XDR_ENCODE&gt;* xdr, MutableHandle&lt;RegExpObject*&gt; objp);
+<span class="lineNum">    1472 </span>            : 
+<span class="lineNum">    1473 </span>            : template bool
+<span class="lineNum">    1474 </span>            : js::XDRScriptRegExpObject(XDRState&lt;XDR_DECODE&gt;* xdr, MutableHandle&lt;RegExpObject*&gt; objp);
+<a name="1475"><span class="lineNum">    1475 </span>            : </a>
+<span class="lineNum">    1476 </span>            : JSObject*
+<span class="lineNum">    1477 </span><span class="lineNoCov">          0 : js::CloneScriptRegExpObject(JSContext* cx, RegExpObject&amp; reobj)</span>
+<span class="lineNum">    1478 </span>            : {
+<span class="lineNum">    1479 </span>            :     /* NB: Keep this in sync with XDRScriptRegExpObject. */
+<span class="lineNum">    1480 </span>            : 
+<span class="lineNum">    1481 </span><span class="lineNoCov">          0 :     RootedAtom source(cx, reobj.getSource());</span>
+<span class="lineNum">    1482 </span><span class="lineNoCov">          0 :     cx-&gt;markAtom(source);</span>
+<span class="lineNum">    1483 </span>            : 
+<span class="lineNum">    1484 </span><span class="lineNoCov">          0 :     return RegExpObject::create(cx, source, reobj.getFlags(), nullptr, cx-&gt;tempLifoAlloc());</span>
+<span class="lineNum">    1485 </span>            : }
+<a name="1486"><span class="lineNum">    1486 </span>            : </a>
+<span class="lineNum">    1487 </span>            : JS_FRIEND_API(bool)
+<span class="lineNum">    1488 </span><span class="lineNoCov">          0 : js::RegExpToSharedNonInline(JSContext* cx, HandleObject obj, MutableHandleRegExpShared shared)</span>
+<span class="lineNum">    1489 </span>            : {
+<span class="lineNum">    1490 </span><span class="lineNoCov">          0 :     return RegExpToShared(cx, obj, shared);</span>
+<span class="lineNum">    1491 </span>            : }
+<a name="1492"><span class="lineNum">    1492 </span>            : </a>
+<span class="lineNum">    1493 </span>            : JS::ubi::Node::Size
+<span class="lineNum">    1494 </span><span class="lineNoCov">          0 : JS::ubi::Concrete&lt;RegExpShared&gt;::size(mozilla::MallocSizeOf mallocSizeOf) const</span>
+<span class="lineNum">    1495 </span>            : {
+<span class="lineNum">    1496 </span>            :     return js::gc::Arena::thingSize(gc::AllocKind::REGEXP_SHARED) +
+<span class="lineNum">    1497 </span><span class="lineNoCov">          0 :         get().sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">    1498 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

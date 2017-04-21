@@ -1,0 +1,605 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/PseudoStack.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - PseudoStack.h<span style="font-size: 80%;"> (source / <a href="PseudoStack.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">94</td>
+            <td class="headerCovTableEntryLo">42.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryLo">47.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef PROFILER_PSEUDO_STACK_H_
+<span class="lineNum">       8 </span>            : #define PROFILER_PSEUDO_STACK_H_
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/ArrayUtils.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;js/ProfilingStack.h&quot;
+<span class="lineNum">      12 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/Atomics.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;nsISupportsImpl.h&quot;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">      17 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : // STORE_SEQUENCER: Because signals can interrupt our profile modification
+<span class="lineNum">      22 </span>            : //                  we need to make stores are not re-ordered by the compiler
+<span class="lineNum">      23 </span>            : //                  or hardware to make sure the profile is consistent at
+<span class="lineNum">      24 </span>            : //                  every point the signal can fire.
+<span class="lineNum">      25 </span>            : #if defined(__arm__)
+<span class="lineNum">      26 </span>            : // TODO Is there something cheaper that will prevent memory stores from being
+<span class="lineNum">      27 </span>            : // reordered?
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : typedef void (*LinuxKernelMemoryBarrierFunc)(void);
+<span class="lineNum">      30 </span>            : LinuxKernelMemoryBarrierFunc pLinuxKernelMemoryBarrier __attribute__((weak)) =
+<span class="lineNum">      31 </span>            :     (LinuxKernelMemoryBarrierFunc) 0xffff0fa0;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : # define STORE_SEQUENCER() pLinuxKernelMemoryBarrier()
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #elif defined(__i386__) || defined(__x86_64__) || \
+<span class="lineNum">      36 </span>            :       defined(_M_IX86) || defined(_M_X64)
+<span class="lineNum">      37 </span>            : # if defined(_MSC_VER)
+<span class="lineNum">      38 </span>            : #  include &lt;intrin.h&gt;
+<span class="lineNum">      39 </span>            : #  define STORE_SEQUENCER() _ReadWriteBarrier();
+<span class="lineNum">      40 </span>            : # elif defined(__INTEL_COMPILER)
+<span class="lineNum">      41 </span>            : #  define STORE_SEQUENCER() __memory_barrier();
+<span class="lineNum">      42 </span>            : # elif __GNUC__
+<span class="lineNum">      43 </span>            : #  define STORE_SEQUENCER() asm volatile(&quot;&quot; ::: &quot;memory&quot;);
+<span class="lineNum">      44 </span>            : # else
+<span class="lineNum">      45 </span>            : #  error &quot;Memory clobber not supported for your compiler.&quot;
+<span class="lineNum">      46 </span>            : # endif
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #else
+<span class="lineNum">      49 </span>            : # error &quot;Memory clobber not supported for your platform.&quot;
+<span class="lineNum">      50 </span>            : #endif
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : class ProfilerMarkerPayload;
+<span class="lineNum">      53 </span>            : template&lt;typename T&gt;
+<span class="lineNum">      54 </span>            : class ProfilerLinkedList;
+<span class="lineNum">      55 </span>            : class SpliceableJSONWriter;
+<span class="lineNum">      56 </span>            : class UniqueStacks;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : class ProfilerMarker
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span>            :   friend class ProfilerLinkedList&lt;ProfilerMarker&gt;;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : public:
+<span class="lineNum">      63 </span>            :   explicit ProfilerMarker(const char* aMarkerName,
+<span class="lineNum">      64 </span>            :                           ProfilerMarkerPayload* aPayload = nullptr,
+<span class="lineNum">      65 </span>            :                           double aTime = 0);
+<span class="lineNum">      66 </span>            :   ~ProfilerMarker();
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :   const char* GetMarkerName() const { return mMarkerName; }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :   void StreamJSON(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">      71 </span>            :                   const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">      72 </span>            :                   UniqueStacks&amp; aUniqueStacks) const;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   void SetGeneration(uint32_t aGenID);
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   bool HasExpired(uint32_t aGenID) const { return mGenID + 2 &lt;= aGenID; }</span>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :   double GetTime() const;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : private:
+<span class="lineNum">      81 </span>            :   char* mMarkerName;
+<span class="lineNum">      82 </span>            :   ProfilerMarkerPayload* mPayload;
+<span class="lineNum">      83 </span>            :   ProfilerMarker* mNext;
+<span class="lineNum">      84 </span>            :   double mTime;
+<span class="lineNum">      85 </span>            :   uint32_t mGenID;
+<span class="lineNum">      86 </span>            : };
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : template&lt;typename T&gt;
+<span class="lineNum">      89 </span>            : class ProfilerLinkedList
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span>            : public:
+<a name="92"><span class="lineNum">      92 </span>            :   ProfilerLinkedList()</a>
+<span class="lineNum">      93 </span>            :     : mHead(nullptr)
+<span class="lineNum">      94 </span><span class="lineCov">        525 :     , mTail(nullptr)</span>
+<a name="95"><span class="lineNum">      95 </span>            :   {}</a>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :   void insert(T* aElem)</span>
+<span class="lineNum">      98 </span>            :   {
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     if (!mTail) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       mHead = aElem;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       mTail = aElem;</span>
+<span class="lineNum">     102 </span>            :     } else {
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       mTail-&gt;mNext = aElem;</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       mTail = aElem;</span>
+<span class="lineNum">     105 </span>            :     }
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :     aElem-&gt;mNext = nullptr;</span>
+<a name="107"><span class="lineNum">     107 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   T* popHead()</span>
+<span class="lineNum">     110 </span>            :   {
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     if (!mHead) {</span>
+<span class="lineNum">     112 </span>            :       MOZ_ASSERT(false);
+<span class="lineNum">     113 </span>            :       return nullptr;
+<span class="lineNum">     114 </span>            :     }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     T* head = mHead;</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     mHead = head-&gt;mNext;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :     if (!mHead) {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :       mTail = nullptr;</span>
+<span class="lineNum">     121 </span>            :     }
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     return head;</span>
+<span class="lineNum">     124 </span>            :   }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :   const T* peek() {
+<span class="lineNum">     127 </span>            :     return mHead;
+<span class="lineNum">     128 </span>            :   }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : private:
+<span class="lineNum">     131 </span>            :   T* mHead;
+<span class="lineNum">     132 </span>            :   T* mTail;
+<span class="lineNum">     133 </span>            : };
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : typedef ProfilerLinkedList&lt;ProfilerMarker&gt; ProfilerMarkerLinkedList;
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     138 </span>            : class ProfilerSignalSafeLinkedList {
+<span class="lineNum">     139 </span>            : public:
+<span class="lineNum">     140 </span>            :   ProfilerSignalSafeLinkedList()
+<span class="lineNum">     141 </span><span class="lineCov">       1050 :     : mSignalLock(false)</span>
+<a name="142"><span class="lineNum">     142 </span>            :   {}</a>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">        525 :   ~ProfilerSignalSafeLinkedList()</span>
+<span class="lineNum">     145 </span>            :   {
+<span class="lineNum">     146 </span><span class="lineCov">        525 :     if (mSignalLock) {</span>
+<span class="lineNum">     147 </span>            :       // Some thread is modifying the list. We should only be released on that
+<span class="lineNum">     148 </span>            :       // thread.
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :       abort();</span>
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineCov">        525 :     while (mList.peek()) {</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       delete mList.popHead();</span>
+<span class="lineNum">     154 </span>            :     }
+<span class="lineNum">     155 </span><span class="lineCov">        525 :   }</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :   // Insert an item into the list. Must only be called from the owning thread.
+<span class="lineNum">     158 </span>            :   // Must not be called while the list from accessList() is being accessed.
+<span class="lineNum">     159 </span>            :   // In the profiler, we ensure that by interrupting the profiled thread
+<a name="160"><span class="lineNum">     160 </span>            :   // (which is the one that owns this list and calls insert() on it) until</a>
+<span class="lineNum">     161 </span>            :   // we're done reading the list from the signal handler.
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   void insert(T* aElement)</span>
+<span class="lineNum">     163 </span>            :   {
+<span class="lineNum">     164 </span>            :     MOZ_ASSERT(aElement);
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     mSignalLock = true;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :     STORE_SEQUENCER();</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     mList.insert(aElement);</span>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     STORE_SEQUENCER();</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     mSignalLock = false;</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :   // Called within signal, from any thread, possibly while insert() is in the
+<span class="lineNum">     176 </span>            :   // middle of modifying the list (on the owning thread). Will return null if
+<span class="lineNum">     177 </span>            :   // that is the case.
+<span class="lineNum">     178 </span>            :   // Function must be reentrant.
+<span class="lineNum">     179 </span>            :   ProfilerLinkedList&lt;T&gt;* accessList()
+<span class="lineNum">     180 </span>            :   {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :     return mSignalLock ? nullptr : &amp;mList;</span>
+<span class="lineNum">     182 </span>            :   }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : private:
+<span class="lineNum">     185 </span>            :   ProfilerLinkedList&lt;T&gt; mList;
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :   // If this is set, then it's not safe to read the list because its contents
+<span class="lineNum">     188 </span>            :   // are being changed.
+<span class="lineNum">     189 </span>            :   volatile bool mSignalLock;
+<span class="lineNum">     190 </span>            : };
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            : // Stub eventMarker function for js-engine event generation.
+<span class="lineNum">     193 </span>            : void ProfilerJSEventMarker(const char* aEvent);
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : // Note that some of these fields (e.g. mSleep) aren't really part of the
+<span class="lineNum">     196 </span>            : // PseudoStack, but they are part of this class so they can be stored in TLS.
+<span class="lineNum">     197 </span>            : //
+<span class="lineNum">     198 </span>            : // The PseudoStack members are read by signal handlers, so the mutation of them
+<span class="lineNum">     199 </span>            : // needs to be signal-safe.
+<span class="lineNum">     200 </span>            : struct PseudoStack
+<span class="lineNum">     201 </span>            : {
+<span class="lineNum">     202 </span>            : public:
+<span class="lineNum">     203 </span><span class="lineCov">        525 :   PseudoStack()</span>
+<span class="lineNum">     204 </span>            :     : mStackPointer(0)
+<span class="lineNum">     205 </span>            :     , mSleep(AWAKE)
+<span class="lineNum">     206 </span>            :     , mContext(nullptr)
+<span class="lineNum">     207 </span><span class="lineCov">       1575 :     , mJSSampling(INACTIVE)</span>
+<span class="lineNum">     208 </span>            :   {
+<span class="lineNum">     209 </span>            :     MOZ_COUNT_CTOR(PseudoStack);
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">        525 :   }</span></a>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">        525 :   ~PseudoStack()</span>
+<span class="lineNum">     213 </span><span class="lineCov">        525 :   {</span>
+<span class="lineNum">     214 </span>            :     MOZ_COUNT_DTOR(PseudoStack);
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :     // The label macros keep a reference to the PseudoStack to avoid a TLS
+<span class="lineNum">     217 </span>            :     // access. If these are somehow not all cleared we will get a
+<span class="lineNum">     218 </span>            :     // use-after-free so better to crash now.
+<span class="lineNum">     219 </span><span class="lineCov">        525 :     MOZ_RELEASE_ASSERT(mStackPointer == 0);</span>
+<span class="lineNum">     220 </span><span class="lineCov">        525 :   }</span>
+<span class="lineNum">     221 </span>            : 
+<a name="222"><span class="lineNum">     222 </span>            :   // This is called on every profiler restart. Put things that should happen at</a>
+<span class="lineNum">     223 </span>            :   // that time here.
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :   void reinitializeOnResume()</span>
+<span class="lineNum">     225 </span>            :   {
+<span class="lineNum">     226 </span>            :     // This is needed to cause an initial sample to be taken from sleeping
+<span class="lineNum">     227 </span>            :     // threads that had been observed prior to the profiler stopping and
+<span class="lineNum">     228 </span>            :     // restarting. Otherwise sleeping threads would not have any samples to
+<span class="lineNum">     229 </span>            :     // copy forward while sleeping.
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :     (void)mSleep.compareExchange(SLEEPING_OBSERVED, SLEEPING_NOT_OBSERVED);</span>
+<a name="231"><span class="lineNum">     231 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :   void addMarker(const char* aMarkerStr, ProfilerMarkerPayload* aPayload,</span>
+<span class="lineNum">     234 </span>            :                  double aTime)
+<span class="lineNum">     235 </span>            :   {
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :     ProfilerMarker* marker = new ProfilerMarker(aMarkerStr, aPayload, aTime);</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :     mPendingMarkers.insert(marker);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            :   // Called within signal. Function must be reentrant.
+<span class="lineNum">     241 </span>            :   ProfilerMarkerLinkedList* getPendingMarkers()
+<span class="lineNum">     242 </span>            :   {
+<span class="lineNum">     243 </span>            :     // The profiled thread is interrupted, so we can access the list safely.
+<span class="lineNum">     244 </span>            :     // Unless the profiled thread was in the middle of changing the list when
+<span class="lineNum">     245 </span>            :     // we interrupted it - in that case, accessList() will return null.
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :     return mPendingMarkers.accessList();</span>
+<span class="lineNum">     247 </span>            :   }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   void push(const char* aName, js::ProfileEntry::Category aCategory,
+<span class="lineNum">     250 </span>            :             uint32_t line)
+<span class="lineNum">     251 </span>            :   {
+<span class="lineNum">     252 </span>            :     push(aName, aCategory, nullptr, false, line, nullptr);
+<a name="253"><span class="lineNum">     253 </span>            :   }</a>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">        331 :   void push(const char* aName, js::ProfileEntry::Category aCategory,</span>
+<span class="lineNum">     256 </span>            :             void* aStackAddress, bool aCopy, uint32_t line,
+<span class="lineNum">     257 </span>            :             const char* aDynamicString)
+<span class="lineNum">     258 </span>            :   {
+<span class="lineNum">     259 </span><span class="lineCov">        331 :     if (size_t(mStackPointer) &gt;= mozilla::ArrayLength(mStack)) {</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :       mStackPointer++;</span>
+<span class="lineNum">     261 </span><span class="lineCov">        331 :       return;</span>
+<span class="lineNum">     262 </span>            :     }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">        331 :     volatile js::ProfileEntry&amp; entry = mStack[mStackPointer];</span>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :     // Make sure we increment the pointer after the name has been written such
+<span class="lineNum">     267 </span>            :     // that mStack is always consistent.
+<span class="lineNum">     268 </span>            :     entry.initCppFrame(aStackAddress, line);
+<span class="lineNum">     269 </span>            :     entry.setLabel(aName);
+<span class="lineNum">     270 </span>            :     entry.setDynamicString(aDynamicString);
+<span class="lineNum">     271 </span>            :     MOZ_ASSERT(entry.flags() == js::ProfileEntry::IS_CPP_ENTRY);
+<span class="lineNum">     272 </span><span class="lineCov">        331 :     entry.setCategory(aCategory);</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :     // Track if mLabel needs a copy.
+<span class="lineNum">     275 </span><span class="lineCov">        331 :     if (aCopy) {</span>
+<span class="lineNum">     276 </span>            :       entry.setFlag(js::ProfileEntry::FRAME_LABEL_COPY);
+<span class="lineNum">     277 </span>            :     } else {
+<span class="lineNum">     278 </span>            :       entry.unsetFlag(js::ProfileEntry::FRAME_LABEL_COPY);
+<span class="lineNum">     279 </span>            :     }
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :     // Prevent the optimizer from re-ordering these instructions
+<span class="lineNum">     282 </span><span class="lineCov">        331 :     STORE_SEQUENCER();</span>
+<span class="lineNum">     283 </span><span class="lineCov">        331 :     mStackPointer++;</span>
+<span class="lineNum">     284 </span>            :   }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :   // Pop the stack.
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">        331 :   void pop() { mStackPointer--; }</span></a>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">          5 :   uint32_t stackSize() const</span>
+<span class="lineNum">     290 </span>            :   {
+<span class="lineNum">     291 </span>            :     return std::min(mStackPointer,
+<span class="lineNum">     292 </span><span class="lineCov">         10 :                     mozilla::sig_safe_t(mozilla::ArrayLength(mStack)));</span>
+<span class="lineNum">     293 </span>            :   }
+<span class="lineNum">     294 </span>            : 
+<a name="295"><span class="lineNum">     295 </span>            :   // Set the JSContext of the thread to be sampled. Sampling cannot begin until</a>
+<span class="lineNum">     296 </span>            :   // this has been set.
+<span class="lineNum">     297 </span><span class="lineCov">         60 :   void setJSContext(JSContext* aContext)</span>
+<span class="lineNum">     298 </span>            :   {
+<span class="lineNum">     299 </span>            :     // This function runs on-thread.
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :     MOZ_ASSERT(aContext &amp;&amp; !mContext);
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span><span class="lineCov">         60 :     mContext = aContext;</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :     js::SetContextProfilingStack(aContext,
+<span class="lineNum">     306 </span>            :                                  (js::ProfileEntry*) mStack,
+<span class="lineNum">     307 </span>            :                                  (uint32_t*) &amp;mStackPointer,
+<span class="lineNum">     308 </span><span class="lineCov">         60 :                                  (uint32_t) mozilla::ArrayLength(mStack));</span>
+<span class="lineNum">     309 </span><span class="lineCov">         60 :     pollJSSampling();</span>
+<span class="lineNum">     310 </span><span class="lineCov">         60 :   }</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :   // Request that this thread start JS sampling. JS sampling won't actually
+<a name="313"><span class="lineNum">     313 </span>            :   // start until a subsequent pollJSSampling() call occurs *and* mContext has</a>
+<span class="lineNum">     314 </span>            :   // been set.
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :   void startJSSampling()</span>
+<span class="lineNum">     316 </span>            :   {
+<span class="lineNum">     317 </span>            :     // This function runs on-thread or off-thread.
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     MOZ_RELEASE_ASSERT(mJSSampling == INACTIVE ||</span>
+<span class="lineNum">     320 </span>            :                        mJSSampling == INACTIVE_REQUESTED);
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :     mJSSampling = ACTIVE_REQUESTED;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     323 </span>            : 
+<a name="324"><span class="lineNum">     324 </span>            :   // Request that this thread stop JS sampling. JS sampling won't actually stop</a>
+<span class="lineNum">     325 </span>            :   // until a subsequent pollJSSampling() call occurs.
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :   void stopJSSampling()</span>
+<span class="lineNum">     327 </span>            :   {
+<span class="lineNum">     328 </span>            :     // This function runs on-thread or off-thread.
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :     MOZ_RELEASE_ASSERT(mJSSampling == ACTIVE ||</span>
+<span class="lineNum">     331 </span>            :                        mJSSampling == ACTIVE_REQUESTED);
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :     mJSSampling = INACTIVE_REQUESTED;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :   }</span>
+<a name="334"><span class="lineNum">     334 </span>            : </a>
+<span class="lineNum">     335 </span>            :   // Poll to see if JS sampling should be started/stopped.
+<span class="lineNum">     336 </span><span class="lineCov">         60 :   void pollJSSampling()</span>
+<span class="lineNum">     337 </span>            :   {
+<span class="lineNum">     338 </span>            :     // This function runs on-thread.
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :     // We can't start/stop profiling until we have the thread's JSContext.
+<span class="lineNum">     341 </span><span class="lineCov">         60 :     if (mContext) {</span>
+<span class="lineNum">     342 </span>            :       // It is possible for mJSSampling to go through the following sequences.
+<span class="lineNum">     343 </span>            :       //
+<span class="lineNum">     344 </span>            :       // - INACTIVE, ACTIVE_REQUESTED, INACTIVE_REQUESTED, INACTIVE
+<span class="lineNum">     345 </span>            :       //
+<span class="lineNum">     346 </span>            :       // - ACTIVE, INACTIVE_REQUESTED, ACTIVE_REQUESTED, ACTIVE
+<span class="lineNum">     347 </span>            :       //
+<span class="lineNum">     348 </span>            :       // Therefore, the if and else branches here aren't always interleaved.
+<span class="lineNum">     349 </span>            :       // This is ok because the JS engine can handle that.
+<span class="lineNum">     350 </span>            :       //
+<span class="lineNum">     351 </span><span class="lineCov">        120 :       if (mJSSampling.compareExchange(ACTIVE_REQUESTED, ACTIVE)) {</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         js::EnableContextProfilingStack(mContext, true);</span>
+<span class="lineNum">     353 </span>            :         js::RegisterContextProfilingEventMarker(mContext,
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                                                 &amp;ProfilerJSEventMarker);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineCov">        120 :       } else if (mJSSampling.compareExchange(INACTIVE_REQUESTED, INACTIVE)) {</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :         js::EnableContextProfilingStack(mContext, false);</span>
+<span class="lineNum">     358 </span>            :       }
+<span class="lineNum">     359 </span>            :     }
+<a name="360"><span class="lineNum">     360 </span><span class="lineCov">         60 :   }</span></a>
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const</span>
+<span class="lineNum">     363 </span>            :   {
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :     size_t n = aMallocSizeOf(this);</span>
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :     // Measurement of the following members may be added later if DMD finds it
+<span class="lineNum">     367 </span>            :     // is worthwhile:
+<span class="lineNum">     368 </span>            :     // - things pointed to by mStack elements
+<span class="lineNum">     369 </span>            :     // - mPendingMarkers
+<span class="lineNum">     370 </span>            :     //
+<span class="lineNum">     371 </span>            :     // If these measurements are added, the code must be careful to avoid data
+<span class="lineNum">     372 </span>            :     // races. (The current code doesn't have any race issues because the
+<span class="lineNum">     373 </span>            :     // contents of the PseudoStack object aren't accessed; |this| is used only
+<span class="lineNum">     374 </span>            :     // as an address for lookup by aMallocSizeof).
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :     return n;</span>
+<span class="lineNum">     377 </span>            :   }
+<a name="378"><span class="lineNum">     378 </span>            : </a>
+<span class="lineNum">     379 </span>            :   // This returns true for the second and subsequent calls in each sleep cycle.
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :   bool CanDuplicateLastSampleDueToSleep()</span>
+<span class="lineNum">     381 </span>            :   {
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :     if (mSleep == AWAKE) {</span>
+<span class="lineNum">     383 </span>            :       return false;
+<span class="lineNum">     384 </span>            :     }
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :     if (mSleep.compareExchange(SLEEPING_NOT_OBSERVED, SLEEPING_OBSERVED)) {</span>
+<span class="lineNum">     387 </span>            :       return false;
+<span class="lineNum">     388 </span>            :     }
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     391 </span>            :   }
+<span class="lineNum">     392 </span>            : 
+<a name="393"><span class="lineNum">     393 </span>            :   // Call this whenever the current thread sleeps. Calling it twice in a row</a>
+<span class="lineNum">     394 </span>            :   // without an intervening setAwake() call is an error.
+<span class="lineNum">     395 </span><span class="lineCov">       4881 :   void setSleeping()</span>
+<span class="lineNum">     396 </span>            :   {
+<span class="lineNum">     397 </span>            :     MOZ_ASSERT(mSleep == AWAKE);
+<span class="lineNum">     398 </span><span class="lineCov">       4881 :     mSleep = SLEEPING_NOT_OBSERVED;</span>
+<span class="lineNum">     399 </span><span class="lineCov">       4881 :   }</span>
+<span class="lineNum">     400 </span>            : 
+<a name="401"><span class="lineNum">     401 </span>            :   // Call this whenever the current thread wakes. Calling it twice in a row</a>
+<span class="lineNum">     402 </span>            :   // without an intervening setSleeping() call is an error.
+<span class="lineNum">     403 </span><span class="lineCov">       4880 :   void setAwake()</span>
+<span class="lineNum">     404 </span>            :   {
+<span class="lineNum">     405 </span>            :     MOZ_ASSERT(mSleep != AWAKE);
+<span class="lineNum">     406 </span><span class="lineCov">       4880 :     mSleep = AWAKE;</span>
+<a name="407"><span class="lineNum">     407 </span><span class="lineCov">       4880 :   }</span></a>
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :   bool isSleeping() { return mSleep != AWAKE; }</span>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span>            : private:
+<span class="lineNum">     412 </span>            :   // No copying.
+<span class="lineNum">     413 </span>            :   PseudoStack(const PseudoStack&amp;) = delete;
+<span class="lineNum">     414 </span>            :   void operator=(const PseudoStack&amp;) = delete;
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :   void flushSamplerOnJSShutdown();
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            : public:
+<span class="lineNum">     419 </span>            :   // The list of active checkpoints.
+<span class="lineNum">     420 </span>            :   js::ProfileEntry volatile mStack[1024];
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : private:
+<span class="lineNum">     423 </span>            :   // A list of pending markers that must be moved to the circular buffer.
+<span class="lineNum">     424 </span>            :   ProfilerSignalSafeLinkedList&lt;ProfilerMarker&gt; mPendingMarkers;
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :   // This may exceed the length of mStack, so instead use the stackSize() method
+<span class="lineNum">     427 </span>            :   // to determine the number of valid samples in mStack.
+<span class="lineNum">     428 </span>            :   mozilla::sig_safe_t mStackPointer;
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            :   // mSleep tracks whether the thread is sleeping, and if so, whether it has
+<span class="lineNum">     431 </span>            :   // been previously observed. This is used for an optimization: in some cases,
+<span class="lineNum">     432 </span>            :   // when a thread is asleep, we duplicate the previous sample, which is
+<span class="lineNum">     433 </span>            :   // cheaper than taking a new sample.
+<span class="lineNum">     434 </span>            :   //
+<span class="lineNum">     435 </span>            :   // mSleep is atomic because it is accessed from multiple threads.
+<span class="lineNum">     436 </span>            :   //
+<span class="lineNum">     437 </span>            :   // - It is written only by this thread, via setSleeping() and setAwake().
+<span class="lineNum">     438 </span>            :   //
+<span class="lineNum">     439 </span>            :   // - It is read by SamplerThread::Run().
+<span class="lineNum">     440 </span>            :   //
+<span class="lineNum">     441 </span>            :   // There are two cases where racing between threads can cause an issue.
+<span class="lineNum">     442 </span>            :   //
+<span class="lineNum">     443 </span>            :   // - If CanDuplicateLastSampleDueToSleep() returns false but that result is
+<span class="lineNum">     444 </span>            :   //   invalidated before being acted upon, we will take a full sample
+<span class="lineNum">     445 </span>            :   //   unnecessarily. This is additional work but won't cause any correctness
+<span class="lineNum">     446 </span>            :   //   issues. (In actual fact, this case is impossible. In order to go from
+<span class="lineNum">     447 </span>            :   //   CanDuplicateLastSampleDueToSleep() returning false to it returning true
+<span class="lineNum">     448 </span>            :   //   requires an intermediate call to it in order for mSleep to go from
+<span class="lineNum">     449 </span>            :   //   SLEEPING_NOT_OBSERVED to SLEEPING_OBSERVED.)
+<span class="lineNum">     450 </span>            :   //
+<span class="lineNum">     451 </span>            :   // - If CanDuplicateLastSampleDueToSleep() returns true but that result is
+<span class="lineNum">     452 </span>            :   //   invalidated before being acted upon -- i.e. the thread wakes up before
+<span class="lineNum">     453 </span>            :   //   DuplicateLastSample() is called -- we will duplicate the previous
+<span class="lineNum">     454 </span>            :   //   sample. This is inaccurate, but only slightly... we will effectively
+<span class="lineNum">     455 </span>            :   //   treat the thread as having slept a tiny bit longer than it really did.
+<span class="lineNum">     456 </span>            :   //
+<span class="lineNum">     457 </span>            :   // This latter inaccuracy could be avoided by moving the
+<span class="lineNum">     458 </span>            :   // CanDuplicateLastSampleDueToSleep() check within the thread-freezing code,
+<span class="lineNum">     459 </span>            :   // e.g. the section where Tick() is called. But that would reduce the
+<span class="lineNum">     460 </span>            :   // effectiveness of the optimization because more code would have to be run
+<span class="lineNum">     461 </span>            :   // before we can tell that duplication is allowed.
+<span class="lineNum">     462 </span>            :   //
+<span class="lineNum">     463 </span>            :   static const int AWAKE = 0;
+<span class="lineNum">     464 </span>            :   static const int SLEEPING_NOT_OBSERVED = 1;
+<span class="lineNum">     465 </span>            :   static const int SLEEPING_OBSERVED = 2;
+<span class="lineNum">     466 </span>            :   mozilla::Atomic&lt;int&gt; mSleep;
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span>            : public:
+<span class="lineNum">     469 </span>            :   // If this is a JS thread, this is its JSContext, which is required for any
+<span class="lineNum">     470 </span>            :   // JS sampling.
+<span class="lineNum">     471 </span>            :   JSContext* mContext;
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            : private:
+<span class="lineNum">     474 </span>            :   // The profiler needs to start and stop JS sampling of JS threads at various
+<span class="lineNum">     475 </span>            :   // times. However, the JS engine can only do the required actions on the
+<span class="lineNum">     476 </span>            :   // JS thread itself (&quot;on-thread&quot;), not from another thread (&quot;off-thread&quot;).
+<span class="lineNum">     477 </span>            :   // Therefore, we have the following two-step process.
+<span class="lineNum">     478 </span>            :   //
+<span class="lineNum">     479 </span>            :   // - The profiler requests (on-thread or off-thread) that the JS sampling be
+<span class="lineNum">     480 </span>            :   //   started/stopped, by changing mJSSampling to the appropriate REQUESTED
+<span class="lineNum">     481 </span>            :   //   state.
+<span class="lineNum">     482 </span>            :   //
+<span class="lineNum">     483 </span>            :   // - The relevant JS thread polls (on-thread) for changes to mJSSampling.
+<span class="lineNum">     484 </span>            :   //   When it sees a REQUESTED state, it performs the appropriate actions to
+<span class="lineNum">     485 </span>            :   //   actually start/stop JS sampling, and changes mJSSampling out of the
+<span class="lineNum">     486 </span>            :   //   REQUESTED state.
+<span class="lineNum">     487 </span>            :   //
+<span class="lineNum">     488 </span>            :   // The state machine is as follows.
+<span class="lineNum">     489 </span>            :   //
+<span class="lineNum">     490 </span>            :   //             INACTIVE --&gt; ACTIVE_REQUESTED
+<span class="lineNum">     491 </span>            :   //                  ^       ^ |
+<span class="lineNum">     492 </span>            :   //                  |     _/  |
+<span class="lineNum">     493 </span>            :   //                  |   _/    |
+<span class="lineNum">     494 </span>            :   //                  |  /      |
+<span class="lineNum">     495 </span>            :   //                  | v       v
+<span class="lineNum">     496 </span>            :   //   INACTIVE_REQUESTED &lt;-- ACTIVE
+<span class="lineNum">     497 </span>            :   //
+<span class="lineNum">     498 </span>            :   // The polling is done in the following two ways.
+<span class="lineNum">     499 </span>            :   //
+<span class="lineNum">     500 </span>            :   // - Via the interrupt callback mechanism; the JS thread must call
+<span class="lineNum">     501 </span>            :   //   profiler_js_interrupt_callback() from its own interrupt callback.
+<span class="lineNum">     502 </span>            :   //   This is how sampling must be started/stopped for threads where the
+<span class="lineNum">     503 </span>            :   //   request was made off-thread.
+<span class="lineNum">     504 </span>            :   //
+<span class="lineNum">     505 </span>            :   // - When {start,stop}JSSampling() is called on-thread, we can immediately
+<span class="lineNum">     506 </span>            :   //   follow it with a pollJSSampling() call to avoid the delay between the
+<span class="lineNum">     507 </span>            :   //   two steps. Likewise, setJSContext() calls pollJSSampling().
+<span class="lineNum">     508 </span>            :   //
+<span class="lineNum">     509 </span>            :   // One non-obvious thing about all this: these JS sampling requests are made
+<span class="lineNum">     510 </span>            :   // on all threads, even non-JS threads. mContext needs to also be set (via
+<span class="lineNum">     511 </span>            :   // setJSContext(), which can only happen for JS threads) for any JS sampling
+<span class="lineNum">     512 </span>            :   // to actually happen.
+<span class="lineNum">     513 </span>            :   //
+<span class="lineNum">     514 </span>            :   static const int INACTIVE = 0;
+<span class="lineNum">     515 </span>            :   static const int ACTIVE_REQUESTED = 1;
+<span class="lineNum">     516 </span>            :   static const int ACTIVE = 2;
+<span class="lineNum">     517 </span>            :   static const int INACTIVE_REQUESTED = 3;
+<span class="lineNum">     518 </span>            :   mozilla::Atomic&lt;int&gt; mJSSampling;
+<span class="lineNum">     519 </span>            : };
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

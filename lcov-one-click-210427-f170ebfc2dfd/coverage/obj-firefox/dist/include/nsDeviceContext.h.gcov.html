@@ -1,0 +1,397 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/nsDeviceContext.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - nsDeviceContext.h<span style="font-size: 80%;"> (source / <a href="nsDeviceContext.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; indent-tabs-mode: nil; c-basic-offset: 4 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #ifndef _NS_DEVICECONTEXT_H_
+<span class="lineNum">       7 </span>            : #define _NS_DEVICECONTEXT_H_
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;stdint.h&gt;                     // for uint32_t
+<span class="lineNum">      10 </span>            : #include &lt;sys/types.h&gt;                  // for int32_t
+<span class="lineNum">      11 </span>            : #include &quot;gfxTypes.h&quot;                   // for gfxFloat
+<span class="lineNum">      12 </span>            : #include &quot;gfxFont.h&quot;                    // for gfxFont::Orientation
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/Assertions.h&quot;         // for MOZ_ASSERT_HELPER2
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/RefPtr.h&quot;             // for RefPtr
+<span class="lineNum">      15 </span>            : #include &quot;nsCOMPtr.h&quot;                   // for nsCOMPtr
+<span class="lineNum">      16 </span>            : #include &quot;nsCoord.h&quot;                    // for nscoord
+<span class="lineNum">      17 </span>            : #include &quot;nsError.h&quot;                    // for nsresult
+<span class="lineNum">      18 </span>            : #include &quot;nsISupports.h&quot;                // for NS_INLINE_DECL_REFCOUNTING
+<span class="lineNum">      19 </span>            : #include &quot;nsMathUtils.h&quot;                // for NS_round
+<span class="lineNum">      20 </span>            : #include &quot;nscore.h&quot;                     // for char16_t, nsAString
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/AppUnits.h&quot;           // for AppUnits
+<span class="lineNum">      22 </span>            : #include &quot;nsFontMetrics.h&quot;              // for nsFontMetrics::Params
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : class gfxContext;
+<span class="lineNum">      25 </span>            : class gfxTextPerfMetrics;
+<span class="lineNum">      26 </span>            : class gfxUserFontSet;
+<span class="lineNum">      27 </span>            : struct nsFont;
+<span class="lineNum">      28 </span>            : class nsFontCache;
+<span class="lineNum">      29 </span>            : class nsIAtom;
+<span class="lineNum">      30 </span>            : class nsIDeviceContextSpec;
+<span class="lineNum">      31 </span>            : class nsIScreen;
+<span class="lineNum">      32 </span>            : class nsIScreenManager;
+<span class="lineNum">      33 </span>            : class nsIWidget;
+<span class="lineNum">      34 </span>            : struct nsRect;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : namespace mozilla {
+<span class="lineNum">      37 </span>            : namespace gfx {
+<span class="lineNum">      38 </span>            : class PrintTarget;
+<span class="lineNum">      39 </span>            : }
+<span class="lineNum">      40 </span>            : }
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : class nsDeviceContext final
+<span class="lineNum">      43 </span>            : {
+<span class="lineNum">      44 </span>            : public:
+<span class="lineNum">      45 </span>            :     typedef mozilla::gfx::PrintTarget PrintTarget;
+<span class="lineNum">      46 </span>            : 
+<a name="47"><span class="lineNum">      47 </span>            :     nsDeviceContext();</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     NS_INLINE_DECL_REFCOUNTING(nsDeviceContext)</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     /**
+<span class="lineNum">      52 </span>            :      * Initialize the device context from a widget
+<span class="lineNum">      53 </span>            :      * @param aWidget a widget to initialize the device context from
+<span class="lineNum">      54 </span>            :      * @return error status
+<span class="lineNum">      55 </span>            :      */
+<span class="lineNum">      56 </span>            :     nsresult Init(nsIWidget *aWidget);
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     /*
+<span class="lineNum">      59 </span>            :      * Initialize the font cache if it hasn't been initialized yet.
+<span class="lineNum">      60 </span>            :      * (Needed for stylo)
+<span class="lineNum">      61 </span>            :      */
+<span class="lineNum">      62 </span>            :     void InitFontCache();
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :     /**
+<span class="lineNum">      65 </span>            :      * Initialize the device context from a device context spec
+<span class="lineNum">      66 </span>            :      * @param aDevSpec the specification of the printing device
+<span class="lineNum">      67 </span>            :      * @return error status
+<span class="lineNum">      68 </span>            :      */
+<span class="lineNum">      69 </span>            :     nsresult InitForPrinting(nsIDeviceContextSpec *aDevSpec);
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     /**
+<span class="lineNum">      72 </span>            :      * Create a rendering context and initialize it.  Only call this
+<span class="lineNum">      73 </span>            :      * method on device contexts that were initialized for printing.
+<span class="lineNum">      74 </span>            :      *
+<span class="lineNum">      75 </span>            :      * @return the new rendering context (guaranteed to be non-null)
+<span class="lineNum">      76 </span>            :      */
+<span class="lineNum">      77 </span>            :     already_AddRefed&lt;gfxContext&gt; CreateRenderingContext();
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :     /**
+<span class="lineNum">      80 </span>            :      * Create a reference rendering context and initialize it.  Only call this
+<span class="lineNum">      81 </span>            :      * method on device contexts that were initialized for printing.
+<span class="lineNum">      82 </span>            :      *
+<span class="lineNum">      83 </span>            :      * @return the new rendering context.
+<span class="lineNum">      84 </span>            :      */
+<span class="lineNum">      85 </span>            :     already_AddRefed&lt;gfxContext&gt; CreateReferenceRenderingContext();
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     /**
+<span class="lineNum">      88 </span>            :      * Gets the number of app units in one CSS pixel; this number is global,
+<span class="lineNum">      89 </span>            :      * not unique to each device context.
+<span class="lineNum">      90 </span>            :      */
+<span class="lineNum">      91 </span>            :     static int32_t AppUnitsPerCSSPixel() { return mozilla::AppUnitsPerCSSPixel(); }
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     /**
+<span class="lineNum">      94 </span>            :      * Gets the number of app units in one device pixel; this number
+<span class="lineNum">      95 </span>            :      * is usually a factor of AppUnitsPerCSSPixel(), although that is
+<span class="lineNum">      96 </span>            :      * not guaranteed.
+<span class="lineNum">      97 </span>            :      */
+<span class="lineNum">      98 </span>            :     int32_t AppUnitsPerDevPixel() const { return mAppUnitsPerDevPixel; }
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     /**
+<span class="lineNum">     101 </span>            :      * Convert device pixels which is used for gfx/thebes to nearest
+<a name="102"><span class="lineNum">     102 </span>            :      * (rounded) app units</a>
+<span class="lineNum">     103 </span>            :      */
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :     nscoord GfxUnitsToAppUnits(gfxFloat aGfxUnits) const</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :     { return nscoord(NS_round(aGfxUnits * AppUnitsPerDevPixel())); }</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     /**
+<span class="lineNum">     108 </span>            :      * Convert app units to device pixels which is used for gfx/thebes.
+<span class="lineNum">     109 </span>            :      */
+<span class="lineNum">     110 </span>            :     gfxFloat AppUnitsToGfxUnits(nscoord aAppUnits) const
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     { return gfxFloat(aAppUnits) / AppUnitsPerDevPixel(); }</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     /**
+<span class="lineNum">     114 </span>            :      * Gets the number of app units in one physical inch; this is the
+<span class="lineNum">     115 </span>            :      * device's DPI times AppUnitsPerDevPixel().
+<span class="lineNum">     116 </span>            :      */
+<span class="lineNum">     117 </span>            :     int32_t AppUnitsPerPhysicalInch() const
+<span class="lineNum">     118 </span>            :     { return mAppUnitsPerPhysicalInch; }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :     /**
+<span class="lineNum">     121 </span>            :      * Gets the number of app units in one CSS inch; this is
+<span class="lineNum">     122 </span>            :      * 96 times AppUnitsPerCSSPixel.
+<span class="lineNum">     123 </span>            :      */
+<span class="lineNum">     124 </span>            :     static int32_t AppUnitsPerCSSInch() { return mozilla::AppUnitsPerCSSInch(); }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :     /**
+<span class="lineNum">     127 </span>            :      * Get the ratio of app units to dev pixels that would be used at unit
+<span class="lineNum">     128 </span>            :      * (100%) full zoom.
+<span class="lineNum">     129 </span>            :      */
+<span class="lineNum">     130 </span>            :     int32_t AppUnitsPerDevPixelAtUnitFullZoom() const
+<span class="lineNum">     131 </span>            :     { return mAppUnitsPerDevPixelAtUnitFullZoom; }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :     /**
+<span class="lineNum">     134 </span>            :      * Get the nsFontMetrics that describe the properties of
+<span class="lineNum">     135 </span>            :      * an nsFont.
+<span class="lineNum">     136 </span>            :      * @param aFont font description to obtain metrics for
+<span class="lineNum">     137 </span>            :      */
+<span class="lineNum">     138 </span>            :     already_AddRefed&lt;nsFontMetrics&gt; GetMetricsFor(
+<span class="lineNum">     139 </span>            :         const nsFont&amp; aFont, const nsFontMetrics::Params&amp; aParams);
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :     /**
+<span class="lineNum">     142 </span>            :      * Notification when a font metrics instance created for this device is
+<span class="lineNum">     143 </span>            :      * about to be deleted
+<span class="lineNum">     144 </span>            :      */
+<span class="lineNum">     145 </span>            :     nsresult FontMetricsDeleted(const nsFontMetrics* aFontMetrics);
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :     /**
+<span class="lineNum">     148 </span>            :      * Attempt to free up resources by flushing out any fonts no longer
+<span class="lineNum">     149 </span>            :      * referenced by anything other than the font cache itself.
+<span class="lineNum">     150 </span>            :      * @return error status
+<span class="lineNum">     151 </span>            :      */
+<span class="lineNum">     152 </span>            :     nsresult FlushFontCache();
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :     /**
+<span class="lineNum">     155 </span>            :      * Return the bit depth of the device.
+<span class="lineNum">     156 </span>            :      */
+<span class="lineNum">     157 </span>            :     nsresult GetDepth(uint32_t&amp; aDepth);
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :     /**
+<span class="lineNum">     160 </span>            :      * Get the size of the displayable area of the output device
+<span class="lineNum">     161 </span>            :      * in app units.
+<span class="lineNum">     162 </span>            :      * @param aWidth out parameter for width
+<span class="lineNum">     163 </span>            :      * @param aHeight out parameter for height
+<span class="lineNum">     164 </span>            :      * @return error status
+<span class="lineNum">     165 </span>            :      */
+<span class="lineNum">     166 </span>            :     nsresult GetDeviceSurfaceDimensions(nscoord&amp; aWidth, nscoord&amp; aHeight);
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :     /**
+<span class="lineNum">     169 </span>            :      * Get the size of the content area of the output device in app
+<span class="lineNum">     170 </span>            :      * units.  This corresponds on a screen device, for instance, to
+<span class="lineNum">     171 </span>            :      * the entire screen.
+<span class="lineNum">     172 </span>            :      * @param aRect out parameter for full rect. Position (x,y) will
+<span class="lineNum">     173 </span>            :      *              be (0,0) or relative to the primary monitor if
+<span class="lineNum">     174 </span>            :      *              this is not the primary.
+<span class="lineNum">     175 </span>            :      * @return error status
+<span class="lineNum">     176 </span>            :      */
+<span class="lineNum">     177 </span>            :     nsresult GetRect(nsRect&amp; aRect);
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :     /**
+<span class="lineNum">     180 </span>            :      * Get the size of the content area of the output device in app
+<span class="lineNum">     181 </span>            :      * units.  This corresponds on a screen device, for instance, to
+<span class="lineNum">     182 </span>            :      * the area reported by GetDeviceSurfaceDimensions, minus the
+<span class="lineNum">     183 </span>            :      * taskbar (Windows) or menubar (Macintosh).
+<span class="lineNum">     184 </span>            :      * @param aRect out parameter for client rect. Position (x,y) will
+<span class="lineNum">     185 </span>            :      *              be (0,0) adjusted for any upper/left non-client
+<span class="lineNum">     186 </span>            :      *              space if present or relative to the primary
+<span class="lineNum">     187 </span>            :      *              monitor if this is not the primary.
+<span class="lineNum">     188 </span>            :      * @return error status
+<span class="lineNum">     189 </span>            :      */
+<span class="lineNum">     190 </span>            :     nsresult GetClientRect(nsRect&amp; aRect);
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :     /**
+<span class="lineNum">     193 </span>            :      * Inform the output device that output of a document is beginning
+<span class="lineNum">     194 </span>            :      * Used for print related device contexts. Must be matched 1:1 with
+<span class="lineNum">     195 </span>            :      * EndDocument() or AbortDocument().
+<span class="lineNum">     196 </span>            :      *
+<span class="lineNum">     197 </span>            :      * @param aTitle - title of Document
+<span class="lineNum">     198 </span>            :      * @param aPrintToFileName - name of file to print to, if empty then don't
+<span class="lineNum">     199 </span>            :      *                           print to file
+<span class="lineNum">     200 </span>            :      * @param aStartPage - starting page number (must be greater than zero)
+<span class="lineNum">     201 </span>            :      * @param aEndPage - ending page number (must be less than or
+<span class="lineNum">     202 </span>            :      * equal to number of pages)
+<span class="lineNum">     203 </span>            :      *
+<span class="lineNum">     204 </span>            :      * @return error status
+<span class="lineNum">     205 </span>            :      */
+<span class="lineNum">     206 </span>            :     nsresult BeginDocument(const nsAString&amp; aTitle,
+<span class="lineNum">     207 </span>            :                            const nsAString&amp; aPrintToFileName,
+<span class="lineNum">     208 </span>            :                            int32_t          aStartPage,
+<span class="lineNum">     209 </span>            :                            int32_t          aEndPage);
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :     /**
+<span class="lineNum">     212 </span>            :      * Inform the output device that output of a document is ending.
+<span class="lineNum">     213 </span>            :      * Used for print related device contexts. Must be matched 1:1 with
+<span class="lineNum">     214 </span>            :      * BeginDocument()
+<span class="lineNum">     215 </span>            :      * @return error status
+<span class="lineNum">     216 </span>            :      */
+<span class="lineNum">     217 </span>            :     nsresult EndDocument();
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :     /**
+<span class="lineNum">     220 </span>            :      * Inform the output device that output of a document is being aborted.
+<span class="lineNum">     221 </span>            :      * Must be matched 1:1 with BeginDocument()
+<span class="lineNum">     222 </span>            :      * @return error status
+<span class="lineNum">     223 </span>            :      */
+<span class="lineNum">     224 </span>            :     nsresult AbortDocument();
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :     /**
+<span class="lineNum">     227 </span>            :      * Inform the output device that output of a page is beginning
+<span class="lineNum">     228 </span>            :      * Used for print related device contexts. Must be matched 1:1 with
+<span class="lineNum">     229 </span>            :      * EndPage() and within a BeginDocument()/EndDocument() pair.
+<span class="lineNum">     230 </span>            :      * @return error status
+<span class="lineNum">     231 </span>            :      */
+<span class="lineNum">     232 </span>            :     nsresult BeginPage();
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :     /**
+<span class="lineNum">     235 </span>            :      * Inform the output device that output of a page is ending
+<span class="lineNum">     236 </span>            :      * Used for print related device contexts. Must be matched 1:1 with
+<span class="lineNum">     237 </span>            :      * BeginPage() and within a BeginDocument()/EndDocument() pair.
+<span class="lineNum">     238 </span>            :      * @return error status
+<span class="lineNum">     239 </span>            :      */
+<span class="lineNum">     240 </span>            :     nsresult EndPage();
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :     /**
+<span class="lineNum">     243 </span>            :      * Check to see if the DPI has changed, or impose a new DPI scale value.
+<span class="lineNum">     244 </span>            :      * @param  aScale - If non-null, the default (unzoomed) CSS to device pixel
+<span class="lineNum">     245 </span>            :      *                  scale factor will be returned here; and if it is &gt; 0.0
+<span class="lineNum">     246 </span>            :      *                  on input, the given value will be used instead of
+<span class="lineNum">     247 </span>            :      *                  getting it from the widget (if any). This is used to
+<span class="lineNum">     248 </span>            :      *                  allow subdocument contexts to inherit the resolution
+<span class="lineNum">     249 </span>            :      *                  setting of their parent.
+<span class="lineNum">     250 </span>            :      * @return whether there was actually a change in the DPI (whether
+<span class="lineNum">     251 </span>            :      *         AppUnitsPerDevPixel() or AppUnitsPerPhysicalInch()
+<span class="lineNum">     252 </span>            :      *         changed)
+<span class="lineNum">     253 </span>            :      */
+<span class="lineNum">     254 </span>            :     bool CheckDPIChange(double* aScale = nullptr);
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :     /**
+<span class="lineNum">     257 </span>            :      * Set the full zoom factor: all lengths are multiplied by this factor
+<span class="lineNum">     258 </span>            :      * when we convert them to device pixels. Returns whether the ratio of
+<span class="lineNum">     259 </span>            :      * app units to dev pixels changed because of the zoom factor.
+<span class="lineNum">     260 </span>            :      */
+<span class="lineNum">     261 </span>            :     bool SetFullZoom(float aScale);
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :     /**
+<span class="lineNum">     264 </span>            :      * Returns the page full zoom factor applied.
+<span class="lineNum">     265 </span>            :      */
+<span class="lineNum">     266 </span>            :     float GetFullZoom() const { return mFullZoom; }
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :     /**
+<span class="lineNum">     269 </span>            :      * True if this device context was created for printing.
+<span class="lineNum">     270 </span>            :      */
+<span class="lineNum">     271 </span>            :     bool IsPrinterContext();
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :     mozilla::DesktopToLayoutDeviceScale GetDesktopToDeviceScale();
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            : private:
+<span class="lineNum">     276 </span>            :     // Private destructor, to discourage deletion outside of Release():
+<span class="lineNum">     277 </span>            :     ~nsDeviceContext();
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            :     /**
+<span class="lineNum">     280 </span>            :      * Implementation shared by CreateRenderingContext and
+<span class="lineNum">     281 </span>            :      * CreateReferenceRenderingContext.
+<span class="lineNum">     282 </span>            :      */
+<span class="lineNum">     283 </span>            :     already_AddRefed&lt;gfxContext&gt;
+<span class="lineNum">     284 </span>            :     CreateRenderingContextCommon(bool aWantReferenceContext);
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :     void SetDPI(double* aScale = nullptr);
+<span class="lineNum">     287 </span>            :     void ComputeClientRectUsingScreen(nsRect *outRect);
+<span class="lineNum">     288 </span>            :     void ComputeFullAreaUsingScreen(nsRect *outRect);
+<span class="lineNum">     289 </span>            :     void FindScreen(nsIScreen **outScreen);
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :     // Return false if the surface is not right
+<span class="lineNum">     292 </span>            :     bool CalcPrintingSize();
+<span class="lineNum">     293 </span>            :     void UpdateAppUnitsForFullZoom();
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :     nscoord  mWidth;
+<span class="lineNum">     296 </span>            :     nscoord  mHeight;
+<span class="lineNum">     297 </span>            :     int32_t  mAppUnitsPerDevPixel;
+<span class="lineNum">     298 </span>            :     int32_t  mAppUnitsPerDevPixelAtUnitFullZoom;
+<span class="lineNum">     299 </span>            :     int32_t  mAppUnitsPerPhysicalInch;
+<span class="lineNum">     300 </span>            :     float    mFullZoom;
+<span class="lineNum">     301 </span>            :     float    mPrintingScale;
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            :     RefPtr&lt;nsFontCache&gt;            mFontCache;
+<span class="lineNum">     304 </span>            :     nsCOMPtr&lt;nsIWidget&gt;            mWidget;
+<span class="lineNum">     305 </span>            :     nsCOMPtr&lt;nsIScreenManager&gt;     mScreenManager;
+<span class="lineNum">     306 </span>            :     nsCOMPtr&lt;nsIDeviceContextSpec&gt; mDeviceContextSpec;
+<span class="lineNum">     307 </span>            :     RefPtr&lt;PrintTarget&gt;            mPrintTarget;
+<span class="lineNum">     308 </span>            : #ifdef DEBUG
+<span class="lineNum">     309 </span>            :     bool mIsInitialized;
+<span class="lineNum">     310 </span>            : #endif
+<span class="lineNum">     311 </span>            : };
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            : #endif /* _NS_DEVICECONTEXT_H_ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

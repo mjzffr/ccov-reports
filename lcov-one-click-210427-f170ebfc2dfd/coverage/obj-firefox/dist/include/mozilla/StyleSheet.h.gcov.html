@@ -1,0 +1,394 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/StyleSheet.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - StyleSheet.h<span style="font-size: 80%;"> (source / <a href="StyleSheet.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_StyleSheet_h
+<span class="lineNum">       8 </span>            : #define mozilla_StyleSheet_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/css/SheetParsingMode.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/dom/CSSStyleSheetBinding.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/net/ReferrerPolicy.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/StyleBackendType.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/CORSMode.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/ServoUtils.h&quot;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &quot;nsICSSLoaderObserver.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsIDOMCSSStyleSheet.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsWrapperCache.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : class nsIDocument;
+<span class="lineNum">      22 </span>            : class nsINode;
+<span class="lineNum">      23 </span>            : class nsIPrincipal;
+<span class="lineNum">      24 </span>            : class nsCSSRuleProcessor;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : namespace mozilla {
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : class CSSStyleSheet;
+<span class="lineNum">      29 </span>            : class ServoStyleSheet;
+<span class="lineNum">      30 </span>            : struct StyleSheetInfo;
+<span class="lineNum">      31 </span>            : struct CSSStyleSheetInner;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : namespace dom {
+<span class="lineNum">      34 </span>            : class CSSRuleList;
+<span class="lineNum">      35 </span>            : class MediaList;
+<span class="lineNum">      36 </span>            : class SRIMetadata;
+<span class="lineNum">      37 </span>            : } // namespace dom
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : namespace css {
+<span class="lineNum">      40 </span>            : class GroupRule;
+<span class="lineNum">      41 </span>            : class ImportRule;
+<span class="lineNum">      42 </span>            : class Rule;
+<span class="lineNum">      43 </span>            : }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : /**
+<span class="lineNum">      46 </span>            :  * Superclass for data common to CSSStyleSheet and ServoStyleSheet.
+<span class="lineNum">      47 </span>            :  */
+<span class="lineNum">      48 </span>            : class StyleSheet : public nsIDOMCSSStyleSheet
+<span class="lineNum">      49 </span>            :                  , public nsICSSLoaderObserver
+<span class="lineNum">      50 </span>            :                  , public nsWrapperCache
+<span class="lineNum">      51 </span>            : {
+<span class="lineNum">      52 </span>            : protected:
+<span class="lineNum">      53 </span>            :   StyleSheet(StyleBackendType aType, css::SheetParsingMode aParsingMode);
+<span class="lineNum">      54 </span>            :   StyleSheet(const StyleSheet&amp; aCopy,
+<span class="lineNum">      55 </span>            :              nsIDocument* aDocumentToUse,
+<span class="lineNum">      56 </span>            :              nsINode* aOwningNodeToUse);
+<span class="lineNum">      57 </span>            :   virtual ~StyleSheet();
+<span class="lineNum">      58 </span>            : 
+<a name="59"><span class="lineNum">      59 </span>            : public:</a>
+<span class="lineNum">      60 </span>            :   NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+<span class="lineNum">      61 </span><span class="lineCov">         70 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_AMBIGUOUS(StyleSheet,</span>
+<span class="lineNum">      62 </span>            :                                                          nsIDOMCSSStyleSheet)
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :   void SetOwningNode(nsINode* aOwningNode)
+<span class="lineNum">      65 </span>            :   {
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     mOwningNode = aOwningNode;</span>
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   css::SheetParsingMode ParsingMode() { return mParsingMode; }
+<span class="lineNum">      70 </span>            :   mozilla::dom::CSSStyleSheetParsingMode ParsingModeDOM();
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :   /**
+<span class="lineNum">      73 </span>            :    * Whether the sheet is complete.
+<span class="lineNum">      74 </span>            :    */
+<span class="lineNum">      75 </span>            :   bool IsComplete() const;
+<span class="lineNum">      76 </span>            :   void SetComplete();
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :   /**
+<span class="lineNum">      79 </span>            :    * Set the stylesheet to be enabled.  This may or may not make it
+<span class="lineNum">      80 </span>            :    * applicable.  Note that this WILL inform the sheet's document of
+<span class="lineNum">      81 </span>            :    * its new applicable state if the state changes but WILL NOT call
+<span class="lineNum">      82 </span>            :    * BeginUpdate() or EndUpdate() on the document -- calling those is
+<span class="lineNum">      83 </span>            :    * the caller's responsibility.  This allows use of SetEnabled when
+<span class="lineNum">      84 </span>            :    * batched updates are desired.  If you want updates handled for
+<span class="lineNum">      85 </span>            :    * you, see nsIDOMStyleSheet::SetDisabled().
+<span class="lineNum">      86 </span>            :    */
+<span class="lineNum">      87 </span>            :   void SetEnabled(bool aEnabled);
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   MOZ_DECL_STYLO_METHODS(CSSStyleSheet, ServoStyleSheet)
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   // Whether the sheet is for an inline &lt;style&gt; element.
+<span class="lineNum">      92 </span>            :   inline bool IsInline() const;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   inline nsIURI* GetSheetURI() const;
+<span class="lineNum">      95 </span>            :   /* Get the URI this sheet was originally loaded from, if any.  Can
+<span class="lineNum">      96 </span>            :      return null */
+<span class="lineNum">      97 </span>            :   inline nsIURI* GetOriginalURI() const;
+<span class="lineNum">      98 </span>            :   inline nsIURI* GetBaseURI() const;
+<span class="lineNum">      99 </span>            :   /**
+<span class="lineNum">     100 </span>            :    * SetURIs must be called on all sheets before parsing into them.
+<span class="lineNum">     101 </span>            :    * SetURIs may only be called while the sheet is 1) incomplete and 2)
+<span class="lineNum">     102 </span>            :    * has no rules in it
+<span class="lineNum">     103 </span>            :    */
+<span class="lineNum">     104 </span>            :   inline void SetURIs(nsIURI* aSheetURI, nsIURI* aOriginalSheetURI,
+<span class="lineNum">     105 </span>            :                       nsIURI* aBaseURI);
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   /**
+<span class="lineNum">     108 </span>            :    * Whether the sheet is applicable.  A sheet that is not applicable
+<span class="lineNum">     109 </span>            :    * should never be inserted into a style set.  A sheet may not be
+<span class="lineNum">     110 </span>            :    * applicable for a variety of reasons including being disabled and
+<span class="lineNum">     111 </span>            :    * being incomplete.
+<span class="lineNum">     112 </span>            :    */
+<span class="lineNum">     113 </span>            :   inline bool IsApplicable() const;
+<span class="lineNum">     114 </span>            :   inline bool HasRules() const;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   virtual already_AddRefed&lt;StyleSheet&gt; Clone(StyleSheet* aCloneParent,
+<span class="lineNum">     117 </span>            :                                              css::ImportRule* aCloneOwnerRule,
+<span class="lineNum">     118 </span>            :                                              nsIDocument* aCloneDocument,
+<span class="lineNum">     119 </span>            :                                              nsINode* aCloneOwningNode) const = 0;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :   virtual bool IsModified() const = 0;
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            :   // style sheet owner info
+<span class="lineNum">     124 </span>            :   enum DocumentAssociationMode {
+<span class="lineNum">     125 </span>            :     // OwnedByDocument means mDocument owns us (possibly via a chain of other
+<span class="lineNum">     126 </span>            :     // stylesheets).
+<span class="lineNum">     127 </span>            :     OwnedByDocument,
+<span class="lineNum">     128 </span>            :     // NotOwnedByDocument means we're owned by something that might have a
+<span class="lineNum">     129 </span>            :     // different lifetime than mDocument.
+<span class="lineNum">     130 </span>            :     NotOwnedByDocument
+<span class="lineNum">     131 </span>            :   };
+<span class="lineNum">     132 </span>            :   nsIDocument* GetAssociatedDocument() const { return mDocument; }
+<span class="lineNum">     133 </span>            :   bool IsOwnedByDocument() const {
+<span class="lineNum">     134 </span>            :     return mDocumentAssociationMode == OwnedByDocument;
+<span class="lineNum">     135 </span>            :   }
+<span class="lineNum">     136 </span>            :   // aDocument must not be null.
+<span class="lineNum">     137 </span>            :   void SetAssociatedDocument(nsIDocument* aDocument,
+<span class="lineNum">     138 </span>            :                              DocumentAssociationMode aMode);
+<span class="lineNum">     139 </span>            :   void ClearAssociatedDocument();
+<span class="lineNum">     140 </span>            :   nsINode* GetOwnerNode() const { return mOwningNode; }
+<span class="lineNum">     141 </span>            :   inline StyleSheet* GetParentSheet() const { return mParent; }
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :   void AppendStyleSheet(StyleSheet* aSheet);
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :   StyleSheet* GetFirstChild() const;
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   // Principal() never returns a null pointer.
+<span class="lineNum">     148 </span>            :   inline nsIPrincipal* Principal() const;
+<span class="lineNum">     149 </span>            :   /**
+<span class="lineNum">     150 </span>            :    * SetPrincipal should be called on all sheets before parsing into them.
+<span class="lineNum">     151 </span>            :    * This can only be called once with a non-null principal.  Calling this with
+<span class="lineNum">     152 </span>            :    * a null pointer is allowed and is treated as a no-op.
+<span class="lineNum">     153 </span>            :    */
+<span class="lineNum">     154 </span>            :   inline void SetPrincipal(nsIPrincipal* aPrincipal);
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineCov">         35 :   void SetTitle(const nsAString&amp; aTitle) { mTitle = aTitle; }</span>
+<span class="lineNum">     157 </span>            :   void SetMedia(dom::MediaList* aMedia);
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   // Get this style sheet's CORS mode
+<span class="lineNum">     160 </span>            :   inline CORSMode GetCORSMode() const;
+<span class="lineNum">     161 </span>            :   // Get this style sheet's Referrer Policy
+<span class="lineNum">     162 </span>            :   inline net::ReferrerPolicy GetReferrerPolicy() const;
+<span class="lineNum">     163 </span>            :   // Get this style sheet's integrity metadata
+<span class="lineNum">     164 </span>            :   inline void GetIntegrity(dom::SRIMetadata&amp; aResult) const;
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   virtual size_t SizeOfIncludingThis(MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">     167 </span>            : #ifdef DEBUG
+<span class="lineNum">     168 </span>            :   virtual void List(FILE* aOut = stdout, int32_t aIndex = 0) const;
+<span class="lineNum">     169 </span>            : #endif
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   // WebIDL StyleSheet API
+<span class="lineNum">     172 </span>            :   // The XPCOM GetType is fine for WebIDL.
+<span class="lineNum">     173 </span>            :   // The XPCOM GetHref is fine for WebIDL
+<span class="lineNum">     174 </span>            :   // GetOwnerNode is defined above.
+<span class="lineNum">     175 </span>            :   inline StyleSheet* GetParentStyleSheet() const;
+<span class="lineNum">     176 </span>            :   // The XPCOM GetTitle is fine for WebIDL.
+<span class="lineNum">     177 </span>            :   dom::MediaList* Media();
+<span class="lineNum">     178 </span>            :   bool Disabled() const { return mDisabled; }
+<span class="lineNum">     179 </span>            :   // The XPCOM SetDisabled is fine for WebIDL.
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   // WebIDL CSSStyleSheet API
+<span class="lineNum">     182 </span>            :   virtual css::Rule* GetDOMOwnerRule() const = 0;
+<span class="lineNum">     183 </span>            :   dom::CSSRuleList* GetCssRules(nsIPrincipal&amp; aSubjectPrincipal,
+<span class="lineNum">     184 </span>            :                                 ErrorResult&amp; aRv);
+<span class="lineNum">     185 </span>            :   uint32_t InsertRule(const nsAString&amp; aRule, uint32_t aIndex,
+<span class="lineNum">     186 </span>            :                       nsIPrincipal&amp; aSubjectPrincipal,
+<span class="lineNum">     187 </span>            :                       ErrorResult&amp; aRv);
+<span class="lineNum">     188 </span>            :   void DeleteRule(uint32_t aIndex,
+<span class="lineNum">     189 </span>            :                   nsIPrincipal&amp; aSubjectPrincipal,
+<span class="lineNum">     190 </span>            :                   ErrorResult&amp; aRv);
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :   // WebIDL miscellaneous bits
+<span class="lineNum">     193 </span>            :   inline dom::ParentObject GetParentObject() const;
+<span class="lineNum">     194 </span>            :   JSObject* WrapObject(JSContext* aCx, JS::Handle&lt;JSObject*&gt; aGivenProto) final;
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   // nsIDOMStyleSheet interface
+<span class="lineNum">     197 </span>            :   NS_IMETHOD GetType(nsAString&amp; aType) final;
+<span class="lineNum">     198 </span>            :   NS_IMETHOD GetDisabled(bool* aDisabled) final;
+<span class="lineNum">     199 </span>            :   NS_IMETHOD SetDisabled(bool aDisabled) final;
+<span class="lineNum">     200 </span>            :   NS_IMETHOD GetOwnerNode(nsIDOMNode** aOwnerNode) final;
+<span class="lineNum">     201 </span>            :   NS_IMETHOD GetParentStyleSheet(nsIDOMStyleSheet** aParentStyleSheet) final;
+<span class="lineNum">     202 </span>            :   NS_IMETHOD GetHref(nsAString&amp; aHref) final;
+<span class="lineNum">     203 </span>            :   NS_IMETHOD GetTitle(nsAString&amp; aTitle) final;
+<span class="lineNum">     204 </span>            :   NS_IMETHOD GetMedia(nsIDOMMediaList** aMedia) final;
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            :   // nsIDOMCSSStyleSheet
+<span class="lineNum">     207 </span>            :   NS_IMETHOD GetOwnerRule(nsIDOMCSSRule** aOwnerRule) final;
+<span class="lineNum">     208 </span>            :   NS_IMETHOD GetCssRules(nsIDOMCSSRuleList** aCssRules) final;
+<span class="lineNum">     209 </span>            :   NS_IMETHOD InsertRule(const nsAString&amp; aRule, uint32_t aIndex,
+<span class="lineNum">     210 </span>            :                       uint32_t* aReturn) final;
+<span class="lineNum">     211 </span>            :   NS_IMETHOD DeleteRule(uint32_t aIndex) final;
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :   // Changes to sheets should be inside of a WillDirty-DidDirty pair.
+<span class="lineNum">     214 </span>            :   // However, the calls do not need to be matched; it's ok to call
+<span class="lineNum">     215 </span>            :   // WillDirty and then make no change and skip the DidDirty call.
+<span class="lineNum">     216 </span>            :   inline void WillDirty();
+<span class="lineNum">     217 </span>            :   inline void DidDirty();
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   nsresult DeleteRuleFromGroup(css::GroupRule* aGroup, uint32_t aIndex);
+<span class="lineNum">     220 </span>            :   nsresult InsertRuleIntoGroup(const nsAString&amp; aRule,
+<span class="lineNum">     221 </span>            :                                css::GroupRule* aGroup, uint32_t aIndex);
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : private:
+<span class="lineNum">     224 </span>            :   // Get a handle to the various stylesheet bits which live on the 'inner' for
+<span class="lineNum">     225 </span>            :   // gecko stylesheets and live on the StyleSheet for Servo stylesheets.
+<span class="lineNum">     226 </span>            :   inline StyleSheetInfo&amp; SheetInfo();
+<span class="lineNum">     227 </span>            :   inline const StyleSheetInfo&amp; SheetInfo() const;
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :   // Check if the rules are available for read and write.
+<span class="lineNum">     230 </span>            :   // It does the security check as well as whether the rules have been
+<span class="lineNum">     231 </span>            :   // completely loaded. aRv will have an exception set if this function
+<span class="lineNum">     232 </span>            :   // returns false.
+<span class="lineNum">     233 </span>            :   bool AreRulesAvailable(nsIPrincipal&amp; aSubjectPrincipal,
+<span class="lineNum">     234 </span>            :                          ErrorResult&amp; aRv);
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : protected:
+<span class="lineNum">     237 </span>            :   struct ChildSheetListBuilder {
+<span class="lineNum">     238 </span>            :     RefPtr&lt;StyleSheet&gt;* sheetSlot;
+<span class="lineNum">     239 </span>            :     StyleSheet* parent;
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     void SetParentLinks(StyleSheet* aSheet);
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     static void ReparentChildList(StyleSheet* aPrimarySheet,
+<span class="lineNum">     244 </span>            :                                   StyleSheet* aFirstChild);
+<span class="lineNum">     245 </span>            :   };
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            :   void UnparentChildren();
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   // Return success if the subject principal subsumes the principal of our
+<span class="lineNum">     250 </span>            :   // inner, error otherwise.  This will also succeed if the subject has
+<span class="lineNum">     251 </span>            :   // UniversalXPConnect or if access is allowed by CORS.  In the latter case,
+<span class="lineNum">     252 </span>            :   // it will set the principal of the inner to the subject principal.
+<span class="lineNum">     253 </span>            :   void SubjectSubsumesInnerPrincipal(nsIPrincipal&amp; aSubjectPrincipal,
+<span class="lineNum">     254 </span>            :                                      ErrorResult&amp; aRv);
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   // Drop our reference to mMedia
+<span class="lineNum">     257 </span>            :   void DropMedia();
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   // Called from SetEnabled when the enabled state changed.
+<span class="lineNum">     260 </span>            :   void EnabledStateChanged();
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :   // Unlink our inner, if needed, for cycle collection
+<span class="lineNum">     263 </span>            :   virtual void UnlinkInner();
+<span class="lineNum">     264 </span>            :   // Traverse our inner, if needed, for cycle collection
+<span class="lineNum">     265 </span>            :   virtual void TraverseInner(nsCycleCollectionTraversalCallback &amp;);
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            :   StyleSheet*           mParent;    // weak ref
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :   nsString              mTitle;
+<span class="lineNum">     270 </span>            :   nsIDocument*          mDocument; // weak ref; parents maintain this for their children
+<span class="lineNum">     271 </span>            :   nsINode*              mOwningNode; // weak ref
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :   RefPtr&lt;dom::MediaList&gt; mMedia;
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            :   RefPtr&lt;StyleSheet&gt; mNext;
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :   // mParsingMode controls access to nonstandard style constructs that
+<span class="lineNum">     278 </span>            :   // are not safe for use on the public Web but necessary in UA sheets
+<span class="lineNum">     279 </span>            :   // and/or useful in user sheets.
+<span class="lineNum">     280 </span>            :   css::SheetParsingMode mParsingMode;
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            :   const StyleBackendType mType;
+<span class="lineNum">     283 </span>            :   bool                  mDisabled;
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :   // mDocumentAssociationMode determines whether mDocument directly owns us (in
+<span class="lineNum">     286 </span>            :   // the sense that if it's known-live then we're known-live).  Always
+<span class="lineNum">     287 </span>            :   // NotOwnedByDocument when mDocument is null.
+<span class="lineNum">     288 </span>            :   DocumentAssociationMode mDocumentAssociationMode;
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   // Core information we get from parsed sheets, which are shared amongst
+<span class="lineNum">     291 </span>            :   // StyleSheet clones.
+<span class="lineNum">     292 </span>            :   StyleSheetInfo* mInner;
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :   friend class ::nsCSSRuleProcessor;
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :   // Make CSSStyleSheet and ServoStyleSheet friends so they can access
+<span class="lineNum">     297 </span>            :   // protected members of other StyleSheet objects (useful for iterating
+<span class="lineNum">     298 </span>            :   // through children).
+<span class="lineNum">     299 </span>            :   friend class mozilla::CSSStyleSheet;
+<span class="lineNum">     300 </span>            :   friend class mozilla::ServoStyleSheet;
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :   // Make StyleSheetInfo and subclasses into friends so they can use
+<span class="lineNum">     303 </span>            :   // ChildSheetListBuilder.
+<span class="lineNum">     304 </span>            :   friend struct mozilla::StyleSheetInfo;
+<span class="lineNum">     305 </span>            :   friend struct mozilla::CSSStyleSheetInner;
+<span class="lineNum">     306 </span>            : };
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            : } // namespace mozilla
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : #endif // mozilla_StyleSheet_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

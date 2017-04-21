@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/layers/CompositorOptions.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/layers</a> - CompositorOptions.h<span style="font-size: 80%;"> (source / <a href="CompositorOptions.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=99: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : #ifndef _include_mozilla_gfx_ipc_CompositorOptions_h_
+<span class="lineNum">       7 </span>            : #define _include_mozilla_gfx_ipc_CompositorOptions_h_
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : namespace IPC {
+<span class="lineNum">      10 </span>            : template &lt;typename&gt; struct ParamTraits;
+<span class="lineNum">      11 </span>            : } // namespace IPC
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace mozilla {
+<span class="lineNum">      14 </span>            : namespace layers {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : /**
+<span class="lineNum">      17 </span>            :  * This class holds options that are &quot;per compositor&quot; - that is, these options
+<span class="lineNum">      18 </span>            :  * affect a particular CompositorBridgeParent and all the content that it
+<span class="lineNum">      19 </span>            :  * renders.
+<span class="lineNum">      20 </span>            :  *
+<span class="lineNum">      21 </span>            :  * This class is intended to be created by a platform widget (but NOT
+<span class="lineNum">      22 </span>            :  * PuppetWidget) and passed to the graphics code during initialization of the
+<span class="lineNum">      23 </span>            :  * top level compositor associated with that widget. The options are immutable
+<span class="lineNum">      24 </span>            :  * after creation. The CompositorBridgeParent holds the canonical version of
+<span class="lineNum">      25 </span>            :  * the options, but they may be accessed by other parts of the code as needed,
+<span class="lineNum">      26 </span>            :  * and are accessible to content processes over PCompositorBridge as well.
+<span class="lineNum">      27 </span>            :  */
+<span class="lineNum">      28 </span>            : class CompositorOptions
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            : public:
+<span class="lineNum">      31 </span>            :   // This constructor needed for IPDL purposes, don't use it anywhere else.
+<span class="lineNum">      32 </span>            :   CompositorOptions()
+<span class="lineNum">      33 </span>            :     : mUseAPZ(false)
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     , mUseWebRender(false)</span>
+<span class="lineNum">      35 </span>            :   {
+<span class="lineNum">      36 </span>            :   }
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   explicit CompositorOptions(bool aUseAPZ,
+<span class="lineNum">      39 </span>            :                              bool aUseWebRender)
+<span class="lineNum">      40 </span>            :     : mUseAPZ(aUseAPZ)
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :     , mUseWebRender(aUseWebRender)</span>
+<span class="lineNum">      42 </span>            :   {
+<span class="lineNum">      43 </span>            :   }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   bool UseAPZ() const { return mUseAPZ; }
+<span class="lineNum">      46 </span>            :   bool UseWebRender() const { return mUseWebRender; }
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   bool operator==(const CompositorOptions&amp; aOther) {
+<span class="lineNum">      49 </span>            :     return mUseAPZ == aOther.mUseAPZ &amp;&amp;
+<span class="lineNum">      50 </span>            :            mUseWebRender == aOther.mUseWebRender;
+<span class="lineNum">      51 </span>            :   }
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :   friend struct IPC::ParamTraits&lt;CompositorOptions&gt;;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : private:
+<span class="lineNum">      56 </span>            :   bool mUseAPZ;
+<span class="lineNum">      57 </span>            :   bool mUseWebRender;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :   // Make sure to add new fields to the ParamTraits implementation
+<span class="lineNum">      60 </span>            : };
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : } // namespace layers
+<span class="lineNum">      63 </span>            : } // namespace mozilla
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : #endif // _include_mozilla_gfx_ipc_CompositorOptions_h_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

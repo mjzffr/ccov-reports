@@ -1,0 +1,480 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/js/HeapAPI.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/js</a> - HeapAPI.h<span style="font-size: 80%;"> (source / <a href="HeapAPI.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntry">50</td>
+            <td class="headerCovTableEntryMed">78.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">81</td>
+            <td class="headerCovTableEntryLo">29.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-</a>
+<span class="lineNum">       2 </span>            :  * vim: set ts=8 sts=4 et sw=4 tw=99:
+<span class="lineNum">       3 </span>            :  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef js_HeapAPI_h
+<span class="lineNum">       8 </span>            : #define js_HeapAPI_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;limits.h&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;jspubtd.h&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &quot;js/TraceKind.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;js/Utility.h&quot;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : /* These values are private to the JS engine. */
+<span class="lineNum">      18 </span>            : namespace js {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : JS_FRIEND_API(bool)
+<span class="lineNum">      21 </span>            : CurrentThreadCanAccessZone(JS::Zone* zone);
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace gc {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : struct Cell;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : const size_t ArenaShift = 12;
+<span class="lineNum">      28 </span>            : const size_t ArenaSize = size_t(1) &lt;&lt; ArenaShift;
+<span class="lineNum">      29 </span>            : const size_t ArenaMask = ArenaSize - 1;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : #ifdef JS_GC_SMALL_CHUNK_SIZE
+<span class="lineNum">      32 </span>            : const size_t ChunkShift = 18;
+<span class="lineNum">      33 </span>            : #else
+<span class="lineNum">      34 </span>            : const size_t ChunkShift = 20;
+<span class="lineNum">      35 </span>            : #endif
+<span class="lineNum">      36 </span>            : const size_t ChunkSize = size_t(1) &lt;&lt; ChunkShift;
+<span class="lineNum">      37 </span>            : const size_t ChunkMask = ChunkSize - 1;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : const size_t CellShift = 3;
+<span class="lineNum">      40 </span>            : const size_t CellSize = size_t(1) &lt;&lt; CellShift;
+<span class="lineNum">      41 </span>            : const size_t CellMask = CellSize - 1;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : /* These are magic constants derived from actual offsets in gc/Heap.h. */
+<span class="lineNum">      44 </span>            : #ifdef JS_GC_SMALL_CHUNK_SIZE
+<span class="lineNum">      45 </span>            : const size_t ChunkMarkBitmapOffset = 258104;
+<span class="lineNum">      46 </span>            : const size_t ChunkMarkBitmapBits = 31744;
+<span class="lineNum">      47 </span>            : #else
+<span class="lineNum">      48 </span>            : const size_t ChunkMarkBitmapOffset = 1032352;
+<span class="lineNum">      49 </span>            : const size_t ChunkMarkBitmapBits = 129024;
+<span class="lineNum">      50 </span>            : #endif
+<span class="lineNum">      51 </span>            : const size_t ChunkRuntimeOffset = ChunkSize - sizeof(void*);
+<span class="lineNum">      52 </span>            : const size_t ChunkTrailerSize = 2 * sizeof(uintptr_t) + sizeof(uint64_t);
+<span class="lineNum">      53 </span>            : const size_t ChunkLocationOffset = ChunkSize - ChunkTrailerSize;
+<span class="lineNum">      54 </span>            : const size_t ArenaZoneOffset = sizeof(size_t);
+<span class="lineNum">      55 </span>            : const size_t ArenaHeaderSize = sizeof(size_t) + 2 * sizeof(uintptr_t) +
+<span class="lineNum">      56 </span>            :                                sizeof(size_t) + sizeof(uintptr_t);
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : /*
+<span class="lineNum">      59 </span>            :  * Live objects are marked black. How many other additional colors are available
+<span class="lineNum">      60 </span>            :  * depends on the size of the GCThing. Objects marked gray are eligible for
+<span class="lineNum">      61 </span>            :  * cycle collection.
+<span class="lineNum">      62 </span>            :  */
+<span class="lineNum">      63 </span>            : static const uint32_t BLACK = 0;
+<span class="lineNum">      64 </span>            : static const uint32_t GRAY = 1;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : /*
+<span class="lineNum">      67 </span>            :  * The &quot;location&quot; field in the Chunk trailer is a enum indicating various roles
+<span class="lineNum">      68 </span>            :  * of the chunk.
+<span class="lineNum">      69 </span>            :  */
+<span class="lineNum">      70 </span>            : enum class ChunkLocation : uint32_t
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span>            :     Invalid = 0,
+<span class="lineNum">      73 </span>            :     Nursery = 1,
+<span class="lineNum">      74 </span>            :     TenuredHeap = 2
+<span class="lineNum">      75 </span>            : };
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : #ifdef JS_DEBUG
+<span class="lineNum">      78 </span>            : /* When downcasting, ensure we are actually the right type. */
+<span class="lineNum">      79 </span>            : extern JS_FRIEND_API(void)
+<span class="lineNum">      80 </span>            : AssertGCThingHasType(js::gc::Cell* cell, JS::TraceKind kind);
+<span class="lineNum">      81 </span>            : #else
+<span class="lineNum">      82 </span>            : inline void
+<span class="lineNum">      83 </span>            : AssertGCThingHasType(js::gc::Cell* cell, JS::TraceKind kind) {}
+<span class="lineNum">      84 </span>            : #endif
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : MOZ_ALWAYS_INLINE bool IsInsideNursery(const js::gc::Cell* cell);
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : } /* namespace gc */
+<span class="lineNum">      89 </span>            : } /* namespace js */
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : namespace JS {
+<span class="lineNum">      92 </span>            : struct Zone;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : /* Default size for the generational nursery in bytes. */
+<span class="lineNum">      95 </span>            : const uint32_t DefaultNurseryBytes = 16 * js::gc::ChunkSize;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : /* Default maximum heap size in bytes to pass to JS_NewRuntime(). */
+<span class="lineNum">      98 </span>            : const uint32_t DefaultHeapMaxBytes = 32 * 1024 * 1024;
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            : namespace shadow {
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            : struct Zone
+<span class="lineNum">     103 </span>            : {
+<span class="lineNum">     104 </span>            :   protected:
+<span class="lineNum">     105 </span>            :     JSRuntime* const runtime_;
+<span class="lineNum">     106 </span>            :     JSTracer* const barrierTracer_;     // A pointer to the JSRuntime's |gcMarker|.
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :   public:
+<span class="lineNum">     109 </span>            :     bool needsIncrementalBarrier_;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     Zone(JSRuntime* runtime, JSTracer* barrierTracerArg)
+<span class="lineNum">     112 </span>            :       : runtime_(runtime),
+<span class="lineNum">     113 </span>            :         barrierTracer_(barrierTracerArg),
+<span class="lineNum">     114 </span><span class="lineCov">        240 :         needsIncrementalBarrier_(false)</span>
+<a name="115"><span class="lineNum">     115 </span>            :     {}</a>
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span><span class="lineCov">    2619520 :     bool needsIncrementalBarrier() const {</span>
+<span class="lineNum">     118 </span><span class="lineCov">    2619520 :         return needsIncrementalBarrier_;</span>
+<a name="119"><span class="lineNum">     119 </span>            :     }</a>
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     JSTracer* barrierTracer() {</span>
+<span class="lineNum">     122 </span>            :         MOZ_ASSERT(needsIncrementalBarrier_);
+<span class="lineNum">     123 </span>            :         MOZ_ASSERT(js::CurrentThreadCanAccessRuntime(runtime_));
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :         return barrierTracer_;</span>
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     JSRuntime* runtimeFromActiveCooperatingThread() const {
+<span class="lineNum">     128 </span>            :         MOZ_ASSERT(js::CurrentThreadCanAccessRuntime(runtime_));
+<span class="lineNum">     129 </span>            :         return runtime_;
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :     // Note: Unrestricted access to the zone's runtime from an arbitrary
+<span class="lineNum">     133 </span>            :     // thread can easily lead to races. Use this method very carefully.
+<span class="lineNum">     134 </span>            :     JSRuntime* runtimeFromAnyThread() const {
+<span class="lineNum">     135 </span>            :         return runtime_;
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :     static MOZ_ALWAYS_INLINE JS::shadow::Zone* asShadowZone(JS::Zone* zone) {
+<span class="lineNum">     139 </span>            :         return reinterpret_cast&lt;JS::shadow::Zone*&gt;(zone);
+<span class="lineNum">     140 </span>            :     }
+<span class="lineNum">     141 </span>            : };
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            : } /* namespace shadow */
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : /**
+<span class="lineNum">     146 </span>            :  * A GC pointer, tagged with the trace kind.
+<span class="lineNum">     147 </span>            :  *
+<span class="lineNum">     148 </span>            :  * In general, a GC pointer should be stored with an exact type. This class
+<span class="lineNum">     149 </span>            :  * is for use when that is not possible because a single pointer must point
+<span class="lineNum">     150 </span>            :  * to several kinds of GC thing.
+<span class="lineNum">     151 </span>            :  */
+<span class="lineNum">     152 </span>            : class JS_FRIEND_API(GCCellPtr)
+<span class="lineNum">     153 </span>            : {
+<a name="154"><span class="lineNum">     154 </span>            :   public:</a>
+<span class="lineNum">     155 </span>            :     // Construction from a void* and trace kind.
+<span class="lineNum">     156 </span><span class="lineCov">     301790 :     GCCellPtr(void* gcthing, JS::TraceKind traceKind) : ptr(checkedCast(gcthing, traceKind)) {}</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :     // Automatically construct a null GCCellPtr from nullptr.
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     MOZ_IMPLICIT GCCellPtr(decltype(nullptr)) : ptr(checkedCast(nullptr, JS::TraceKind::Null)) {}</span>
+<span class="lineNum">     160 </span>            : 
+<a name="161"><span class="lineNum">     161 </span>            :     // Construction from an explicit type.</a>
+<span class="lineNum">     162 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     163 </span><span class="lineCov">     570234 :     explicit GCCellPtr(T* p) : ptr(checkedCast(p, JS::MapTypeToTraceKind&lt;T&gt;::kind)) { }</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     explicit GCCellPtr(JSFunction* p) : ptr(checkedCast(p, JS::TraceKind::Object)) { }</span>
+<span class="lineNum">     165 </span>            :     explicit GCCellPtr(JSFlatString* str) : ptr(checkedCast(str, JS::TraceKind::String)) { }
+<a name="166"><span class="lineNum">     166 </span>            :     explicit GCCellPtr(const Value&amp; v);</a>
+<a name="167"><span class="lineNum">     167 </span>            : </a>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     JS::TraceKind kind() const {</span>
+<span class="lineNum">     169 </span><span class="lineCov">     405878 :         JS::TraceKind traceKind = JS::TraceKind(ptr &amp; OutOfLineTraceKindMask);</span>
+<span class="lineNum">     170 </span><span class="lineCov">     405878 :         if (uintptr_t(traceKind) != OutOfLineTraceKindMask)</span>
+<span class="lineNum">     171 </span>            :             return traceKind;
+<span class="lineNum">     172 </span><span class="lineCov">      16275 :         return outOfLineKind();</span>
+<span class="lineNum">     173 </span>            :     }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     // Allow GCCellPtr to be used in a boolean context.
+<span class="lineNum">     176 </span>            :     explicit operator bool() const {
+<span class="lineNum">     177 </span>            :         MOZ_ASSERT(bool(asCell()) == (kind() != JS::TraceKind::Null));
+<span class="lineNum">     178 </span>            :         return asCell();
+<span class="lineNum">     179 </span>            :     }
+<span class="lineNum">     180 </span>            : 
+<a name="181"><span class="lineNum">     181 </span>            :     // Simplify checks to the kind.</a>
+<span class="lineNum">     182 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     bool is() const { return kind() == JS::MapTypeToTraceKind&lt;T&gt;::kind; }</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :     // Conversions to more specific types must match the kind. Access to
+<span class="lineNum">     186 </span>            :     // further refined types is not allowed directly from a GCCellPtr.
+<span class="lineNum">     187 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     188 </span>            :     T&amp; as() const {
+<span class="lineNum">     189 </span>            :         MOZ_ASSERT(kind() == JS::MapTypeToTraceKind&lt;T&gt;::kind);
+<span class="lineNum">     190 </span>            :         // We can't use static_cast here, because the fact that JSObject
+<span class="lineNum">     191 </span>            :         // inherits from js::gc::Cell is not part of the public API.
+<span class="lineNum">     192 </span>            :         return *reinterpret_cast&lt;T*&gt;(asCell());
+<span class="lineNum">     193 </span>            :     }
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :     // Return a pointer to the cell this |GCCellPtr| refers to, or |nullptr|.
+<a name="196"><span class="lineNum">     196 </span>            :     // (It would be more symmetrical with |to| for this to return a |Cell&amp;|, but</a>
+<a name="197"><span class="lineNum">     197 </span>            :     // the result can be |nullptr|, and null references are undefined behavior.)</a>
+<span class="lineNum">     198 </span><span class="lineCov">     306355 :     js::gc::Cell* asCell() const {</span>
+<span class="lineNum">     199 </span><span class="lineCov">    1133852 :         return reinterpret_cast&lt;js::gc::Cell*&gt;(ptr &amp; ~OutOfLineTraceKindMask);</span>
+<span class="lineNum">     200 </span>            :     }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :     // The CC's trace logger needs an identity that is XPIDL serializable.
+<span class="lineNum">     203 </span>            :     uint64_t unsafeAsInteger() const {
+<span class="lineNum">     204 </span>            :         return static_cast&lt;uint64_t&gt;(unsafeAsUIntPtr());
+<span class="lineNum">     205 </span>            :     }
+<span class="lineNum">     206 </span>            :     // Inline mark bitmap access requires direct pointer arithmetic.
+<span class="lineNum">     207 </span><span class="lineCov">     139450 :     uintptr_t unsafeAsUIntPtr() const {</span>
+<span class="lineNum">     208 </span>            :         MOZ_ASSERT(asCell());
+<span class="lineNum">     209 </span>            :         MOZ_ASSERT(!js::gc::IsInsideNursery(asCell()));
+<span class="lineNum">     210 </span><span class="lineCov">     139450 :         return reinterpret_cast&lt;uintptr_t&gt;(asCell());</span>
+<span class="lineNum">     211 </span>            :     }
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :     bool mayBeOwnedByOtherRuntime() const;
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :   private:
+<span class="lineNum">     216 </span>            :     static uintptr_t checkedCast(void* p, JS::TraceKind traceKind) {
+<span class="lineNum">     217 </span><span class="lineCov">     717572 :         js::gc::Cell* cell = static_cast&lt;js::gc::Cell*&gt;(p);</span>
+<span class="lineNum">     218 </span>            :         MOZ_ASSERT((uintptr_t(p) &amp; OutOfLineTraceKindMask) == 0);
+<span class="lineNum">     219 </span><span class="lineCov">     717572 :         AssertGCThingHasType(cell, traceKind);</span>
+<span class="lineNum">     220 </span>            :         // Note: the OutOfLineTraceKindMask bits are set on all out-of-line kinds
+<span class="lineNum">     221 </span>            :         // so that we can mask instead of branching.
+<span class="lineNum">     222 </span>            :         MOZ_ASSERT_IF(uintptr_t(traceKind) &gt;= OutOfLineTraceKindMask,
+<span class="lineNum">     223 </span>            :                       (uintptr_t(traceKind) &amp; OutOfLineTraceKindMask) == OutOfLineTraceKindMask);
+<span class="lineNum">     224 </span><span class="lineCov">     713925 :         return uintptr_t(p) | (uintptr_t(traceKind) &amp; OutOfLineTraceKindMask);</span>
+<span class="lineNum">     225 </span>            :     }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :     JS::TraceKind outOfLineKind() const;
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :     uintptr_t ptr;
+<span class="lineNum">     230 </span>            : };
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            : inline bool
+<span class="lineNum">     233 </span>            : operator==(const GCCellPtr&amp; ptr1, const GCCellPtr&amp; ptr2)
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :     return ptr1.asCell() == ptr2.asCell();</span>
+<span class="lineNum">     236 </span>            : }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            : inline bool
+<span class="lineNum">     239 </span>            : operator!=(const GCCellPtr&amp; ptr1, const GCCellPtr&amp; ptr2)
+<span class="lineNum">     240 </span>            : {
+<span class="lineNum">     241 </span>            :     return !(ptr1 == ptr2);
+<span class="lineNum">     242 </span>            : }
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : // Unwraps the given GCCellPtr and calls the given functor with a template
+<span class="lineNum">     245 </span>            : // argument of the actual type of the pointer.
+<span class="lineNum">     246 </span>            : template &lt;typename F, typename... Args&gt;
+<span class="lineNum">     247 </span>            : auto
+<span class="lineNum">     248 </span><span class="lineCov">       5873 : DispatchTyped(F f, GCCellPtr thing, Args&amp;&amp;... args)</span>
+<span class="lineNum">     249 </span>            :   -&gt; decltype(f(static_cast&lt;JSObject*&gt;(nullptr), mozilla::Forward&lt;Args&gt;(args)...))
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span><span class="lineCov">       5873 :     switch (thing.kind()) {</span>
+<span class="lineNum">     252 </span>            : #define JS_EXPAND_DEF(name, type, _) \
+<span class="lineNum">     253 </span>            :       case JS::TraceKind::name: \
+<span class="lineNum">     254 </span>            :           return f(&amp;thing.as&lt;type&gt;(), mozilla::Forward&lt;Args&gt;(args)...);
+<span class="lineNum">     255 </span><span class="lineCov">      11746 :       JS_FOR_EACH_TRACEKIND(JS_EXPAND_DEF);</span>
+<span class="lineNum">     256 </span>            : #undef JS_EXPAND_DEF
+<span class="lineNum">     257 </span>            :       default:
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :           MOZ_CRASH(&quot;Invalid trace kind in DispatchTyped for GCCellPtr.&quot;);</span>
+<span class="lineNum">     259 </span>            :     }
+<span class="lineNum">     260 </span>            : }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            : } /* namespace JS */
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : namespace js {
+<span class="lineNum">     265 </span>            : namespace gc {
+<span class="lineNum">     266 </span>            : namespace detail {
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            : static MOZ_ALWAYS_INLINE uintptr_t*
+<span class="lineNum">     269 </span>            : GetGCThingMarkBitmap(const uintptr_t addr)
+<span class="lineNum">     270 </span>            : {
+<span class="lineNum">     271 </span>            :     MOZ_ASSERT(addr);
+<span class="lineNum">     272 </span><span class="lineCov">   18679541 :     const uintptr_t bmap_addr = (addr &amp; ~ChunkMask) | ChunkMarkBitmapOffset;</span>
+<span class="lineNum">     273 </span><span class="lineCov">   18145791 :     return reinterpret_cast&lt;uintptr_t*&gt;(bmap_addr);</span>
+<span class="lineNum">     274 </span>            : }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            : static MOZ_ALWAYS_INLINE void
+<span class="lineNum">     277 </span>            : GetGCThingMarkWordAndMask(const uintptr_t addr, uint32_t color,
+<span class="lineNum">     278 </span>            :                           uintptr_t** wordp, uintptr_t* maskp)
+<span class="lineNum">     279 </span>            : {
+<span class="lineNum">     280 </span>            :     MOZ_ASSERT(addr);
+<span class="lineNum">     281 </span><span class="lineCov">   18679541 :     const size_t bit = (addr &amp; js::gc::ChunkMask) / js::gc::CellSize + color;</span>
+<span class="lineNum">     282 </span>            :     MOZ_ASSERT(bit &lt; js::gc::ChunkMarkBitmapBits);
+<span class="lineNum">     283 </span><span class="lineCov">   18679541 :     uintptr_t* bitmap = GetGCThingMarkBitmap(addr);</span>
+<span class="lineNum">     284 </span><span class="lineCov">   18679541 :     const uintptr_t nbits = sizeof(*bitmap) * CHAR_BIT;</span>
+<span class="lineNum">     285 </span><span class="lineCov">   18679541 :     *maskp = uintptr_t(1) &lt;&lt; (bit % nbits);</span>
+<span class="lineNum">     286 </span><span class="lineCov">   18679541 :     *wordp = &amp;bitmap[bit / nbits];</span>
+<span class="lineNum">     287 </span>            : }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : static MOZ_ALWAYS_INLINE JS::Zone*
+<span class="lineNum">     290 </span>            : GetGCThingZone(const uintptr_t addr)
+<span class="lineNum">     291 </span>            : {
+<span class="lineNum">     292 </span>            :     MOZ_ASSERT(addr);
+<span class="lineNum">     293 </span><span class="lineCov">     139450 :     const uintptr_t zone_addr = (addr &amp; ~ArenaMask) | ArenaZoneOffset;</span>
+<span class="lineNum">     294 </span><span class="lineCov">     139450 :     return *reinterpret_cast&lt;JS::Zone**&gt;(zone_addr);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            : }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     299 </span>            : CellIsMarkedGray(const Cell* cell)
+<span class="lineNum">     300 </span>            : {
+<span class="lineNum">     301 </span>            :     MOZ_ASSERT(cell);
+<span class="lineNum">     302 </span><span class="lineCov">     140596 :     if (js::gc::IsInsideNursery(cell))</span>
+<span class="lineNum">     303 </span>            :         return false;
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :     uintptr_t* word, mask;
+<span class="lineNum">     306 </span><span class="lineCov">     140596 :     js::gc::detail::GetGCThingMarkWordAndMask(uintptr_t(cell), js::gc::GRAY, &amp;word, &amp;mask);</span>
+<span class="lineNum">     307 </span><span class="lineCov">     140596 :     return *word &amp; mask;</span>
+<span class="lineNum">     308 </span>            : }
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : extern JS_PUBLIC_API(bool)
+<span class="lineNum">     311 </span>            : CellIsMarkedGrayIfKnown(const Cell* cell);
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            : #ifdef DEBUG
+<span class="lineNum">     314 </span>            : extern JS_PUBLIC_API(bool)
+<span class="lineNum">     315 </span>            : CellIsNotGray(const Cell* cell);
+<span class="lineNum">     316 </span>            : #endif
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : } /* namespace detail */
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            : MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     321 </span>            : IsInsideNursery(const js::gc::Cell* cell)
+<span class="lineNum">     322 </span>            : {
+<span class="lineNum">     323 </span><span class="lineCov">    2742266 :     if (!cell)</span>
+<span class="lineNum">     324 </span>            :         return false;
+<span class="lineNum">     325 </span><span class="lineCov">    2741860 :     uintptr_t addr = uintptr_t(cell);</span>
+<span class="lineNum">     326 </span><span class="lineCov">    2741860 :     addr &amp;= ~js::gc::ChunkMask;</span>
+<span class="lineNum">     327 </span><span class="lineCov">    2741860 :     addr |= js::gc::ChunkLocationOffset;</span>
+<span class="lineNum">     328 </span><span class="lineCov">    2741860 :     auto location = *reinterpret_cast&lt;ChunkLocation*&gt;(addr);</span>
+<span class="lineNum">     329 </span>            :     MOZ_ASSERT(location == ChunkLocation::Nursery || location == ChunkLocation::TenuredHeap);
+<span class="lineNum">     330 </span><span class="lineCov">    2741860 :     return location == ChunkLocation::Nursery;</span>
+<span class="lineNum">     331 </span>            : }
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            : } /* namespace gc */
+<span class="lineNum">     334 </span>            : } /* namespace js */
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            : namespace JS {
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            : static MOZ_ALWAYS_INLINE Zone*
+<span class="lineNum">     339 </span>            : GetTenuredGCThingZone(GCCellPtr thing)
+<span class="lineNum">     340 </span>            : {
+<span class="lineNum">     341 </span>            :     MOZ_ASSERT(!js::gc::IsInsideNursery(thing.asCell()));
+<span class="lineNum">     342 </span><span class="lineCov">     139450 :     return js::gc::detail::GetGCThingZone(thing.unsafeAsUIntPtr());</span>
+<span class="lineNum">     343 </span>            : }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            : static MOZ_ALWAYS_INLINE Zone*
+<span class="lineNum">     346 </span>            : GetStringZone(JSString* str)
+<span class="lineNum">     347 </span>            : {
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :     return js::gc::detail::GetGCThingZone(uintptr_t(str));</span>
+<span class="lineNum">     349 </span>            : }
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            : extern JS_PUBLIC_API(Zone*)
+<span class="lineNum">     352 </span>            : GetObjectZone(JSObject* obj);
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     355 </span>            : GCThingIsMarkedGray(GCCellPtr thing)
+<span class="lineNum">     356 </span>            : {
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :     if (thing.mayBeOwnedByOtherRuntime())</span>
+<span class="lineNum">     358 </span>            :         return false;
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :     return js::gc::detail::CellIsMarkedGrayIfKnown(thing.asCell());</span>
+<span class="lineNum">     360 </span>            : }
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            : extern JS_PUBLIC_API(JS::TraceKind)
+<span class="lineNum">     363 </span>            : GCThingTraceKind(void* thing);
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            : } /* namespace JS */
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            : namespace js {
+<span class="lineNum">     368 </span>            : namespace gc {
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            : static MOZ_ALWAYS_INLINE bool
+<span class="lineNum">     371 </span>            : IsIncrementalBarrierNeededOnTenuredGCThing(const JS::GCCellPtr thing)
+<span class="lineNum">     372 </span>            : {
+<span class="lineNum">     373 </span>            :     MOZ_ASSERT(thing);
+<span class="lineNum">     374 </span>            :     MOZ_ASSERT(!js::gc::IsInsideNursery(thing.asCell()));
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :     // TODO: I'd like to assert !CurrentThreadIsHeapBusy() here but this gets
+<span class="lineNum">     377 </span>            :     // called while we are tracing the heap, e.g. during memory reporting
+<span class="lineNum">     378 </span>            :     // (see bug 1313318).
+<span class="lineNum">     379 </span>            :     MOZ_ASSERT(!JS::CurrentThreadIsHeapCollecting());
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineCov">     139450 :     JS::Zone* zone = JS::GetTenuredGCThingZone(thing);</span>
+<span class="lineNum">     382 </span><span class="lineCov">     139450 :     return JS::shadow::Zone::asShadowZone(zone)-&gt;needsIncrementalBarrier();</span>
+<span class="lineNum">     383 </span>            : }
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : /**
+<span class="lineNum">     386 </span>            :  * Create an object providing access to the garbage collector's internal notion
+<span class="lineNum">     387 </span>            :  * of the current state of memory (both GC heap memory and GCthing-controlled
+<span class="lineNum">     388 </span>            :  * malloc memory.
+<span class="lineNum">     389 </span>            :  */
+<span class="lineNum">     390 </span>            : extern JS_PUBLIC_API(JSObject*)
+<span class="lineNum">     391 </span>            : NewMemoryInfoObject(JSContext* cx);
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : } /* namespace gc */
+<span class="lineNum">     394 </span>            : } /* namespace js */
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            : #endif /* js_HeapAPI_h */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

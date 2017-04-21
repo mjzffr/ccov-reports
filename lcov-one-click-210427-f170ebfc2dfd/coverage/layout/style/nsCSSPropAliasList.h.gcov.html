@@ -1,0 +1,583 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - layout/style/nsCSSPropAliasList.h</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">layout/style</a> - nsCSSPropAliasList.h<span style="font-size: 80%;"> (source / <a href="nsCSSPropAliasList.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">86</td>
+            <td class="headerCovTableEntry">109</td>
+            <td class="headerCovTableEntryMed">78.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">218</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* vim: set shiftwidth=2 tabstop=8 autoindent cindent expandtab: */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /*
+<span class="lineNum">       7 </span>            :  * a list of all CSS property aliases with data about them, for preprocessing
+<span class="lineNum">       8 </span>            :  */
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : /******
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :   This file contains the list of all CSS properties that are just
+<span class="lineNum">      13 </span>            :   aliases for other properties (e.g., for when we temporarily continue
+<span class="lineNum">      14 </span>            :   to support a prefixed property after adding support for its unprefixed
+<span class="lineNum">      15 </span>            :   form).  It is designed to be used as inline input through the magic of
+<span class="lineNum">      16 </span>            :   C preprocessing.  All entries must be enclosed in the appropriate
+<span class="lineNum">      17 </span>            :   CSS_PROP_ALIAS macro which will have cruel and unusual things done to
+<span class="lineNum">      18 </span>            :   it.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   The arguments to CSS_PROP_ALIAS are:
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :   -. 'aliasname' entries represent a CSS property name and *must* use
+<span class="lineNum">      23 </span>            :   only lowercase characters.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   -. 'id' should be the same as the 'id' field in nsCSSPropList.h for
+<span class="lineNum">      26 </span>            :   the property that 'aliasname' is being aliased to.
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   -. 'method' is the CSS2Properties property name.  Unlike
+<span class="lineNum">      29 </span>            :   nsCSSPropList.h, prefixes should just be included in this file (rather
+<span class="lineNum">      30 </span>            :   than needing the CSS_PROP_DOMPROP_PREFIXED(prop) macro).
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :   -. 'pref' is the name of a pref that controls whether the property
+<span class="lineNum">      33 </span>            :   is enabled.  The property is enabled if 'pref' is an empty string,
+<span class="lineNum">      34 </span>            :   or if the boolean property whose name is 'pref' is set to true.
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :  ******/
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(word-wrap,</span>
+<span class="lineNum">      39 </span>            :                overflow_wrap,
+<span class="lineNum">      40 </span>            :                WordWrap,
+<span class="lineNum">      41 </span>            :                &quot;&quot;)
+<span class="lineNum">      42 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transform-origin,</span>
+<span class="lineNum">      43 </span>            :                transform_origin,
+<span class="lineNum">      44 </span>            :                MozTransformOrigin,
+<span class="lineNum">      45 </span>            :                &quot;layout.css.prefixes.transforms&quot;)
+<span class="lineNum">      46 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-perspective-origin,</span>
+<span class="lineNum">      47 </span>            :                perspective_origin,
+<span class="lineNum">      48 </span>            :                MozPerspectiveOrigin,
+<span class="lineNum">      49 </span>            :                &quot;layout.css.prefixes.transforms&quot;)
+<span class="lineNum">      50 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-perspective,</span>
+<span class="lineNum">      51 </span>            :                perspective,
+<span class="lineNum">      52 </span>            :                MozPerspective,
+<span class="lineNum">      53 </span>            :                &quot;layout.css.prefixes.transforms&quot;)
+<span class="lineNum">      54 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transform-style,</span>
+<span class="lineNum">      55 </span>            :                transform_style,
+<span class="lineNum">      56 </span>            :                MozTransformStyle,
+<span class="lineNum">      57 </span>            :                &quot;layout.css.prefixes.transforms&quot;)
+<span class="lineNum">      58 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-backface-visibility,</span>
+<span class="lineNum">      59 </span>            :                backface_visibility,
+<span class="lineNum">      60 </span>            :                MozBackfaceVisibility,
+<span class="lineNum">      61 </span>            :                &quot;layout.css.prefixes.transforms&quot;)
+<span class="lineNum">      62 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-border-image,</span>
+<span class="lineNum">      63 </span>            :                border_image,
+<span class="lineNum">      64 </span>            :                MozBorderImage,
+<span class="lineNum">      65 </span>            :                &quot;layout.css.prefixes.border-image&quot;)
+<span class="lineNum">      66 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transition,</span>
+<span class="lineNum">      67 </span>            :                transition,
+<span class="lineNum">      68 </span>            :                MozTransition,
+<span class="lineNum">      69 </span>            :                &quot;layout.css.prefixes.transitions&quot;)
+<span class="lineNum">      70 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transition-delay,</span>
+<span class="lineNum">      71 </span>            :                transition_delay,
+<span class="lineNum">      72 </span>            :                MozTransitionDelay,
+<span class="lineNum">      73 </span>            :                &quot;layout.css.prefixes.transitions&quot;)
+<span class="lineNum">      74 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transition-duration,</span>
+<span class="lineNum">      75 </span>            :                transition_duration,
+<span class="lineNum">      76 </span>            :                MozTransitionDuration,
+<span class="lineNum">      77 </span>            :                &quot;layout.css.prefixes.transitions&quot;)
+<span class="lineNum">      78 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transition-property,</span>
+<span class="lineNum">      79 </span>            :                transition_property,
+<span class="lineNum">      80 </span>            :                MozTransitionProperty,
+<span class="lineNum">      81 </span>            :                &quot;layout.css.prefixes.transitions&quot;)
+<span class="lineNum">      82 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-transition-timing-function,</span>
+<span class="lineNum">      83 </span>            :                transition_timing_function,
+<span class="lineNum">      84 </span>            :                MozTransitionTimingFunction,
+<span class="lineNum">      85 </span>            :                &quot;layout.css.prefixes.transitions&quot;)
+<span class="lineNum">      86 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation,</span>
+<span class="lineNum">      87 </span>            :                animation,
+<span class="lineNum">      88 </span>            :                MozAnimation,
+<span class="lineNum">      89 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">      90 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-delay,</span>
+<span class="lineNum">      91 </span>            :                animation_delay,
+<span class="lineNum">      92 </span>            :                MozAnimationDelay,
+<span class="lineNum">      93 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">      94 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-direction,</span>
+<span class="lineNum">      95 </span>            :                animation_direction,
+<span class="lineNum">      96 </span>            :                MozAnimationDirection,
+<span class="lineNum">      97 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">      98 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-duration,</span>
+<span class="lineNum">      99 </span>            :                animation_duration,
+<span class="lineNum">     100 </span>            :                MozAnimationDuration,
+<span class="lineNum">     101 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     102 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-fill-mode,</span>
+<span class="lineNum">     103 </span>            :                animation_fill_mode,
+<span class="lineNum">     104 </span>            :                MozAnimationFillMode,
+<span class="lineNum">     105 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     106 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-iteration-count,</span>
+<span class="lineNum">     107 </span>            :                animation_iteration_count,
+<span class="lineNum">     108 </span>            :                MozAnimationIterationCount,
+<span class="lineNum">     109 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     110 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-name,</span>
+<span class="lineNum">     111 </span>            :                animation_name,
+<span class="lineNum">     112 </span>            :                MozAnimationName,
+<span class="lineNum">     113 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     114 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-play-state,</span>
+<span class="lineNum">     115 </span>            :                animation_play_state,
+<span class="lineNum">     116 </span>            :                MozAnimationPlayState,
+<span class="lineNum">     117 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     118 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-animation-timing-function,</span>
+<span class="lineNum">     119 </span>            :                animation_timing_function,
+<span class="lineNum">     120 </span>            :                MozAnimationTimingFunction,
+<span class="lineNum">     121 </span>            :                &quot;layout.css.prefixes.animations&quot;)
+<span class="lineNum">     122 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-box-sizing,</span>
+<span class="lineNum">     123 </span>            :                box_sizing,
+<span class="lineNum">     124 </span>            :                MozBoxSizing,
+<span class="lineNum">     125 </span>            :                &quot;layout.css.prefixes.box-sizing&quot;)
+<span class="lineNum">     126 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-font-feature-settings,</span>
+<span class="lineNum">     127 </span>            :                font_feature_settings,
+<span class="lineNum">     128 </span>            :                MozFontFeatureSettings,
+<span class="lineNum">     129 </span>            :                &quot;layout.css.prefixes.font-features&quot;)
+<span class="lineNum">     130 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-moz-font-language-override,</span>
+<span class="lineNum">     131 </span>            :                font_language_override,
+<span class="lineNum">     132 </span>            :                MozFontLanguageOverride,
+<span class="lineNum">     133 </span>            :                &quot;layout.css.prefixes.font-features&quot;)
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-padding-end,</span>
+<span class="lineNum">     135 </span>            :                padding_inline_end,
+<span class="lineNum">     136 </span>            :                MozPaddingEnd,
+<span class="lineNum">     137 </span>            :                &quot;&quot;)
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-padding-start,</span>
+<span class="lineNum">     139 </span>            :                padding_inline_start,
+<span class="lineNum">     140 </span>            :                MozPaddingStart,
+<span class="lineNum">     141 </span>            :                &quot;&quot;)
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-margin-end,</span>
+<span class="lineNum">     143 </span>            :                margin_inline_end,
+<span class="lineNum">     144 </span>            :                MozMarginEnd,
+<span class="lineNum">     145 </span>            :                &quot;&quot;)
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-margin-start,</span>
+<span class="lineNum">     147 </span>            :                margin_inline_start,
+<span class="lineNum">     148 </span>            :                MozMarginStart,
+<span class="lineNum">     149 </span>            :                &quot;&quot;)
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-end,</span>
+<span class="lineNum">     151 </span>            :                border_inline_end,
+<span class="lineNum">     152 </span>            :                MozBorderEnd,
+<span class="lineNum">     153 </span>            :                &quot;&quot;)
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-end-color,</span>
+<span class="lineNum">     155 </span>            :                border_inline_end_color,
+<span class="lineNum">     156 </span>            :                MozBorderEndColor,
+<span class="lineNum">     157 </span>            :                &quot;&quot;)
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-end-style,</span>
+<span class="lineNum">     159 </span>            :                border_inline_end_style,
+<span class="lineNum">     160 </span>            :                MozBorderEndStyle,
+<span class="lineNum">     161 </span>            :                &quot;&quot;)
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-end-width,</span>
+<span class="lineNum">     163 </span>            :                border_inline_end_width,
+<span class="lineNum">     164 </span>            :                MozBorderEndWidth,
+<span class="lineNum">     165 </span>            :                &quot;&quot;)
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-start,</span>
+<span class="lineNum">     167 </span>            :                border_inline_start,
+<span class="lineNum">     168 </span>            :                MozBorderStart,
+<span class="lineNum">     169 </span>            :                &quot;&quot;)
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-start-color,</span>
+<span class="lineNum">     171 </span>            :                border_inline_start_color,
+<span class="lineNum">     172 </span>            :                MozBorderStartColor,
+<span class="lineNum">     173 </span>            :                &quot;&quot;)
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-start-style,</span>
+<span class="lineNum">     175 </span>            :                border_inline_start_style,
+<span class="lineNum">     176 </span>            :                MozBorderStartStyle,
+<span class="lineNum">     177 </span>            :                &quot;&quot;)
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-border-start-width,</span>
+<span class="lineNum">     179 </span>            :                border_inline_start_width,
+<span class="lineNum">     180 </span>            :                MozBorderStartWidth,
+<span class="lineNum">     181 </span>            :                &quot;&quot;)
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-hyphens,</span>
+<span class="lineNum">     183 </span>            :                hyphens,
+<span class="lineNum">     184 </span>            :                MozHyphens,
+<span class="lineNum">     185 </span>            :                &quot;&quot;)
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-count,</span>
+<span class="lineNum">     187 </span>            :                column_count,
+<span class="lineNum">     188 </span>            :                MozColumnCount,
+<span class="lineNum">     189 </span>            :                &quot;&quot;)
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-fill,</span>
+<span class="lineNum">     191 </span>            :                column_fill,
+<span class="lineNum">     192 </span>            :                MozColumnFill,
+<span class="lineNum">     193 </span>            :                &quot;&quot;)
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-gap,</span>
+<span class="lineNum">     195 </span>            :                column_gap,
+<span class="lineNum">     196 </span>            :                MozColumnGap,
+<span class="lineNum">     197 </span>            :                &quot;&quot;)
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-rule,</span>
+<span class="lineNum">     199 </span>            :                column_rule,
+<span class="lineNum">     200 </span>            :                MozColumnRule,
+<span class="lineNum">     201 </span>            :                &quot;&quot;)
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-rule-color,</span>
+<span class="lineNum">     203 </span>            :                column_rule_color,
+<span class="lineNum">     204 </span>            :                MozColumnRuleColor,
+<span class="lineNum">     205 </span>            :                &quot;&quot;)
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-rule-style,</span>
+<span class="lineNum">     207 </span>            :                column_rule_style,
+<span class="lineNum">     208 </span>            :                MozColumnRuleStyle,
+<span class="lineNum">     209 </span>            :                &quot;&quot;)
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-rule-width,</span>
+<span class="lineNum">     211 </span>            :                column_rule_width,
+<span class="lineNum">     212 </span>            :                MozColumnRuleWidth,
+<span class="lineNum">     213 </span>            :                &quot;&quot;)
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-column-width,</span>
+<span class="lineNum">     215 </span>            :                column_width,
+<span class="lineNum">     216 </span>            :                MozColumnWidth,
+<span class="lineNum">     217 </span>            :                &quot;&quot;)
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 : CSS_PROP_ALIAS(-moz-columns,</span>
+<span class="lineNum">     219 </span>            :                columns,
+<span class="lineNum">     220 </span>            :                MozColumns,
+<span class="lineNum">     221 </span>            :                &quot;&quot;)
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : #define WEBKIT_PREFIX_PREF &quot;layout.css.prefixes.webkit&quot;
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : // -webkit- prefixes
+<span class="lineNum">     226 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation,</span>
+<span class="lineNum">     227 </span>            :                animation,
+<span class="lineNum">     228 </span>            :                WebkitAnimation,
+<span class="lineNum">     229 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     230 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-delay,</span>
+<span class="lineNum">     231 </span>            :                animation_delay,
+<span class="lineNum">     232 </span>            :                WebkitAnimationDelay,
+<span class="lineNum">     233 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     234 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-direction,</span>
+<span class="lineNum">     235 </span>            :                animation_direction,
+<span class="lineNum">     236 </span>            :                WebkitAnimationDirection,
+<span class="lineNum">     237 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     238 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-duration,</span>
+<span class="lineNum">     239 </span>            :                animation_duration,
+<span class="lineNum">     240 </span>            :                WebkitAnimationDuration,
+<span class="lineNum">     241 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     242 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-fill-mode,</span>
+<span class="lineNum">     243 </span>            :                animation_fill_mode,
+<span class="lineNum">     244 </span>            :                WebkitAnimationFillMode,
+<span class="lineNum">     245 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     246 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-iteration-count,</span>
+<span class="lineNum">     247 </span>            :                animation_iteration_count,
+<span class="lineNum">     248 </span>            :                WebkitAnimationIterationCount,
+<span class="lineNum">     249 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     250 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-name,</span>
+<span class="lineNum">     251 </span>            :                animation_name,
+<span class="lineNum">     252 </span>            :                WebkitAnimationName,
+<span class="lineNum">     253 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     254 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-play-state,</span>
+<span class="lineNum">     255 </span>            :                animation_play_state,
+<span class="lineNum">     256 </span>            :                WebkitAnimationPlayState,
+<span class="lineNum">     257 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     258 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-animation-timing-function,</span>
+<span class="lineNum">     259 </span>            :                animation_timing_function,
+<span class="lineNum">     260 </span>            :                WebkitAnimationTimingFunction,
+<span class="lineNum">     261 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-appearance,</span>
+<span class="lineNum">     264 </span>            :                appearance,
+<span class="lineNum">     265 </span>            :                WebkitAppearance,
+<span class="lineNum">     266 </span>            :                &quot;layout.css.appearance.enabled&quot;) // same pref as for 'appearance' (XXX when we remove that pref we should probably make this WEBKIT_PREFIX_PREF instead)
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-filter,</span>
+<span class="lineNum">     269 </span>            :                filter,
+<span class="lineNum">     270 </span>            :                WebkitFilter,
+<span class="lineNum">     271 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     272 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-text-size-adjust,</span>
+<span class="lineNum">     273 </span>            :                _moz_text_size_adjust,
+<span class="lineNum">     274 </span>            :                WebkitTextSizeAdjust,
+<span class="lineNum">     275 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transform,</span>
+<span class="lineNum">     278 </span>            :                transform,
+<span class="lineNum">     279 </span>            :                WebkitTransform,
+<span class="lineNum">     280 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     281 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transform-origin,</span>
+<span class="lineNum">     282 </span>            :                transform_origin,
+<span class="lineNum">     283 </span>            :                WebkitTransformOrigin,
+<span class="lineNum">     284 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     285 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transform-style,</span>
+<span class="lineNum">     286 </span>            :                transform_style,
+<span class="lineNum">     287 </span>            :                WebkitTransformStyle,
+<span class="lineNum">     288 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     289 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-backface-visibility,</span>
+<span class="lineNum">     290 </span>            :                backface_visibility,
+<span class="lineNum">     291 </span>            :                WebkitBackfaceVisibility,
+<span class="lineNum">     292 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     293 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-perspective,</span>
+<span class="lineNum">     294 </span>            :                perspective,
+<span class="lineNum">     295 </span>            :                WebkitPerspective,
+<span class="lineNum">     296 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     297 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-perspective-origin,</span>
+<span class="lineNum">     298 </span>            :                perspective_origin,
+<span class="lineNum">     299 </span>            :                WebkitPerspectiveOrigin,
+<span class="lineNum">     300 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transition,</span>
+<span class="lineNum">     303 </span>            :                transition,
+<span class="lineNum">     304 </span>            :                WebkitTransition,
+<span class="lineNum">     305 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     306 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transition-delay,</span>
+<span class="lineNum">     307 </span>            :                transition_delay,
+<span class="lineNum">     308 </span>            :                WebkitTransitionDelay,
+<span class="lineNum">     309 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     310 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transition-duration,</span>
+<span class="lineNum">     311 </span>            :                transition_duration,
+<span class="lineNum">     312 </span>            :                WebkitTransitionDuration,
+<span class="lineNum">     313 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     314 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transition-property,</span>
+<span class="lineNum">     315 </span>            :                transition_property,
+<span class="lineNum">     316 </span>            :                WebkitTransitionProperty,
+<span class="lineNum">     317 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     318 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-transition-timing-function,</span>
+<span class="lineNum">     319 </span>            :                transition_timing_function,
+<span class="lineNum">     320 </span>            :                WebkitTransitionTimingFunction,
+<span class="lineNum">     321 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-radius,</span>
+<span class="lineNum">     324 </span>            :                border_radius,
+<span class="lineNum">     325 </span>            :                WebkitBorderRadius,
+<span class="lineNum">     326 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     327 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-top-left-radius,</span>
+<span class="lineNum">     328 </span>            :                border_top_left_radius,
+<span class="lineNum">     329 </span>            :                WebkitBorderTopLeftRadius, // really no dom property
+<span class="lineNum">     330 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     331 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-top-right-radius,</span>
+<span class="lineNum">     332 </span>            :                border_top_right_radius,
+<span class="lineNum">     333 </span>            :                WebkitBorderTopRightRadius, // really no dom property
+<span class="lineNum">     334 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     335 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-bottom-left-radius,</span>
+<span class="lineNum">     336 </span>            :                border_bottom_left_radius,
+<span class="lineNum">     337 </span>            :                WebkitBorderBottomLeftRadius, // really no dom property
+<span class="lineNum">     338 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     339 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-bottom-right-radius,</span>
+<span class="lineNum">     340 </span>            :                border_bottom_right_radius,
+<span class="lineNum">     341 </span>            :                WebkitBorderBottomRightRadius, // really no dom property
+<span class="lineNum">     342 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-background-clip,</span>
+<span class="lineNum">     345 </span>            :                background_clip,
+<span class="lineNum">     346 </span>            :                WebkitBackgroundClip,
+<span class="lineNum">     347 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     348 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-background-origin,</span>
+<span class="lineNum">     349 </span>            :                background_origin,
+<span class="lineNum">     350 </span>            :                WebkitBackgroundOrigin,
+<span class="lineNum">     351 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     352 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-background-size,</span>
+<span class="lineNum">     353 </span>            :                background_size,
+<span class="lineNum">     354 </span>            :                WebkitBackgroundSize,
+<span class="lineNum">     355 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-border-image,</span>
+<span class="lineNum">     358 </span>            :                border_image,
+<span class="lineNum">     359 </span>            :                WebkitBorderImage,
+<span class="lineNum">     360 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-shadow,</span>
+<span class="lineNum">     363 </span>            :                box_shadow,
+<span class="lineNum">     364 </span>            :                WebkitBoxShadow,
+<span class="lineNum">     365 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     366 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-sizing,</span>
+<span class="lineNum">     367 </span>            :                box_sizing,
+<span class="lineNum">     368 </span>            :                WebkitBoxSizing,
+<span class="lineNum">     369 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            : // Alias -webkit-box properties to their -moz-box equivalents.
+<span class="lineNum">     372 </span>            : // (NOTE: Even though they're aliases, in practice these -webkit properties
+<span class="lineNum">     373 </span>            : // will behave a bit differently from their -moz versions, if they're
+<span class="lineNum">     374 </span>            : // accompanied by &quot;display:-webkit-box&quot;, because we generate a different frame
+<span class="lineNum">     375 </span>            : // for those two display values.)
+<span class="lineNum">     376 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-flex,</span>
+<span class="lineNum">     377 </span>            :                _moz_box_flex,
+<span class="lineNum">     378 </span>            :                WebkitBoxFlex,
+<span class="lineNum">     379 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     380 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-ordinal-group,</span>
+<span class="lineNum">     381 </span>            :                _moz_box_ordinal_group,
+<span class="lineNum">     382 </span>            :                WebkitBoxOrdinalGroup,
+<span class="lineNum">     383 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     384 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-orient,</span>
+<span class="lineNum">     385 </span>            :                _moz_box_orient,
+<span class="lineNum">     386 </span>            :                WebkitBoxOrient,
+<span class="lineNum">     387 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     388 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-direction,</span>
+<span class="lineNum">     389 </span>            :                _moz_box_direction,
+<span class="lineNum">     390 </span>            :                WebkitBoxDirection,
+<span class="lineNum">     391 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     392 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-align,</span>
+<span class="lineNum">     393 </span>            :                _moz_box_align,
+<span class="lineNum">     394 </span>            :                WebkitBoxAlign,
+<span class="lineNum">     395 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     396 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-box-pack,</span>
+<span class="lineNum">     397 </span>            :                _moz_box_pack,
+<span class="lineNum">     398 </span>            :                WebkitBoxPack,
+<span class="lineNum">     399 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : // Alias -webkit-flex related properties to their unprefixed equivalents:
+<span class="lineNum">     402 </span>            : // (Matching ordering at https://drafts.csswg.org/css-flexbox-1/#property-index )
+<span class="lineNum">     403 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-direction,</span>
+<span class="lineNum">     404 </span>            :                flex_direction,
+<span class="lineNum">     405 </span>            :                WebkitFlexDirection,
+<span class="lineNum">     406 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     407 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-wrap,</span>
+<span class="lineNum">     408 </span>            :                flex_wrap,
+<span class="lineNum">     409 </span>            :                WebkitFlexWrap,
+<span class="lineNum">     410 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     411 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-flow,</span>
+<span class="lineNum">     412 </span>            :                flex_flow,
+<span class="lineNum">     413 </span>            :                WebkitFlexFlow,
+<span class="lineNum">     414 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     415 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-order,</span>
+<span class="lineNum">     416 </span>            :                order,
+<span class="lineNum">     417 </span>            :                WebkitOrder,
+<span class="lineNum">     418 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     419 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex,</span>
+<span class="lineNum">     420 </span>            :                flex,
+<span class="lineNum">     421 </span>            :                WebkitFlex,
+<span class="lineNum">     422 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     423 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-grow,</span>
+<span class="lineNum">     424 </span>            :                flex_grow,
+<span class="lineNum">     425 </span>            :                WebkitFlexGrow,
+<span class="lineNum">     426 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     427 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-shrink,</span>
+<span class="lineNum">     428 </span>            :                flex_shrink,
+<span class="lineNum">     429 </span>            :                WebkitFlexShrink,
+<span class="lineNum">     430 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     431 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-flex-basis,</span>
+<span class="lineNum">     432 </span>            :                flex_basis,
+<span class="lineNum">     433 </span>            :                WebkitFlexBasis,
+<span class="lineNum">     434 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     435 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-justify-content,</span>
+<span class="lineNum">     436 </span>            :                justify_content,
+<span class="lineNum">     437 </span>            :                WebkitJustifyContent,
+<span class="lineNum">     438 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     439 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-align-items,</span>
+<span class="lineNum">     440 </span>            :                align_items,
+<span class="lineNum">     441 </span>            :                WebkitAlignItems,
+<span class="lineNum">     442 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     443 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-align-self,</span>
+<span class="lineNum">     444 </span>            :                align_self,
+<span class="lineNum">     445 </span>            :                WebkitAlignSelf,
+<span class="lineNum">     446 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     447 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-align-content,</span>
+<span class="lineNum">     448 </span>            :                align_content,
+<span class="lineNum">     449 </span>            :                WebkitAlignContent,
+<span class="lineNum">     450 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-user-select,</span>
+<span class="lineNum">     453 </span>            :                _moz_user_select,
+<span class="lineNum">     454 </span>            :                WebkitUserSelect,
+<span class="lineNum">     455 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : #ifdef MOZ_ENABLE_MASK_AS_SHORTHAND
+<span class="lineNum">     458 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask,</span>
+<span class="lineNum">     459 </span>            :                mask,
+<span class="lineNum">     460 </span>            :                WebkitMask,
+<span class="lineNum">     461 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     462 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-clip,</span>
+<span class="lineNum">     463 </span>            :                mask_clip,
+<span class="lineNum">     464 </span>            :                WebkitMaskClip,
+<span class="lineNum">     465 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     466 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-composite,</span>
+<span class="lineNum">     467 </span>            :                mask_composite,
+<span class="lineNum">     468 </span>            :                WebkitMaskComposite,
+<span class="lineNum">     469 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     470 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-image,</span>
+<span class="lineNum">     471 </span>            :                mask_image,
+<span class="lineNum">     472 </span>            :                WebkitMaskImage,
+<span class="lineNum">     473 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     474 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-origin,</span>
+<span class="lineNum">     475 </span>            :                mask_origin,
+<span class="lineNum">     476 </span>            :                WebkitMaskOrigin,
+<span class="lineNum">     477 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     478 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-position,</span>
+<span class="lineNum">     479 </span>            :                mask_position,
+<span class="lineNum">     480 </span>            :                WebkitMaskPosition,
+<span class="lineNum">     481 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     482 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-position-x,</span>
+<span class="lineNum">     483 </span>            :                mask_position_x,
+<span class="lineNum">     484 </span>            :                WebkitMaskPositionX,
+<span class="lineNum">     485 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     486 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-position-y,</span>
+<span class="lineNum">     487 </span>            :                mask_position_y,
+<span class="lineNum">     488 </span>            :                WebkitMaskPositionY,
+<span class="lineNum">     489 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     490 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-repeat,</span>
+<span class="lineNum">     491 </span>            :                mask_repeat,
+<span class="lineNum">     492 </span>            :                WebkitMaskRepeat,
+<span class="lineNum">     493 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     494 </span><span class="lineCov">         60 : CSS_PROP_ALIAS(-webkit-mask-size,</span>
+<span class="lineNum">     495 </span>            :                mask_size,
+<span class="lineNum">     496 </span>            :                WebkitMaskSize,
+<span class="lineNum">     497 </span>            :                WEBKIT_PREFIX_PREF)
+<span class="lineNum">     498 </span>            : #endif
+<span class="lineNum">     499 </span>            : #undef WEBKIT_PREFIX_PREF
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

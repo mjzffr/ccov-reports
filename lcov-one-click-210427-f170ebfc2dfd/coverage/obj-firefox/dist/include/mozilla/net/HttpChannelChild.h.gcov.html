@@ -1,0 +1,522 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/net/HttpChannelChild.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/net</a> - HttpChannelChild.h<span style="font-size: 80%;"> (source / <a href="HttpChannelChild.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set sw=2 ts=8 et tw=80 : */
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       5 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       6 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #ifndef mozilla_net_HttpChannelChild_h
+<span class="lineNum">       9 </span>            : #define mozilla_net_HttpChannelChild_h
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/Mutex.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/net/HttpBaseChannel.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/net/PHttpChannelChild.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/net/ChannelEventQueue.h&quot;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &quot;nsIStreamListener.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsILoadGroup.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsIInterfaceRequestor.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsIInterfaceRequestorUtils.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsIProgressEventSink.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsICacheInfoChannel.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsIApplicationCache.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;nsIApplicationCacheChannel.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;nsIUploadChannel2.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;nsIResumableChannel.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;nsIProxiedChannel.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;nsIAsyncVerifyRedirectCallback.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;nsIAssociatedContentSecurity.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;nsIChildChannel.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;nsIHttpChannelChild.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsIDivertableChannel.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;nsIThreadRetargetableRequest.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;mozilla/net/DNS.h&quot;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : class nsIEventTarget;
+<span class="lineNum">      37 </span>            : class nsInputStreamPump;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : namespace mozilla {
+<span class="lineNum">      40 </span>            : namespace net {
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : class InterceptedChannelContent;
+<span class="lineNum">      43 </span>            : class InterceptStreamListener;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : class HttpChannelChild final : public PHttpChannelChild
+<span class="lineNum">      46 </span>            :                              , public HttpBaseChannel
+<span class="lineNum">      47 </span>            :                              , public HttpAsyncAborter&lt;HttpChannelChild&gt;
+<span class="lineNum">      48 </span>            :                              , public nsICacheInfoChannel
+<span class="lineNum">      49 </span>            :                              , public nsIProxiedChannel
+<span class="lineNum">      50 </span>            :                              , public nsIApplicationCacheChannel
+<span class="lineNum">      51 </span>            :                              , public nsIAsyncVerifyRedirectCallback
+<span class="lineNum">      52 </span>            :                              , public nsIAssociatedContentSecurity
+<span class="lineNum">      53 </span>            :                              , public nsIChildChannel
+<span class="lineNum">      54 </span>            :                              , public nsIHttpChannelChild
+<span class="lineNum">      55 </span>            :                              , public nsIDivertableChannel
+<span class="lineNum">      56 </span>            :                              , public nsIThreadRetargetableRequest
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span>            :   virtual ~HttpChannelChild();
+<span class="lineNum">      59 </span>            : public:
+<span class="lineNum">      60 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">      61 </span>            :   NS_DECL_NSICACHEINFOCHANNEL
+<span class="lineNum">      62 </span>            :   NS_DECL_NSIPROXIEDCHANNEL
+<span class="lineNum">      63 </span>            :   NS_DECL_NSIAPPLICATIONCACHECONTAINER
+<span class="lineNum">      64 </span>            :   NS_DECL_NSIAPPLICATIONCACHECHANNEL
+<span class="lineNum">      65 </span>            :   NS_DECL_NSIASYNCVERIFYREDIRECTCALLBACK
+<span class="lineNum">      66 </span>            :   NS_DECL_NSIASSOCIATEDCONTENTSECURITY
+<span class="lineNum">      67 </span>            :   NS_DECL_NSICHILDCHANNEL
+<span class="lineNum">      68 </span>            :   NS_DECL_NSIHTTPCHANNELCHILD
+<span class="lineNum">      69 </span>            :   NS_DECL_NSIDIVERTABLECHANNEL
+<span class="lineNum">      70 </span>            :   NS_DECL_NSITHREADRETARGETABLEREQUEST
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :   HttpChannelChild();
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   // Methods HttpBaseChannel didn't implement for us or that we override.
+<span class="lineNum">      75 </span>            :   //
+<span class="lineNum">      76 </span>            :   // nsIRequest
+<span class="lineNum">      77 </span>            :   NS_IMETHOD Cancel(nsresult status) override;
+<span class="lineNum">      78 </span>            :   NS_IMETHOD Suspend() override;
+<span class="lineNum">      79 </span>            :   NS_IMETHOD Resume() override;
+<span class="lineNum">      80 </span>            :   // nsIChannel
+<span class="lineNum">      81 </span>            :   NS_IMETHOD GetSecurityInfo(nsISupports **aSecurityInfo) override;
+<span class="lineNum">      82 </span>            :   NS_IMETHOD AsyncOpen(nsIStreamListener *listener, nsISupports *aContext) override;
+<span class="lineNum">      83 </span>            :   NS_IMETHOD AsyncOpen2(nsIStreamListener *aListener) override;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :   // HttpBaseChannel::nsIHttpChannel
+<span class="lineNum">      86 </span>            :   NS_IMETHOD SetReferrerWithPolicy(nsIURI *referrer, uint32_t referrerPolicy) override;
+<span class="lineNum">      87 </span>            :   NS_IMETHOD SetRequestHeader(const nsACString&amp; aHeader,
+<span class="lineNum">      88 </span>            :                               const nsACString&amp; aValue,
+<span class="lineNum">      89 </span>            :                               bool aMerge) override;
+<span class="lineNum">      90 </span>            :   NS_IMETHOD SetEmptyRequestHeader(const nsACString&amp; aHeader) override;
+<span class="lineNum">      91 </span>            :   NS_IMETHOD RedirectTo(nsIURI *newURI) override;
+<span class="lineNum">      92 </span>            :   NS_IMETHOD GetProtocolVersion(nsACString&amp; aProtocolVersion) override;
+<span class="lineNum">      93 </span>            :   // nsIHttpChannelInternal
+<span class="lineNum">      94 </span>            :   NS_IMETHOD SetupFallbackChannel(const char *aFallbackKey) override;
+<span class="lineNum">      95 </span>            :   NS_IMETHOD ForceIntercepted(uint64_t aInterceptionID) override;
+<span class="lineNum">      96 </span>            :   // nsISupportsPriority
+<span class="lineNum">      97 </span>            :   NS_IMETHOD SetPriority(int32_t value) override;
+<span class="lineNum">      98 </span>            :   // nsIClassOfService
+<span class="lineNum">      99 </span>            :   NS_IMETHOD SetClassFlags(uint32_t inFlags) override;
+<span class="lineNum">     100 </span>            :   NS_IMETHOD AddClassFlags(uint32_t inFlags) override;
+<span class="lineNum">     101 </span>            :   NS_IMETHOD ClearClassFlags(uint32_t inFlags) override;
+<span class="lineNum">     102 </span>            :   // nsIResumableChannel
+<span class="lineNum">     103 </span>            :   NS_IMETHOD ResumeAt(uint64_t startPos, const nsACString&amp; entityID) override;
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   // IPDL holds a reference while the PHttpChannel protocol is live (starting at
+<span class="lineNum">     106 </span>            :   // AsyncOpen, and ending at either OnStopRequest or any IPDL error, either of
+<span class="lineNum">     107 </span>            :   // which call NeckoChild::DeallocPHttpChannelChild()).
+<span class="lineNum">     108 </span>            :   void AddIPDLReference();
+<span class="lineNum">     109 </span>            :   void ReleaseIPDLReference();
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :   MOZ_MUST_USE bool IsSuspended();
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   mozilla::ipc::IPCResult RecvNotifyTrackingProtectionDisabled() override;
+<span class="lineNum">     114 </span>            :   mozilla::ipc::IPCResult RecvNotifyTrackingResource() override;
+<span class="lineNum">     115 </span>            :   void FlushedForDiversion();
+<span class="lineNum">     116 </span>            :   mozilla::ipc::IPCResult RecvSetClassifierMatchedInfo(const ClassifierInfo&amp; aInfo) override;
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            : protected:
+<span class="lineNum">     119 </span>            :   mozilla::ipc::IPCResult RecvOnStartRequest(const nsresult&amp; channelStatus,
+<span class="lineNum">     120 </span>            :                                              const nsHttpResponseHead&amp; responseHead,
+<span class="lineNum">     121 </span>            :                                              const bool&amp; useResponseHead,
+<span class="lineNum">     122 </span>            :                                              const nsHttpHeaderArray&amp; requestHeaders,
+<span class="lineNum">     123 </span>            :                                              const bool&amp; isFromCache,
+<span class="lineNum">     124 </span>            :                                              const bool&amp; cacheEntryAvailable,
+<span class="lineNum">     125 </span>            :                                              const uint32_t&amp; cacheExpirationTime,
+<span class="lineNum">     126 </span>            :                                              const nsCString&amp; cachedCharset,
+<span class="lineNum">     127 </span>            :                                              const nsCString&amp; securityInfoSerialization,
+<span class="lineNum">     128 </span>            :                                              const NetAddr&amp; selfAddr,
+<span class="lineNum">     129 </span>            :                                              const NetAddr&amp; peerAddr,
+<span class="lineNum">     130 </span>            :                                              const int16_t&amp; redirectCount,
+<span class="lineNum">     131 </span>            :                                              const uint32_t&amp; cacheKey,
+<span class="lineNum">     132 </span>            :                                              const nsCString&amp; altDataType,
+<span class="lineNum">     133 </span>            :                                              const int64_t&amp; altDataLen) override;
+<span class="lineNum">     134 </span>            :   mozilla::ipc::IPCResult RecvOnTransportAndData(const nsresult&amp; channelStatus,
+<span class="lineNum">     135 </span>            :                                                  const nsresult&amp; status,
+<span class="lineNum">     136 </span>            :                                                  const uint64_t&amp; offset,
+<span class="lineNum">     137 </span>            :                                                  const uint32_t&amp; count,
+<span class="lineNum">     138 </span>            :                                                  const nsCString&amp; data) override;
+<span class="lineNum">     139 </span>            :   mozilla::ipc::IPCResult RecvOnStopRequest(const nsresult&amp; statusCode, const ResourceTimingStruct&amp; timing) override;
+<span class="lineNum">     140 </span>            :   mozilla::ipc::IPCResult RecvOnProgress(const int64_t&amp; progress, const int64_t&amp; progressMax) override;
+<span class="lineNum">     141 </span>            :   mozilla::ipc::IPCResult RecvOnStatus(const nsresult&amp; status) override;
+<span class="lineNum">     142 </span>            :   mozilla::ipc::IPCResult RecvFailedAsyncOpen(const nsresult&amp; status) override;
+<span class="lineNum">     143 </span>            :   mozilla::ipc::IPCResult RecvRedirect1Begin(const uint32_t&amp; registrarId,
+<span class="lineNum">     144 </span>            :                                              const URIParams&amp; newURI,
+<span class="lineNum">     145 </span>            :                                              const uint32_t&amp; redirectFlags,
+<span class="lineNum">     146 </span>            :                                              const nsHttpResponseHead&amp; responseHead,
+<span class="lineNum">     147 </span>            :                                              const nsCString&amp; securityInfoSerialization,
+<span class="lineNum">     148 </span>            :                                              const uint64_t&amp; channelId) override;
+<span class="lineNum">     149 </span>            :   mozilla::ipc::IPCResult RecvRedirect3Complete() override;
+<span class="lineNum">     150 </span>            :   mozilla::ipc::IPCResult RecvAssociateApplicationCache(const nsCString&amp; groupID,
+<span class="lineNum">     151 </span>            :                                                         const nsCString&amp; clientID) override;
+<span class="lineNum">     152 </span>            :   mozilla::ipc::IPCResult RecvFlushedForDiversion() override;
+<span class="lineNum">     153 </span>            :   mozilla::ipc::IPCResult RecvDivertMessages() override;
+<span class="lineNum">     154 </span>            :   mozilla::ipc::IPCResult RecvDeleteSelf() override;
+<span class="lineNum">     155 </span>            :   mozilla::ipc::IPCResult RecvFinishInterceptedRedirect() override;
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :   mozilla::ipc::IPCResult RecvReportSecurityMessage(const nsString&amp; messageTag,
+<span class="lineNum">     158 </span>            :                                                     const nsString&amp; messageCategory) override;
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            :   mozilla::ipc::IPCResult RecvIssueDeprecationWarning(const uint32_t&amp; warning,
+<span class="lineNum">     161 </span>            :                                                       const bool&amp; asError) override;
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :   mozilla::ipc::IPCResult RecvSetPriority(const int16_t&amp; aPriority) override;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   MOZ_MUST_USE bool
+<span class="lineNum">     166 </span>            :   GetAssociatedContentSecurity(nsIAssociatedContentSecurity** res = nullptr);
+<span class="lineNum">     167 </span>            :   virtual void DoNotifyListenerCleanup() override;
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   NS_IMETHOD GetResponseSynthesized(bool* aSynthesized) override;
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            : private:
+<span class="lineNum">     172 </span>            :   // this section is for main-thread-only object
+<span class="lineNum">     173 </span>            :   // all the references need to be proxy released on main thread.
+<span class="lineNum">     174 </span>            :   nsCOMPtr&lt;nsISupports&gt; mCacheKey;
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :   // Proxy release all members above on main thread.
+<span class="lineNum">     177 </span>            :   void ReleaseMainThreadOnlyReferences();
+<span class="lineNum">     178 </span>            : 
+<a name="179"><span class="lineNum">     179 </span>            : private:</a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   class OverrideRunnable : public Runnable {</span>
+<span class="lineNum">     182 </span>            :   public:
+<span class="lineNum">     183 </span>            :     OverrideRunnable(HttpChannelChild* aChannel,
+<span class="lineNum">     184 </span>            :                      HttpChannelChild* aNewChannel,
+<span class="lineNum">     185 </span>            :                      InterceptStreamListener* aListener,
+<span class="lineNum">     186 </span>            :                      nsIInputStream* aInput,
+<span class="lineNum">     187 </span>            :                      nsAutoPtr&lt;nsHttpResponseHead&gt;&amp; aHead);
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     NS_IMETHOD Run() override;
+<span class="lineNum">     190 </span>            :     void OverrideWithSynthesizedResponse();
+<span class="lineNum">     191 </span>            :   private:
+<span class="lineNum">     192 </span>            :     RefPtr&lt;HttpChannelChild&gt; mChannel;
+<span class="lineNum">     193 </span>            :     RefPtr&lt;HttpChannelChild&gt; mNewChannel;
+<span class="lineNum">     194 </span>            :     RefPtr&lt;InterceptStreamListener&gt; mListener;
+<span class="lineNum">     195 </span>            :     nsCOMPtr&lt;nsIInputStream&gt; mInput;
+<span class="lineNum">     196 </span>            :     nsAutoPtr&lt;nsHttpResponseHead&gt; mHead;
+<span class="lineNum">     197 </span>            :   };
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            :   // Sets the event target for future IPC messages. Messages will either be
+<span class="lineNum">     200 </span>            :   // directed to the TabGroup or DocGroup, depending on the LoadInfo associated
+<span class="lineNum">     201 </span>            :   // with the channel. Should be called when a new channel is being set up,
+<span class="lineNum">     202 </span>            :   // before the constructor message is sent to the parent.
+<span class="lineNum">     203 </span>            :   void SetEventTarget();
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :   // Get event target for processing network events.
+<span class="lineNum">     206 </span>            :   already_AddRefed&lt;nsIEventTarget&gt; GetNeckoTarget();
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   // Get event target for ODA.
+<span class="lineNum">     209 </span>            :   already_AddRefed&lt;nsIEventTarget&gt; GetODATarget();
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   MOZ_MUST_USE nsresult ContinueAsyncOpen();
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :   void DoOnStartRequest(nsIRequest* aRequest, nsISupports* aContext);
+<span class="lineNum">     214 </span>            :   void DoOnStatus(nsIRequest* aRequest, nsresult status);
+<span class="lineNum">     215 </span>            :   void DoOnProgress(nsIRequest* aRequest, int64_t progress, int64_t progressMax);
+<span class="lineNum">     216 </span>            :   void DoOnDataAvailable(nsIRequest* aRequest, nsISupports* aContext, nsIInputStream* aStream,
+<span class="lineNum">     217 </span>            :                          uint64_t offset, uint32_t count);
+<span class="lineNum">     218 </span>            :   void DoPreOnStopRequest(nsresult aStatus);
+<span class="lineNum">     219 </span>            :   void DoOnStopRequest(nsIRequest* aRequest, nsresult aChannelStatus, nsISupports* aContext);
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :   bool ShouldInterceptURI(nsIURI* aURI, bool&amp; aShouldUpgrade);
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :   // Discard the prior interception and continue with the original network request.
+<span class="lineNum">     224 </span>            :   void ResetInterception();
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   // Override this channel's pending response with a synthesized one. The content will be
+<span class="lineNum">     227 </span>            :   // asynchronously read from the pump.
+<span class="lineNum">     228 </span>            :   void OverrideWithSynthesizedResponse(nsAutoPtr&lt;nsHttpResponseHead&gt;&amp; aResponseHead,
+<span class="lineNum">     229 </span>            :                                        nsIInputStream* aSynthesizedInput,
+<span class="lineNum">     230 </span>            :                                        InterceptStreamListener* aStreamListener);
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :   void ForceIntercepted(nsIInputStream* aSynthesizedInput);
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :   // Try send DeletingChannel message to parent side. Dispatch an async task to
+<span class="lineNum">     235 </span>            :   // main thread if invoking on non-main thread.
+<span class="lineNum">     236 </span>            :   void TrySendDeletingChannel();
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   // Try invoke Cancel if on main thread, or prepend a CancelEvent in mEventQ to
+<span class="lineNum">     239 </span>            :   // ensure Cacnel is processed before any other channel events.
+<span class="lineNum">     240 </span>            :   void CancelOnMainThread(nsresult aRv);
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :   RequestHeaderTuples mClientSetRequestHeaders;
+<span class="lineNum">     243 </span>            :   nsCOMPtr&lt;nsIChildChannel&gt; mRedirectChannelChild;
+<span class="lineNum">     244 </span>            :   RefPtr&lt;InterceptStreamListener&gt; mInterceptListener;
+<span class="lineNum">     245 </span>            :   RefPtr&lt;nsInputStreamPump&gt; mSynthesizedResponsePump;
+<span class="lineNum">     246 </span>            :   nsCOMPtr&lt;nsIInputStream&gt; mSynthesizedInput;
+<span class="lineNum">     247 </span>            :   int64_t mSynthesizedStreamLength;
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   bool mIsFromCache;
+<span class="lineNum">     250 </span>            :   bool mCacheEntryAvailable;
+<span class="lineNum">     251 </span>            :   uint32_t     mCacheExpirationTime;
+<span class="lineNum">     252 </span>            :   nsCString    mCachedCharset;
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :   nsCString mProtocolVersion;
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   // If ResumeAt is called before AsyncOpen, we need to send extra data upstream
+<span class="lineNum">     257 </span>            :   bool mSendResumeAt;
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   // To ensure only one SendDeletingChannel is triggered.
+<span class="lineNum">     260 </span>            :   Atomic&lt;bool&gt; mDeletingChannelSent;
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :   Atomic&lt;bool&gt; mIPCOpen;
+<span class="lineNum">     263 </span>            :   bool mKeptAlive;            // IPC kept open, but only for security info
+<span class="lineNum">     264 </span>            :   RefPtr&lt;ChannelEventQueue&gt; mEventQ;
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :   // If nsUnknownDecoder is involved OnStartRequest call will be delayed and
+<span class="lineNum">     267 </span>            :   // this queue keeps OnDataAvailable data until OnStartRequest is finally
+<span class="lineNum">     268 </span>            :   // called.
+<span class="lineNum">     269 </span>            :   nsTArray&lt;UniquePtr&lt;ChannelEvent&gt;&gt; mUnknownDecoderEventQ;
+<span class="lineNum">     270 </span>            :   bool mUnknownDecoderInvolved;
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :   // Once set, OnData and possibly OnStop will be diverted to the parent.
+<span class="lineNum">     273 </span>            :   bool mDivertingToParent;
+<span class="lineNum">     274 </span>            :   // Once set, no OnStart/OnData/OnStop callbacks should be received from the
+<span class="lineNum">     275 </span>            :   // parent channel, nor dequeued from the ChannelEventQueue.
+<span class="lineNum">     276 </span>            :   bool mFlushedForDiversion;
+<span class="lineNum">     277 </span>            :   // Set if SendSuspend is called. Determines if SendResume is needed when
+<span class="lineNum">     278 </span>            :   // diverting callbacks to parent.
+<span class="lineNum">     279 </span>            :   bool mSuspendSent;
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :   // Set if a response was synthesized, indicating that any forthcoming redirects
+<span class="lineNum">     282 </span>            :   // should be intercepted.
+<span class="lineNum">     283 </span>            :   bool mSynthesizedResponse;
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            :   // Set if a synthesized response should cause us to explictly allows intercepting
+<span class="lineNum">     286 </span>            :   // an expected forthcoming redirect.
+<span class="lineNum">     287 </span>            :   bool mShouldInterceptSubsequentRedirect;
+<span class="lineNum">     288 </span>            :   // Set if a redirection is being initiated to facilitate providing a synthesized
+<span class="lineNum">     289 </span>            :   // response to a channel using a different principal than the current one.
+<span class="lineNum">     290 </span>            :   bool mRedirectingForSubsequentSynthesizedResponse;
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :   // Set if a manual redirect mode channel needs to be intercepted in the
+<span class="lineNum">     293 </span>            :   // parent.
+<span class="lineNum">     294 </span>            :   bool mPostRedirectChannelShouldIntercept;
+<span class="lineNum">     295 </span>            :   // Set if a manual redirect mode channel needs to be upgraded to a secure URI
+<span class="lineNum">     296 </span>            :   // when it's being considered for interception.  Can only be true if
+<span class="lineNum">     297 </span>            :   // mPostRedirectChannelShouldIntercept is true.
+<span class="lineNum">     298 </span>            :   bool mPostRedirectChannelShouldUpgrade;
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   // Set if the corresponding parent channel should force an interception to occur
+<span class="lineNum">     301 </span>            :   // before the network transaction is initiated.
+<span class="lineNum">     302 </span>            :   bool mShouldParentIntercept;
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            :   // Set if the corresponding parent channel should suspend after a response
+<span class="lineNum">     305 </span>            :   // is synthesized.
+<span class="lineNum">     306 </span>            :   bool mSuspendParentAfterSynthesizeResponse;
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            :   // Needed to call AsyncOpen in FinishInterceptedRedirect
+<span class="lineNum">     309 </span>            :   nsCOMPtr&lt;nsIStreamListener&gt; mInterceptedRedirectListener;
+<span class="lineNum">     310 </span>            :   nsCOMPtr&lt;nsISupports&gt; mInterceptedRedirectContext;
+<span class="lineNum">     311 </span>            :   // Needed to call CleanupRedirectingChannel in FinishInterceptedRedirect
+<span class="lineNum">     312 </span>            :   RefPtr&lt;HttpChannelChild&gt; mInterceptingChannel;
+<span class="lineNum">     313 </span>            :   // Used to call OverrideWithSynthesizedResponse in FinishInterceptedRedirect
+<span class="lineNum">     314 </span>            :   RefPtr&lt;OverrideRunnable&gt; mOverrideRunnable;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   // EventTarget for labeling networking events.
+<span class="lineNum">     317 </span>            :   nsCOMPtr&lt;nsIEventTarget&gt; mNeckoTarget;
+<span class="lineNum">     318 </span>            :   // Target thread for delivering ODA.
+<span class="lineNum">     319 </span>            :   nsCOMPtr&lt;nsIEventTarget&gt; mODATarget;
+<span class="lineNum">     320 </span>            :   // Used to ensure atomicity of mNeckoTarget / mODATarget;
+<span class="lineNum">     321 </span>            :   Mutex mEventTargetMutex;
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            :   void FinishInterceptedRedirect();
+<span class="lineNum">     324 </span>            :   void CleanupRedirectingChannel(nsresult rv);
+<a name="325"><span class="lineNum">     325 </span>            : </a>
+<span class="lineNum">     326 </span>            :   // true after successful AsyncOpen until OnStopRequest completes.
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :   bool RemoteChannelExists() { return mIPCOpen &amp;&amp; !mKeptAlive; }</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :   void AssociateApplicationCache(const nsCString &amp;groupID,
+<span class="lineNum">     330 </span>            :                                  const nsCString &amp;clientID);
+<span class="lineNum">     331 </span>            :   void OnStartRequest(const nsresult&amp; channelStatus,
+<span class="lineNum">     332 </span>            :                       const nsHttpResponseHead&amp; responseHead,
+<span class="lineNum">     333 </span>            :                       const bool&amp; useResponseHead,
+<span class="lineNum">     334 </span>            :                       const nsHttpHeaderArray&amp; requestHeaders,
+<span class="lineNum">     335 </span>            :                       const bool&amp; isFromCache,
+<span class="lineNum">     336 </span>            :                       const bool&amp; cacheEntryAvailable,
+<span class="lineNum">     337 </span>            :                       const uint32_t&amp; cacheExpirationTime,
+<span class="lineNum">     338 </span>            :                       const nsCString&amp; cachedCharset,
+<span class="lineNum">     339 </span>            :                       const nsCString&amp; securityInfoSerialization,
+<span class="lineNum">     340 </span>            :                       const NetAddr&amp; selfAddr,
+<span class="lineNum">     341 </span>            :                       const NetAddr&amp; peerAddr,
+<span class="lineNum">     342 </span>            :                       const uint32_t&amp; cacheKey,
+<span class="lineNum">     343 </span>            :                       const nsCString&amp; altDataType,
+<span class="lineNum">     344 </span>            :                       const int64_t&amp; altDataLen);
+<span class="lineNum">     345 </span>            :   void MaybeDivertOnData(const nsCString&amp; data,
+<span class="lineNum">     346 </span>            :                          const uint64_t&amp; offset,
+<span class="lineNum">     347 </span>            :                          const uint32_t&amp; count);
+<span class="lineNum">     348 </span>            :   void OnTransportAndData(const nsresult&amp; channelStatus,
+<span class="lineNum">     349 </span>            :                           const nsresult&amp; status,
+<span class="lineNum">     350 </span>            :                           const uint64_t&amp; offset,
+<span class="lineNum">     351 </span>            :                           const uint32_t&amp; count,
+<span class="lineNum">     352 </span>            :                           const nsCString&amp; data);
+<span class="lineNum">     353 </span>            :   void OnStopRequest(const nsresult&amp; channelStatus, const ResourceTimingStruct&amp; timing);
+<span class="lineNum">     354 </span>            :   void MaybeDivertOnStop(const nsresult&amp; aChannelStatus);
+<span class="lineNum">     355 </span>            :   void OnProgress(const int64_t&amp; progress, const int64_t&amp; progressMax);
+<span class="lineNum">     356 </span>            :   void OnStatus(const nsresult&amp; status);
+<span class="lineNum">     357 </span>            :   void FailedAsyncOpen(const nsresult&amp; status);
+<span class="lineNum">     358 </span>            :   void HandleAsyncAbort();
+<span class="lineNum">     359 </span>            :   void Redirect1Begin(const uint32_t&amp; registrarId,
+<span class="lineNum">     360 </span>            :                       const URIParams&amp; newUri,
+<span class="lineNum">     361 </span>            :                       const uint32_t&amp; redirectFlags,
+<span class="lineNum">     362 </span>            :                       const nsHttpResponseHead&amp; responseHead,
+<span class="lineNum">     363 </span>            :                       const nsACString&amp; securityInfoSerialization,
+<span class="lineNum">     364 </span>            :                       const uint64_t&amp; channelId);
+<span class="lineNum">     365 </span>            :   bool Redirect3Complete(OverrideRunnable* aRunnable);
+<span class="lineNum">     366 </span>            :   void DeleteSelf();
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   // Create a a new channel to be used in a redirection, based on the provided
+<span class="lineNum">     369 </span>            :   // response headers.
+<span class="lineNum">     370 </span>            :   MOZ_MUST_USE nsresult SetupRedirect(nsIURI* uri,
+<span class="lineNum">     371 </span>            :                                       const nsHttpResponseHead* responseHead,
+<span class="lineNum">     372 </span>            :                                       const uint32_t&amp; redirectFlags,
+<span class="lineNum">     373 </span>            :                                       nsIChannel** outChannel);
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            :   // Perform a redirection without communicating with the parent process at all.
+<span class="lineNum">     376 </span>            :   void BeginNonIPCRedirect(nsIURI* responseURI,
+<span class="lineNum">     377 </span>            :                            const nsHttpResponseHead* responseHead);
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            :   // Override the default security info pointer during a non-IPC redirection.
+<span class="lineNum">     380 </span>            :   void OverrideSecurityInfoForNonIPCRedirect(nsISupports* securityInfo);
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :   friend class AssociateApplicationCacheEvent;
+<span class="lineNum">     383 </span>            :   friend class StartRequestEvent;
+<span class="lineNum">     384 </span>            :   friend class StopRequestEvent;
+<span class="lineNum">     385 </span>            :   friend class TransportAndDataEvent;
+<span class="lineNum">     386 </span>            :   friend class MaybeDivertOnDataHttpEvent;
+<span class="lineNum">     387 </span>            :   friend class MaybeDivertOnStopHttpEvent;
+<span class="lineNum">     388 </span>            :   friend class ProgressEvent;
+<span class="lineNum">     389 </span>            :   friend class StatusEvent;
+<span class="lineNum">     390 </span>            :   friend class FailedAsyncOpenEvent;
+<span class="lineNum">     391 </span>            :   friend class Redirect1Event;
+<span class="lineNum">     392 </span>            :   friend class Redirect3Event;
+<span class="lineNum">     393 </span>            :   friend class DeleteSelfEvent;
+<span class="lineNum">     394 </span>            :   friend class HttpFlushedForDiversionEvent;
+<span class="lineNum">     395 </span>            :   friend class CancelEvent;
+<span class="lineNum">     396 </span>            :   friend class HttpAsyncAborter&lt;HttpChannelChild&gt;;
+<span class="lineNum">     397 </span>            :   friend class InterceptStreamListener;
+<span class="lineNum">     398 </span>            :   friend class InterceptedChannelContent;
+<span class="lineNum">     399 </span>            : };
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : // A stream listener interposed between the nsInputStreamPump used for intercepted channels
+<span class="lineNum">     402 </span>            : // and this channel's original listener. This is only used to ensure the original listener
+<span class="lineNum">     403 </span>            : // sees the channel as the request object, and to synthesize OnStatus and OnProgress notifications.
+<span class="lineNum">     404 </span>            : class InterceptStreamListener : public nsIStreamListener
+<span class="lineNum">     405 </span>            :                               , public nsIProgressEventSink
+<span class="lineNum">     406 </span>            : {
+<a name="407"><span class="lineNum">     407 </span>            :   RefPtr&lt;HttpChannelChild&gt; mOwner;</a>
+<span class="lineNum">     408 </span>            :   nsCOMPtr&lt;nsISupports&gt; mContext;
+<a name="409"><span class="lineNum">     409 </span><span class="lineNoCov">          0 :   virtual ~InterceptStreamListener() {}</span></a>
+<span class="lineNum">     410 </span>            :  public:
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :   InterceptStreamListener(HttpChannelChild* aOwner, nsISupports* aContext)</span>
+<span class="lineNum">     412 </span>            :   : mOwner(aOwner)
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :   , mContext(aContext)</span>
+<span class="lineNum">     414 </span>            :   {
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">     418 </span>            :   NS_DECL_NSIREQUESTOBSERVER
+<span class="lineNum">     419 </span>            :   NS_DECL_NSISTREAMLISTENER
+<span class="lineNum">     420 </span>            :   NS_DECL_NSIPROGRESSEVENTSINK
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            :   void Cleanup();
+<span class="lineNum">     423 </span>            : };
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : //-----------------------------------------------------------------------------
+<span class="lineNum">     426 </span>            : // inline functions
+<span class="lineNum">     427 </span>            : //-----------------------------------------------------------------------------
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            : inline bool
+<span class="lineNum">     430 </span>            : HttpChannelChild::IsSuspended()
+<span class="lineNum">     431 </span>            : {
+<span class="lineNum">     432 </span>            :   return mSuspendCount != 0;
+<span class="lineNum">     433 </span>            : }
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            : } // namespace net
+<span class="lineNum">     436 </span>            : } // namespace mozilla
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            : #endif // mozilla_net_HttpChannelChild_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

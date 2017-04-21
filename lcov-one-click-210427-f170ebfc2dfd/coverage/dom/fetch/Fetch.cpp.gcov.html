@@ -1,0 +1,1634 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - dom/fetch/Fetch.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">dom/fetch</a> - Fetch.cpp<span style="font-size: 80%;"> (source / <a href="Fetch.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">542</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">147</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &quot;Fetch.h&quot;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;nsIDocument.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;nsIGlobalObject.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;nsIStreamLoader.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsIThreadRetargetableRequest.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsIUnicodeDecoder.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &quot;nsCharSeparatedTokenizer.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsDOMString.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsNetUtil.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsReadableUtils.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsStreamUtils.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsStringStream.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &quot;mozilla/ErrorResult.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;mozilla/dom/BindingDeclarations.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;mozilla/dom/BodyUtil.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;mozilla/dom/Exceptions.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;mozilla/dom/FetchDriver.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;mozilla/dom/File.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;mozilla/dom/FormData.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;mozilla/dom/Headers.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;mozilla/dom/MutableBlobStreamListener.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;mozilla/dom/Promise.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;mozilla/dom/PromiseWorkerProxy.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;mozilla/dom/Request.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;mozilla/dom/Response.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;mozilla/dom/ScriptSettings.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;mozilla/dom/URLSearchParams.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;mozilla/dom/workers/ServiceWorkerManager.h&quot;
+<span class="lineNum">      38 </span>            : #include &quot;mozilla/Telemetry.h&quot;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #include &quot;BodyExtractor.h&quot;
+<span class="lineNum">      41 </span>            : #include &quot;FetchObserver.h&quot;
+<span class="lineNum">      42 </span>            : #include &quot;InternalRequest.h&quot;
+<span class="lineNum">      43 </span>            : #include &quot;InternalResponse.h&quot;
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #include &quot;WorkerPrivate.h&quot;
+<span class="lineNum">      46 </span>            : #include &quot;WorkerRunnable.h&quot;
+<span class="lineNum">      47 </span>            : #include &quot;WorkerScope.h&quot;
+<span class="lineNum">      48 </span>            : #include &quot;Workers.h&quot;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : namespace mozilla {
+<span class="lineNum">      51 </span>            : namespace dom {
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : using namespace workers;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : // This class helps the proxying of FetchSignal changes cross threads.
+<span class="lineNum">      56 </span>            : class FetchSignalProxy final : public FetchSignal::Follower
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span>            :   // This is created and released on the main-thread.
+<span class="lineNum">      59 </span>            :   RefPtr&lt;FetchSignal&gt; mSignalMainThread;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :   // This value is used only for the creation of FetchSignal on the
+<span class="lineNum">      62 </span>            :   // main-thread. They are not updated.
+<span class="lineNum">      63 </span>            :   const bool mAborted;
+<span class="lineNum">      64 </span>            : 
+<a name="65"><span class="lineNum">      65 </span>            :   // This runnable propagates changes from the FetchSignal on workers to the</a>
+<span class="lineNum">      66 </span>            :   // FetchSignal on main-thread.
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   class FetchSignalProxyRunnable final : public Runnable</span>
+<span class="lineNum">      68 </span>            :   {
+<span class="lineNum">      69 </span>            :     RefPtr&lt;FetchSignalProxy&gt; mProxy;
+<a name="70"><span class="lineNum">      70 </span>            : </a>
+<span class="lineNum">      71 </span>            :   public:
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :     explicit FetchSignalProxyRunnable(FetchSignalProxy* aProxy)</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       : mProxy(aProxy)</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     {}</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :     NS_IMETHOD
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     Run() override</span>
+<span class="lineNum">      78 </span>            :     {
+<span class="lineNum">      79 </span>            :       MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       FetchSignal* signal = mProxy-&gt;GetOrCreateSignalForMainThread();</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :       signal-&gt;Abort();</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       return NS_OK;</span>
+<span class="lineNum">      83 </span>            :     }
+<span class="lineNum">      84 </span>            :   };
+<a name="85"><span class="lineNum">      85 </span>            : </a>
+<span class="lineNum">      86 </span>            : public:
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   NS_INLINE_DECL_THREADSAFE_REFCOUNTING(FetchSignalProxy)</span>
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :   explicit FetchSignalProxy(FetchSignal* aSignal)</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     : mAborted(aSignal-&gt;Aborted())</span>
+<span class="lineNum">      91 </span>            :   {
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     Follow(aSignal);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   void
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   Aborted() override</span>
+<span class="lineNum">      97 </span>            :   {
+<span class="lineNum">      98 </span>            :     RefPtr&lt;FetchSignalProxyRunnable&gt; runnable =
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :       new FetchSignalProxyRunnable(this);</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     NS_DispatchToMainThread(runnable);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   FetchSignal*
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :   GetOrCreateSignalForMainThread()</span>
+<span class="lineNum">     105 </span>            :   {
+<span class="lineNum">     106 </span>            :     MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :     if (!mSignalMainThread) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :       mSignalMainThread = new FetchSignal(mAborted);</span>
+<span class="lineNum">     109 </span>            :     }
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :     return mSignalMainThread;</span>
+<span class="lineNum">     111 </span>            :   }
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   void
+<span class="lineNum">     114 </span>            :   Shutdown()
+<span class="lineNum">     115 </span>            :   {
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     Unfollow();</span>
+<span class="lineNum">     117 </span>            :   }
+<a name="118"><span class="lineNum">     118 </span>            : </a>
+<span class="lineNum">     119 </span>            : private:
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   ~FetchSignalProxy()</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     NS_ReleaseOnMainThread(mSignalMainThread.forget());</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     124 </span>            : };
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : class WorkerFetchResolver final : public FetchDriverObserver
+<span class="lineNum">     127 </span>            : {
+<span class="lineNum">     128 </span>            :   friend class MainThreadFetchRunnable;
+<span class="lineNum">     129 </span>            :   friend class WorkerDataAvailableRunnable;
+<span class="lineNum">     130 </span>            :   friend class WorkerFetchResponseEndBase;
+<span class="lineNum">     131 </span>            :   friend class WorkerFetchResponseEndRunnable;
+<span class="lineNum">     132 </span>            :   friend class WorkerFetchResponseRunnable;
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :   RefPtr&lt;PromiseWorkerProxy&gt; mPromiseProxy;
+<span class="lineNum">     135 </span>            :   RefPtr&lt;FetchSignalProxy&gt; mSignalProxy;
+<span class="lineNum">     136 </span>            :   RefPtr&lt;FetchObserver&gt; mFetchObserver;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : public:
+<span class="lineNum">     139 </span>            :   // Returns null if worker is shutting down.
+<span class="lineNum">     140 </span>            :   static already_AddRefed&lt;WorkerFetchResolver&gt;
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   Create(workers::WorkerPrivate* aWorkerPrivate, Promise* aPromise,</span>
+<span class="lineNum">     142 </span>            :          FetchSignal* aSignal, FetchObserver* aObserver)
+<span class="lineNum">     143 </span>            :   {
+<span class="lineNum">     144 </span>            :     MOZ_ASSERT(aWorkerPrivate);
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     aWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">     146 </span>            :     RefPtr&lt;PromiseWorkerProxy&gt; proxy =
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :       PromiseWorkerProxy::Create(aWorkerPrivate, aPromise);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     if (!proxy) {</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :       return nullptr;</span>
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     RefPtr&lt;FetchSignalProxy&gt; signalProxy;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     if (aSignal) {</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       signalProxy = new FetchSignalProxy(aSignal);</span>
+<span class="lineNum">     155 </span>            :     }
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :     RefPtr&lt;WorkerFetchResolver&gt; r =
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       new WorkerFetchResolver(proxy, signalProxy, aObserver);</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     return r.forget();</span>
+<span class="lineNum">     160 </span>            :   }
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   FetchSignal*
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :   GetFetchSignal()</span>
+<span class="lineNum">     164 </span>            :   {
+<span class="lineNum">     165 </span>            :     MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :     if (!mSignalProxy) {</span>
+<span class="lineNum">     168 </span>            :       return nullptr;
+<span class="lineNum">     169 </span>            :     }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     return mSignalProxy-&gt;GetOrCreateSignalForMainThread();</span>
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :   void
+<span class="lineNum">     175 </span>            :   OnResponseAvailableInternal(InternalResponse* aResponse) override;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :   void
+<span class="lineNum">     178 </span>            :   OnResponseEnd(FetchDriverObserver::EndReason eReason) override;
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   void
+<span class="lineNum">     181 </span>            :   OnDataAvailable() override;
+<a name="182"><span class="lineNum">     182 </span>            : </a>
+<span class="lineNum">     183 </span>            : private:
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :    WorkerFetchResolver(PromiseWorkerProxy* aProxy,</span>
+<span class="lineNum">     185 </span>            :                        FetchSignalProxy* aSignalProxy,
+<span class="lineNum">     186 </span>            :                        FetchObserver* aObserver)
+<span class="lineNum">     187 </span>            :     : mPromiseProxy(aProxy)
+<span class="lineNum">     188 </span>            :     , mSignalProxy(aSignalProxy)
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     , mFetchObserver(aObserver)</span>
+<span class="lineNum">     190 </span>            :   {
+<span class="lineNum">     191 </span>            :     MOZ_ASSERT(!NS_IsMainThread());
+<span class="lineNum">     192 </span>            :     MOZ_ASSERT(mPromiseProxy);
+<a name="193"><span class="lineNum">     193 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :   ~WorkerFetchResolver()</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :   {}</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   virtual void
+<span class="lineNum">     199 </span>            :   FlushConsoleReport() override;
+<span class="lineNum">     200 </span>            : };
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            : class MainThreadFetchResolver final : public FetchDriverObserver
+<span class="lineNum">     203 </span>            : {
+<span class="lineNum">     204 </span>            :   RefPtr&lt;Promise&gt; mPromise;
+<span class="lineNum">     205 </span>            :   RefPtr&lt;Response&gt; mResponse;
+<span class="lineNum">     206 </span>            :   RefPtr&lt;FetchObserver&gt; mFetchObserver;
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   nsCOMPtr&lt;nsILoadGroup&gt; mLoadGroup;
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   NS_DECL_OWNINGTHREAD
+<span class="lineNum">     211 </span>            : public:
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   MainThreadFetchResolver(Promise* aPromise, FetchObserver* aObserver)</span>
+<span class="lineNum">     213 </span>            :     : mPromise(aPromise)
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :     , mFetchObserver(aObserver)</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :   {}</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :   void
+<span class="lineNum">     218 </span>            :   OnResponseAvailableInternal(InternalResponse* aResponse) override;
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :   void SetLoadGroup(nsILoadGroup* aLoadGroup)
+<span class="lineNum">     221 </span>            :   {
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     mLoadGroup = aLoadGroup;</span>
+<span class="lineNum">     223 </span>            :   }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   void
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :   OnResponseEnd(FetchDriverObserver::EndReason aReason) override</span>
+<span class="lineNum">     227 </span>            :   {
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :     if (aReason == eAborted) {</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       mPromise-&gt;MaybeReject(NS_ERROR_DOM_ABORT_ERR);</span>
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :     mFetchObserver = nullptr;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :     FlushConsoleReport();</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   void
+<span class="lineNum">     238 </span>            :   OnDataAvailable() override;
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : private:
+<a name="241"><span class="lineNum">     241 </span>            :   ~MainThreadFetchResolver();</a>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :   void FlushConsoleReport() override</span>
+<span class="lineNum">     244 </span>            :   {
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     mReporter-&gt;FlushConsoleReports(mLoadGroup);</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   }</span>
+<a name="247"><span class="lineNum">     247 </span>            : };</a>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 : class MainThreadFetchRunnable : public Runnable</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span>            :   RefPtr&lt;WorkerFetchResolver&gt; mResolver;
+<span class="lineNum">     252 </span>            :   RefPtr&lt;InternalRequest&gt; mRequest;
+<a name="253"><span class="lineNum">     253 </span>            : </a>
+<span class="lineNum">     254 </span>            : public:
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :   MainThreadFetchRunnable(WorkerFetchResolver* aResolver,</span>
+<span class="lineNum">     256 </span>            :                           InternalRequest* aRequest)
+<span class="lineNum">     257 </span>            :     : mResolver(aResolver)
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :     , mRequest(aRequest)</span>
+<span class="lineNum">     259 </span>            :   {
+<span class="lineNum">     260 </span>            :     MOZ_ASSERT(mResolver);
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :   NS_IMETHOD
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :   Run() override</span>
+<span class="lineNum">     265 </span>            :   {
+<span class="lineNum">     266 </span>            :     AssertIsOnMainThread();
+<span class="lineNum">     267 </span>            :     RefPtr&lt;FetchDriver&gt; fetch;
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     RefPtr&lt;PromiseWorkerProxy&gt; proxy = mResolver-&gt;mPromiseProxy;</span>
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :     {
+<span class="lineNum">     271 </span>            :       // Acquire the proxy mutex while getting data from the WorkerPrivate...
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :       MutexAutoLock lock(proxy-&gt;Lock());</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :       if (proxy-&gt;CleanedUp()) {</span>
+<span class="lineNum">     274 </span>            :         NS_WARNING(&quot;Aborting Fetch because worker already shut down&quot;);
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :         return NS_OK;</span>
+<span class="lineNum">     276 </span>            :       }
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :       nsCOMPtr&lt;nsIPrincipal&gt; principal = proxy-&gt;GetWorkerPrivate()-&gt;GetPrincipal();</span>
+<span class="lineNum">     279 </span>            :       MOZ_ASSERT(principal);
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :       nsCOMPtr&lt;nsILoadGroup&gt; loadGroup = proxy-&gt;GetWorkerPrivate()-&gt;GetLoadGroup();</span>
+<span class="lineNum">     281 </span>            :       MOZ_ASSERT(loadGroup);
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :       fetch = new FetchDriver(mRequest, principal, loadGroup);</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :       nsAutoCString spec;</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       if (proxy-&gt;GetWorkerPrivate()-&gt;GetBaseURI()) {</span>
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :         proxy-&gt;GetWorkerPrivate()-&gt;GetBaseURI()-&gt;GetAsciiSpec(spec);</span>
+<span class="lineNum">     286 </span>            :       }
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :       fetch-&gt;SetWorkerScript(spec);</span>
+<span class="lineNum">     288 </span>            :     }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :     RefPtr&lt;FetchSignal&gt; signal = mResolver-&gt;GetFetchSignal();</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :     // ...but release it before calling Fetch, because mResolver's callback can
+<span class="lineNum">     293 </span>            :     // be called synchronously and they want the mutex, too.
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     return fetch-&gt;Fetch(signal, mResolver);</span>
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span>            : };
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : already_AddRefed&lt;Promise&gt;
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 : FetchRequest(nsIGlobalObject* aGlobal, const RequestOrUSVString&amp; aInput,</span>
+<span class="lineNum">     300 </span>            :              const RequestInit&amp; aInit, CallerType aCallerType, ErrorResult&amp; aRv)
+<span class="lineNum">     301 </span>            : {
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :   RefPtr&lt;Promise&gt; p = Promise::Create(aGlobal, aRv);</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(aRv.Failed())) {</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     305 </span>            :   }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :   // Double check that we have chrome privileges if the Request's content
+<span class="lineNum">     308 </span>            :   // policy type has been overridden.
+<span class="lineNum">     309 </span>            :   MOZ_ASSERT_IF(aInput.IsRequest() &amp;&amp;
+<span class="lineNum">     310 </span>            :                 aInput.GetAsRequest().IsContentPolicyTypeOverridden(),
+<span class="lineNum">     311 </span>            :                 aCallerType == CallerType::System);
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   AutoJSAPI jsapi;</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :   if (!jsapi.Init(aGlobal)) {</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :     aRv.Throw(NS_ERROR_NOT_AVAILABLE);</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     317 </span>            :   }
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :   JSContext* cx = jsapi.cx();</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :   JS::Rooted&lt;JSObject*&gt; jsGlobal(cx, aGlobal-&gt;GetGlobalJSObject());</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :   GlobalObject global(cx, jsGlobal);</span>
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :   RefPtr&lt;Request&gt; request = Request::Constructor(global, aInput, aInit, aRv);</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(aRv.Failed())) {</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     326 </span>            :   }
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :   RefPtr&lt;InternalRequest&gt; r = request-&gt;GetInternalRequest();</span>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :   RefPtr&lt;FetchSignal&gt; signal;</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :   if (aInit.mSignal.WasPassed()) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :     signal = &amp;aInit.mSignal.Value();</span>
+<span class="lineNum">     333 </span>            :     // Let's FetchDriver to deal with an already aborted signal.
+<span class="lineNum">     334 </span>            :   }
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :   RefPtr&lt;FetchObserver&gt; observer;</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :   if (aInit.mObserve.WasPassed()) {</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :     observer = new FetchObserver(aGlobal, signal);</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :     aInit.mObserve.Value().HandleEvent(*observer);</span>
+<span class="lineNum">     340 </span>            :   }
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :   if (NS_IsMainThread()) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :     nsCOMPtr&lt;nsPIDOMWindowInner&gt; window = do_QueryInterface(aGlobal);</span>
+<span class="lineNum">     344 </span>            :     nsCOMPtr&lt;nsIDocument&gt; doc;
+<span class="lineNum">     345 </span>            :     nsCOMPtr&lt;nsILoadGroup&gt; loadGroup;
+<span class="lineNum">     346 </span>            :     nsIPrincipal* principal;
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :     if (window) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :       doc = window-&gt;GetExtantDoc();</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :       if (!doc) {</span>
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :         aRv.Throw(NS_ERROR_FAILURE);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :         return nullptr;</span>
+<span class="lineNum">     352 </span>            :       }
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :       principal = doc-&gt;NodePrincipal();</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :       loadGroup = doc-&gt;GetDocumentLoadGroup();</span>
+<span class="lineNum">     355 </span>            :     } else {
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :       principal = aGlobal-&gt;PrincipalOrNull();</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :       if (NS_WARN_IF(!principal)) {</span>
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :         aRv.Throw(NS_ERROR_FAILURE);</span>
+<span class="lineNum">     359 </span><span class="lineNoCov">          0 :         return nullptr;</span>
+<span class="lineNum">     360 </span>            :       }
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :       nsresult rv = NS_NewLoadGroup(getter_AddRefs(loadGroup), principal);</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :       if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :         aRv.Throw(rv);</span>
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 :         return nullptr;</span>
+<span class="lineNum">     365 </span>            :       }
+<span class="lineNum">     366 </span>            :     }
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :     Telemetry::Accumulate(Telemetry::FETCH_IS_MAINTHREAD, 1);</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :     RefPtr&lt;MainThreadFetchResolver&gt; resolver =
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :       new MainThreadFetchResolver(p, observer);</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :     RefPtr&lt;FetchDriver&gt; fetch = new FetchDriver(r, principal, loadGroup);</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     fetch-&gt;SetDocument(doc);</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :     resolver-&gt;SetLoadGroup(loadGroup);</span>
+<span class="lineNum">     375 </span><span class="lineNoCov">          0 :     aRv = fetch-&gt;Fetch(signal, resolver);</span>
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :     if (NS_WARN_IF(aRv.Failed())) {</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :       return nullptr;</span>
+<span class="lineNum">     378 </span>            :     }
+<span class="lineNum">     379 </span>            :   } else {
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :     WorkerPrivate* worker = GetCurrentThreadWorkerPrivate();</span>
+<span class="lineNum">     381 </span>            :     MOZ_ASSERT(worker);
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :     Telemetry::Accumulate(Telemetry::FETCH_IS_MAINTHREAD, 0);</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :     if (worker-&gt;IsServiceWorker()) {</span>
+<span class="lineNum">     386 </span>            :       r-&gt;SetSkipServiceWorker();
+<span class="lineNum">     387 </span>            :     }
+<span class="lineNum">     388 </span>            : 
+<span class="lineNum">     389 </span>            :     RefPtr&lt;WorkerFetchResolver&gt; resolver =
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :       WorkerFetchResolver::Create(worker, p, signal, observer);</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     if (!resolver) {</span>
+<span class="lineNum">     392 </span>            :       NS_WARNING(&quot;Could not add WorkerFetchResolver workerHolder to worker&quot;);
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :       aRv.Throw(NS_ERROR_DOM_ABORT_ERR);</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :       return nullptr;</span>
+<span class="lineNum">     395 </span>            :     }
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            :     RefPtr&lt;MainThreadFetchRunnable&gt; run =
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :       new MainThreadFetchRunnable(resolver, r);</span>
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :     worker-&gt;DispatchToMainThread(run.forget());</span>
+<span class="lineNum">     400 </span>            :   }
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :   return p.forget();</span>
+<span class="lineNum">     403 </span>            : }
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : void
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 : MainThreadFetchResolver::OnResponseAvailableInternal(InternalResponse* aResponse)</span>
+<span class="lineNum">     407 </span>            : {
+<span class="lineNum">     408 </span>            :   NS_ASSERT_OWNINGTHREAD(MainThreadFetchResolver);
+<span class="lineNum">     409 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :   if (aResponse-&gt;Type() != ResponseType::Error) {</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :     if (mFetchObserver) {</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :       mFetchObserver-&gt;SetState(FetchState::Complete);</span>
+<span class="lineNum">     414 </span>            :     }
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :     nsCOMPtr&lt;nsIGlobalObject&gt; go = mPromise-&gt;GetParentObject();</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :     mResponse = new Response(go, aResponse);</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :     mPromise-&gt;MaybeResolve(mResponse);</span>
+<span class="lineNum">     419 </span>            :   } else {
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :     if (mFetchObserver) {</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :       mFetchObserver-&gt;SetState(FetchState::Errored);</span>
+<span class="lineNum">     422 </span>            :     }
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            :     ErrorResult result;
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :     result.ThrowTypeError&lt;MSG_FETCH_FAILED&gt;();</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :     mPromise-&gt;MaybeReject(result);</span>
+<span class="lineNum">     427 </span>            :   }
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            : void
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 : MainThreadFetchResolver::OnDataAvailable()</span>
+<span class="lineNum">     432 </span>            : {
+<span class="lineNum">     433 </span>            :   NS_ASSERT_OWNINGTHREAD(MainThreadFetchResolver);
+<span class="lineNum">     434 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :   if (!mFetchObserver) {</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     438 </span>            :   }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :   if (mFetchObserver-&gt;State() == FetchState::Requesting) {</span>
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :     mFetchObserver-&gt;SetState(FetchState::Responding);</span>
+<span class="lineNum">     442 </span>            :   }
+<a name="443"><span class="lineNum">     443 </span>            : }</a>
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 : MainThreadFetchResolver::~MainThreadFetchResolver()</span>
+<span class="lineNum">     446 </span>            : {
+<span class="lineNum">     447 </span>            :   NS_ASSERT_OWNINGTHREAD(MainThreadFetchResolver);
+<a name="448"><span class="lineNum">     448 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 : class WorkerFetchResponseRunnable final : public MainThreadWorkerRunnable</span>
+<span class="lineNum">     451 </span>            : {
+<span class="lineNum">     452 </span>            :   RefPtr&lt;WorkerFetchResolver&gt; mResolver;
+<span class="lineNum">     453 </span>            :   // Passed from main thread to worker thread after being initialized.
+<a name="454"><span class="lineNum">     454 </span>            :   RefPtr&lt;InternalResponse&gt; mInternalResponse;</a>
+<span class="lineNum">     455 </span>            : public:
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :   WorkerFetchResponseRunnable(WorkerPrivate* aWorkerPrivate,</span>
+<span class="lineNum">     457 </span>            :                               WorkerFetchResolver* aResolver,
+<span class="lineNum">     458 </span>            :                               InternalResponse* aResponse)
+<span class="lineNum">     459 </span>            :     : MainThreadWorkerRunnable(aWorkerPrivate)
+<span class="lineNum">     460 </span>            :     , mResolver(aResolver)
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :     , mInternalResponse(aResponse)</span>
+<span class="lineNum">     462 </span>            :   {
+<span class="lineNum">     463 </span>            :      MOZ_ASSERT(mResolver);
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :   bool
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     468 </span>            :   {
+<span class="lineNum">     469 </span>            :     MOZ_ASSERT(aWorkerPrivate);
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :     aWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :     RefPtr&lt;Promise&gt; promise = mResolver-&gt;mPromiseProxy-&gt;WorkerPromise();</span>
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :     if (mInternalResponse-&gt;Type() != ResponseType::Error) {</span>
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :       if (mResolver-&gt;mFetchObserver) {</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :         mResolver-&gt;mFetchObserver-&gt;SetState(FetchState::Complete);</span>
+<span class="lineNum">     477 </span>            :       }
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :       RefPtr&lt;nsIGlobalObject&gt; global = aWorkerPrivate-&gt;GlobalScope();</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :       RefPtr&lt;Response&gt; response = new Response(global, mInternalResponse);</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :       promise-&gt;MaybeResolve(response);</span>
+<span class="lineNum">     482 </span>            :     } else {
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :       if (mResolver-&gt;mFetchObserver) {</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :         mResolver-&gt;mFetchObserver-&gt;SetState(FetchState::Errored);</span>
+<span class="lineNum">     485 </span>            :       }
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :       ErrorResult result;
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :       result.ThrowTypeError&lt;MSG_FETCH_FAILED&gt;();</span>
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :       promise-&gt;MaybeReject(result);</span>
+<span class="lineNum">     490 </span>            :     }
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     492 </span>            :   }
+<a name="493"><span class="lineNum">     493 </span>            : };</a>
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 : class WorkerDataAvailableRunnable final : public MainThreadWorkerRunnable</span>
+<span class="lineNum">     496 </span>            : {
+<a name="497"><span class="lineNum">     497 </span>            :   RefPtr&lt;WorkerFetchResolver&gt; mResolver;</a>
+<span class="lineNum">     498 </span>            : public:
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :   WorkerDataAvailableRunnable(WorkerPrivate* aWorkerPrivate,</span>
+<span class="lineNum">     500 </span>            :                               WorkerFetchResolver* aResolver)
+<span class="lineNum">     501 </span>            :     : MainThreadWorkerRunnable(aWorkerPrivate)
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :     , mResolver(aResolver)</span>
+<span class="lineNum">     503 </span>            :   {
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :   bool
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     508 </span>            :   {
+<span class="lineNum">     509 </span>            :     MOZ_ASSERT(aWorkerPrivate);
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :     aWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :     if (mResolver-&gt;mFetchObserver &amp;&amp;</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :         mResolver-&gt;mFetchObserver-&gt;State() == FetchState::Requesting) {</span>
+<span class="lineNum">     514 </span><span class="lineNoCov">          0 :       mResolver-&gt;mFetchObserver-&gt;SetState(FetchState::Responding);</span>
+<span class="lineNum">     515 </span>            :     }
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     518 </span>            :   }
+<a name="519"><span class="lineNum">     519 </span>            : };</a>
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 : class WorkerFetchResponseEndBase</span>
+<span class="lineNum">     522 </span>            : {
+<span class="lineNum">     523 </span>            : protected:
+<span class="lineNum">     524 </span>            :   RefPtr&lt;WorkerFetchResolver&gt; mResolver;
+<span class="lineNum">     525 </span>            : 
+<a name="526"><span class="lineNum">     526 </span>            : public:</a>
+<span class="lineNum">     527 </span>            :   explicit WorkerFetchResponseEndBase(WorkerFetchResolver* aResolver)
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :     : mResolver(aResolver)</span>
+<span class="lineNum">     529 </span>            :   {
+<span class="lineNum">     530 </span>            :     MOZ_ASSERT(aResolver);
+<span class="lineNum">     531 </span>            :   }
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span>            :   void
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :   WorkerRunInternal(WorkerPrivate* aWorkerPrivate)</span>
+<span class="lineNum">     535 </span>            :   {
+<span class="lineNum">     536 </span>            :     MOZ_ASSERT(aWorkerPrivate);
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :     aWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     mResolver-&gt;mPromiseProxy-&gt;CleanUp();</span>
+<span class="lineNum">     540 </span>            : 
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :     mResolver-&gt;mFetchObserver = nullptr;</span>
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :     if (mResolver-&gt;mSignalProxy) {</span>
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :       mResolver-&gt;mSignalProxy-&gt;Shutdown();</span>
+<span class="lineNum">     545 </span><span class="lineNoCov">          0 :       mResolver-&gt;mSignalProxy = nullptr;</span>
+<span class="lineNum">     546 </span>            :     }
+<span class="lineNum">     547 </span><span class="lineNoCov">          0 :   }</span>
+<a name="548"><span class="lineNum">     548 </span>            : };</a>
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 : class WorkerFetchResponseEndRunnable final : public MainThreadWorkerRunnable</span>
+<span class="lineNum">     551 </span>            :                                            , public WorkerFetchResponseEndBase
+<span class="lineNum">     552 </span>            : {
+<span class="lineNum">     553 </span>            :   FetchDriverObserver::EndReason mReason;
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span>            : public:
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :   WorkerFetchResponseEndRunnable(WorkerPrivate* aWorkerPrivate,</span>
+<span class="lineNum">     557 </span>            :                                  WorkerFetchResolver* aResolver,
+<span class="lineNum">     558 </span>            :                                  FetchDriverObserver::EndReason aReason)
+<span class="lineNum">     559 </span>            :     : MainThreadWorkerRunnable(aWorkerPrivate)
+<span class="lineNum">     560 </span>            :     , WorkerFetchResponseEndBase(aResolver)
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :     , mReason(aReason)</span>
+<span class="lineNum">     562 </span>            :   {
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            :   bool
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     567 </span>            :   {
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :     if (mReason == FetchDriverObserver::eAborted) {</span>
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :       RefPtr&lt;Promise&gt; promise = mResolver-&gt;mPromiseProxy-&gt;WorkerPromise();</span>
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :       promise-&gt;MaybeReject(NS_ERROR_DOM_ABORT_ERR);</span>
+<span class="lineNum">     571 </span>            :     }
+<span class="lineNum">     572 </span>            : 
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :     WorkerRunInternal(aWorkerPrivate);</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     575 </span>            :   }
+<a name="576"><span class="lineNum">     576 </span>            : </a>
+<span class="lineNum">     577 </span>            :   nsresult
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :   Cancel() override</span>
+<span class="lineNum">     579 </span>            :   {
+<span class="lineNum">     580 </span>            :     // Execute Run anyway to make sure we cleanup our promise proxy to avoid
+<span class="lineNum">     581 </span>            :     // leaking the worker thread
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :     Run();</span>
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :     return WorkerRunnable::Cancel();</span>
+<span class="lineNum">     584 </span>            :   }
+<a name="585"><span class="lineNum">     585 </span>            : };</a>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineNoCov">          0 : class WorkerFetchResponseEndControlRunnable final : public MainThreadWorkerControlRunnable</span>
+<span class="lineNum">     588 </span>            :                                                   , public WorkerFetchResponseEndBase
+<span class="lineNum">     589 </span>            : {
+<span class="lineNum">     590 </span>            : public:
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :   WorkerFetchResponseEndControlRunnable(WorkerPrivate* aWorkerPrivate,</span>
+<span class="lineNum">     592 </span>            :                                         WorkerFetchResolver* aResolver)
+<span class="lineNum">     593 </span>            :     : MainThreadWorkerControlRunnable(aWorkerPrivate)
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :     , WorkerFetchResponseEndBase(aResolver)</span>
+<span class="lineNum">     595 </span>            :   {
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :   }</span>
+<a name="597"><span class="lineNum">     597 </span>            : </a>
+<span class="lineNum">     598 </span>            :   bool
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     600 </span>            :   {
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :     WorkerRunInternal(aWorkerPrivate);</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     603 </span>            :   }
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            :   // Control runnable cancel already calls Run().
+<span class="lineNum">     606 </span>            : };
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            : void
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 : WorkerFetchResolver::OnResponseAvailableInternal(InternalResponse* aResponse)</span>
+<span class="lineNum">     610 </span>            : {
+<span class="lineNum">     611 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     612 </span>            : 
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :   MutexAutoLock lock(mPromiseProxy-&gt;Lock());</span>
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :   if (mPromiseProxy-&gt;CleanedUp()) {</span>
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     616 </span>            :   }
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span>            :   RefPtr&lt;WorkerFetchResponseRunnable&gt; r =
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :     new WorkerFetchResponseRunnable(mPromiseProxy-&gt;GetWorkerPrivate(), this,</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :                                     aResponse);</span>
+<span class="lineNum">     621 </span>            : 
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :   if (!r-&gt;Dispatch()) {</span>
+<span class="lineNum">     623 </span>            :     NS_WARNING(&quot;Could not dispatch fetch response&quot;);
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     625 </span>            : }
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span>            : void
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 : WorkerFetchResolver::OnDataAvailable()</span>
+<span class="lineNum">     629 </span>            : {
+<span class="lineNum">     630 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :   MutexAutoLock lock(mPromiseProxy-&gt;Lock());</span>
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :   if (mPromiseProxy-&gt;CleanedUp()) {</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     635 </span>            :   }
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span>            :   RefPtr&lt;WorkerDataAvailableRunnable&gt; r =
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :     new WorkerDataAvailableRunnable(mPromiseProxy-&gt;GetWorkerPrivate(), this);</span>
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :   Unused &lt;&lt; r-&gt;Dispatch();</span>
+<span class="lineNum">     640 </span>            : }
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : void
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 : WorkerFetchResolver::OnResponseEnd(FetchDriverObserver::EndReason aReason)</span>
+<span class="lineNum">     644 </span>            : {
+<span class="lineNum">     645 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     646 </span><span class="lineNoCov">          0 :   MutexAutoLock lock(mPromiseProxy-&gt;Lock());</span>
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :   if (mPromiseProxy-&gt;CleanedUp()) {</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     649 </span>            :   }
+<span class="lineNum">     650 </span>            : 
+<span class="lineNum">     651 </span><span class="lineNoCov">          0 :   FlushConsoleReport();</span>
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span>            :   RefPtr&lt;WorkerFetchResponseEndRunnable&gt; r =
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :     new WorkerFetchResponseEndRunnable(mPromiseProxy-&gt;GetWorkerPrivate(),</span>
+<span class="lineNum">     655 </span><span class="lineNoCov">          0 :                                        this, aReason);</span>
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :   if (!r-&gt;Dispatch()) {</span>
+<span class="lineNum">     658 </span>            :     RefPtr&lt;WorkerFetchResponseEndControlRunnable&gt; cr =
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :       new WorkerFetchResponseEndControlRunnable(mPromiseProxy-&gt;GetWorkerPrivate(),</span>
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :                                                 this);</span>
+<span class="lineNum">     661 </span>            :     // This can fail if the worker thread is canceled or killed causing
+<span class="lineNum">     662 </span>            :     // the PromiseWorkerProxy to give up its WorkerHolder immediately,
+<span class="lineNum">     663 </span>            :     // allowing the worker thread to become Dead.
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :     if (!cr-&gt;Dispatch()) {</span>
+<span class="lineNum">     665 </span>            :       NS_WARNING(&quot;Failed to dispatch WorkerFetchResponseEndControlRunnable&quot;);
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     668 </span>            : }
+<span class="lineNum">     669 </span>            : 
+<span class="lineNum">     670 </span>            : void
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 : WorkerFetchResolver::FlushConsoleReport()</span>
+<span class="lineNum">     672 </span>            : {
+<span class="lineNum">     673 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">     674 </span>            :   MOZ_ASSERT(mPromiseProxy);
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :   if(!mReporter) {</span>
+<span class="lineNum">     677 </span>            :     return;
+<span class="lineNum">     678 </span>            :   }
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :   workers::WorkerPrivate* worker = mPromiseProxy-&gt;GetWorkerPrivate();</span>
+<span class="lineNum">     681 </span><span class="lineNoCov">          0 :   if (!worker) {</span>
+<span class="lineNum">     682 </span><span class="lineNoCov">          0 :     mReporter-&gt;FlushReportsToConsole(0);</span>
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     684 </span>            :   }
+<span class="lineNum">     685 </span>            : 
+<span class="lineNum">     686 </span><span class="lineNoCov">          0 :   if (worker-&gt;IsServiceWorker()) {</span>
+<span class="lineNum">     687 </span>            :     // Flush to service worker
+<span class="lineNum">     688 </span><span class="lineNoCov">          0 :     RefPtr&lt;ServiceWorkerManager&gt; swm = ServiceWorkerManager::GetInstance();</span>
+<span class="lineNum">     689 </span><span class="lineNoCov">          0 :     if (!swm) {</span>
+<span class="lineNum">     690 </span><span class="lineNoCov">          0 :       mReporter-&gt;FlushReportsToConsole(0);</span>
+<span class="lineNum">     691 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     692 </span>            :     }
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :     swm-&gt;FlushReportsToAllClients(worker-&gt;ServiceWorkerScope(), mReporter);</span>
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     696 </span>            :   }
+<span class="lineNum">     697 </span>            : 
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :   if (worker-&gt;IsSharedWorker()) {</span>
+<span class="lineNum">     699 </span>            :     // Flush to shared worker
+<span class="lineNum">     700 </span><span class="lineNoCov">          0 :     worker-&gt;FlushReportsToSharedWorkers(mReporter);</span>
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     702 </span>            :   }
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span>            :   // Flush to dedicated worker
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :   mReporter-&gt;FlushConsoleReports(worker-&gt;GetLoadGroup());</span>
+<span class="lineNum">     706 </span>            : }
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            : nsresult
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 : ExtractByteStreamFromBody(const fetch::OwningBodyInit&amp; aBodyInit,</span>
+<span class="lineNum">     710 </span>            :                           nsIInputStream** aStream,
+<span class="lineNum">     711 </span>            :                           nsCString&amp; aContentTypeWithCharset,
+<span class="lineNum">     712 </span>            :                           uint64_t&amp; aContentLength)
+<span class="lineNum">     713 </span>            : {
+<span class="lineNum">     714 </span>            :   MOZ_ASSERT(aStream);
+<span class="lineNum">     715 </span><span class="lineNoCov">          0 :   nsAutoCString charset;</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :   aContentTypeWithCharset.SetIsVoid(true);</span>
+<span class="lineNum">     717 </span>            : 
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsArrayBuffer()) {</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const ArrayBuffer&gt; body(&amp;aBodyInit.GetAsArrayBuffer());</span>
+<span class="lineNum">     720 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     722 </span>            :   }
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsArrayBufferView()) {</span>
+<span class="lineNum">     725 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const ArrayBufferView&gt; body(&amp;aBodyInit.GetAsArrayBufferView());</span>
+<span class="lineNum">     726 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     728 </span>            :   }
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsBlob()) {</span>
+<span class="lineNum">     731 </span><span class="lineNoCov">          0 :     Blob&amp; blob = aBodyInit.GetAsBlob();</span>
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;blob);</span>
+<span class="lineNum">     733 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     735 </span>            :   }
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsFormData()) {</span>
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :     FormData&amp; formData = aBodyInit.GetAsFormData();</span>
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;formData);</span>
+<span class="lineNum">     740 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     742 </span>            :   }
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsUSVString()) {</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const nsAString&gt; body(&amp;aBodyInit.GetAsUSVString());</span>
+<span class="lineNum">     746 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     748 </span>            :   }
+<span class="lineNum">     749 </span>            : 
+<span class="lineNum">     750 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsURLSearchParams()) {</span>
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :     URLSearchParams&amp; usp = aBodyInit.GetAsURLSearchParams();</span>
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;usp);</span>
+<span class="lineNum">     753 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     755 </span>            :   }
+<span class="lineNum">     756 </span>            : 
+<span class="lineNum">     757 </span>            :   NS_NOTREACHED(&quot;Should never reach here&quot;);
+<span class="lineNum">     758 </span>            :   return NS_ERROR_FAILURE;
+<span class="lineNum">     759 </span>            : }
+<a name="760"><span class="lineNum">     760 </span>            : </a>
+<span class="lineNum">     761 </span>            : nsresult
+<span class="lineNum">     762 </span><span class="lineNoCov">          0 : ExtractByteStreamFromBody(const fetch::BodyInit&amp; aBodyInit,</span>
+<span class="lineNum">     763 </span>            :                           nsIInputStream** aStream,
+<span class="lineNum">     764 </span>            :                           nsCString&amp; aContentTypeWithCharset,
+<span class="lineNum">     765 </span>            :                           uint64_t&amp; aContentLength)
+<span class="lineNum">     766 </span>            : {
+<span class="lineNum">     767 </span>            :   MOZ_ASSERT(aStream);
+<span class="lineNum">     768 </span>            :   MOZ_ASSERT(!*aStream);
+<span class="lineNum">     769 </span>            : 
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 :   nsAutoCString charset;</span>
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :   aContentTypeWithCharset.SetIsVoid(true);</span>
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsArrayBuffer()) {</span>
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const ArrayBuffer&gt; body(&amp;aBodyInit.GetAsArrayBuffer());</span>
+<span class="lineNum">     775 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     777 </span>            :   }
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsArrayBufferView()) {</span>
+<span class="lineNum">     780 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const ArrayBufferView&gt; body(&amp;aBodyInit.GetAsArrayBufferView());</span>
+<span class="lineNum">     781 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     783 </span>            :   }
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsBlob()) {</span>
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;aBodyInit.GetAsBlob());</span>
+<span class="lineNum">     787 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     788 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     789 </span>            :   }
+<span class="lineNum">     790 </span>            : 
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsFormData()) {</span>
+<span class="lineNum">     792 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;aBodyInit.GetAsFormData());</span>
+<span class="lineNum">     793 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     794 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     795 </span>            :   }
+<span class="lineNum">     796 </span>            : 
+<span class="lineNum">     797 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsUSVString()) {</span>
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;const nsAString&gt; body(&amp;aBodyInit.GetAsUSVString());</span>
+<span class="lineNum">     799 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     801 </span>            :   }
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :   if (aBodyInit.IsURLSearchParams()) {</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :     BodyExtractor&lt;nsIXHRSendable&gt; body(&amp;aBodyInit.GetAsURLSearchParams());</span>
+<span class="lineNum">     805 </span>            :     return body.GetAsStream(aStream, &amp;aContentLength, aContentTypeWithCharset,
+<span class="lineNum">     806 </span><span class="lineNoCov">          0 :                             charset);</span>
+<span class="lineNum">     807 </span>            :   }
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            :   NS_NOTREACHED(&quot;Should never reach here&quot;);
+<span class="lineNum">     810 </span>            :   return NS_ERROR_FAILURE;
+<span class="lineNum">     811 </span>            : }
+<span class="lineNum">     812 </span>            : 
+<span class="lineNum">     813 </span>            : namespace {
+<span class="lineNum">     814 </span>            : /*
+<span class="lineNum">     815 </span>            :  * Called on successfully reading the complete stream.
+<a name="816"><span class="lineNum">     816 </span>            :  */</a>
+<span class="lineNum">     817 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 : class ContinueConsumeBodyRunnable final : public MainThreadWorkerRunnable</span>
+<span class="lineNum">     819 </span>            : {
+<span class="lineNum">     820 </span>            :   // This has been addrefed before this runnable is dispatched,
+<span class="lineNum">     821 </span>            :   // released in WorkerRun().
+<span class="lineNum">     822 </span>            :   FetchBody&lt;Derived&gt;* mFetchBody;
+<span class="lineNum">     823 </span>            :   nsresult mStatus;
+<span class="lineNum">     824 </span>            :   uint32_t mLength;
+<span class="lineNum">     825 </span>            :   uint8_t* mResult;
+<a name="826"><span class="lineNum">     826 </span>            : </a>
+<span class="lineNum">     827 </span>            : public:
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 :   ContinueConsumeBodyRunnable(FetchBody&lt;Derived&gt;* aFetchBody, nsresult aStatus,</span>
+<span class="lineNum">     829 </span>            :                               uint32_t aLength, uint8_t* aResult)
+<span class="lineNum">     830 </span>            :     : MainThreadWorkerRunnable(aFetchBody-&gt;mWorkerPrivate)
+<span class="lineNum">     831 </span>            :     , mFetchBody(aFetchBody)
+<span class="lineNum">     832 </span>            :     , mStatus(aStatus)
+<span class="lineNum">     833 </span>            :     , mLength(aLength)
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :     , mResult(aResult)</span>
+<span class="lineNum">     835 </span>            :   {
+<span class="lineNum">     836 </span>            :     MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :   }</span>
+<a name="838"><span class="lineNum">     838 </span>            : </a>
+<span class="lineNum">     839 </span>            :   bool
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     841 </span>            :   {
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :     mFetchBody-&gt;ContinueConsumeBody(mStatus, mLength, mResult);</span>
+<span class="lineNum">     843 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     844 </span>            :   }
+<span class="lineNum">     845 </span>            : };
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span>            : /*
+<span class="lineNum">     848 </span>            :  * Called on successfully reading the complete stream for Blob.
+<a name="849"><span class="lineNum">     849 </span>            :  */</a>
+<span class="lineNum">     850 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 : class ContinueConsumeBlobBodyRunnable final : public MainThreadWorkerRunnable</span>
+<span class="lineNum">     852 </span>            : {
+<span class="lineNum">     853 </span>            :   // This has been addrefed before this runnable is dispatched,
+<span class="lineNum">     854 </span>            :   // released in WorkerRun().
+<span class="lineNum">     855 </span>            :   FetchBody&lt;Derived&gt;* mFetchBody;
+<span class="lineNum">     856 </span>            :   RefPtr&lt;BlobImpl&gt; mBlobImpl;
+<a name="857"><span class="lineNum">     857 </span>            : </a>
+<span class="lineNum">     858 </span>            : public:
+<span class="lineNum">     859 </span><span class="lineNoCov">          0 :   ContinueConsumeBlobBodyRunnable(FetchBody&lt;Derived&gt;* aFetchBody,</span>
+<span class="lineNum">     860 </span>            :                                   BlobImpl* aBlobImpl)
+<span class="lineNum">     861 </span>            :     : MainThreadWorkerRunnable(aFetchBody-&gt;mWorkerPrivate)
+<span class="lineNum">     862 </span>            :     , mFetchBody(aFetchBody)
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :     , mBlobImpl(aBlobImpl)</span>
+<span class="lineNum">     864 </span>            :   {
+<span class="lineNum">     865 </span>            :     MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     866 </span>            :     MOZ_ASSERT(mBlobImpl);
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     868 </span>            : 
+<span class="lineNum">     869 </span>            :   bool
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     871 </span>            :   {
+<span class="lineNum">     872 </span><span class="lineNoCov">          0 :     mFetchBody-&gt;ContinueConsumeBlobBody(mBlobImpl);</span>
+<span class="lineNum">     873 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     874 </span>            :   }
+<span class="lineNum">     875 </span>            : };
+<span class="lineNum">     876 </span>            : 
+<span class="lineNum">     877 </span>            : // OnStreamComplete always adopts the buffer, utility class to release it in
+<span class="lineNum">     878 </span>            : // a couple of places.
+<span class="lineNum">     879 </span>            : class MOZ_STACK_CLASS AutoFreeBuffer final {
+<span class="lineNum">     880 </span>            :   uint8_t* mBuffer;
+<span class="lineNum">     881 </span>            : 
+<span class="lineNum">     882 </span>            : public:
+<span class="lineNum">     883 </span>            :   explicit AutoFreeBuffer(uint8_t* aBuffer)
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 :     : mBuffer(aBuffer)</span>
+<a name="885"><span class="lineNum">     885 </span>            :   {}</a>
+<span class="lineNum">     886 </span>            : 
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :   ~AutoFreeBuffer()</span>
+<span class="lineNum">     888 </span>            :   {
+<span class="lineNum">     889 </span><span class="lineNoCov">          0 :     free(mBuffer);</span>
+<span class="lineNum">     890 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     891 </span>            : 
+<span class="lineNum">     892 </span>            :   void
+<span class="lineNum">     893 </span>            :   Reset()
+<span class="lineNum">     894 </span>            :   {
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :     mBuffer= nullptr;</span>
+<span class="lineNum">     896 </span>            :   }
+<span class="lineNum">     897 </span>            : };
+<a name="898"><span class="lineNum">     898 </span>            : </a>
+<span class="lineNum">     899 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 : class FailConsumeBodyWorkerRunnable : public MainThreadWorkerControlRunnable</span>
+<span class="lineNum">     901 </span>            : {
+<a name="902"><span class="lineNum">     902 </span>            :   FetchBody&lt;Derived&gt;* mBody;</a>
+<span class="lineNum">     903 </span>            : public:
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :   explicit FailConsumeBodyWorkerRunnable(FetchBody&lt;Derived&gt;* aBody)</span>
+<span class="lineNum">     905 </span>            :     : MainThreadWorkerControlRunnable(aBody-&gt;mWorkerPrivate)
+<span class="lineNum">     906 </span><span class="lineNoCov">          0 :     , mBody(aBody)</span>
+<span class="lineNum">     907 </span>            :   {
+<span class="lineNum">     908 </span>            :     AssertIsOnMainThread();
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :   }</span>
+<a name="910"><span class="lineNum">     910 </span>            : </a>
+<span class="lineNum">     911 </span>            :   bool
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :   WorkerRun(JSContext* aCx, WorkerPrivate* aWorkerPrivate) override</span>
+<span class="lineNum">     913 </span>            :   {
+<span class="lineNum">     914 </span><span class="lineNoCov">          0 :     mBody-&gt;ContinueConsumeBody(NS_ERROR_FAILURE, 0, nullptr);</span>
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     916 </span>            :   }
+<span class="lineNum">     917 </span>            : };
+<span class="lineNum">     918 </span>            : 
+<span class="lineNum">     919 </span>            : /*
+<span class="lineNum">     920 </span>            :  * In case of failure to create a stream pump or dispatch stream completion to
+<span class="lineNum">     921 </span>            :  * worker, ensure we cleanup properly. Thread agnostic.
+<span class="lineNum">     922 </span>            :  */
+<span class="lineNum">     923 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">     924 </span>            : class MOZ_STACK_CLASS AutoFailConsumeBody final
+<span class="lineNum">     925 </span>            : {
+<span class="lineNum">     926 </span>            :   FetchBody&lt;Derived&gt;* mBody;
+<span class="lineNum">     927 </span>            : public:
+<span class="lineNum">     928 </span>            :   explicit AutoFailConsumeBody(FetchBody&lt;Derived&gt;* aBody)
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :     : mBody(aBody)</span>
+<span class="lineNum">     930 </span>            :   { }
+<span class="lineNum">     931 </span>            : 
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :   ~AutoFailConsumeBody()</span>
+<span class="lineNum">     933 </span>            :   {
+<span class="lineNum">     934 </span>            :     AssertIsOnMainThread();
+<span class="lineNum">     935 </span><span class="lineNoCov">          0 :     if (mBody) {</span>
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :       if (mBody-&gt;mWorkerPrivate) {</span>
+<span class="lineNum">     937 </span>            :         RefPtr&lt;FailConsumeBodyWorkerRunnable&lt;Derived&gt;&gt; r =
+<span class="lineNum">     938 </span><span class="lineNoCov">          0 :           new FailConsumeBodyWorkerRunnable&lt;Derived&gt;(mBody);</span>
+<span class="lineNum">     939 </span><span class="lineNoCov">          0 :         if (!r-&gt;Dispatch()) {</span>
+<span class="lineNum">     940 </span><span class="lineNoCov">          0 :           MOZ_CRASH(&quot;We are going to leak&quot;);</span>
+<span class="lineNum">     941 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">     942 </span>            :       } else {
+<span class="lineNum">     943 </span><span class="lineNoCov">          0 :         mBody-&gt;ContinueConsumeBody(NS_ERROR_FAILURE, 0, nullptr);</span>
+<span class="lineNum">     944 </span>            :       }
+<span class="lineNum">     945 </span>            :     }
+<span class="lineNum">     946 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     947 </span>            : 
+<span class="lineNum">     948 </span>            :   void
+<span class="lineNum">     949 </span>            :   DontFail()
+<span class="lineNum">     950 </span>            :   {
+<span class="lineNum">     951 </span><span class="lineNoCov">          0 :     mBody = nullptr;</span>
+<span class="lineNum">     952 </span>            :   }
+<span class="lineNum">     953 </span>            : };
+<span class="lineNum">     954 </span>            : 
+<span class="lineNum">     955 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">     956 </span>            : class ConsumeBodyDoneObserver : public nsIStreamLoaderObserver
+<span class="lineNum">     957 </span>            :                               , public MutableBlobStorageCallback
+<span class="lineNum">     958 </span>            : {
+<span class="lineNum">     959 </span>            :   FetchBody&lt;Derived&gt;* mFetchBody;
+<span class="lineNum">     960 </span>            : 
+<span class="lineNum">     961 </span>            : public:
+<a name="962"><span class="lineNum">     962 </span>            :   NS_DECL_THREADSAFE_ISUPPORTS</a>
+<span class="lineNum">     963 </span>            : 
+<span class="lineNum">     964 </span><span class="lineNoCov">          0 :   explicit ConsumeBodyDoneObserver(FetchBody&lt;Derived&gt;* aFetchBody)</span>
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :     : mFetchBody(aFetchBody)</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :   { }</span>
+<span class="lineNum">     967 </span>            : 
+<span class="lineNum">     968 </span>            :   NS_IMETHOD
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 :   OnStreamComplete(nsIStreamLoader* aLoader,</span>
+<span class="lineNum">     970 </span>            :                    nsISupports* aCtxt,
+<span class="lineNum">     971 </span>            :                    nsresult aStatus,
+<span class="lineNum">     972 </span>            :                    uint32_t aResultLength,
+<span class="lineNum">     973 </span>            :                    const uint8_t* aResult) override
+<span class="lineNum">     974 </span>            :   {
+<span class="lineNum">     975 </span>            :     MOZ_ASSERT(NS_IsMainThread());
+<span class="lineNum">     976 </span>            : 
+<span class="lineNum">     977 </span>            :     // If the binding requested cancel, we don't need to call
+<span class="lineNum">     978 </span>            :     // ContinueConsumeBody, since that is the originator.
+<span class="lineNum">     979 </span><span class="lineNoCov">          0 :     if (aStatus == NS_BINDING_ABORTED) {</span>
+<span class="lineNum">     980 </span>            :       return NS_OK;
+<span class="lineNum">     981 </span>            :     }
+<span class="lineNum">     982 </span>            : 
+<span class="lineNum">     983 </span><span class="lineNoCov">          0 :     uint8_t* nonconstResult = const_cast&lt;uint8_t*&gt;(aResult);</span>
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :     if (mFetchBody-&gt;mWorkerPrivate) {</span>
+<span class="lineNum">     985 </span>            :       RefPtr&lt;ContinueConsumeBodyRunnable&lt;Derived&gt;&gt; r =
+<span class="lineNum">     986 </span>            :         new ContinueConsumeBodyRunnable&lt;Derived&gt;(mFetchBody,
+<span class="lineNum">     987 </span>            :                                         aStatus,
+<span class="lineNum">     988 </span>            :                                         aResultLength,
+<span class="lineNum">     989 </span><span class="lineNoCov">          0 :                                         nonconstResult);</span>
+<span class="lineNum">     990 </span><span class="lineNoCov">          0 :       if (!r-&gt;Dispatch()) {</span>
+<span class="lineNum">     991 </span>            :         // XXXcatalinb: The worker is shutting down, the pump will be canceled
+<span class="lineNum">     992 </span>            :         // by FetchBodyWorkerHolder::Notify.
+<span class="lineNum">     993 </span>            :         NS_WARNING(&quot;Could not dispatch ConsumeBodyRunnable&quot;);
+<span class="lineNum">     994 </span>            :         // Return failure so that aResult is freed.
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 :         return NS_ERROR_FAILURE;</span>
+<span class="lineNum">     996 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     997 </span>            :     } else {
+<span class="lineNum">     998 </span><span class="lineNoCov">          0 :       mFetchBody-&gt;ContinueConsumeBody(aStatus, aResultLength, nonconstResult);</span>
+<span class="lineNum">     999 </span>            :     }
+<span class="lineNum">    1000 </span>            : 
+<span class="lineNum">    1001 </span>            :     // FetchBody is responsible for data.
+<span class="lineNum">    1002 </span>            :     return NS_SUCCESS_ADOPTED_DATA;
+<span class="lineNum">    1003 </span>            :   }
+<span class="lineNum">    1004 </span>            : 
+<span class="lineNum">    1005 </span><span class="lineNoCov">          0 :   virtual void BlobStoreCompleted(MutableBlobStorage* aBlobStorage,</span>
+<span class="lineNum">    1006 </span>            :                                   Blob* aBlob,
+<span class="lineNum">    1007 </span>            :                                   nsresult aRv) override
+<span class="lineNum">    1008 </span>            :   {
+<span class="lineNum">    1009 </span>            :     // On error.
+<span class="lineNum">    1010 </span><span class="lineNoCov">          0 :     if (NS_FAILED(aRv)) {</span>
+<span class="lineNum">    1011 </span><span class="lineNoCov">          0 :       OnStreamComplete(nullptr, nullptr, aRv, 0, nullptr);</span>
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">    1013 </span>            :     }
+<span class="lineNum">    1014 </span>            : 
+<span class="lineNum">    1015 </span>            :     MOZ_ASSERT(aBlob);
+<span class="lineNum">    1016 </span>            : 
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :     if (mFetchBody-&gt;mWorkerPrivate) {</span>
+<span class="lineNum">    1018 </span>            :       RefPtr&lt;ContinueConsumeBlobBodyRunnable&lt;Derived&gt;&gt; r =
+<span class="lineNum">    1019 </span><span class="lineNoCov">          0 :         new ContinueConsumeBlobBodyRunnable&lt;Derived&gt;(mFetchBody, aBlob-&gt;Impl());</span>
+<span class="lineNum">    1020 </span>            : 
+<span class="lineNum">    1021 </span><span class="lineNoCov">          0 :       if (!r-&gt;Dispatch()) {</span>
+<span class="lineNum">    1022 </span>            :         NS_WARNING(&quot;Could not dispatch ConsumeBlobBodyRunnable&quot;);
+<span class="lineNum">    1023 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">    1024 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">    1025 </span>            :     } else {
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :       mFetchBody-&gt;ContinueConsumeBlobBody(aBlob-&gt;Impl());</span>
+<span class="lineNum">    1027 </span>            :     }
+<span class="lineNum">    1028 </span>            :   }
+<a name="1029"><span class="lineNum">    1029 </span>            : </a>
+<span class="lineNum">    1030 </span>            : private:
+<span class="lineNum">    1031 </span><span class="lineNoCov">          0 :   virtual ~ConsumeBodyDoneObserver()</span>
+<span class="lineNum">    1032 </span><span class="lineNoCov">          0 :   { }</span>
+<span class="lineNum">    1033 </span>            : };
+<a name="1034"><span class="lineNum">    1034 </span>            : </a>
+<span class="lineNum">    1035 </span>            : template &lt;class Derived&gt;
+<a name="1036"><span class="lineNum">    1036 </span><span class="lineNoCov">          0 : NS_IMPL_ADDREF(ConsumeBodyDoneObserver&lt;Derived&gt;)</span></a>
+<span class="lineNum">    1037 </span>            : template &lt;class Derived&gt;
+<a name="1038"><span class="lineNum">    1038 </span><span class="lineNoCov">          0 : NS_IMPL_RELEASE(ConsumeBodyDoneObserver&lt;Derived&gt;)</span></a>
+<span class="lineNum">    1039 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1040 </span><span class="lineNoCov">          0 : NS_INTERFACE_MAP_BEGIN(ConsumeBodyDoneObserver&lt;Derived&gt;)</span>
+<span class="lineNum">    1041 </span><span class="lineNoCov">          0 :   NS_INTERFACE_MAP_ENTRY(nsIStreamLoaderObserver)</span>
+<span class="lineNum">    1042 </span><span class="lineNoCov">          0 :   NS_INTERFACE_MAP_ENTRY_AMBIGUOUS(nsISupports, nsIStreamLoaderObserver)</span>
+<span class="lineNum">    1043 </span><span class="lineNoCov">          0 : NS_INTERFACE_MAP_END</span>
+<a name="1044"><span class="lineNum">    1044 </span>            : </a>
+<span class="lineNum">    1045 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1046 </span><span class="lineNoCov">          0 : class BeginConsumeBodyRunnable final : public Runnable</span>
+<span class="lineNum">    1047 </span>            : {
+<a name="1048"><span class="lineNum">    1048 </span>            :   FetchBody&lt;Derived&gt;* mFetchBody;</a>
+<span class="lineNum">    1049 </span>            : public:
+<span class="lineNum">    1050 </span><span class="lineNoCov">          0 :   explicit BeginConsumeBodyRunnable(FetchBody&lt;Derived&gt;* aBody)</span>
+<span class="lineNum">    1051 </span><span class="lineNoCov">          0 :     : mFetchBody(aBody)</span>
+<span class="lineNum">    1052 </span><span class="lineNoCov">          0 :   { }</span>
+<a name="1053"><span class="lineNum">    1053 </span>            : </a>
+<span class="lineNum">    1054 </span>            :   NS_IMETHOD
+<span class="lineNum">    1055 </span><span class="lineNoCov">          0 :   Run() override</span>
+<span class="lineNum">    1056 </span>            :   {
+<span class="lineNum">    1057 </span><span class="lineNoCov">          0 :     mFetchBody-&gt;BeginConsumeBodyMainThread();</span>
+<span class="lineNum">    1058 </span><span class="lineNoCov">          0 :     return NS_OK;</span>
+<span class="lineNum">    1059 </span>            :   }
+<span class="lineNum">    1060 </span>            : };
+<a name="1061"><span class="lineNum">    1061 </span>            : </a>
+<span class="lineNum">    1062 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1063 </span><span class="lineNoCov">          0 : class CancelPumpRunnable final : public WorkerMainThreadRunnable</span>
+<span class="lineNum">    1064 </span>            : {
+<a name="1065"><span class="lineNum">    1065 </span>            :   FetchBody&lt;Derived&gt;* mBody;</a>
+<span class="lineNum">    1066 </span>            : public:
+<span class="lineNum">    1067 </span><span class="lineNoCov">          0 :   explicit CancelPumpRunnable(FetchBody&lt;Derived&gt;* aBody)</span>
+<span class="lineNum">    1068 </span>            :     : WorkerMainThreadRunnable(aBody-&gt;mWorkerPrivate,
+<span class="lineNum">    1069 </span>            :                                NS_LITERAL_CSTRING(&quot;Fetch :: Cancel Pump&quot;))
+<span class="lineNum">    1070 </span><span class="lineNoCov">          0 :     , mBody(aBody)</span>
+<span class="lineNum">    1071 </span><span class="lineNoCov">          0 :   { }</span>
+<a name="1072"><span class="lineNum">    1072 </span>            : </a>
+<span class="lineNum">    1073 </span>            :   bool
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :   MainThreadRun() override</span>
+<span class="lineNum">    1075 </span>            :   {
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :     mBody-&gt;CancelPump();</span>
+<span class="lineNum">    1077 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">    1078 </span>            :   }
+<span class="lineNum">    1079 </span>            : };
+<span class="lineNum">    1080 </span>            : } // namespace
+<span class="lineNum">    1081 </span>            : 
+<span class="lineNum">    1082 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1083 </span>            : class FetchBodyWorkerHolder final : public workers::WorkerHolder
+<span class="lineNum">    1084 </span>            : {
+<span class="lineNum">    1085 </span>            :   // This is addrefed before the workerHolder is created, and is released in
+<span class="lineNum">    1086 </span>            :   // ContinueConsumeBody() so we can hold a rawptr.
+<span class="lineNum">    1087 </span>            :   FetchBody&lt;Derived&gt;* mBody;
+<span class="lineNum">    1088 </span>            :   bool mWasNotified;
+<a name="1089"><span class="lineNum">    1089 </span>            : </a>
+<span class="lineNum">    1090 </span>            : public:
+<span class="lineNum">    1091 </span><span class="lineNoCov">          0 :   explicit FetchBodyWorkerHolder(FetchBody&lt;Derived&gt;* aBody)</span>
+<span class="lineNum">    1092 </span>            :     : mBody(aBody)
+<span class="lineNum">    1093 </span><span class="lineNoCov">          0 :     , mWasNotified(false)</span>
+<a name="1094"><span class="lineNum">    1094 </span><span class="lineNoCov">          0 :   { }</span></a>
+<span class="lineNum">    1095 </span>            : 
+<span class="lineNum">    1096 </span><span class="lineNoCov">          0 :   ~FetchBodyWorkerHolder()</span>
+<a name="1097"><span class="lineNum">    1097 </span><span class="lineNoCov">          0 :   { }</span></a>
+<span class="lineNum">    1098 </span>            : 
+<span class="lineNum">    1099 </span><span class="lineNoCov">          0 :   bool Notify(workers::Status aStatus) override</span>
+<span class="lineNum">    1100 </span>            :   {
+<span class="lineNum">    1101 </span>            :     MOZ_ASSERT(aStatus &gt; workers::Running);
+<span class="lineNum">    1102 </span><span class="lineNoCov">          0 :     if (!mWasNotified) {</span>
+<span class="lineNum">    1103 </span><span class="lineNoCov">          0 :       mWasNotified = true;</span>
+<span class="lineNum">    1104 </span><span class="lineNoCov">          0 :       mBody-&gt;ContinueConsumeBody(NS_BINDING_ABORTED, 0, nullptr);</span>
+<span class="lineNum">    1105 </span>            :     }
+<span class="lineNum">    1106 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">    1107 </span>            :   }
+<span class="lineNum">    1108 </span>            : };
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1111 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::FetchBody()</span>
+<span class="lineNum">    1112 </span>            :   : mWorkerHolder(nullptr)
+<span class="lineNum">    1113 </span><span class="lineNoCov">          0 :   , mBodyUsed(false)</span>
+<span class="lineNum">    1114 </span>            : #ifdef DEBUG
+<span class="lineNum">    1115 </span>            :   , mReadDone(false)
+<span class="lineNum">    1116 </span>            : #endif
+<span class="lineNum">    1117 </span>            : {
+<span class="lineNum">    1118 </span><span class="lineNoCov">          0 :   if (!NS_IsMainThread()) {</span>
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 :     mWorkerPrivate = GetCurrentThreadWorkerPrivate();</span>
+<span class="lineNum">    1120 </span>            :     MOZ_ASSERT(mWorkerPrivate);
+<span class="lineNum">    1121 </span>            :   } else {
+<span class="lineNum">    1122 </span><span class="lineNoCov">          0 :     mWorkerPrivate = nullptr;</span>
+<span class="lineNum">    1123 </span>            :   }
+<span class="lineNum">    1124 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1125 </span>            : 
+<span class="lineNum">    1126 </span>            : template
+<span class="lineNum">    1127 </span>            : FetchBody&lt;Request&gt;::FetchBody();
+<span class="lineNum">    1128 </span>            : 
+<span class="lineNum">    1129 </span>            : template
+<span class="lineNum">    1130 </span>            : FetchBody&lt;Response&gt;::FetchBody();
+<a name="1131"><span class="lineNum">    1131 </span>            : </a>
+<span class="lineNum">    1132 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1133 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::~FetchBody()</span>
+<span class="lineNum">    1134 </span>            : {
+<span class="lineNum">    1135 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1136 </span>            : 
+<span class="lineNum">    1137 </span>            : // Returns true if addref succeeded.
+<span class="lineNum">    1138 </span>            : // Always succeeds on main thread.
+<span class="lineNum">    1139 </span>            : // May fail on worker if RegisterWorkerHolder() fails. In that case, it will
+<span class="lineNum">    1140 </span>            : // release the object before returning false.
+<a name="1141"><span class="lineNum">    1141 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1142 </span>            : bool
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::AddRefObject()</span>
+<span class="lineNum">    1144 </span>            : {
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :   AssertIsOnTargetThread();</span>
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :   DerivedClass()-&gt;AddRef();</span>
+<span class="lineNum">    1147 </span>            : 
+<span class="lineNum">    1148 </span><span class="lineNoCov">          0 :   if (mWorkerPrivate &amp;&amp; !mWorkerHolder) {</span>
+<span class="lineNum">    1149 </span><span class="lineNoCov">          0 :     if (!RegisterWorkerHolder()) {</span>
+<span class="lineNum">    1150 </span><span class="lineNoCov">          0 :       ReleaseObject();</span>
+<span class="lineNum">    1151 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">    1152 </span>            :     }
+<span class="lineNum">    1153 </span>            :   }
+<span class="lineNum">    1154 </span>            :   return true;
+<span class="lineNum">    1155 </span>            : }
+<span class="lineNum">    1156 </span>            : 
+<a name="1157"><span class="lineNum">    1157 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1158 </span>            : void
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::ReleaseObject()</span>
+<span class="lineNum">    1160 </span>            : {
+<span class="lineNum">    1161 </span><span class="lineNoCov">          0 :   AssertIsOnTargetThread();</span>
+<span class="lineNum">    1162 </span>            : 
+<span class="lineNum">    1163 </span><span class="lineNoCov">          0 :   if (mWorkerPrivate &amp;&amp; mWorkerHolder) {</span>
+<span class="lineNum">    1164 </span><span class="lineNoCov">          0 :     UnregisterWorkerHolder();</span>
+<span class="lineNum">    1165 </span>            :   }
+<span class="lineNum">    1166 </span>            : 
+<span class="lineNum">    1167 </span><span class="lineNoCov">          0 :   DerivedClass()-&gt;Release();</span>
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1169 </span>            : 
+<a name="1170"><span class="lineNum">    1170 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1171 </span>            : bool
+<span class="lineNum">    1172 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::RegisterWorkerHolder()</span>
+<span class="lineNum">    1173 </span>            : {
+<span class="lineNum">    1174 </span>            :   MOZ_ASSERT(mWorkerPrivate);
+<span class="lineNum">    1175 </span><span class="lineNoCov">          0 :   mWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">    1176 </span>            :   MOZ_ASSERT(!mWorkerHolder);
+<span class="lineNum">    1177 </span><span class="lineNoCov">          0 :   mWorkerHolder = new FetchBodyWorkerHolder&lt;Derived&gt;(this);</span>
+<span class="lineNum">    1178 </span>            : 
+<span class="lineNum">    1179 </span><span class="lineNoCov">          0 :   if (!mWorkerHolder-&gt;HoldWorker(mWorkerPrivate, Closing)) {</span>
+<span class="lineNum">    1180 </span>            :     NS_WARNING(&quot;Failed to add workerHolder&quot;);
+<span class="lineNum">    1181 </span><span class="lineNoCov">          0 :     mWorkerHolder = nullptr;</span>
+<span class="lineNum">    1182 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">    1183 </span>            :   }
+<span class="lineNum">    1184 </span>            : 
+<span class="lineNum">    1185 </span>            :   return true;
+<span class="lineNum">    1186 </span>            : }
+<span class="lineNum">    1187 </span>            : 
+<a name="1188"><span class="lineNum">    1188 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1189 </span>            : void
+<span class="lineNum">    1190 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::UnregisterWorkerHolder()</span>
+<span class="lineNum">    1191 </span>            : {
+<span class="lineNum">    1192 </span>            :   MOZ_ASSERT(mWorkerPrivate);
+<span class="lineNum">    1193 </span><span class="lineNoCov">          0 :   mWorkerPrivate-&gt;AssertIsOnWorkerThread();</span>
+<span class="lineNum">    1194 </span>            :   MOZ_ASSERT(mWorkerHolder);
+<span class="lineNum">    1195 </span>            : 
+<span class="lineNum">    1196 </span><span class="lineNoCov">          0 :   mWorkerHolder-&gt;ReleaseWorker();</span>
+<span class="lineNum">    1197 </span><span class="lineNoCov">          0 :   mWorkerHolder = nullptr;</span>
+<span class="lineNum">    1198 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1199 </span>            : 
+<a name="1200"><span class="lineNum">    1200 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1201 </span>            : void
+<span class="lineNum">    1202 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::CancelPump()</span>
+<span class="lineNum">    1203 </span>            : {
+<span class="lineNum">    1204 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">    1205 </span>            :   MOZ_ASSERT(mConsumeBodyPump);
+<span class="lineNum">    1206 </span><span class="lineNoCov">          0 :   mConsumeBodyPump-&gt;Cancel(NS_BINDING_ABORTED);</span>
+<span class="lineNum">    1207 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1208 </span>            : 
+<span class="lineNum">    1209 </span>            : // Return value is used by ConsumeBody to bubble the error code up to WebIDL so
+<span class="lineNum">    1210 </span>            : // mConsumePromise doesn't have to be rejected on early exit.
+<a name="1211"><span class="lineNum">    1211 </span>            : template &lt;class Derived&gt;</a>
+<span class="lineNum">    1212 </span>            : nsresult
+<span class="lineNum">    1213 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::BeginConsumeBody()</span>
+<span class="lineNum">    1214 </span>            : {
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :   AssertIsOnTargetThread();</span>
+<span class="lineNum">    1216 </span>            :   MOZ_ASSERT(!mWorkerHolder);
+<span class="lineNum">    1217 </span>            :   MOZ_ASSERT(mConsumePromise);
+<span class="lineNum">    1218 </span>            : 
+<span class="lineNum">    1219 </span>            :   // The FetchBody is not thread-safe refcounted. We addref it here and release
+<span class="lineNum">    1220 </span>            :   // it once the stream read is finished.
+<span class="lineNum">    1221 </span><span class="lineNoCov">          0 :   if (!AddRefObject()) {</span>
+<span class="lineNum">    1222 </span>            :     return NS_ERROR_FAILURE;
+<span class="lineNum">    1223 </span>            :   }
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span><span class="lineNoCov">          0 :   nsCOMPtr&lt;nsIRunnable&gt; r = new BeginConsumeBodyRunnable&lt;Derived&gt;(this);</span>
+<span class="lineNum">    1226 </span><span class="lineNoCov">          0 :   nsresult rv = NS_OK;</span>
+<span class="lineNum">    1227 </span><span class="lineNoCov">          0 :   if (mWorkerPrivate) {</span>
+<span class="lineNum">    1228 </span><span class="lineNoCov">          0 :     rv = mWorkerPrivate-&gt;DispatchToMainThread(r.forget());</span>
+<span class="lineNum">    1229 </span>            :   } else {
+<span class="lineNum">    1230 </span><span class="lineNoCov">          0 :     rv = NS_DispatchToMainThread(r.forget());</span>
+<span class="lineNum">    1231 </span>            :   }
+<span class="lineNum">    1232 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1233 </span><span class="lineNoCov">          0 :     ReleaseObject();</span>
+<span class="lineNum">    1234 </span><span class="lineNoCov">          0 :     return rv;</span>
+<span class="lineNum">    1235 </span>            :   }
+<span class="lineNum">    1236 </span>            :   return NS_OK;
+<span class="lineNum">    1237 </span>            : }
+<span class="lineNum">    1238 </span>            : 
+<span class="lineNum">    1239 </span>            : /*
+<span class="lineNum">    1240 </span>            :  * BeginConsumeBodyMainThread() will automatically reject the consume promise
+<span class="lineNum">    1241 </span>            :  * and clean up on any failures, so there is no need for callers to do so,
+<span class="lineNum">    1242 </span>            :  * reflected in a lack of error return code.
+<span class="lineNum">    1243 </span>            :  */
+<span class="lineNum">    1244 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1245 </span>            : void
+<span class="lineNum">    1246 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::BeginConsumeBodyMainThread()</span>
+<span class="lineNum">    1247 </span>            : {
+<span class="lineNum">    1248 </span>            :   AssertIsOnMainThread();
+<span class="lineNum">    1249 </span><span class="lineNoCov">          0 :   AutoFailConsumeBody&lt;Derived&gt; autoReject(DerivedClass());</span>
+<span class="lineNum">    1250 </span>            :   nsresult rv;
+<span class="lineNum">    1251 </span>            :   nsCOMPtr&lt;nsIInputStream&gt; stream;
+<span class="lineNum">    1252 </span><span class="lineNoCov">          0 :   DerivedClass()-&gt;GetBody(getter_AddRefs(stream));</span>
+<span class="lineNum">    1253 </span><span class="lineNoCov">          0 :   if (!stream) {</span>
+<span class="lineNum">    1254 </span><span class="lineNoCov">          0 :     rv = NS_NewCStringInputStream(getter_AddRefs(stream), EmptyCString());</span>
+<span class="lineNum">    1255 </span><span class="lineNoCov">          0 :     if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1256 </span>            :       return;
+<span class="lineNum">    1257 </span>            :     }
+<span class="lineNum">    1258 </span>            :   }
+<span class="lineNum">    1259 </span>            : 
+<span class="lineNum">    1260 </span>            :   nsCOMPtr&lt;nsIInputStreamPump&gt; pump;
+<span class="lineNum">    1261 </span><span class="lineNoCov">          0 :   rv = NS_NewInputStreamPump(getter_AddRefs(pump),</span>
+<span class="lineNum">    1262 </span><span class="lineNoCov">          0 :                              stream);</span>
+<span class="lineNum">    1263 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1264 </span>            :     return;
+<span class="lineNum">    1265 </span>            :   }
+<span class="lineNum">    1266 </span>            : 
+<span class="lineNum">    1267 </span><span class="lineNoCov">          0 :   RefPtr&lt;ConsumeBodyDoneObserver&lt;Derived&gt;&gt; p = new ConsumeBodyDoneObserver&lt;Derived&gt;(this);</span>
+<span class="lineNum">    1268 </span>            : 
+<span class="lineNum">    1269 </span>            :   nsCOMPtr&lt;nsIStreamListener&gt; listener;
+<span class="lineNum">    1270 </span><span class="lineNoCov">          0 :   if (mConsumeType == CONSUME_BLOB) {</span>
+<span class="lineNum">    1271 </span>            :     MutableBlobStorage::MutableBlobStorageType type =
+<span class="lineNum">    1272 </span><span class="lineNoCov">          0 :       MutableBlobStorage::eOnlyInMemory;</span>
+<span class="lineNum">    1273 </span>            : 
+<span class="lineNum">    1274 </span>            :     const mozilla::UniquePtr&lt;mozilla::ipc::PrincipalInfo&gt;&amp; principalInfo =
+<span class="lineNum">    1275 </span><span class="lineNoCov">          0 :       DerivedClass()-&gt;GetPrincipalInfo();</span>
+<span class="lineNum">    1276 </span>            :     // We support temporary file for blobs only if the principal is known and
+<span class="lineNum">    1277 </span>            :     // it's system or content not in private Browsing.
+<span class="lineNum">    1278 </span><span class="lineNoCov">          0 :     if (principalInfo &amp;&amp;</span>
+<span class="lineNum">    1279 </span>            :         (principalInfo-&gt;type() == mozilla::ipc::PrincipalInfo::TSystemPrincipalInfo ||
+<span class="lineNum">    1280 </span>            :          (principalInfo-&gt;type() == mozilla::ipc::PrincipalInfo::TContentPrincipalInfo &amp;&amp;
+<span class="lineNum">    1281 </span><span class="lineNoCov">          0 :           principalInfo-&gt;get_ContentPrincipalInfo().attrs().mPrivateBrowsingId == 0))) {</span>
+<span class="lineNum">    1282 </span><span class="lineNoCov">          0 :       type = MutableBlobStorage::eCouldBeInTemporaryFile;</span>
+<span class="lineNum">    1283 </span>            :     }
+<span class="lineNum">    1284 </span>            : 
+<span class="lineNum">    1285 </span><span class="lineNoCov">          0 :     listener = new MutableBlobStreamListener(type, nullptr, mMimeType, p);</span>
+<span class="lineNum">    1286 </span>            :   } else {
+<span class="lineNum">    1287 </span>            :     nsCOMPtr&lt;nsIStreamLoader&gt; loader;
+<span class="lineNum">    1288 </span><span class="lineNoCov">          0 :     rv = NS_NewStreamLoader(getter_AddRefs(loader), p);</span>
+<span class="lineNum">    1289 </span><span class="lineNoCov">          0 :     if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1290 </span>            :       return;
+<span class="lineNum">    1291 </span>            :     }
+<span class="lineNum">    1292 </span>            : 
+<span class="lineNum">    1293 </span><span class="lineNoCov">          0 :     listener = loader;</span>
+<span class="lineNum">    1294 </span>            :   }
+<span class="lineNum">    1295 </span>            : 
+<span class="lineNum">    1296 </span><span class="lineNoCov">          0 :   rv = pump-&gt;AsyncRead(listener, nullptr);</span>
+<span class="lineNum">    1297 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1298 </span>            :     return;
+<span class="lineNum">    1299 </span>            :   }
+<span class="lineNum">    1300 </span>            : 
+<span class="lineNum">    1301 </span>            :   // Now that everything succeeded, we can assign the pump to a pointer that
+<span class="lineNum">    1302 </span>            :   // stays alive for the lifetime of the FetchBody.
+<span class="lineNum">    1303 </span><span class="lineNoCov">          0 :   mConsumeBodyPump = new nsMainThreadPtrHolder&lt;nsIInputStreamPump&gt;(pump);</span>
+<span class="lineNum">    1304 </span>            :   // It is ok for retargeting to fail and reads to happen on the main thread.
+<span class="lineNum">    1305 </span>            :   autoReject.DontFail();
+<span class="lineNum">    1306 </span>            : 
+<span class="lineNum">    1307 </span>            :   // Try to retarget, otherwise fall back to main thread.
+<span class="lineNum">    1308 </span><span class="lineNoCov">          0 :   nsCOMPtr&lt;nsIThreadRetargetableRequest&gt; rr = do_QueryInterface(pump);</span>
+<span class="lineNum">    1309 </span><span class="lineNoCov">          0 :   if (rr) {</span>
+<span class="lineNum">    1310 </span><span class="lineNoCov">          0 :     nsCOMPtr&lt;nsIEventTarget&gt; sts = do_GetService(NS_STREAMTRANSPORTSERVICE_CONTRACTID);</span>
+<span class="lineNum">    1311 </span><span class="lineNoCov">          0 :     rv = rr-&gt;RetargetDeliveryTo(sts);</span>
+<span class="lineNum">    1312 </span><span class="lineNoCov">          0 :     if (NS_WARN_IF(NS_FAILED(rv))) {</span>
+<span class="lineNum">    1313 </span>            :       NS_WARNING(&quot;Retargeting failed&quot;);
+<span class="lineNum">    1314 </span>            :     }
+<span class="lineNum">    1315 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1316 </span>            : }
+<span class="lineNum">    1317 </span>            : 
+<span class="lineNum">    1318 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1319 </span>            : void
+<span class="lineNum">    1320 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::ContinueConsumeBody(nsresult aStatus, uint32_t aResultLength, uint8_t* aResult)</span>
+<span class="lineNum">    1321 </span>            : {
+<span class="lineNum">    1322 </span><span class="lineNoCov">          0 :   AssertIsOnTargetThread();</span>
+<span class="lineNum">    1323 </span>            :   // Just a precaution to ensure ContinueConsumeBody is not called out of
+<span class="lineNum">    1324 </span>            :   // sync with a body read.
+<span class="lineNum">    1325 </span>            :   MOZ_ASSERT(mBodyUsed);
+<span class="lineNum">    1326 </span>            :   MOZ_ASSERT(!mReadDone);
+<span class="lineNum">    1327 </span>            :   MOZ_ASSERT_IF(mWorkerPrivate, mWorkerHolder);
+<span class="lineNum">    1328 </span>            : #ifdef DEBUG
+<span class="lineNum">    1329 </span>            :   mReadDone = true;
+<span class="lineNum">    1330 </span>            : #endif
+<span class="lineNum">    1331 </span>            : 
+<span class="lineNum">    1332 </span>            :   AutoFreeBuffer autoFree(aResult);
+<span class="lineNum">    1333 </span>            : 
+<span class="lineNum">    1334 </span>            :   MOZ_ASSERT(mConsumePromise);
+<span class="lineNum">    1335 </span><span class="lineNoCov">          0 :   RefPtr&lt;Promise&gt; localPromise = mConsumePromise.forget();</span>
+<span class="lineNum">    1336 </span>            : 
+<span class="lineNum">    1337 </span><span class="lineNoCov">          0 :   RefPtr&lt;Derived&gt; derivedClass = DerivedClass();</span>
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :   ReleaseObject();</span>
+<span class="lineNum">    1339 </span>            : 
+<span class="lineNum">    1340 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(NS_FAILED(aStatus))) {</span>
+<span class="lineNum">    1341 </span><span class="lineNoCov">          0 :     localPromise-&gt;MaybeReject(NS_ERROR_DOM_ABORT_ERR);</span>
+<span class="lineNum">    1342 </span>            : 
+<span class="lineNum">    1343 </span>            :     // If binding aborted, cancel the pump. We can't assert mConsumeBodyPump.
+<span class="lineNum">    1344 </span>            :     // In the (admittedly rare) situation that BeginConsumeBodyMainThread()
+<span class="lineNum">    1345 </span>            :     // context switches out, and the worker thread gets canceled before the
+<span class="lineNum">    1346 </span>            :     // pump is setup, mConsumeBodyPump will be null.
+<span class="lineNum">    1347 </span>            :     // We've to use the !! form since non-main thread pointer access on
+<span class="lineNum">    1348 </span>            :     // a nsMainThreadPtrHandle is not permitted.
+<span class="lineNum">    1349 </span><span class="lineNoCov">          0 :     if (aStatus == NS_BINDING_ABORTED &amp;&amp; !!mConsumeBodyPump) {</span>
+<span class="lineNum">    1350 </span><span class="lineNoCov">          0 :       if (NS_IsMainThread()) {</span>
+<span class="lineNum">    1351 </span><span class="lineNoCov">          0 :         CancelPump();</span>
+<span class="lineNum">    1352 </span>            :       } else {
+<span class="lineNum">    1353 </span>            :         MOZ_ASSERT(mWorkerPrivate);
+<span class="lineNum">    1354 </span>            :         // In case of worker thread, we block the worker while the request is
+<span class="lineNum">    1355 </span>            :         // canceled on the main thread. This ensures that OnStreamComplete has
+<span class="lineNum">    1356 </span>            :         // a valid FetchBody around to call CancelPump and we don't release the
+<span class="lineNum">    1357 </span>            :         // FetchBody on the main thread.
+<span class="lineNum">    1358 </span>            :         RefPtr&lt;CancelPumpRunnable&lt;Derived&gt;&gt; r =
+<span class="lineNum">    1359 </span><span class="lineNoCov">          0 :           new CancelPumpRunnable&lt;Derived&gt;(this);</span>
+<span class="lineNum">    1360 </span>            :         ErrorResult rv;
+<span class="lineNum">    1361 </span><span class="lineNoCov">          0 :         r-&gt;Dispatch(Terminating, rv);</span>
+<span class="lineNum">    1362 </span><span class="lineNoCov">          0 :         if (rv.Failed()) {</span>
+<span class="lineNum">    1363 </span>            :           NS_WARNING(&quot;Could not dispatch CancelPumpRunnable. Nothing we can do here&quot;);
+<span class="lineNum">    1364 </span>            :           // None of our callers are callled directly from JS, so there is no
+<span class="lineNum">    1365 </span>            :           // point in trying to propagate this failure out of here.  And
+<span class="lineNum">    1366 </span>            :           // localPromise is already rejected.  Just suppress the failure.
+<span class="lineNum">    1367 </span><span class="lineNoCov">          0 :           rv.SuppressException();</span>
+<span class="lineNum">    1368 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">    1369 </span>            :       }
+<span class="lineNum">    1370 </span>            :     }
+<span class="lineNum">    1371 </span>            :   }
+<span class="lineNum">    1372 </span>            : 
+<span class="lineNum">    1373 </span>            :   // Release the pump and then early exit if there was an error.
+<span class="lineNum">    1374 </span>            :   // Uses NS_ProxyRelease internally, so this is safe.
+<span class="lineNum">    1375 </span><span class="lineNoCov">          0 :   mConsumeBodyPump = nullptr;</span>
+<span class="lineNum">    1376 </span>            : 
+<span class="lineNum">    1377 </span>            :   // Don't warn here since we warned above.
+<span class="lineNum">    1378 </span><span class="lineNoCov">          0 :   if (NS_FAILED(aStatus)) {</span>
+<span class="lineNum">    1379 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">    1380 </span>            :   }
+<span class="lineNum">    1381 </span>            : 
+<span class="lineNum">    1382 </span>            :   // Finish successfully consuming body according to type.
+<span class="lineNum">    1383 </span>            :   MOZ_ASSERT(aResult);
+<span class="lineNum">    1384 </span>            : 
+<span class="lineNum">    1385 </span><span class="lineNoCov">          0 :   AutoJSAPI jsapi;</span>
+<span class="lineNum">    1386 </span><span class="lineNoCov">          0 :   if (!jsapi.Init(derivedClass-&gt;GetParentObject())) {</span>
+<span class="lineNum">    1387 </span><span class="lineNoCov">          0 :     localPromise-&gt;MaybeReject(NS_ERROR_UNEXPECTED);</span>
+<span class="lineNum">    1388 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">    1389 </span>            :   }
+<span class="lineNum">    1390 </span>            : 
+<span class="lineNum">    1391 </span><span class="lineNoCov">          0 :   JSContext* cx = jsapi.cx();</span>
+<span class="lineNum">    1392 </span>            :   ErrorResult error;
+<span class="lineNum">    1393 </span>            : 
+<span class="lineNum">    1394 </span><span class="lineNoCov">          0 :   switch (mConsumeType) {</span>
+<span class="lineNum">    1395 </span>            :     case CONSUME_ARRAYBUFFER: {
+<span class="lineNum">    1396 </span><span class="lineNoCov">          0 :       JS::Rooted&lt;JSObject*&gt; arrayBuffer(cx);</span>
+<span class="lineNum">    1397 </span><span class="lineNoCov">          0 :       BodyUtil::ConsumeArrayBuffer(cx, &amp;arrayBuffer, aResultLength, aResult,</span>
+<span class="lineNum">    1398 </span><span class="lineNoCov">          0 :                                     error);</span>
+<span class="lineNum">    1399 </span>            : 
+<span class="lineNum">    1400 </span><span class="lineNoCov">          0 :       if (!error.Failed()) {</span>
+<span class="lineNum">    1401 </span><span class="lineNoCov">          0 :         JS::Rooted&lt;JS::Value&gt; val(cx);</span>
+<span class="lineNum">    1402 </span><span class="lineNoCov">          0 :         val.setObjectOrNull(arrayBuffer);</span>
+<span class="lineNum">    1403 </span>            : 
+<span class="lineNum">    1404 </span><span class="lineNoCov">          0 :         localPromise-&gt;MaybeResolve(cx, val);</span>
+<span class="lineNum">    1405 </span>            :         // ArrayBuffer takes over ownership.
+<span class="lineNum">    1406 </span>            :         autoFree.Reset();
+<span class="lineNum">    1407 </span>            :       }
+<span class="lineNum">    1408 </span>            :       break;
+<span class="lineNum">    1409 </span>            :     }
+<span class="lineNum">    1410 </span>            :     case CONSUME_BLOB: {
+<span class="lineNum">    1411 </span><span class="lineNoCov">          0 :       MOZ_CRASH(&quot;This should not happen.&quot;);</span>
+<span class="lineNum">    1412 </span>            :       break;
+<span class="lineNum">    1413 </span>            :     }
+<span class="lineNum">    1414 </span>            :     case CONSUME_FORMDATA: {
+<span class="lineNum">    1415 </span>            :       nsCString data;
+<span class="lineNum">    1416 </span><span class="lineNoCov">          0 :       data.Adopt(reinterpret_cast&lt;char*&gt;(aResult), aResultLength);</span>
+<span class="lineNum">    1417 </span>            :       autoFree.Reset();
+<span class="lineNum">    1418 </span>            : 
+<span class="lineNum">    1419 </span>            :       RefPtr&lt;dom::FormData&gt; fd = BodyUtil::ConsumeFormData(
+<span class="lineNum">    1420 </span>            :         derivedClass-&gt;GetParentObject(),
+<span class="lineNum">    1421 </span><span class="lineNoCov">          0 :         mMimeType, data, error);</span>
+<span class="lineNum">    1422 </span><span class="lineNoCov">          0 :       if (!error.Failed()) {</span>
+<span class="lineNum">    1423 </span><span class="lineNoCov">          0 :         localPromise-&gt;MaybeResolve(fd);</span>
+<span class="lineNum">    1424 </span>            :       }
+<span class="lineNum">    1425 </span>            :       break;
+<span class="lineNum">    1426 </span>            :     }
+<span class="lineNum">    1427 </span>            :     case CONSUME_TEXT:
+<span class="lineNum">    1428 </span>            :       // fall through handles early exit.
+<span class="lineNum">    1429 </span>            :     case CONSUME_JSON: {
+<span class="lineNum">    1430 </span>            :       nsString decoded;
+<span class="lineNum">    1431 </span><span class="lineNoCov">          0 :       if (NS_SUCCEEDED(BodyUtil::ConsumeText(aResultLength, aResult, decoded))) {</span>
+<span class="lineNum">    1432 </span><span class="lineNoCov">          0 :         if (mConsumeType == CONSUME_TEXT) {</span>
+<span class="lineNum">    1433 </span><span class="lineNoCov">          0 :           localPromise-&gt;MaybeResolve(decoded);</span>
+<span class="lineNum">    1434 </span>            :         } else {
+<span class="lineNum">    1435 </span><span class="lineNoCov">          0 :           JS::Rooted&lt;JS::Value&gt; json(cx);</span>
+<span class="lineNum">    1436 </span><span class="lineNoCov">          0 :           BodyUtil::ConsumeJson(cx, &amp;json, decoded, error);</span>
+<span class="lineNum">    1437 </span><span class="lineNoCov">          0 :           if (!error.Failed()) {</span>
+<span class="lineNum">    1438 </span><span class="lineNoCov">          0 :             localPromise-&gt;MaybeResolve(cx, json);</span>
+<span class="lineNum">    1439 </span>            :           }
+<span class="lineNum">    1440 </span>            :         }
+<span class="lineNum">    1441 </span>            :       };
+<span class="lineNum">    1442 </span>            :       break;
+<span class="lineNum">    1443 </span>            :     }
+<span class="lineNum">    1444 </span>            :     default:
+<span class="lineNum">    1445 </span>            :       NS_NOTREACHED(&quot;Unexpected consume body type&quot;);
+<span class="lineNum">    1446 </span>            :   }
+<span class="lineNum">    1447 </span>            : 
+<span class="lineNum">    1448 </span><span class="lineNoCov">          0 :   error.WouldReportJSException();</span>
+<span class="lineNum">    1449 </span><span class="lineNoCov">          0 :   if (error.Failed()) {</span>
+<span class="lineNum">    1450 </span><span class="lineNoCov">          0 :     localPromise-&gt;MaybeReject(error);</span>
+<span class="lineNum">    1451 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1452 </span>            : }
+<span class="lineNum">    1453 </span>            : 
+<span class="lineNum">    1454 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1455 </span>            : void
+<span class="lineNum">    1456 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::ContinueConsumeBlobBody(BlobImpl* aBlobImpl)</span>
+<span class="lineNum">    1457 </span>            : {
+<span class="lineNum">    1458 </span><span class="lineNoCov">          0 :   AssertIsOnTargetThread();</span>
+<span class="lineNum">    1459 </span>            :   // Just a precaution to ensure ContinueConsumeBody is not called out of
+<span class="lineNum">    1460 </span>            :   // sync with a body read.
+<span class="lineNum">    1461 </span>            :   MOZ_ASSERT(mBodyUsed);
+<span class="lineNum">    1462 </span>            :   MOZ_ASSERT(!mReadDone);
+<span class="lineNum">    1463 </span>            :   MOZ_ASSERT(mConsumeType == CONSUME_BLOB);
+<span class="lineNum">    1464 </span>            :   MOZ_ASSERT_IF(mWorkerPrivate, mWorkerHolder);
+<span class="lineNum">    1465 </span>            : #ifdef DEBUG
+<span class="lineNum">    1466 </span>            :   mReadDone = true;
+<span class="lineNum">    1467 </span>            : #endif
+<span class="lineNum">    1468 </span>            : 
+<span class="lineNum">    1469 </span>            :   MOZ_ASSERT(mConsumePromise);
+<span class="lineNum">    1470 </span><span class="lineNoCov">          0 :   RefPtr&lt;Promise&gt; localPromise = mConsumePromise.forget();</span>
+<span class="lineNum">    1471 </span>            : 
+<span class="lineNum">    1472 </span><span class="lineNoCov">          0 :   RefPtr&lt;Derived&gt; derivedClass = DerivedClass();</span>
+<span class="lineNum">    1473 </span><span class="lineNoCov">          0 :   ReleaseObject();</span>
+<span class="lineNum">    1474 </span>            : 
+<span class="lineNum">    1475 </span>            :   // Release the pump and then early exit if there was an error.
+<span class="lineNum">    1476 </span>            :   // Uses NS_ProxyRelease internally, so this is safe.
+<span class="lineNum">    1477 </span><span class="lineNoCov">          0 :   mConsumeBodyPump = nullptr;</span>
+<span class="lineNum">    1478 </span>            : 
+<span class="lineNum">    1479 </span>            :   RefPtr&lt;dom::Blob&gt; blob =
+<span class="lineNum">    1480 </span><span class="lineNoCov">          0 :     dom::Blob::Create(derivedClass-&gt;GetParentObject(), aBlobImpl);</span>
+<span class="lineNum">    1481 </span>            :   MOZ_ASSERT(blob);
+<span class="lineNum">    1482 </span>            : 
+<span class="lineNum">    1483 </span><span class="lineNoCov">          0 :   localPromise-&gt;MaybeResolve(blob);</span>
+<span class="lineNum">    1484 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1485 </span>            : 
+<span class="lineNum">    1486 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1487 </span>            : already_AddRefed&lt;Promise&gt;
+<span class="lineNum">    1488 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::ConsumeBody(ConsumeType aType, ErrorResult&amp; aRv)</span>
+<span class="lineNum">    1489 </span>            : {
+<span class="lineNum">    1490 </span><span class="lineNoCov">          0 :   mConsumeType = aType;</span>
+<span class="lineNum">    1491 </span><span class="lineNoCov">          0 :   if (BodyUsed()) {</span>
+<span class="lineNum">    1492 </span><span class="lineNoCov">          0 :     aRv.ThrowTypeError&lt;MSG_FETCH_BODY_CONSUMED_ERROR&gt;();</span>
+<span class="lineNum">    1493 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">    1494 </span>            :   }
+<span class="lineNum">    1495 </span>            : 
+<span class="lineNum">    1496 </span><span class="lineNoCov">          0 :   SetBodyUsed();</span>
+<span class="lineNum">    1497 </span>            : 
+<span class="lineNum">    1498 </span><span class="lineNoCov">          0 :   mConsumePromise = Promise::Create(DerivedClass()-&gt;GetParentObject(), aRv);</span>
+<span class="lineNum">    1499 </span><span class="lineNoCov">          0 :   if (aRv.Failed()) {</span>
+<span class="lineNum">    1500 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">    1501 </span>            :   }
+<span class="lineNum">    1502 </span>            : 
+<span class="lineNum">    1503 </span><span class="lineNoCov">          0 :   aRv = BeginConsumeBody();</span>
+<span class="lineNum">    1504 </span><span class="lineNoCov">          0 :   if (NS_WARN_IF(aRv.Failed())) {</span>
+<span class="lineNum">    1505 </span><span class="lineNoCov">          0 :     mConsumePromise = nullptr;</span>
+<span class="lineNum">    1506 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">    1507 </span>            :   }
+<span class="lineNum">    1508 </span>            : 
+<span class="lineNum">    1509 </span><span class="lineNoCov">          0 :   RefPtr&lt;Promise&gt; promise = mConsumePromise;</span>
+<span class="lineNum">    1510 </span><span class="lineNoCov">          0 :   return promise.forget();</span>
+<span class="lineNum">    1511 </span>            : }
+<span class="lineNum">    1512 </span>            : 
+<span class="lineNum">    1513 </span>            : template
+<span class="lineNum">    1514 </span>            : already_AddRefed&lt;Promise&gt;
+<span class="lineNum">    1515 </span>            : FetchBody&lt;Request&gt;::ConsumeBody(ConsumeType aType, ErrorResult&amp; aRv);
+<span class="lineNum">    1516 </span>            : 
+<span class="lineNum">    1517 </span>            : template
+<span class="lineNum">    1518 </span>            : already_AddRefed&lt;Promise&gt;
+<span class="lineNum">    1519 </span>            : FetchBody&lt;Response&gt;::ConsumeBody(ConsumeType aType, ErrorResult&amp; aRv);
+<span class="lineNum">    1520 </span>            : 
+<span class="lineNum">    1521 </span>            : template &lt;class Derived&gt;
+<span class="lineNum">    1522 </span>            : void
+<span class="lineNum">    1523 </span><span class="lineNoCov">          0 : FetchBody&lt;Derived&gt;::SetMimeType()</span>
+<span class="lineNum">    1524 </span>            : {
+<span class="lineNum">    1525 </span>            :   // Extract mime type.
+<span class="lineNum">    1526 </span>            :   ErrorResult result;
+<span class="lineNum">    1527 </span>            :   nsCString contentTypeValues;
+<span class="lineNum">    1528 </span>            :   MOZ_ASSERT(DerivedClass()-&gt;GetInternalHeaders());
+<span class="lineNum">    1529 </span><span class="lineNoCov">          0 :   DerivedClass()-&gt;GetInternalHeaders()-&gt;Get(NS_LITERAL_CSTRING(&quot;Content-Type&quot;),</span>
+<span class="lineNum">    1530 </span>            :                                             contentTypeValues, result);
+<span class="lineNum">    1531 </span><span class="lineNoCov">          0 :   MOZ_ALWAYS_TRUE(!result.Failed());</span>
+<span class="lineNum">    1532 </span>            : 
+<span class="lineNum">    1533 </span>            :   // HTTP ABNF states Content-Type may have only one value.
+<span class="lineNum">    1534 </span>            :   // This is from the &quot;parse a header value&quot; of the fetch spec.
+<span class="lineNum">    1535 </span><span class="lineNoCov">          0 :   if (!contentTypeValues.IsVoid() &amp;&amp; contentTypeValues.Find(&quot;,&quot;) == -1) {</span>
+<span class="lineNum">    1536 </span><span class="lineNoCov">          0 :     mMimeType = contentTypeValues;</span>
+<span class="lineNum">    1537 </span><span class="lineNoCov">          0 :     ToLowerCase(mMimeType);</span>
+<span class="lineNum">    1538 </span>            :   }
+<span class="lineNum">    1539 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1540 </span>            : 
+<span class="lineNum">    1541 </span>            : template
+<span class="lineNum">    1542 </span>            : void
+<span class="lineNum">    1543 </span>            : FetchBody&lt;Request&gt;::SetMimeType();
+<span class="lineNum">    1544 </span>            : 
+<span class="lineNum">    1545 </span>            : template
+<span class="lineNum">    1546 </span>            : void
+<span class="lineNum">    1547 </span>            : FetchBody&lt;Response&gt;::SetMimeType();
+<span class="lineNum">    1548 </span>            : 
+<span class="lineNum">    1549 </span>            : } // namespace dom
+<span class="lineNum">    1550 </span>            : } // namespace mozilla
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

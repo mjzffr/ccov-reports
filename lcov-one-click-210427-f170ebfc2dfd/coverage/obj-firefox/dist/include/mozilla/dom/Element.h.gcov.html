@@ -1,0 +1,1871 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/dom/Element.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/dom</a> - Element.h<span style="font-size: 80%;"> (source / <a href="Element.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">203</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">71</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : /*
+<span class="lineNum">       8 </span>            :  * Base class for all element classes; this provides an implementation
+<span class="lineNum">       9 </span>            :  * of DOM Core's nsIDOMElement, implements nsIContent, provides
+<span class="lineNum">      10 </span>            :  * utility methods for subclasses, and so forth.
+<span class="lineNum">      11 </span>            :  */
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #ifndef mozilla_dom_Element_h__
+<span class="lineNum">      14 </span>            : #define mozilla_dom_Element_h__
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/dom/FragmentOrElement.h&quot; // for base class
+<span class="lineNum">      17 </span>            : #include &quot;nsChangeHint.h&quot;                  // for enum
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/EventStates.h&quot;           // for member
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/ServoTypes.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/dom/DirectionalityUtils.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsIDOMElement.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsILinkHandler.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsINodeList.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;nsNodeUtils.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;nsAttrAndChildArray.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;mozilla/FlushType.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;nsDOMAttributeMap.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;nsPresContext.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;mozilla/CORSMode.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;nsIScrollableFrame.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;mozilla/dom/Attr.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;nsISMILAttr.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;mozilla/dom/DOMRect.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;nsAttrValue.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;mozilla/EventForwards.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;mozilla/dom/BindingDeclarations.h&quot;
+<span class="lineNum">      38 </span>            : #include &quot;mozilla/dom/DOMTokenListSupportedTokens.h&quot;
+<span class="lineNum">      39 </span>            : #include &quot;mozilla/dom/WindowBinding.h&quot;
+<span class="lineNum">      40 </span>            : #include &quot;mozilla/dom/ElementBinding.h&quot;
+<span class="lineNum">      41 </span>            : #include &quot;mozilla/dom/Nullable.h&quot;
+<span class="lineNum">      42 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      43 </span>            : #include &quot;Units.h&quot;
+<span class="lineNum">      44 </span>            : #include &quot;DOMIntersectionObserver.h&quot;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : class mozAutoDocUpdate;
+<span class="lineNum">      47 </span>            : class nsIFrame;
+<span class="lineNum">      48 </span>            : class nsIDOMMozNamedAttrMap;
+<span class="lineNum">      49 </span>            : class nsIMozBrowserFrame;
+<span class="lineNum">      50 </span>            : class nsIURI;
+<span class="lineNum">      51 </span>            : class nsIScrollableFrame;
+<span class="lineNum">      52 </span>            : class nsAttrValueOrString;
+<span class="lineNum">      53 </span>            : class nsContentList;
+<span class="lineNum">      54 </span>            : class nsDOMTokenList;
+<span class="lineNum">      55 </span>            : struct nsRect;
+<span class="lineNum">      56 </span>            : class nsFocusManager;
+<span class="lineNum">      57 </span>            : class nsGlobalWindow;
+<span class="lineNum">      58 </span>            : class nsICSSDeclaration;
+<span class="lineNum">      59 </span>            : class nsISMILAttr;
+<span class="lineNum">      60 </span>            : class nsDocument;
+<span class="lineNum">      61 </span>            : class nsDOMStringMap;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : namespace mozilla {
+<span class="lineNum">      64 </span>            : class DeclarationBlock;
+<span class="lineNum">      65 </span>            : namespace dom {
+<span class="lineNum">      66 </span>            :   struct AnimationFilter;
+<span class="lineNum">      67 </span>            :   struct ScrollIntoViewOptions;
+<span class="lineNum">      68 </span>            :   struct ScrollToOptions;
+<span class="lineNum">      69 </span>            :   class DOMIntersectionObserver;
+<span class="lineNum">      70 </span>            :   class ElementOrCSSPseudoElement;
+<span class="lineNum">      71 </span>            :   class UnrestrictedDoubleOrKeyframeAnimationOptions;
+<span class="lineNum">      72 </span>            :   enum class CallerType : uint32_t;
+<span class="lineNum">      73 </span>            : } // namespace dom
+<span class="lineNum">      74 </span>            : } // namespace mozilla
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : already_AddRefed&lt;nsContentList&gt;
+<span class="lineNum">      78 </span>            : NS_GetContentList(nsINode* aRootNode,
+<span class="lineNum">      79 </span>            :                   int32_t  aMatchNameSpaceId,
+<span class="lineNum">      80 </span>            :                   const nsAString&amp; aTagname);
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            : #define ELEMENT_FLAG_BIT(n_) NODE_FLAG_BIT(NODE_TYPE_SPECIFIC_BITS_OFFSET + (n_))
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : // Element-specific flags
+<span class="lineNum">      85 </span>            : enum {
+<span class="lineNum">      86 </span>            :   // Set if the element has a pending style change.
+<span class="lineNum">      87 </span>            :   ELEMENT_HAS_PENDING_RESTYLE =                 NODE_SHARED_RESTYLE_BIT_1,
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   // Set if the element is a potential restyle root (that is, has a style
+<span class="lineNum">      90 </span>            :   // change pending _and_ that style change will attempt to restyle
+<span class="lineNum">      91 </span>            :   // descendants).
+<span class="lineNum">      92 </span>            :   ELEMENT_IS_POTENTIAL_RESTYLE_ROOT =           NODE_SHARED_RESTYLE_BIT_2,
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   // Set if the element has a pending animation-only style change as
+<span class="lineNum">      95 </span>            :   // part of an animation-only style update (where we update styles from
+<span class="lineNum">      96 </span>            :   // animation to the current refresh tick, but leave everything else as
+<span class="lineNum">      97 </span>            :   // it was).
+<span class="lineNum">      98 </span>            :   ELEMENT_HAS_PENDING_ANIMATION_ONLY_RESTYLE =  ELEMENT_FLAG_BIT(0),
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   // Set if the element is a potential animation-only restyle root (that
+<span class="lineNum">     101 </span>            :   // is, has an animation-only style change pending _and_ that style
+<span class="lineNum">     102 </span>            :   // change will attempt to restyle descendants).
+<span class="lineNum">     103 </span>            :   ELEMENT_IS_POTENTIAL_ANIMATION_ONLY_RESTYLE_ROOT = ELEMENT_FLAG_BIT(1),
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   // Set if this element has a pending restyle with an eRestyle_SomeDescendants
+<span class="lineNum">     106 </span>            :   // restyle hint.
+<span class="lineNum">     107 </span>            :   ELEMENT_IS_CONDITIONAL_RESTYLE_ANCESTOR = ELEMENT_FLAG_BIT(2),
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :   // Just the HAS_PENDING bits, for convenience
+<span class="lineNum">     110 </span>            :   ELEMENT_PENDING_RESTYLE_FLAGS =
+<span class="lineNum">     111 </span>            :     ELEMENT_HAS_PENDING_RESTYLE |
+<span class="lineNum">     112 </span>            :     ELEMENT_HAS_PENDING_ANIMATION_ONLY_RESTYLE,
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :   // Just the IS_POTENTIAL bits, for convenience
+<span class="lineNum">     115 </span>            :   ELEMENT_POTENTIAL_RESTYLE_ROOT_FLAGS =
+<span class="lineNum">     116 </span>            :     ELEMENT_IS_POTENTIAL_RESTYLE_ROOT |
+<span class="lineNum">     117 </span>            :     ELEMENT_IS_POTENTIAL_ANIMATION_ONLY_RESTYLE_ROOT,
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :   // All of the restyle bits together, for convenience.
+<span class="lineNum">     120 </span>            :   ELEMENT_ALL_RESTYLE_FLAGS = ELEMENT_PENDING_RESTYLE_FLAGS |
+<span class="lineNum">     121 </span>            :                               ELEMENT_POTENTIAL_RESTYLE_ROOT_FLAGS |
+<span class="lineNum">     122 </span>            :                               ELEMENT_IS_CONDITIONAL_RESTYLE_ANCESTOR,
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :   // Set if this element is marked as 'scrollgrab' (see bug 912666)
+<span class="lineNum">     125 </span>            :   ELEMENT_HAS_SCROLLGRAB = ELEMENT_FLAG_BIT(3),
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :   // Remaining bits are for subclasses
+<span class="lineNum">     128 </span>            :   ELEMENT_TYPE_SPECIFIC_BITS_OFFSET = NODE_TYPE_SPECIFIC_BITS_OFFSET + 4
+<span class="lineNum">     129 </span>            : };
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : #undef ELEMENT_FLAG_BIT
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : // Make sure we have space for our bits
+<span class="lineNum">     134 </span>            : ASSERT_NODE_FLAGS_SPACE(ELEMENT_TYPE_SPECIFIC_BITS_OFFSET);
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : namespace mozilla {
+<span class="lineNum">     137 </span>            : enum class CSSPseudoElementType : uint8_t;
+<span class="lineNum">     138 </span>            : class EventChainPostVisitor;
+<span class="lineNum">     139 </span>            : class EventChainPreVisitor;
+<span class="lineNum">     140 </span>            : class EventChainVisitor;
+<span class="lineNum">     141 </span>            : class EventListenerManager;
+<span class="lineNum">     142 </span>            : class EventStateManager;
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            : namespace dom {
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : class Animation;
+<span class="lineNum">     147 </span>            : class CustomElementRegistry;
+<span class="lineNum">     148 </span>            : class Link;
+<span class="lineNum">     149 </span>            : class DOMRect;
+<span class="lineNum">     150 </span>            : class DOMRectList;
+<span class="lineNum">     151 </span>            : class DestinationInsertionPointList;
+<span class="lineNum">     152 </span>            : class Grid;
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            : // IID for the dom::Element interface
+<span class="lineNum">     155 </span>            : #define NS_ELEMENT_IID \
+<span class="lineNum">     156 </span>            : { 0xc67ed254, 0xfd3b, 0x4b10, \
+<span class="lineNum">     157 </span>            :   { 0x96, 0xa2, 0xc5, 0x8b, 0x7b, 0x64, 0x97, 0xd1 } }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            : class Element : public FragmentOrElement
+<span class="lineNum">     160 </span>            : {
+<a name="161"><span class="lineNum">     161 </span>            : public:</a>
+<span class="lineNum">     162 </span>            : #ifdef MOZILLA_INTERNAL_API
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :   explicit Element(already_AddRefed&lt;mozilla::dom::NodeInfo&gt;&amp; aNodeInfo) :</span>
+<span class="lineNum">     164 </span>            :     FragmentOrElement(aNodeInfo),
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     mState(NS_EVENT_STATE_MOZ_READONLY)</span>
+<span class="lineNum">     166 </span>            :   {
+<span class="lineNum">     167 </span>            :     MOZ_ASSERT(mNodeInfo-&gt;NodeType() == nsIDOMNode::ELEMENT_NODE,
+<span class="lineNum">     168 </span>            :                &quot;Bad NodeType in aNodeInfo&quot;);
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     SetIsElement();</span>
+<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   ~Element()</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     174 </span>            : #ifdef MOZ_STYLO
+<span class="lineNum">     175 </span>            :     NS_ASSERTION(!HasServoData(), &quot;expected ServoData to be cleared earlier&quot;);
+<span class="lineNum">     176 </span>            : #endif
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            : #endif // MOZILLA_INTERNAL_API
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   NS_DECLARE_STATIC_IID_ACCESSOR(NS_ELEMENT_IID)
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   NS_IMETHOD QueryInterface(REFNSIID aIID, void** aInstancePtr) override;
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :   /**
+<span class="lineNum">     186 </span>            :    * Method to get the full state of this element.  See mozilla/EventStates.h
+<span class="lineNum">     187 </span>            :    * for the possible bits that could be set here.
+<span class="lineNum">     188 </span>            :    */
+<span class="lineNum">     189 </span>            :   EventStates State() const
+<span class="lineNum">     190 </span>            :   {
+<span class="lineNum">     191 </span>            :     // mState is maintained by having whoever might have changed it
+<span class="lineNum">     192 </span>            :     // call UpdateState() or one of the other mState mutators.
+<span class="lineNum">     193 </span>            :     return mState;
+<span class="lineNum">     194 </span>            :   }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   /**
+<span class="lineNum">     197 </span>            :    * Ask this element to update its state.  If aNotify is false, then
+<span class="lineNum">     198 </span>            :    * state change notifications will not be dispatched; in that
+<span class="lineNum">     199 </span>            :    * situation it is the caller's responsibility to dispatch them.
+<span class="lineNum">     200 </span>            :    *
+<span class="lineNum">     201 </span>            :    * In general, aNotify should only be false if we're guaranteed that
+<span class="lineNum">     202 </span>            :    * the element can't have a frame no matter what its style is
+<span class="lineNum">     203 </span>            :    * (e.g. if we're in the middle of adding it to the document or
+<span class="lineNum">     204 </span>            :    * removing it from the document).
+<span class="lineNum">     205 </span>            :    */
+<span class="lineNum">     206 </span>            :   void UpdateState(bool aNotify);
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   /**
+<span class="lineNum">     209 </span>            :    * Method to update mState with link state information.  This does not notify.
+<span class="lineNum">     210 </span>            :    */
+<a name="211"><span class="lineNum">     211 </span>            :   void UpdateLinkState(EventStates aState);</a>
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :   virtual int32_t TabIndexDefault()</span>
+<span class="lineNum">     214 </span>            :   {
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     216 </span>            :   }
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   /**
+<span class="lineNum">     219 </span>            :    * Get tabIndex of this element. If not found, return TabIndexDefault.
+<span class="lineNum">     220 </span>            :    */
+<span class="lineNum">     221 </span>            :   int32_t TabIndex();
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :   /**
+<span class="lineNum">     224 </span>            :    * Set tabIndex value to this element.
+<span class="lineNum">     225 </span>            :    */
+<span class="lineNum">     226 </span>            :   void SetTabIndex(int32_t aTabIndex, mozilla::ErrorResult&amp; aError);
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :   /**
+<span class="lineNum">     229 </span>            :    * Make focus on this element.
+<span class="lineNum">     230 </span>            :    */
+<span class="lineNum">     231 </span>            :   virtual void Focus(mozilla::ErrorResult&amp; aError);
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :   /**
+<span class="lineNum">     234 </span>            :    * Show blur and clear focus.
+<span class="lineNum">     235 </span>            :    */
+<span class="lineNum">     236 </span>            :   virtual void Blur(mozilla::ErrorResult&amp; aError);
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   /**
+<span class="lineNum">     239 </span>            :    * The style state of this element. This is the real state of the element
+<a name="240"><span class="lineNum">     240 </span>            :    * with any style locks applied for pseudo-class inspecting.</a>
+<span class="lineNum">     241 </span>            :    */
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :   EventStates StyleState() const</span>
+<span class="lineNum">     243 </span>            :   {
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :     if (!HasLockedStyleStates()) {</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :       return mState;</span>
+<span class="lineNum">     246 </span>            :     }
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :     return StyleStateFromLocks();</span>
+<span class="lineNum">     248 </span>            :   }
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :   /**
+<span class="lineNum">     251 </span>            :    * StyleStateLocks is used to specify which event states should be locked,
+<span class="lineNum">     252 </span>            :    * and whether they should be locked to on or off.
+<span class="lineNum">     253 </span>            :    */
+<span class="lineNum">     254 </span>            :   struct StyleStateLocks {
+<span class="lineNum">     255 </span>            :     // mLocks tracks which event states should be locked.
+<span class="lineNum">     256 </span>            :     EventStates mLocks;
+<span class="lineNum">     257 </span>            :     // mValues tracks if the locked state should be on or off.
+<span class="lineNum">     258 </span>            :     EventStates mValues;
+<span class="lineNum">     259 </span>            :   };
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :   /**
+<span class="lineNum">     262 </span>            :    * The style state locks applied to this element.
+<span class="lineNum">     263 </span>            :    */
+<span class="lineNum">     264 </span>            :   StyleStateLocks LockedStyleStates() const;
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :   /**
+<span class="lineNum">     267 </span>            :    * Add a style state lock on this element.
+<span class="lineNum">     268 </span>            :    * aEnabled is the value to lock the given state bits to.
+<span class="lineNum">     269 </span>            :    */
+<span class="lineNum">     270 </span>            :   void LockStyleStates(EventStates aStates, bool aEnabled);
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :   /**
+<span class="lineNum">     273 </span>            :    * Remove a style state lock on this element.
+<span class="lineNum">     274 </span>            :    */
+<span class="lineNum">     275 </span>            :   void UnlockStyleStates(EventStates aStates);
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :   /**
+<span class="lineNum">     278 </span>            :    * Clear all style state locks on this element.
+<span class="lineNum">     279 </span>            :    */
+<span class="lineNum">     280 </span>            :   void ClearStyleStateLocks();
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            :   /**
+<span class="lineNum">     283 </span>            :    * Get the inline style declaration, if any, for this element.
+<span class="lineNum">     284 </span>            :    */
+<span class="lineNum">     285 </span>            :   DeclarationBlock* GetInlineStyleDeclaration() const;
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :   /**
+<span class="lineNum">     288 </span>            :    * Get the mapped attributes, if any, for this element.
+<span class="lineNum">     289 </span>            :    */
+<span class="lineNum">     290 </span>            :   const nsMappedAttributes* GetMappedAttributes() const;
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :   void ClearMappedServoStyle() {
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     mAttrsAndChildren.ClearMappedServoStyle();</span>
+<span class="lineNum">     294 </span>            :   }
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :   /**
+<span class="lineNum">     297 </span>            :    * Set the inline style declaration for this element. This will send
+<span class="lineNum">     298 </span>            :    * an appropriate AttributeChanged notification if aNotify is true.
+<span class="lineNum">     299 </span>            :    */
+<span class="lineNum">     300 </span>            :   virtual nsresult SetInlineStyleDeclaration(DeclarationBlock* aDeclaration,
+<span class="lineNum">     301 </span>            :                                              const nsAString* aSerialized,
+<span class="lineNum">     302 </span>            :                                              bool aNotify);
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            :   /**
+<span class="lineNum">     305 </span>            :    * Get the SMIL override style declaration for this element. If the
+<span class="lineNum">     306 </span>            :    * rule hasn't been created, this method simply returns null.
+<span class="lineNum">     307 </span>            :    */
+<span class="lineNum">     308 </span>            :   virtual DeclarationBlock* GetSMILOverrideStyleDeclaration();
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :   /**
+<span class="lineNum">     311 </span>            :    * Set the SMIL override style declaration for this element. If
+<span class="lineNum">     312 </span>            :    * aNotify is true, this method will notify the document's pres
+<span class="lineNum">     313 </span>            :    * context, so that the style changes will be noticed.
+<span class="lineNum">     314 </span>            :    */
+<span class="lineNum">     315 </span>            :   virtual nsresult SetSMILOverrideStyleDeclaration(
+<span class="lineNum">     316 </span>            :     DeclarationBlock* aDeclaration, bool aNotify);
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            :   /**
+<span class="lineNum">     319 </span>            :    * Returns a new nsISMILAttr that allows the caller to animate the given
+<a name="320"><span class="lineNum">     320 </span>            :    * attribute on this element.</a>
+<span class="lineNum">     321 </span>            :    */
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   virtual UniquePtr&lt;nsISMILAttr&gt; GetAnimatedAttr(int32_t aNamespaceID,</span>
+<span class="lineNum">     323 </span>            :                                                  nsIAtom* aName)
+<span class="lineNum">     324 </span>            :   {
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     326 </span>            :   }
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            :   /**
+<span class="lineNum">     329 </span>            :    * Get the SMIL override style for this element. This is a style declaration
+<span class="lineNum">     330 </span>            :    * that is applied *after* the inline style, and it can be used e.g. to store
+<span class="lineNum">     331 </span>            :    * animated style values.
+<span class="lineNum">     332 </span>            :    *
+<span class="lineNum">     333 </span>            :    * Note: This method is analogous to the 'GetStyle' method in
+<span class="lineNum">     334 </span>            :    * nsGenericHTMLElement and nsStyledElement.
+<span class="lineNum">     335 </span>            :    */
+<span class="lineNum">     336 </span>            :   virtual nsICSSDeclaration* GetSMILOverrideStyle();
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :   /**
+<span class="lineNum">     339 </span>            :    * Returns if the element is labelable as per HTML specification.
+<span class="lineNum">     340 </span>            :    */
+<span class="lineNum">     341 </span>            :   virtual bool IsLabelable() const;
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :   /**
+<span class="lineNum">     344 </span>            :    * Returns if the element is interactive content as per HTML specification.
+<span class="lineNum">     345 </span>            :    */
+<span class="lineNum">     346 </span>            :   virtual bool IsInteractiveHTMLContent(bool aIgnoreTabindex) const;
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   /**
+<span class="lineNum">     349 </span>            :    * Returns |this| as an nsIMozBrowserFrame* if the element is a frame or
+<span class="lineNum">     350 </span>            :    * iframe element.
+<span class="lineNum">     351 </span>            :    *
+<span class="lineNum">     352 </span>            :    * We have this method, rather than using QI, so that we can use it during
+<span class="lineNum">     353 </span>            :    * the servo traversal, where we can't QI DOM nodes because of non-thread-safe
+<a name="354"><span class="lineNum">     354 </span>            :    * refcounts.</a>
+<span class="lineNum">     355 </span>            :    */
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :   virtual nsIMozBrowserFrame* GetAsMozBrowserFrame() { return nullptr; }</span>
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            :   /**
+<span class="lineNum">     359 </span>            :    * Is the attribute named stored in the mapped attributes?
+<span class="lineNum">     360 </span>            :    *
+<span class="lineNum">     361 </span>            :    * // XXXbz we use this method in HasAttributeDependentStyle, so svg
+<span class="lineNum">     362 </span>            :    *    returns true here even though it stores nothing in the mapped
+<span class="lineNum">     363 </span>            :    *    attributes.
+<span class="lineNum">     364 </span>            :    */
+<span class="lineNum">     365 </span>            :   NS_IMETHOD_(bool) IsAttributeMapped(const nsIAtom* aAttribute) const;
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :   /**
+<span class="lineNum">     368 </span>            :    * Get a hint that tells the style system what to do when
+<span class="lineNum">     369 </span>            :    * an attribute on this node changes, if something needs to happen
+<span class="lineNum">     370 </span>            :    * in response to the change *other* than the result of what is
+<span class="lineNum">     371 </span>            :    * mapped into style data via any type of style rule.
+<span class="lineNum">     372 </span>            :    */
+<span class="lineNum">     373 </span>            :   virtual nsChangeHint GetAttributeChangeHint(const nsIAtom* aAttribute,
+<a name="374"><span class="lineNum">     374 </span>            :                                               int32_t aModType) const;</a>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :   inline Directionality GetDirectionality() const {</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :     if (HasFlag(NODE_HAS_DIRECTION_RTL)) {</span>
+<span class="lineNum">     378 </span>            :       return eDir_RTL;
+<span class="lineNum">     379 </span>            :     }
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :     if (HasFlag(NODE_HAS_DIRECTION_LTR)) {</span>
+<span class="lineNum">     382 </span>            :       return eDir_LTR;
+<span class="lineNum">     383 </span>            :     }
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :     return eDir_NotSet;</span>
+<a name="386"><span class="lineNum">     386 </span>            :   }</a>
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :   inline void SetDirectionality(Directionality aDir, bool aNotify) {</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :     UnsetFlags(NODE_ALL_DIRECTION_FLAGS);</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :     if (!aNotify) {</span>
+<span class="lineNum">     391 </span>            :       RemoveStatesSilently(DIRECTION_STATES);
+<span class="lineNum">     392 </span>            :     }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     switch (aDir) {</span>
+<span class="lineNum">     395 </span>            :       case (eDir_RTL):
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :         SetFlags(NODE_HAS_DIRECTION_RTL);</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :         if (!aNotify) {</span>
+<span class="lineNum">     398 </span>            :           AddStatesSilently(NS_EVENT_STATE_RTL);
+<span class="lineNum">     399 </span>            :         }
+<span class="lineNum">     400 </span>            :         break;
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :       case(eDir_LTR):
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :         SetFlags(NODE_HAS_DIRECTION_LTR);</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :         if (!aNotify) {</span>
+<span class="lineNum">     405 </span>            :           AddStatesSilently(NS_EVENT_STATE_LTR);
+<span class="lineNum">     406 </span>            :         }
+<span class="lineNum">     407 </span>            :         break;
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            :       default:
+<span class="lineNum">     410 </span>            :         break;
+<span class="lineNum">     411 </span>            :     }
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            :     /*
+<span class="lineNum">     414 </span>            :      * Only call UpdateState if we need to notify, because we call
+<span class="lineNum">     415 </span>            :      * SetDirectionality for every element, and UpdateState is very very slow
+<span class="lineNum">     416 </span>            :      * for some elements.
+<span class="lineNum">     417 </span>            :      */
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :     if (aNotify) {</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :       UpdateState(true);</span>
+<span class="lineNum">     420 </span>            :     }
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            :   bool GetBindingURL(nsIDocument* aDocument, css::URLValue **aResult);
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            :   // The bdi element defaults to dir=auto if it has no dir attribute set.
+<span class="lineNum">     426 </span>            :   // Other elements will only have dir=auto if they have an explicit dir=auto,
+<a name="427"><span class="lineNum">     427 </span>            :   // which will mean that HasValidDir() returns true but HasFixedDir() returns</a>
+<span class="lineNum">     428 </span>            :   // false
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :   inline bool HasDirAuto() const {</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :     return (!HasFixedDir() &amp;&amp;</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :             (HasValidDir() || IsHTMLElement(nsGkAtoms::bdi)));</span>
+<span class="lineNum">     432 </span>            :   }
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :   Directionality GetComputedDirectionality() const;
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span>            :   inline Element* GetFlattenedTreeParentElement() const;
+<span class="lineNum">     437 </span>            :   inline Element* GetFlattenedTreeParentElementForStyle() const;
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            :   bool HasDirtyDescendantsForServo() const
+<span class="lineNum">     440 </span>            :   {
+<span class="lineNum">     441 </span>            :     MOZ_ASSERT(IsStyledByServo());
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :     return HasFlag(NODE_HAS_DIRTY_DESCENDANTS_FOR_SERVO);</span>
+<span class="lineNum">     443 </span>            :   }
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            :   void SetHasDirtyDescendantsForServo() {
+<span class="lineNum">     446 </span>            :     MOZ_ASSERT(IsStyledByServo());
+<span class="lineNum">     447 </span>            :     SetFlags(NODE_HAS_DIRTY_DESCENDANTS_FOR_SERVO);
+<span class="lineNum">     448 </span>            :   }
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :   void UnsetHasDirtyDescendantsForServo() {
+<span class="lineNum">     451 </span>            :     MOZ_ASSERT(IsStyledByServo());
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :     UnsetFlags(NODE_HAS_DIRTY_DESCENDANTS_FOR_SERVO);</span>
+<span class="lineNum">     453 </span>            :   }
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            :   inline void NoteDirtyDescendantsForServo();
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : #ifdef DEBUG
+<span class="lineNum">     458 </span>            :   inline bool DirtyDescendantsBitIsPropagatedForServo();
+<a name="459"><span class="lineNum">     459 </span>            : #endif</a>
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :   bool HasServoData() const {</span>
+<span class="lineNum">     462 </span>            : #ifdef MOZ_STYLO
+<span class="lineNum">     463 </span>            :     return !!mServoData.Get();
+<span class="lineNum">     464 </span>            : #else
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :     MOZ_CRASH(&quot;Accessing servo node data in non-stylo build&quot;);</span>
+<span class="lineNum">     466 </span>            : #endif
+<span class="lineNum">     467 </span>            :   }
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :   void ClearServoData();
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            :   /**
+<span class="lineNum">     472 </span>            :    * Gets the custom element data used by web components custom element.
+<span class="lineNum">     473 </span>            :    * Custom element data is created at the first attempt to enqueue a callback.
+<span class="lineNum">     474 </span>            :    *
+<a name="475"><span class="lineNum">     475 </span>            :    * @return The custom element data or null if none.</a>
+<span class="lineNum">     476 </span>            :    */
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :   inline CustomElementData* GetCustomElementData() const</span>
+<span class="lineNum">     478 </span>            :   {
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :     nsDOMSlots *slots = GetExistingDOMSlots();</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :     if (slots) {</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :       return slots-&gt;mCustomElementData;</span>
+<span class="lineNum">     482 </span>            :     }
+<span class="lineNum">     483 </span>            :     return nullptr;
+<span class="lineNum">     484 </span>            :   }
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :   /**
+<span class="lineNum">     487 </span>            :    * Sets the custom element data, ownership of the
+<span class="lineNum">     488 </span>            :    * callback data is taken by this element.
+<span class="lineNum">     489 </span>            :    *
+<span class="lineNum">     490 </span>            :    * @param aData The custom element data.
+<span class="lineNum">     491 </span>            :    */
+<span class="lineNum">     492 </span>            :   void SetCustomElementData(CustomElementData* aData);
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            : protected:
+<span class="lineNum">     495 </span>            :   /**
+<span class="lineNum">     496 </span>            :    * Method to get the _intrinsic_ content state of this element.  This is the
+<span class="lineNum">     497 </span>            :    * state that is independent of the element's presentation.  To get the full
+<span class="lineNum">     498 </span>            :    * content state, use State().  See mozilla/EventStates.h for
+<span class="lineNum">     499 </span>            :    * the possible bits that could be set here.
+<span class="lineNum">     500 </span>            :    */
+<span class="lineNum">     501 </span>            :   virtual EventStates IntrinsicState() const;
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span>            :   /**
+<span class="lineNum">     504 </span>            :    * Method to add state bits.  This should be called from subclass
+<span class="lineNum">     505 </span>            :    * constructors to set up our event state correctly at construction
+<span class="lineNum">     506 </span>            :    * time and other places where we don't want to notify a state
+<span class="lineNum">     507 </span>            :    * change.
+<span class="lineNum">     508 </span>            :    */
+<a name="509"><span class="lineNum">     509 </span>            :   void AddStatesSilently(EventStates aStates)</a>
+<span class="lineNum">     510 </span>            :   {
+<span class="lineNum">     511 </span><span class="lineNoCov">          0 :     mState |= aStates;</span>
+<span class="lineNum">     512 </span>            :   }
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span>            :   /**
+<span class="lineNum">     515 </span>            :    * Method to remove state bits.  This should be called from subclass
+<span class="lineNum">     516 </span>            :    * constructors to set up our event state correctly at construction
+<span class="lineNum">     517 </span>            :    * time and other places where we don't want to notify a state
+<span class="lineNum">     518 </span>            :    * change.
+<span class="lineNum">     519 </span>            :    */
+<a name="520"><span class="lineNum">     520 </span>            :   void RemoveStatesSilently(EventStates aStates)</a>
+<span class="lineNum">     521 </span>            :   {
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :     mState &amp;= ~aStates;</span>
+<span class="lineNum">     523 </span>            :   }
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            : private:
+<span class="lineNum">     526 </span>            :   // Need to allow the ESM, nsGlobalWindow, and the focus manager to
+<span class="lineNum">     527 </span>            :   // set our state
+<span class="lineNum">     528 </span>            :   friend class mozilla::EventStateManager;
+<span class="lineNum">     529 </span>            :   friend class ::nsGlobalWindow;
+<span class="lineNum">     530 </span>            :   friend class ::nsFocusManager;
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :   // Allow CusomtElementRegistry to call AddStates.
+<span class="lineNum">     533 </span>            :   friend class CustomElementRegistry;
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            :   // Also need to allow Link to call UpdateLinkState.
+<span class="lineNum">     536 </span>            :   friend class Link;
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            :   void NotifyStateChange(EventStates aStates);
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span>            :   void NotifyStyleStateChange(EventStates aStates);
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            :   // Style state computed from element's state and style locks.
+<span class="lineNum">     543 </span>            :   EventStates StyleStateFromLocks() const;
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span>            : protected:
+<span class="lineNum">     546 </span>            :   // Methods for the ESM, nsGlobalWindow and focus manager to manage state bits.
+<span class="lineNum">     547 </span>            :   // These will handle setting up script blockers when they notify, so no need
+<span class="lineNum">     548 </span>            :   // to do it in the callers unless desired.  States passed here must only be
+<span class="lineNum">     549 </span>            :   // those in EXTERNALLY_MANAGED_STATES.
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :   virtual void AddStates(EventStates aStates)</span>
+<span class="lineNum">     551 </span>            :   {
+<span class="lineNum">     552 </span>            :     NS_PRECONDITION(!aStates.HasAtLeastOneOfStates(INTRINSIC_STATES),
+<span class="lineNum">     553 </span>            :                     &quot;Should only be adding externally-managed states here&quot;);
+<span class="lineNum">     554 </span>            :     AddStatesSilently(aStates);
+<span class="lineNum">     555 </span><span class="lineNoCov">          0 :     NotifyStateChange(aStates);</span>
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :   virtual void RemoveStates(EventStates aStates)</span>
+<span class="lineNum">     558 </span>            :   {
+<span class="lineNum">     559 </span>            :     NS_PRECONDITION(!aStates.HasAtLeastOneOfStates(INTRINSIC_STATES),
+<span class="lineNum">     560 </span>            :                     &quot;Should only be removing externally-managed states here&quot;);
+<span class="lineNum">     561 </span>            :     RemoveStatesSilently(aStates);
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :     NotifyStateChange(aStates);</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     564 </span>            : public:
+<span class="lineNum">     565 </span>            :   // Public methods to manage state bits in MANUALLY_MANAGED_STATES.
+<span class="lineNum">     566 </span>            :   void AddManuallyManagedStates(EventStates aStates)
+<span class="lineNum">     567 </span>            :   {
+<span class="lineNum">     568 </span>            :     MOZ_ASSERT(MANUALLY_MANAGED_STATES.HasAllStates(aStates),
+<span class="lineNum">     569 </span>            :                &quot;Should only be adding manually-managed states here&quot;);
+<span class="lineNum">     570 </span>            :     AddStates(aStates);
+<span class="lineNum">     571 </span>            :   }
+<span class="lineNum">     572 </span>            :   void RemoveManuallyManagedStates(EventStates aStates)
+<span class="lineNum">     573 </span>            :   {
+<span class="lineNum">     574 </span>            :     MOZ_ASSERT(MANUALLY_MANAGED_STATES.HasAllStates(aStates),
+<span class="lineNum">     575 </span>            :                &quot;Should only be removing manually-managed states here&quot;);
+<span class="lineNum">     576 </span>            :     RemoveStates(aStates);
+<span class="lineNum">     577 </span>            :   }
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :   virtual void UpdateEditableState(bool aNotify) override;
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span>            :   virtual nsresult BindToTree(nsIDocument* aDocument, nsIContent* aParent,
+<span class="lineNum">     582 </span>            :                               nsIContent* aBindingParent,
+<span class="lineNum">     583 </span>            :                               bool aCompileEventHandlers) override;
+<span class="lineNum">     584 </span>            :   virtual void UnbindFromTree(bool aDeep = true,
+<span class="lineNum">     585 </span>            :                               bool aNullParent = true) override;
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            :   /**
+<span class="lineNum">     588 </span>            :    * Normalizes an attribute name and returns it as a nodeinfo if an attribute
+<span class="lineNum">     589 </span>            :    * with that name exists. This method is intended for character case
+<span class="lineNum">     590 </span>            :    * conversion if the content object is case insensitive (e.g. HTML). Returns
+<span class="lineNum">     591 </span>            :    * the nodeinfo of the attribute with the specified name if one exists or
+<span class="lineNum">     592 </span>            :    * null otherwise.
+<span class="lineNum">     593 </span>            :    *
+<span class="lineNum">     594 </span>            :    * @param aStr the unparsed attribute string
+<span class="lineNum">     595 </span>            :    * @return the node info. May be nullptr.
+<span class="lineNum">     596 </span>            :    */
+<span class="lineNum">     597 </span>            :   already_AddRefed&lt;mozilla::dom::NodeInfo&gt;
+<a name="598"><span class="lineNum">     598 </span>            :   GetExistingAttrNameFromQName(const nsAString&amp; aStr) const;</a>
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span><span class="lineNoCov">          0 :   nsresult SetAttr(int32_t aNameSpaceID, nsIAtom* aName,</span>
+<span class="lineNum">     601 </span>            :                    const nsAString&amp; aValue, bool aNotify)
+<span class="lineNum">     602 </span>            :   {
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :     return SetAttr(aNameSpaceID, aName, nullptr, aValue, aNotify);</span>
+<span class="lineNum">     604 </span>            :   }
+<span class="lineNum">     605 </span>            : 
+<span class="lineNum">     606 </span>            :   /**
+<span class="lineNum">     607 </span>            :    * Helper for SetAttr/SetParsedAttr. This method will return true if aNotify
+<span class="lineNum">     608 </span>            :    * is true or there are mutation listeners that must be triggered, the
+<span class="lineNum">     609 </span>            :    * attribute is currently set, and the new value that is about to be set is
+<span class="lineNum">     610 </span>            :    * different to the current value. As a perf optimization the new and old
+<span class="lineNum">     611 </span>            :    * values will not actually be compared if we aren't notifying and we don't
+<span class="lineNum">     612 </span>            :    * have mutation listeners (in which case it's cheap to just return false
+<span class="lineNum">     613 </span>            :    * and let the caller go ahead and set the value).
+<span class="lineNum">     614 </span>            :    * @param aOldValue Set to the old value of the attribute, but only if there
+<span class="lineNum">     615 </span>            :    *   are event listeners. If set, the type of aOldValue will be either
+<span class="lineNum">     616 </span>            :    *   nsAttrValue::eString or nsAttrValue::eAtom.
+<span class="lineNum">     617 </span>            :    * @param aModType Set to nsIDOMMutationEvent::MODIFICATION or to
+<span class="lineNum">     618 </span>            :    *   nsIDOMMutationEvent::ADDITION, but only if this helper returns true
+<span class="lineNum">     619 </span>            :    * @param aHasListeners Set to true if there are mutation event listeners
+<span class="lineNum">     620 </span>            :    *   listening for NS_EVENT_BITS_MUTATION_ATTRMODIFIED
+<span class="lineNum">     621 </span>            :    */
+<span class="lineNum">     622 </span>            :   bool MaybeCheckSameAttrVal(int32_t aNamespaceID, nsIAtom* aName,
+<span class="lineNum">     623 </span>            :                              nsIAtom* aPrefix,
+<span class="lineNum">     624 </span>            :                              const nsAttrValueOrString&amp; aValue,
+<span class="lineNum">     625 </span>            :                              bool aNotify, nsAttrValue&amp; aOldValue,
+<span class="lineNum">     626 </span>            :                              uint8_t* aModType, bool* aHasListeners);
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span>            :   bool OnlyNotifySameValueSet(int32_t aNamespaceID, nsIAtom* aName,
+<span class="lineNum">     629 </span>            :                               nsIAtom* aPrefix,
+<span class="lineNum">     630 </span>            :                               const nsAttrValueOrString&amp; aValue,
+<span class="lineNum">     631 </span>            :                               bool aNotify, nsAttrValue&amp; aOldValue,
+<span class="lineNum">     632 </span>            :                               uint8_t* aModType, bool* aHasListeners);
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            :   virtual nsresult SetAttr(int32_t aNameSpaceID, nsIAtom* aName, nsIAtom* aPrefix,
+<span class="lineNum">     635 </span>            :                            const nsAString&amp; aValue, bool aNotify) override;
+<span class="lineNum">     636 </span>            :   // aParsedValue receives the old value of the attribute. That's useful if
+<span class="lineNum">     637 </span>            :   // either the input or output value of aParsedValue is StoresOwnData.
+<span class="lineNum">     638 </span>            :   nsresult SetParsedAttr(int32_t aNameSpaceID, nsIAtom* aName, nsIAtom* aPrefix,
+<span class="lineNum">     639 </span>            :                          nsAttrValue&amp; aParsedValue, bool aNotify);
+<span class="lineNum">     640 </span>            :   // GetAttr is not inlined on purpose, to keep down codesize from all
+<span class="lineNum">     641 </span>            :   // the inlined nsAttrValue bits for C++ callers.
+<span class="lineNum">     642 </span>            :   bool GetAttr(int32_t aNameSpaceID, nsIAtom* aName,
+<span class="lineNum">     643 </span>            :                nsAString&amp; aResult) const;
+<span class="lineNum">     644 </span>            :   inline bool HasAttr(int32_t aNameSpaceID, nsIAtom* aName) const;
+<span class="lineNum">     645 </span>            :   // aCaseSensitive == eIgnoreCaase means ASCII case-insensitive matching.
+<span class="lineNum">     646 </span>            :   inline bool AttrValueIs(int32_t aNameSpaceID, nsIAtom* aName,
+<span class="lineNum">     647 </span>            :                           const nsAString&amp; aValue,
+<span class="lineNum">     648 </span>            :                           nsCaseTreatment aCaseSensitive) const;
+<span class="lineNum">     649 </span>            :   inline bool AttrValueIs(int32_t aNameSpaceID, nsIAtom* aName,
+<span class="lineNum">     650 </span>            :                           nsIAtom* aValue,
+<span class="lineNum">     651 </span>            :                           nsCaseTreatment aCaseSensitive) const;
+<span class="lineNum">     652 </span>            :   virtual int32_t FindAttrValueIn(int32_t aNameSpaceID,
+<span class="lineNum">     653 </span>            :                                   nsIAtom* aName,
+<span class="lineNum">     654 </span>            :                                   AttrValuesArray* aValues,
+<span class="lineNum">     655 </span>            :                                   nsCaseTreatment aCaseSensitive) const override;
+<span class="lineNum">     656 </span>            :   virtual nsresult UnsetAttr(int32_t aNameSpaceID, nsIAtom* aAttribute,
+<span class="lineNum">     657 </span>            :                              bool aNotify) override;
+<span class="lineNum">     658 </span>            :   virtual const nsAttrName* GetAttrNameAt(uint32_t aIndex) const override;
+<span class="lineNum">     659 </span>            :   virtual BorrowedAttrInfo GetAttrInfoAt(uint32_t aIndex) const override;
+<span class="lineNum">     660 </span>            :   virtual uint32_t GetAttrCount() const override;
+<span class="lineNum">     661 </span>            :   virtual bool IsNodeOfType(uint32_t aFlags) const override;
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span>            :   /**
+<span class="lineNum">     664 </span>            :    * Get the class list of this element (this corresponds to the value of the
+<span class="lineNum">     665 </span>            :    * class attribute).  This may be null if there are no classes, but that's not
+<a name="666"><span class="lineNum">     666 </span>            :    * guaranteed (e.g. we could have class=&quot;&quot;).</a>
+<span class="lineNum">     667 </span>            :    */
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :   const nsAttrValue* GetClasses() const {</span>
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :     if (MayHaveClass()) {</span>
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :       return DoGetClasses();</span>
+<span class="lineNum">     671 </span>            :     }
+<span class="lineNum">     672 </span>            :     return nullptr;
+<span class="lineNum">     673 </span>            :   }
+<span class="lineNum">     674 </span>            : 
+<span class="lineNum">     675 </span>            : #ifdef DEBUG
+<span class="lineNum">     676 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override
+<span class="lineNum">     677 </span>            :   {
+<span class="lineNum">     678 </span>            :     List(out, aIndent, EmptyCString());
+<span class="lineNum">     679 </span>            :   }
+<span class="lineNum">     680 </span>            :   virtual void DumpContent(FILE* out, int32_t aIndent, bool aDumpAll) const override;
+<span class="lineNum">     681 </span>            :   void List(FILE* out, int32_t aIndent, const nsCString&amp; aPrefix) const;
+<span class="lineNum">     682 </span>            :   void ListAttributes(FILE* out) const;
+<span class="lineNum">     683 </span>            : #endif
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            :   void Describe(nsAString&amp; aOutDescription) const override;
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span>            :   /*
+<span class="lineNum">     688 </span>            :    * Attribute Mapping Helpers
+<span class="lineNum">     689 </span>            :    */
+<span class="lineNum">     690 </span>            :   struct MappedAttributeEntry {
+<span class="lineNum">     691 </span>            :     nsIAtom** attribute;
+<span class="lineNum">     692 </span>            :   };
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span>            :   /**
+<span class="lineNum">     695 </span>            :    * A common method where you can just pass in a list of maps to check
+<span class="lineNum">     696 </span>            :    * for attribute dependence. Most implementations of
+<span class="lineNum">     697 </span>            :    * IsAttributeMapped should use this function as a default
+<span class="lineNum">     698 </span>            :    * handler.
+<span class="lineNum">     699 </span>            :    */
+<a name="700"><span class="lineNum">     700 </span>            :   template&lt;size_t N&gt;</a>
+<span class="lineNum">     701 </span>            :   static bool
+<span class="lineNum">     702 </span><span class="lineNoCov">          0 :   FindAttributeDependence(const nsIAtom* aAttribute,</span>
+<span class="lineNum">     703 </span>            :                           const MappedAttributeEntry* const (&amp;aMaps)[N])
+<span class="lineNum">     704 </span>            :   {
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :     return FindAttributeDependence(aAttribute, aMaps, N);</span>
+<span class="lineNum">     706 </span>            :   }
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :   static nsIAtom*** HTMLSVGPropertiesToTraverseAndUnlink();
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            : private:
+<span class="lineNum">     711 </span>            :   void DescribeAttribute(uint32_t index, nsAString&amp; aOutDescription) const;
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            :   static bool
+<span class="lineNum">     714 </span>            :   FindAttributeDependence(const nsIAtom* aAttribute,
+<span class="lineNum">     715 </span>            :                           const MappedAttributeEntry* const aMaps[],
+<span class="lineNum">     716 </span>            :                           uint32_t aMapCount);
+<a name="717"><span class="lineNum">     717 </span>            : </a>
+<span class="lineNum">     718 </span>            : protected:
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :   inline bool GetAttr(int32_t aNameSpaceID, nsIAtom* aName,</span>
+<span class="lineNum">     720 </span>            :                       DOMString&amp; aResult) const
+<span class="lineNum">     721 </span>            :   {
+<span class="lineNum">     722 </span>            :     NS_ASSERTION(nullptr != aName, &quot;must have attribute name&quot;);
+<span class="lineNum">     723 </span>            :     NS_ASSERTION(aNameSpaceID != kNameSpaceID_Unknown,
+<span class="lineNum">     724 </span>            :                  &quot;must have a real namespace ID!&quot;);
+<span class="lineNum">     725 </span>            :     MOZ_ASSERT(aResult.HasStringBuffer() &amp;&amp; aResult.StringBufferLength() == 0,
+<span class="lineNum">     726 </span>            :                &quot;Should have empty string coming in&quot;);
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :     const nsAttrValue* val = mAttrsAndChildren.GetAttr(aName, aNameSpaceID);</span>
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :     if (val) {</span>
+<span class="lineNum">     729 </span><span class="lineNoCov">          0 :       val-&gt;ToString(aResult);</span>
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     731 </span>            :     }
+<span class="lineNum">     732 </span>            :     // else DOMString comes pre-emptied.
+<span class="lineNum">     733 </span>            :     return false;
+<span class="lineNum">     734 </span>            :   }
+<span class="lineNum">     735 </span>            : 
+<span class="lineNum">     736 </span>            : public:
+<a name="737"><span class="lineNum">     737 </span><span class="lineNoCov">          0 :   bool HasAttrs() const { return mAttrsAndChildren.HasAttrs(); }</span></a>
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :   inline bool GetAttr(const nsAString&amp; aName, DOMString&amp; aResult) const</span>
+<span class="lineNum">     740 </span>            :   {
+<span class="lineNum">     741 </span>            :     MOZ_ASSERT(aResult.HasStringBuffer() &amp;&amp; aResult.StringBufferLength() == 0,
+<span class="lineNum">     742 </span>            :                &quot;Should have empty string coming in&quot;);
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :     const nsAttrValue* val = mAttrsAndChildren.GetAttr(aName);</span>
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :     if (val) {</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :       val-&gt;ToString(aResult);</span>
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     747 </span>            :     }
+<span class="lineNum">     748 </span>            :     // else DOMString comes pre-emptied.
+<span class="lineNum">     749 </span>            :     return false;
+<a name="750"><span class="lineNum">     750 </span>            :   }</a>
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :   void GetTagName(nsAString&amp; aTagName) const</span>
+<span class="lineNum">     753 </span>            :   {
+<a name="754"><span class="lineNum">     754 </span><span class="lineNoCov">          0 :     aTagName = NodeName();</span></a>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     756 </span><span class="lineNoCov">          0 :   void GetId(nsAString&amp; aId) const</span>
+<span class="lineNum">     757 </span>            :   {
+<a name="758"><span class="lineNum">     758 </span><span class="lineNoCov">          0 :     GetAttr(kNameSpaceID_None, nsGkAtoms::id, aId);</span></a>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :   void GetId(DOMString&amp; aId) const</span>
+<span class="lineNum">     761 </span>            :   {
+<a name="762"><span class="lineNum">     762 </span><span class="lineNoCov">          0 :     GetAttr(kNameSpaceID_None, nsGkAtoms::id, aId);</span></a>
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 :   void SetId(const nsAString&amp; aId)</span>
+<span class="lineNum">     765 </span>            :   {
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :     SetAttr(kNameSpaceID_None, nsGkAtoms::id, aId, true);</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     768 </span>            :   void GetClassName(nsAString&amp; aClassName)
+<span class="lineNum">     769 </span>            :   {
+<a name="770"><span class="lineNum">     770 </span>            :     GetAttr(kNameSpaceID_None, nsGkAtoms::_class, aClassName);</a>
+<span class="lineNum">     771 </span>            :   }
+<span class="lineNum">     772 </span><span class="lineNoCov">          0 :   void GetClassName(DOMString&amp; aClassName)</span>
+<span class="lineNum">     773 </span>            :   {
+<a name="774"><span class="lineNum">     774 </span><span class="lineNoCov">          0 :     GetAttr(kNameSpaceID_None, nsGkAtoms::_class, aClassName);</span></a>
+<span class="lineNum">     775 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :   void SetClassName(const nsAString&amp; aClassName)</span>
+<span class="lineNum">     777 </span>            :   {
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :     SetAttr(kNameSpaceID_None, nsGkAtoms::_class, aClassName, true);</span>
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :   }</span>
+<a name="780"><span class="lineNum">     780 </span>            : </a>
+<span class="lineNum">     781 </span>            :   nsDOMTokenList* ClassList();
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :   nsDOMAttributeMap* Attributes()</span>
+<span class="lineNum">     783 </span>            :   {
+<span class="lineNum">     784 </span><span class="lineNoCov">          0 :     nsDOMSlots* slots = DOMSlots();</span>
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :     if (!slots-&gt;mAttributeMap) {</span>
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :       slots-&gt;mAttributeMap = new nsDOMAttributeMap(this);</span>
+<span class="lineNum">     787 </span>            :     }
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span><span class="lineNoCov">          0 :     return slots-&gt;mAttributeMap;</span>
+<span class="lineNum">     790 </span>            :   }
+<span class="lineNum">     791 </span>            : 
+<a name="792"><span class="lineNum">     792 </span>            :   void GetAttributeNames(nsTArray&lt;nsString&gt;&amp; aResult);</a>
+<span class="lineNum">     793 </span>            : 
+<span class="lineNum">     794 </span><span class="lineNoCov">          0 :   void GetAttribute(const nsAString&amp; aName, nsString&amp; aReturn)</span>
+<span class="lineNum">     795 </span>            :   {
+<span class="lineNum">     796 </span><span class="lineNoCov">          0 :     DOMString str;</span>
+<span class="lineNum">     797 </span><span class="lineNoCov">          0 :     GetAttribute(aName, str);</span>
+<span class="lineNum">     798 </span><span class="lineNoCov">          0 :     str.ToString(aReturn);</span>
+<span class="lineNum">     799 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     800 </span>            : 
+<span class="lineNum">     801 </span>            :   void GetAttribute(const nsAString&amp; aName, DOMString&amp; aReturn);
+<span class="lineNum">     802 </span>            :   void GetAttributeNS(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">     803 </span>            :                       const nsAString&amp; aLocalName,
+<span class="lineNum">     804 </span>            :                       nsAString&amp; aReturn);
+<span class="lineNum">     805 </span>            :   void SetAttribute(const nsAString&amp; aName, const nsAString&amp; aValue,
+<span class="lineNum">     806 </span>            :                     ErrorResult&amp; aError);
+<span class="lineNum">     807 </span>            :   void SetAttributeNS(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">     808 </span>            :                       const nsAString&amp; aLocalName,
+<span class="lineNum">     809 </span>            :                       const nsAString&amp; aValue,
+<span class="lineNum">     810 </span>            :                       ErrorResult&amp; aError);
+<span class="lineNum">     811 </span>            :   void RemoveAttribute(const nsAString&amp; aName,
+<span class="lineNum">     812 </span>            :                        ErrorResult&amp; aError);
+<span class="lineNum">     813 </span>            :   void RemoveAttributeNS(const nsAString&amp; aNamespaceURI,
+<a name="814"><span class="lineNum">     814 </span>            :                          const nsAString&amp; aLocalName,</a>
+<span class="lineNum">     815 </span>            :                          ErrorResult&amp; aError);
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :   bool HasAttribute(const nsAString&amp; aName) const</span>
+<span class="lineNum">     817 </span>            :   {
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :     return InternalGetAttrNameFromQName(aName) != nullptr;</span>
+<span class="lineNum">     819 </span>            :   }
+<span class="lineNum">     820 </span>            :   bool HasAttributeNS(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">     821 </span>            :                       const nsAString&amp; aLocalName) const;
+<span class="lineNum">     822 </span>            :   bool HasAttributes() const
+<span class="lineNum">     823 </span>            :   {
+<span class="lineNum">     824 </span>            :     return HasAttrs();
+<span class="lineNum">     825 </span>            :   }
+<span class="lineNum">     826 </span>            :   Element* Closest(const nsAString&amp; aSelector,
+<span class="lineNum">     827 </span>            :                    ErrorResult&amp; aResult);
+<span class="lineNum">     828 </span>            :   bool Matches(const nsAString&amp; aSelector,
+<span class="lineNum">     829 </span>            :                ErrorResult&amp; aError);
+<span class="lineNum">     830 </span>            :   already_AddRefed&lt;nsIHTMLCollection&gt;
+<span class="lineNum">     831 </span>            :     GetElementsByTagName(const nsAString&amp; aQualifiedName);
+<span class="lineNum">     832 </span>            :   already_AddRefed&lt;nsIHTMLCollection&gt;
+<span class="lineNum">     833 </span>            :     GetElementsByTagNameNS(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">     834 </span>            :                            const nsAString&amp; aLocalName,
+<span class="lineNum">     835 </span>            :                            ErrorResult&amp; aError);
+<span class="lineNum">     836 </span>            :   already_AddRefed&lt;nsIHTMLCollection&gt;
+<a name="837"><span class="lineNum">     837 </span>            :     GetElementsByClassName(const nsAString&amp; aClassNames);</a>
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 :   CSSPseudoElementType GetPseudoElementType() const {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :     if (!HasProperties()) {</span>
+<span class="lineNum">     841 </span>            :       return CSSPseudoElementType::NotPseudo;
+<span class="lineNum">     842 </span>            :     }
+<span class="lineNum">     843 </span><span class="lineNoCov">          0 :     nsresult rv = NS_OK;</span>
+<span class="lineNum">     844 </span><span class="lineNoCov">          0 :     auto raw = GetProperty(nsGkAtoms::pseudoProperty, &amp;rv);</span>
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :     if (rv == NS_PROPTABLE_PROP_NOT_THERE) {</span>
+<span class="lineNum">     846 </span>            :       return CSSPseudoElementType::NotPseudo;
+<span class="lineNum">     847 </span>            :     }
+<span class="lineNum">     848 </span><span class="lineNoCov">          0 :     return CSSPseudoElementType(reinterpret_cast&lt;uintptr_t&gt;(raw));</span>
+<a name="849"><span class="lineNum">     849 </span>            :   }</a>
+<span class="lineNum">     850 </span>            : 
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 :   void SetPseudoElementType(CSSPseudoElementType aPseudo) {</span>
+<span class="lineNum">     852 </span>            :     static_assert(sizeof(CSSPseudoElementType) &lt;= sizeof(uintptr_t),
+<span class="lineNum">     853 </span>            :                   &quot;Need to be able to store this in a void*&quot;);
+<span class="lineNum">     854 </span>            :     MOZ_ASSERT(aPseudo != CSSPseudoElementType::NotPseudo);
+<span class="lineNum">     855 </span><span class="lineNoCov">          0 :     SetProperty(nsGkAtoms::pseudoProperty, reinterpret_cast&lt;void*&gt;(aPseudo));</span>
+<span class="lineNum">     856 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     857 </span>            : 
+<span class="lineNum">     858 </span>            : private:
+<span class="lineNum">     859 </span>            :   /**
+<span class="lineNum">     860 </span>            :    * Implement the algorithm specified at
+<span class="lineNum">     861 </span>            :    * https://dom.spec.whatwg.org/#insert-adjacent for both
+<span class="lineNum">     862 </span>            :    * |insertAdjacentElement()| and |insertAdjacentText()| APIs.
+<span class="lineNum">     863 </span>            :    */
+<span class="lineNum">     864 </span>            :   nsINode* InsertAdjacent(const nsAString&amp; aWhere,
+<span class="lineNum">     865 </span>            :                           nsINode* aNode,
+<span class="lineNum">     866 </span>            :                           ErrorResult&amp; aError);
+<span class="lineNum">     867 </span>            : 
+<span class="lineNum">     868 </span>            : public:
+<span class="lineNum">     869 </span>            :   Element* InsertAdjacentElement(const nsAString&amp; aWhere,
+<span class="lineNum">     870 </span>            :                                  Element&amp; aElement,
+<span class="lineNum">     871 </span>            :                                  ErrorResult&amp; aError);
+<span class="lineNum">     872 </span>            : 
+<span class="lineNum">     873 </span>            :   void InsertAdjacentText(const nsAString&amp; aWhere,
+<span class="lineNum">     874 </span>            :                           const nsAString&amp; aData,
+<a name="875"><span class="lineNum">     875 </span>            :                           ErrorResult&amp; aError);</a>
+<span class="lineNum">     876 </span>            : 
+<span class="lineNum">     877 </span><span class="lineNoCov">          0 :   void SetPointerCapture(int32_t aPointerId, ErrorResult&amp; aError)</span>
+<span class="lineNum">     878 </span>            :   {
+<span class="lineNum">     879 </span><span class="lineNoCov">          0 :     bool activeState = false;</span>
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :     if (!nsIPresShell::GetPointerInfo(aPointerId, activeState)) {</span>
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :       aError.Throw(NS_ERROR_DOM_INVALID_POINTER_ERR);</span>
+<span class="lineNum">     882 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     883 </span>            :     }
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 :     if (!IsInUncomposedDoc()) {</span>
+<span class="lineNum">     885 </span><span class="lineNoCov">          0 :       aError.Throw(NS_ERROR_DOM_INVALID_STATE_ERR);</span>
+<span class="lineNum">     886 </span>            :       return;
+<span class="lineNum">     887 </span>            :     }
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :     if (!activeState) {</span>
+<span class="lineNum">     889 </span>            :       return;
+<span class="lineNum">     890 </span>            :     }
+<a name="891"><span class="lineNum">     891 </span><span class="lineNoCov">          0 :     nsIPresShell::SetPointerCapturingContent(aPointerId, this);</span></a>
+<span class="lineNum">     892 </span>            :   }
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :   void ReleasePointerCapture(int32_t aPointerId, ErrorResult&amp; aError)</span>
+<span class="lineNum">     894 </span>            :   {
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :     bool activeState = false;</span>
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 :     if (!nsIPresShell::GetPointerInfo(aPointerId, activeState)) {</span>
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 :       aError.Throw(NS_ERROR_DOM_INVALID_POINTER_ERR);</span>
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     899 </span>            :     }
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 :     if (HasPointerCapture(aPointerId)) {</span>
+<span class="lineNum">     901 </span><span class="lineNoCov">          0 :       nsIPresShell::ReleasePointerCapturingContent(aPointerId);</span>
+<a name="902"><span class="lineNum">     902 </span>            :     }</a>
+<span class="lineNum">     903 </span>            :   }
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :   bool HasPointerCapture(long aPointerId)</span>
+<span class="lineNum">     905 </span>            :   {
+<span class="lineNum">     906 </span>            :     nsIPresShell::PointerCaptureInfo* pointerCaptureInfo =
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :       nsIPresShell::GetPointerCaptureInfo(aPointerId);</span>
+<span class="lineNum">     908 </span><span class="lineNoCov">          0 :     if (pointerCaptureInfo &amp;&amp; pointerCaptureInfo-&gt;mPendingContent == this) {</span>
+<span class="lineNum">     909 </span>            :       return true;
+<span class="lineNum">     910 </span>            :     }
+<a name="911"><span class="lineNum">     911 </span><span class="lineNoCov">          0 :     return false;</span></a>
+<span class="lineNum">     912 </span>            :   }
+<span class="lineNum">     913 </span><span class="lineNoCov">          0 :   void SetCapture(bool aRetargetToElement)</span>
+<span class="lineNum">     914 </span>            :   {
+<span class="lineNum">     915 </span>            :     // If there is already an active capture, ignore this request. This would
+<span class="lineNum">     916 </span>            :     // occur if a splitter, frame resizer, etc had already captured and we don't
+<span class="lineNum">     917 </span>            :     // want to override those.
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :     if (!nsIPresShell::GetCapturingContent()) {</span>
+<span class="lineNum">     919 </span>            :       nsIPresShell::SetCapturingContent(this, CAPTURE_PREVENTDRAG |
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 :         (aRetargetToElement ? CAPTURE_RETARGETTOELEMENT : 0));</span>
+<span class="lineNum">     921 </span>            :     }
+<a name="922"><span class="lineNum">     922 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     923 </span>            : 
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :   void SetCaptureAlways(bool aRetargetToElement)</span>
+<span class="lineNum">     925 </span>            :   {
+<span class="lineNum">     926 </span>            :     nsIPresShell::SetCapturingContent(this,
+<span class="lineNum">     927 </span>            :         CAPTURE_PREVENTDRAG | CAPTURE_IGNOREALLOWED |
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :         (aRetargetToElement ? CAPTURE_RETARGETTOELEMENT : 0));</span>
+<a name="929"><span class="lineNum">     929 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span><span class="lineNoCov">          0 :   void ReleaseCapture()</span>
+<span class="lineNum">     932 </span>            :   {
+<span class="lineNum">     933 </span><span class="lineNoCov">          0 :     if (nsIPresShell::GetCapturingContent() == this) {</span>
+<span class="lineNum">     934 </span><span class="lineNoCov">          0 :       nsIPresShell::SetCapturingContent(nullptr, 0);</span>
+<span class="lineNum">     935 </span>            :     }
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     937 </span>            : 
+<span class="lineNum">     938 </span>            :   void RequestFullscreen(CallerType aCallerType, ErrorResult&amp; aError);
+<span class="lineNum">     939 </span>            :   void RequestPointerLock(CallerType aCallerType);
+<span class="lineNum">     940 </span>            :   Attr* GetAttributeNode(const nsAString&amp; aName);
+<span class="lineNum">     941 </span>            :   already_AddRefed&lt;Attr&gt; SetAttributeNode(Attr&amp; aNewAttr,
+<span class="lineNum">     942 </span>            :                                           ErrorResult&amp; aError);
+<span class="lineNum">     943 </span>            :   already_AddRefed&lt;Attr&gt; RemoveAttributeNode(Attr&amp; aOldAttr,
+<span class="lineNum">     944 </span>            :                                              ErrorResult&amp; aError);
+<span class="lineNum">     945 </span>            :   Attr* GetAttributeNodeNS(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">     946 </span>            :                            const nsAString&amp; aLocalName);
+<span class="lineNum">     947 </span>            :   already_AddRefed&lt;Attr&gt; SetAttributeNodeNS(Attr&amp; aNewAttr,
+<span class="lineNum">     948 </span>            :                                             ErrorResult&amp; aError);
+<span class="lineNum">     949 </span>            : 
+<span class="lineNum">     950 </span>            :   already_AddRefed&lt;DOMRectList&gt; GetClientRects();
+<span class="lineNum">     951 </span>            :   already_AddRefed&lt;DOMRect&gt; GetBoundingClientRect();
+<span class="lineNum">     952 </span>            : 
+<span class="lineNum">     953 </span>            :   already_AddRefed&lt;ShadowRoot&gt; CreateShadowRoot(ErrorResult&amp; aError);
+<a name="954"><span class="lineNum">     954 </span>            :   already_AddRefed&lt;DestinationInsertionPointList&gt; GetDestinationInsertionPoints();</a>
+<span class="lineNum">     955 </span>            : 
+<span class="lineNum">     956 </span><span class="lineNoCov">          0 :   ShadowRoot *FastGetShadowRoot() const</span>
+<span class="lineNum">     957 </span>            :   {
+<span class="lineNum">     958 </span><span class="lineNoCov">          0 :     nsDOMSlots* slots = GetExistingDOMSlots();</span>
+<span class="lineNum">     959 </span><span class="lineNoCov">          0 :     return slots ? slots-&gt;mShadowRoot.get() : nullptr;</span>
+<span class="lineNum">     960 </span>            :   }
+<span class="lineNum">     961 </span>            : 
+<span class="lineNum">     962 </span>            :   void ScrollIntoView();
+<span class="lineNum">     963 </span>            :   void ScrollIntoView(bool aTop);
+<span class="lineNum">     964 </span>            :   void ScrollIntoView(const ScrollIntoViewOptions &amp;aOptions);
+<span class="lineNum">     965 </span>            :   void Scroll(double aXScroll, double aYScroll);
+<span class="lineNum">     966 </span>            :   void Scroll(const ScrollToOptions&amp; aOptions);
+<span class="lineNum">     967 </span>            :   void ScrollTo(double aXScroll, double aYScroll);
+<span class="lineNum">     968 </span>            :   void ScrollTo(const ScrollToOptions&amp; aOptions);
+<span class="lineNum">     969 </span>            :   void ScrollBy(double aXScrollDif, double aYScrollDif);
+<span class="lineNum">     970 </span>            :   void ScrollBy(const ScrollToOptions&amp; aOptions);
+<span class="lineNum">     971 </span>            :   /* Scrolls without flushing the layout.
+<span class="lineNum">     972 </span>            :    * aDx is the x offset, aDy the y offset in CSS pixels.
+<span class="lineNum">     973 </span>            :    * Returns true if we actually scrolled.
+<span class="lineNum">     974 </span>            :    */
+<span class="lineNum">     975 </span>            :   bool ScrollByNoFlush(int32_t aDx, int32_t aDy);
+<span class="lineNum">     976 </span>            :   int32_t ScrollTop();
+<span class="lineNum">     977 </span>            :   void SetScrollTop(int32_t aScrollTop);
+<span class="lineNum">     978 </span>            :   int32_t ScrollLeft();
+<span class="lineNum">     979 </span>            :   void SetScrollLeft(int32_t aScrollLeft);
+<span class="lineNum">     980 </span>            :   int32_t ScrollWidth();
+<a name="981"><span class="lineNum">     981 </span>            :   int32_t ScrollHeight();</a>
+<span class="lineNum">     982 </span>            :   void MozScrollSnap();
+<span class="lineNum">     983 </span><span class="lineNoCov">          0 :   int32_t ClientTop()</span>
+<span class="lineNum">     984 </span>            :   {
+<a name="985"><span class="lineNum">     985 </span><span class="lineNoCov">          0 :     return nsPresContext::AppUnitsToIntCSSPixels(GetClientAreaRect().y);</span></a>
+<span class="lineNum">     986 </span>            :   }
+<span class="lineNum">     987 </span><span class="lineNoCov">          0 :   int32_t ClientLeft()</span>
+<span class="lineNum">     988 </span>            :   {
+<a name="989"><span class="lineNum">     989 </span><span class="lineNoCov">          0 :     return nsPresContext::AppUnitsToIntCSSPixels(GetClientAreaRect().x);</span></a>
+<span class="lineNum">     990 </span>            :   }
+<span class="lineNum">     991 </span><span class="lineNoCov">          0 :   int32_t ClientWidth()</span>
+<span class="lineNum">     992 </span>            :   {
+<a name="993"><span class="lineNum">     993 </span><span class="lineNoCov">          0 :     return nsPresContext::AppUnitsToIntCSSPixels(GetClientAreaRect().width);</span></a>
+<span class="lineNum">     994 </span>            :   }
+<span class="lineNum">     995 </span><span class="lineNoCov">          0 :   int32_t ClientHeight()</span>
+<span class="lineNum">     996 </span>            :   {
+<a name="997"><span class="lineNum">     997 </span><span class="lineNoCov">          0 :     return nsPresContext::AppUnitsToIntCSSPixels(GetClientAreaRect().height);</span></a>
+<span class="lineNum">     998 </span>            :   }
+<span class="lineNum">     999 </span><span class="lineNoCov">          0 :   int32_t ScrollTopMin()</span>
+<span class="lineNum">    1000 </span>            :   {
+<span class="lineNum">    1001 </span><span class="lineNoCov">          0 :     nsIScrollableFrame* sf = GetScrollFrame();</span>
+<span class="lineNum">    1002 </span>            :     return sf ?
+<a name="1003"><span class="lineNum">    1003 </span><span class="lineNoCov">          0 :            nsPresContext::AppUnitsToIntCSSPixels(sf-&gt;GetScrollRange().y) : 0;</span></a>
+<span class="lineNum">    1004 </span>            :   }
+<span class="lineNum">    1005 </span><span class="lineNoCov">          0 :   int32_t ScrollTopMax()</span>
+<span class="lineNum">    1006 </span>            :   {
+<span class="lineNum">    1007 </span><span class="lineNoCov">          0 :     nsIScrollableFrame* sf = GetScrollFrame();</span>
+<span class="lineNum">    1008 </span>            :     return sf ?
+<span class="lineNum">    1009 </span><span class="lineNoCov">          0 :            nsPresContext::AppUnitsToIntCSSPixels(sf-&gt;GetScrollRange().YMost()) :</span>
+<a name="1010"><span class="lineNum">    1010 </span><span class="lineNoCov">          0 :            0;</span></a>
+<span class="lineNum">    1011 </span>            :   }
+<span class="lineNum">    1012 </span><span class="lineNoCov">          0 :   int32_t ScrollLeftMin()</span>
+<span class="lineNum">    1013 </span>            :   {
+<span class="lineNum">    1014 </span><span class="lineNoCov">          0 :     nsIScrollableFrame* sf = GetScrollFrame();</span>
+<span class="lineNum">    1015 </span>            :     return sf ?
+<a name="1016"><span class="lineNum">    1016 </span><span class="lineNoCov">          0 :            nsPresContext::AppUnitsToIntCSSPixels(sf-&gt;GetScrollRange().x) : 0;</span></a>
+<span class="lineNum">    1017 </span>            :   }
+<span class="lineNum">    1018 </span><span class="lineNoCov">          0 :   int32_t ScrollLeftMax()</span>
+<span class="lineNum">    1019 </span>            :   {
+<span class="lineNum">    1020 </span><span class="lineNoCov">          0 :     nsIScrollableFrame* sf = GetScrollFrame();</span>
+<span class="lineNum">    1021 </span>            :     return sf ?
+<span class="lineNum">    1022 </span><span class="lineNoCov">          0 :            nsPresContext::AppUnitsToIntCSSPixels(sf-&gt;GetScrollRange().XMost()) :</span>
+<span class="lineNum">    1023 </span><span class="lineNoCov">          0 :            0;</span>
+<span class="lineNum">    1024 </span>            :   }
+<span class="lineNum">    1025 </span>            : 
+<span class="lineNum">    1026 </span>            :   void GetGridFragments(nsTArray&lt;RefPtr&lt;Grid&gt;&gt;&amp; aResult);
+<span class="lineNum">    1027 </span>            : 
+<span class="lineNum">    1028 </span>            :   already_AddRefed&lt;Animation&gt;
+<span class="lineNum">    1029 </span>            :   Animate(JSContext* aContext,
+<span class="lineNum">    1030 </span>            :           JS::Handle&lt;JSObject*&gt; aKeyframes,
+<span class="lineNum">    1031 </span>            :           const UnrestrictedDoubleOrKeyframeAnimationOptions&amp; aOptions,
+<span class="lineNum">    1032 </span>            :           ErrorResult&amp; aError);
+<span class="lineNum">    1033 </span>            : 
+<span class="lineNum">    1034 </span>            :   // A helper method that factors out the common functionality needed by
+<span class="lineNum">    1035 </span>            :   // Element::Animate and CSSPseudoElement::Animate
+<span class="lineNum">    1036 </span>            :   static already_AddRefed&lt;Animation&gt;
+<span class="lineNum">    1037 </span>            :   Animate(const Nullable&lt;ElementOrCSSPseudoElement&gt;&amp; aTarget,
+<span class="lineNum">    1038 </span>            :           JSContext* aContext,
+<span class="lineNum">    1039 </span>            :           JS::Handle&lt;JSObject*&gt; aKeyframes,
+<span class="lineNum">    1040 </span>            :           const UnrestrictedDoubleOrKeyframeAnimationOptions&amp; aOptions,
+<span class="lineNum">    1041 </span>            :           ErrorResult&amp; aError);
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span>            :   // Note: GetAnimations will flush style while GetAnimationsUnsorted won't.
+<span class="lineNum">    1044 </span>            :   // Callers must keep this element alive because flushing style may destroy
+<span class="lineNum">    1045 </span>            :   // this element.
+<span class="lineNum">    1046 </span>            :   void GetAnimations(const AnimationFilter&amp; filter,
+<span class="lineNum">    1047 </span>            :                      nsTArray&lt;RefPtr&lt;Animation&gt;&gt;&amp; aAnimations);
+<span class="lineNum">    1048 </span>            :   static void GetAnimationsUnsorted(Element* aElement,
+<span class="lineNum">    1049 </span>            :                                     CSSPseudoElementType aPseudoType,
+<span class="lineNum">    1050 </span>            :                                     nsTArray&lt;RefPtr&lt;Animation&gt;&gt;&amp; aAnimations);
+<span class="lineNum">    1051 </span>            : 
+<span class="lineNum">    1052 </span>            :   NS_IMETHOD GetInnerHTML(nsAString&amp; aInnerHTML);
+<span class="lineNum">    1053 </span>            :   virtual void SetInnerHTML(const nsAString&amp; aInnerHTML, ErrorResult&amp; aError);
+<span class="lineNum">    1054 </span>            :   void GetOuterHTML(nsAString&amp; aOuterHTML);
+<span class="lineNum">    1055 </span>            :   void SetOuterHTML(const nsAString&amp; aOuterHTML, ErrorResult&amp; aError);
+<span class="lineNum">    1056 </span>            :   void InsertAdjacentHTML(const nsAString&amp; aPosition, const nsAString&amp; aText,
+<span class="lineNum">    1057 </span>            :                           ErrorResult&amp; aError);
+<span class="lineNum">    1058 </span>            : 
+<span class="lineNum">    1059 </span>            :   //----------------------------------------
+<span class="lineNum">    1060 </span>            : 
+<span class="lineNum">    1061 </span>            :   /**
+<span class="lineNum">    1062 </span>            :    * Add a script event listener with the given event handler name
+<span class="lineNum">    1063 </span>            :    * (like onclick) and with the value as JS
+<span class="lineNum">    1064 </span>            :    * @param aEventName the event listener name
+<span class="lineNum">    1065 </span>            :    * @param aValue the JS to attach
+<span class="lineNum">    1066 </span>            :    * @param aDefer indicates if deferred execution is allowed
+<span class="lineNum">    1067 </span>            :    */
+<span class="lineNum">    1068 </span>            :   nsresult SetEventHandler(nsIAtom* aEventName,
+<span class="lineNum">    1069 </span>            :                            const nsAString&amp; aValue,
+<span class="lineNum">    1070 </span>            :                            bool aDefer = true);
+<span class="lineNum">    1071 </span>            : 
+<span class="lineNum">    1072 </span>            :   /**
+<span class="lineNum">    1073 </span>            :    * Do whatever needs to be done when the mouse leaves a link
+<span class="lineNum">    1074 </span>            :    */
+<span class="lineNum">    1075 </span>            :   nsresult LeaveLink(nsPresContext* aPresContext);
+<span class="lineNum">    1076 </span>            : 
+<span class="lineNum">    1077 </span>            :   static bool ShouldBlur(nsIContent *aContent);
+<span class="lineNum">    1078 </span>            : 
+<span class="lineNum">    1079 </span>            :   /**
+<span class="lineNum">    1080 </span>            :    * Method to create and dispatch a left-click event loosely based on
+<span class="lineNum">    1081 </span>            :    * aSourceEvent. If aFullDispatch is true, the event will be dispatched
+<span class="lineNum">    1082 </span>            :    * through the full dispatching of the presshell of the aPresContext; if it's
+<span class="lineNum">    1083 </span>            :    * false the event will be dispatched only as a DOM event.
+<span class="lineNum">    1084 </span>            :    * If aPresContext is nullptr, this does nothing.
+<span class="lineNum">    1085 </span>            :    *
+<span class="lineNum">    1086 </span>            :    * @param aFlags      Extra flags for the dispatching event.  The true flags
+<span class="lineNum">    1087 </span>            :    *                    will be respected.
+<span class="lineNum">    1088 </span>            :    */
+<span class="lineNum">    1089 </span>            :   static nsresult DispatchClickEvent(nsPresContext* aPresContext,
+<span class="lineNum">    1090 </span>            :                                      WidgetInputEvent* aSourceEvent,
+<span class="lineNum">    1091 </span>            :                                      nsIContent* aTarget,
+<span class="lineNum">    1092 </span>            :                                      bool aFullDispatch,
+<span class="lineNum">    1093 </span>            :                                      const EventFlags* aFlags,
+<span class="lineNum">    1094 </span>            :                                      nsEventStatus* aStatus);
+<span class="lineNum">    1095 </span>            : 
+<span class="lineNum">    1096 </span>            :   /**
+<span class="lineNum">    1097 </span>            :    * Method to dispatch aEvent to aTarget. If aFullDispatch is true, the event
+<span class="lineNum">    1098 </span>            :    * will be dispatched through the full dispatching of the presshell of the
+<span class="lineNum">    1099 </span>            :    * aPresContext; if it's false the event will be dispatched only as a DOM
+<span class="lineNum">    1100 </span>            :    * event.
+<span class="lineNum">    1101 </span>            :    * If aPresContext is nullptr, this does nothing.
+<span class="lineNum">    1102 </span>            :    */
+<span class="lineNum">    1103 </span>            :   using nsIContent::DispatchEvent;
+<span class="lineNum">    1104 </span>            :   static nsresult DispatchEvent(nsPresContext* aPresContext,
+<span class="lineNum">    1105 </span>            :                                 WidgetEvent* aEvent,
+<span class="lineNum">    1106 </span>            :                                 nsIContent* aTarget,
+<span class="lineNum">    1107 </span>            :                                 bool aFullDispatch,
+<span class="lineNum">    1108 </span>            :                                 nsEventStatus* aStatus);
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span>            :   /**
+<span class="lineNum">    1111 </span>            :    * Get the primary frame for this content with flushing
+<span class="lineNum">    1112 </span>            :    *
+<span class="lineNum">    1113 </span>            :    * @param aType the kind of flush to do, typically FlushType::Frames or
+<span class="lineNum">    1114 </span>            :    *              FlushType::Layout
+<span class="lineNum">    1115 </span>            :    * @return the primary frame
+<span class="lineNum">    1116 </span>            :    */
+<span class="lineNum">    1117 </span>            :   nsIFrame* GetPrimaryFrame(FlushType aType);
+<span class="lineNum">    1118 </span>            :   // Work around silly C++ name hiding stuff
+<a name="1119"><span class="lineNum">    1119 </span><span class="lineNoCov">          0 :   nsIFrame* GetPrimaryFrame() const { return nsIContent::GetPrimaryFrame(); }</span></a>
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span><span class="lineNoCov">          0 :   const nsAttrValue* GetParsedAttr(nsIAtom* aAttr) const</span>
+<span class="lineNum">    1122 </span>            :   {
+<span class="lineNum">    1123 </span><span class="lineNoCov">          0 :     return mAttrsAndChildren.GetAttr(aAttr);</span>
+<span class="lineNum">    1124 </span>            :   }
+<span class="lineNum">    1125 </span>            : 
+<span class="lineNum">    1126 </span>            :   const nsAttrValue* GetParsedAttr(nsIAtom* aAttr, int32_t aNameSpaceID) const
+<span class="lineNum">    1127 </span>            :   {
+<span class="lineNum">    1128 </span><span class="lineNoCov">          0 :     return mAttrsAndChildren.GetAttr(aAttr, aNameSpaceID);</span>
+<span class="lineNum">    1129 </span>            :   }
+<span class="lineNum">    1130 </span>            : 
+<span class="lineNum">    1131 </span>            :   /**
+<span class="lineNum">    1132 </span>            :    * Returns the attribute map, if there is one.
+<span class="lineNum">    1133 </span>            :    *
+<a name="1134"><span class="lineNum">    1134 </span>            :    * @return existing attribute map or nullptr.</a>
+<span class="lineNum">    1135 </span>            :    */
+<span class="lineNum">    1136 </span><span class="lineNoCov">          0 :   nsDOMAttributeMap *GetAttributeMap()</span>
+<span class="lineNum">    1137 </span>            :   {
+<span class="lineNum">    1138 </span><span class="lineNoCov">          0 :     nsDOMSlots *slots = GetExistingDOMSlots();</span>
+<span class="lineNum">    1139 </span>            : 
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :     return slots ? slots-&gt;mAttributeMap.get() : nullptr;</span>
+<a name="1141"><span class="lineNum">    1141 </span>            :   }</a>
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 :   virtual void RecompileScriptEventListeners()</span>
+<span class="lineNum">    1144 </span>            :   {
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1146 </span>            : 
+<span class="lineNum">    1147 </span>            :   /**
+<span class="lineNum">    1148 </span>            :    * Get the attr info for the given namespace ID and attribute name.  The
+<span class="lineNum">    1149 </span>            :    * namespace ID must not be kNameSpaceID_Unknown and the name must not be
+<span class="lineNum">    1150 </span>            :    * null.  Note that this can only return info on attributes that actually
+<span class="lineNum">    1151 </span>            :    * live on this element (and is only virtual to handle XUL prototypes).  That
+<span class="lineNum">    1152 </span>            :    * is, this should only be called from methods that only care about attrs
+<span class="lineNum">    1153 </span>            :    * that effectively live in mAttrsAndChildren.
+<span class="lineNum">    1154 </span>            :    */
+<span class="lineNum">    1155 </span>            :   virtual BorrowedAttrInfo GetAttrInfo(int32_t aNamespaceID, nsIAtom* aName) const;
+<span class="lineNum">    1156 </span>            : 
+<span class="lineNum">    1157 </span>            :   /**
+<span class="lineNum">    1158 </span>            :    * Called when we have been adopted, and the information of the
+<span class="lineNum">    1159 </span>            :    * node has been changed.
+<span class="lineNum">    1160 </span>            :    *
+<span class="lineNum">    1161 </span>            :    * The new document can be reached via OwnerDoc().
+<span class="lineNum">    1162 </span>            :    *
+<span class="lineNum">    1163 </span>            :    * If you override this method,
+<span class="lineNum">    1164 </span>            :    * please call up to the parent NodeInfoChanged.
+<span class="lineNum">    1165 </span>            :    *
+<a name="1166"><span class="lineNum">    1166 </span>            :    * If you change this, change also the similar method in Link.</a>
+<span class="lineNum">    1167 </span>            :    */
+<span class="lineNum">    1168 </span><span class="lineNoCov">          0 :   virtual void NodeInfoChanged(nsIDocument* aOldDoc) {}</span>
+<span class="lineNum">    1169 </span>            : 
+<span class="lineNum">    1170 </span>            :   /**
+<span class="lineNum">    1171 </span>            :    * Parse a string into an nsAttrValue for a CORS attribute.  This
+<span class="lineNum">    1172 </span>            :    * never fails.  The resulting value is an enumerated value whose
+<span class="lineNum">    1173 </span>            :    * GetEnumValue() returns one of the above constants.
+<span class="lineNum">    1174 </span>            :    */
+<span class="lineNum">    1175 </span>            :   static void ParseCORSValue(const nsAString&amp; aValue, nsAttrValue&amp; aResult);
+<span class="lineNum">    1176 </span>            : 
+<span class="lineNum">    1177 </span>            :   /**
+<span class="lineNum">    1178 </span>            :    * Return the CORS mode for a given string
+<span class="lineNum">    1179 </span>            :    */
+<span class="lineNum">    1180 </span>            :   static CORSMode StringToCORSMode(const nsAString&amp; aValue);
+<span class="lineNum">    1181 </span>            : 
+<span class="lineNum">    1182 </span>            :   /**
+<span class="lineNum">    1183 </span>            :    * Return the CORS mode for a given nsAttrValue (which may be null,
+<span class="lineNum">    1184 </span>            :    * but if not should have been parsed via ParseCORSValue).
+<span class="lineNum">    1185 </span>            :    */
+<span class="lineNum">    1186 </span>            :   static CORSMode AttrValueToCORSMode(const nsAttrValue* aValue);
+<span class="lineNum">    1187 </span>            : 
+<span class="lineNum">    1188 </span>            :   virtual JSObject* WrapObject(JSContext *aCx, JS::Handle&lt;JSObject*&gt; aGivenProto) final override;
+<span class="lineNum">    1189 </span>            : 
+<span class="lineNum">    1190 </span>            :   nsINode* GetScopeChainParent() const override;
+<span class="lineNum">    1191 </span>            : 
+<span class="lineNum">    1192 </span>            :   /**
+<span class="lineNum">    1193 </span>            :    * Locate an nsIEditor rooted at this content node, if there is one.
+<span class="lineNum">    1194 </span>            :    */
+<span class="lineNum">    1195 </span>            :   nsIEditor* GetEditorInternal();
+<span class="lineNum">    1196 </span>            : 
+<span class="lineNum">    1197 </span>            :   /**
+<span class="lineNum">    1198 </span>            :    * Helper method for NS_IMPL_BOOL_ATTR macro.
+<span class="lineNum">    1199 </span>            :    * Gets value of boolean attribute. Only works for attributes in null
+<span class="lineNum">    1200 </span>            :    * namespace.
+<span class="lineNum">    1201 </span>            :    *
+<span class="lineNum">    1202 </span>            :    * @param aAttr    name of attribute.
+<a name="1203"><span class="lineNum">    1203 </span>            :    * @param aValue   Boolean value of attribute.</a>
+<span class="lineNum">    1204 </span>            :    */
+<span class="lineNum">    1205 </span><span class="lineNoCov">          0 :   bool GetBoolAttr(nsIAtom* aAttr) const</span>
+<span class="lineNum">    1206 </span>            :   {
+<span class="lineNum">    1207 </span><span class="lineNoCov">          0 :     return HasAttr(kNameSpaceID_None, aAttr);</span>
+<span class="lineNum">    1208 </span>            :   }
+<span class="lineNum">    1209 </span>            : 
+<span class="lineNum">    1210 </span>            :   /**
+<span class="lineNum">    1211 </span>            :    * Helper method for NS_IMPL_BOOL_ATTR macro.
+<span class="lineNum">    1212 </span>            :    * Sets value of boolean attribute by removing attribute or setting it to
+<span class="lineNum">    1213 </span>            :    * the empty string. Only works for attributes in null namespace.
+<span class="lineNum">    1214 </span>            :    *
+<span class="lineNum">    1215 </span>            :    * @param aAttr    name of attribute.
+<span class="lineNum">    1216 </span>            :    * @param aValue   Boolean value of attribute.
+<span class="lineNum">    1217 </span>            :    */
+<span class="lineNum">    1218 </span>            :   nsresult SetBoolAttr(nsIAtom* aAttr, bool aValue);
+<span class="lineNum">    1219 </span>            : 
+<span class="lineNum">    1220 </span>            :   /**
+<span class="lineNum">    1221 </span>            :    * Helper method for NS_IMPL_ENUM_ATTR_DEFAULT_VALUE.
+<span class="lineNum">    1222 </span>            :    * Gets the enum value string of an attribute and using a default value if
+<span class="lineNum">    1223 </span>            :    * the attribute is missing or the string is an invalid enum value.
+<span class="lineNum">    1224 </span>            :    *
+<span class="lineNum">    1225 </span>            :    * @param aType     the name of the attribute.
+<span class="lineNum">    1226 </span>            :    * @param aDefault  the default value if the attribute is missing or invalid.
+<span class="lineNum">    1227 </span>            :    * @param aResult   string corresponding to the value [out].
+<span class="lineNum">    1228 </span>            :    */
+<span class="lineNum">    1229 </span>            :   void GetEnumAttr(nsIAtom* aAttr,
+<span class="lineNum">    1230 </span>            :                    const char* aDefault,
+<span class="lineNum">    1231 </span>            :                    nsAString&amp; aResult) const;
+<span class="lineNum">    1232 </span>            : 
+<span class="lineNum">    1233 </span>            :   /**
+<span class="lineNum">    1234 </span>            :    * Helper method for NS_IMPL_ENUM_ATTR_DEFAULT_MISSING_INVALID_VALUES.
+<span class="lineNum">    1235 </span>            :    * Gets the enum value string of an attribute and using the default missing
+<span class="lineNum">    1236 </span>            :    * value if the attribute is missing or the default invalid value if the
+<span class="lineNum">    1237 </span>            :    * string is an invalid enum value.
+<span class="lineNum">    1238 </span>            :    *
+<span class="lineNum">    1239 </span>            :    * @param aType            the name of the attribute.
+<span class="lineNum">    1240 </span>            :    * @param aDefaultMissing  the default value if the attribute is missing.  If
+<span class="lineNum">    1241 </span>            :                              null and the attribute is missing, aResult will be
+<span class="lineNum">    1242 </span>            :                              set to the null DOMString; this only matters for
+<span class="lineNum">    1243 </span>            :                              cases in which we're reflecting a nullable string.
+<span class="lineNum">    1244 </span>            :    * @param aDefaultInvalid  the default value if the attribute is invalid.
+<span class="lineNum">    1245 </span>            :    * @param aResult          string corresponding to the value [out].
+<span class="lineNum">    1246 </span>            :    */
+<span class="lineNum">    1247 </span>            :   void GetEnumAttr(nsIAtom* aAttr,
+<span class="lineNum">    1248 </span>            :                    const char* aDefaultMissing,
+<span class="lineNum">    1249 </span>            :                    const char* aDefaultInvalid,
+<span class="lineNum">    1250 </span>            :                    nsAString&amp; aResult) const;
+<span class="lineNum">    1251 </span>            : 
+<span class="lineNum">    1252 </span>            :   /**
+<a name="1253"><span class="lineNum">    1253 </span>            :    * Unset an attribute.</a>
+<span class="lineNum">    1254 </span>            :    */
+<span class="lineNum">    1255 </span><span class="lineNoCov">          0 :   void UnsetAttr(nsIAtom* aAttr, ErrorResult&amp; aError)</span>
+<span class="lineNum">    1256 </span>            :   {
+<span class="lineNum">    1257 </span><span class="lineNoCov">          0 :     aError = UnsetAttr(kNameSpaceID_None, aAttr, true);</span>
+<span class="lineNum">    1258 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1259 </span>            : 
+<span class="lineNum">    1260 </span>            :   /**
+<a name="1261"><span class="lineNum">    1261 </span>            :    * Set an attribute in the simplest way possible.</a>
+<span class="lineNum">    1262 </span>            :    */
+<span class="lineNum">    1263 </span><span class="lineNoCov">          0 :   void SetAttr(nsIAtom* aAttr, const nsAString&amp; aValue, ErrorResult&amp; aError)</span>
+<span class="lineNum">    1264 </span>            :   {
+<span class="lineNum">    1265 </span><span class="lineNoCov">          0 :     aError = SetAttr(kNameSpaceID_None, aAttr, aValue, true);</span>
+<span class="lineNum">    1266 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1267 </span>            : 
+<span class="lineNum">    1268 </span>            :   /**
+<span class="lineNum">    1269 </span>            :    * Set a content attribute via a reflecting nullable string IDL
+<span class="lineNum">    1270 </span>            :    * attribute (e.g. a CORS attribute).  If DOMStringIsNull(aValue),
+<span class="lineNum">    1271 </span>            :    * this will actually remove the content attribute.
+<span class="lineNum">    1272 </span>            :    */
+<span class="lineNum">    1273 </span>            :   void SetOrRemoveNullableStringAttr(nsIAtom* aName, const nsAString&amp; aValue,
+<span class="lineNum">    1274 </span>            :                                      ErrorResult&amp; aError);
+<span class="lineNum">    1275 </span>            : 
+<span class="lineNum">    1276 </span>            :   /**
+<span class="lineNum">    1277 </span>            :    * Retrieve the ratio of font-size-inflated text font size to computed font
+<span class="lineNum">    1278 </span>            :    * size for this element. This will query the element for its primary frame,
+<span class="lineNum">    1279 </span>            :    * and then use this to get font size inflation information about the frame.
+<span class="lineNum">    1280 </span>            :    *
+<span class="lineNum">    1281 </span>            :    * @returns The font size inflation ratio (inflated font size to uninflated
+<span class="lineNum">    1282 </span>            :    *          font size) for the primary frame of this element. Returns 1.0
+<span class="lineNum">    1283 </span>            :    *          by default if font size inflation is not enabled. Returns -1
+<span class="lineNum">    1284 </span>            :    *          if the element does not have a primary frame.
+<span class="lineNum">    1285 </span>            :    *
+<span class="lineNum">    1286 </span>            :    * @note The font size inflation ratio that is returned is actually the
+<span class="lineNum">    1287 </span>            :    *       font size inflation data for the element's _primary frame_, not the
+<span class="lineNum">    1288 </span>            :    *       element itself, but for most purposes, this should be sufficient.
+<span class="lineNum">    1289 </span>            :    */
+<span class="lineNum">    1290 </span>            :   float FontSizeInflation();
+<span class="lineNum">    1291 </span>            : 
+<span class="lineNum">    1292 </span>            :   net::ReferrerPolicy GetReferrerPolicyAsEnum();
+<span class="lineNum">    1293 </span>            : 
+<span class="lineNum">    1294 </span>            :   /*
+<span class="lineNum">    1295 </span>            :    * Helpers for .dataset.  This is implemented on Element, though only some
+<span class="lineNum">    1296 </span>            :    * sorts of elements expose it to JS as a .dataset property
+<span class="lineNum">    1297 </span>            :    */
+<span class="lineNum">    1298 </span>            :   // Getter, to be called from bindings.
+<span class="lineNum">    1299 </span>            :   already_AddRefed&lt;nsDOMStringMap&gt; Dataset();
+<span class="lineNum">    1300 </span>            :   // Callback for destructor of dataset to ensure to null out our weak pointer
+<span class="lineNum">    1301 </span>            :   // to it.
+<span class="lineNum">    1302 </span>            :   void ClearDataset();
+<span class="lineNum">    1303 </span>            : 
+<span class="lineNum">    1304 </span>            :   void RegisterIntersectionObserver(DOMIntersectionObserver* aObserver);
+<span class="lineNum">    1305 </span>            :   void UnregisterIntersectionObserver(DOMIntersectionObserver* aObserver);
+<span class="lineNum">    1306 </span>            :   bool UpdateIntersectionObservation(DOMIntersectionObserver* aObserver, int32_t threshold);
+<span class="lineNum">    1307 </span>            : 
+<span class="lineNum">    1308 </span>            : protected:
+<span class="lineNum">    1309 </span>            :   /*
+<span class="lineNum">    1310 </span>            :    * Named-bools for use with SetAttrAndNotify to make call sites easier to
+<span class="lineNum">    1311 </span>            :    * read.
+<span class="lineNum">    1312 </span>            :    */
+<span class="lineNum">    1313 </span>            :   static const bool kFireMutationEvent           = true;
+<span class="lineNum">    1314 </span>            :   static const bool kDontFireMutationEvent       = false;
+<span class="lineNum">    1315 </span>            :   static const bool kNotifyDocumentObservers     = true;
+<span class="lineNum">    1316 </span>            :   static const bool kDontNotifyDocumentObservers = false;
+<span class="lineNum">    1317 </span>            :   static const bool kCallAfterSetAttr            = true;
+<span class="lineNum">    1318 </span>            :   static const bool kDontCallAfterSetAttr        = false;
+<span class="lineNum">    1319 </span>            : 
+<span class="lineNum">    1320 </span>            :   /**
+<span class="lineNum">    1321 </span>            :    * Set attribute and (if needed) notify documentobservers and fire off
+<span class="lineNum">    1322 </span>            :    * mutation events.  This will send the AttributeChanged notification.
+<span class="lineNum">    1323 </span>            :    * Callers of this method are responsible for calling AttributeWillChange,
+<span class="lineNum">    1324 </span>            :    * since that needs to happen before the new attr value has been set, and
+<span class="lineNum">    1325 </span>            :    * in particular before it has been parsed.
+<span class="lineNum">    1326 </span>            :    *
+<span class="lineNum">    1327 </span>            :    * For the boolean parameters, consider using the named bools above to aid
+<span class="lineNum">    1328 </span>            :    * code readability.
+<span class="lineNum">    1329 </span>            :    *
+<span class="lineNum">    1330 </span>            :    * @param aNamespaceID  namespace of attribute
+<span class="lineNum">    1331 </span>            :    * @param aAttribute    local-name of attribute
+<span class="lineNum">    1332 </span>            :    * @param aPrefix       aPrefix of attribute
+<span class="lineNum">    1333 </span>            :    * @param aOldValue     The old value of the attribute to use as a fallback
+<span class="lineNum">    1334 </span>            :    *                      in the cases where the actual old value (i.e.
+<span class="lineNum">    1335 </span>            :    *                      its current value) is !StoresOwnData() --- in which
+<span class="lineNum">    1336 </span>            :    *                      case the current value is probably already useless.
+<span class="lineNum">    1337 </span>            :    *                      If the current value is StoresOwnData() (or absent),
+<span class="lineNum">    1338 </span>            :    *                      aOldValue will not be used.
+<span class="lineNum">    1339 </span>            :    * @param aParsedValue  parsed new value of attribute. Replaced by the
+<span class="lineNum">    1340 </span>            :    *                      old value of the attribute. This old value is only
+<span class="lineNum">    1341 </span>            :    *                      useful if either it or the new value is StoresOwnData.
+<span class="lineNum">    1342 </span>            :    * @param aModType      nsIDOMMutationEvent::MODIFICATION or ADDITION.  Only
+<span class="lineNum">    1343 </span>            :    *                      needed if aFireMutation or aNotify is true.
+<span class="lineNum">    1344 </span>            :    * @param aFireMutation should mutation-events be fired?
+<span class="lineNum">    1345 </span>            :    * @param aNotify       should we notify document-observers?
+<span class="lineNum">    1346 </span>            :    * @param aCallAfterSetAttr should we call AfterSetAttr?
+<span class="lineNum">    1347 </span>            :    * @param aComposedDocument The current composed document of the element.
+<span class="lineNum">    1348 </span>            :    */
+<span class="lineNum">    1349 </span>            :   nsresult SetAttrAndNotify(int32_t aNamespaceID,
+<span class="lineNum">    1350 </span>            :                             nsIAtom* aName,
+<span class="lineNum">    1351 </span>            :                             nsIAtom* aPrefix,
+<span class="lineNum">    1352 </span>            :                             const nsAttrValue&amp; aOldValue,
+<span class="lineNum">    1353 </span>            :                             nsAttrValue&amp; aParsedValue,
+<span class="lineNum">    1354 </span>            :                             uint8_t aModType,
+<span class="lineNum">    1355 </span>            :                             bool aFireMutation,
+<span class="lineNum">    1356 </span>            :                             bool aNotify,
+<span class="lineNum">    1357 </span>            :                             bool aCallAfterSetAttr,
+<span class="lineNum">    1358 </span>            :                             nsIDocument* aComposedDocument,
+<span class="lineNum">    1359 </span>            :                             const mozAutoDocUpdate&amp; aGuard);
+<span class="lineNum">    1360 </span>            : 
+<span class="lineNum">    1361 </span>            :   /**
+<span class="lineNum">    1362 </span>            :    * Scroll to a new position using behavior evaluated from CSS and
+<span class="lineNum">    1363 </span>            :    * a CSSOM-View DOM method ScrollOptions dictionary.  The scrolling may
+<span class="lineNum">    1364 </span>            :    * be performed asynchronously or synchronously depending on the resolved
+<span class="lineNum">    1365 </span>            :    * scroll-behavior.
+<span class="lineNum">    1366 </span>            :    *
+<span class="lineNum">    1367 </span>            :    * @param aScroll       Destination of scroll, in CSS pixels
+<span class="lineNum">    1368 </span>            :    * @param aOptions      Dictionary of options to be evaluated
+<span class="lineNum">    1369 </span>            :    */
+<span class="lineNum">    1370 </span>            :   void Scroll(const CSSIntPoint&amp; aScroll, const ScrollOptions&amp; aOptions);
+<span class="lineNum">    1371 </span>            : 
+<span class="lineNum">    1372 </span>            :   /**
+<span class="lineNum">    1373 </span>            :    * Convert an attribute string value to attribute type based on the type of
+<span class="lineNum">    1374 </span>            :    * attribute.  Called by SetAttr().  Note that at the moment we only do this
+<span class="lineNum">    1375 </span>            :    * for attributes in the null namespace (kNameSpaceID_None).
+<span class="lineNum">    1376 </span>            :    *
+<span class="lineNum">    1377 </span>            :    * @param aNamespaceID the namespace of the attribute to convert
+<span class="lineNum">    1378 </span>            :    * @param aAttribute the attribute to convert
+<span class="lineNum">    1379 </span>            :    * @param aValue the string value to convert
+<span class="lineNum">    1380 </span>            :    * @param aResult the nsAttrValue [OUT]
+<span class="lineNum">    1381 </span>            :    * @return true if the parsing was successful, false otherwise
+<span class="lineNum">    1382 </span>            :    */
+<span class="lineNum">    1383 </span>            :   virtual bool ParseAttribute(int32_t aNamespaceID,
+<span class="lineNum">    1384 </span>            :                                 nsIAtom* aAttribute,
+<span class="lineNum">    1385 </span>            :                                 const nsAString&amp; aValue,
+<span class="lineNum">    1386 </span>            :                                 nsAttrValue&amp; aResult);
+<span class="lineNum">    1387 </span>            : 
+<span class="lineNum">    1388 </span>            :   /**
+<span class="lineNum">    1389 </span>            :    * Try to set the attribute as a mapped attribute, if applicable.  This will
+<span class="lineNum">    1390 </span>            :    * only be called for attributes that are in the null namespace and only on
+<span class="lineNum">    1391 </span>            :    * attributes that returned true when passed to IsAttributeMapped.  The
+<span class="lineNum">    1392 </span>            :    * caller will not try to set the attr in any other way if this method
+<span class="lineNum">    1393 </span>            :    * returns true (the value of aRetval does not matter for that purpose).
+<span class="lineNum">    1394 </span>            :    *
+<span class="lineNum">    1395 </span>            :    * @param aName the name of the attribute
+<span class="lineNum">    1396 </span>            :    * @param aValue the nsAttrValue to set
+<span class="lineNum">    1397 </span>            :    * @param [out] aRetval the nsresult status of the operation, if any.
+<span class="lineNum">    1398 </span>            :    * @return true if the setting was attempted, false otherwise.
+<span class="lineNum">    1399 </span>            :    */
+<span class="lineNum">    1400 </span>            :   virtual bool SetMappedAttribute(nsIAtom* aName,
+<span class="lineNum">    1401 </span>            :                                   nsAttrValue&amp; aValue,
+<span class="lineNum">    1402 </span>            :                                   nsresult* aRetval);
+<span class="lineNum">    1403 </span>            : 
+<span class="lineNum">    1404 </span>            :   /**
+<span class="lineNum">    1405 </span>            :    * Hook that is called by Element::SetAttr to allow subclasses to
+<span class="lineNum">    1406 </span>            :    * deal with attribute sets.  This will only be called after we verify that
+<span class="lineNum">    1407 </span>            :    * we're actually doing an attr set and will be called before
+<span class="lineNum">    1408 </span>            :    * AttributeWillChange and before ParseAttribute and hence before we've set
+<span class="lineNum">    1409 </span>            :    * the new value.
+<span class="lineNum">    1410 </span>            :    *
+<span class="lineNum">    1411 </span>            :    * @param aNamespaceID the namespace of the attr being set
+<span class="lineNum">    1412 </span>            :    * @param aName the localname of the attribute being set
+<span class="lineNum">    1413 </span>            :    * @param aValue the value it's being set to represented as either a string or
+<span class="lineNum">    1414 </span>            :    *        a parsed nsAttrValue. Alternatively, if the attr is being removed it
+<span class="lineNum">    1415 </span>            :    *        will be null.
+<span class="lineNum">    1416 </span>            :    * @param aNotify Whether we plan to notify document observers.
+<span class="lineNum">    1417 </span>            :    */
+<a name="1418"><span class="lineNum">    1418 </span>            :   // Note that this is inlined so that when subclasses call it it gets</a>
+<span class="lineNum">    1419 </span>            :   // inlined.  Those calls don't go through a vtable.
+<span class="lineNum">    1420 </span><span class="lineNoCov">          0 :   virtual nsresult BeforeSetAttr(int32_t aNamespaceID, nsIAtom* aName,</span>
+<span class="lineNum">    1421 </span>            :                                  const nsAttrValueOrString* aValue,
+<span class="lineNum">    1422 </span>            :                                  bool aNotify)
+<span class="lineNum">    1423 </span>            :   {
+<span class="lineNum">    1424 </span><span class="lineNoCov">          0 :     return NS_OK;</span>
+<span class="lineNum">    1425 </span>            :   }
+<span class="lineNum">    1426 </span>            : 
+<span class="lineNum">    1427 </span>            :   /**
+<span class="lineNum">    1428 </span>            :    * Hook that is called by Element::SetAttr to allow subclasses to
+<span class="lineNum">    1429 </span>            :    * deal with attribute sets.  This will only be called after we have called
+<span class="lineNum">    1430 </span>            :    * SetAndTakeAttr and AttributeChanged (that is, after we have actually set
+<span class="lineNum">    1431 </span>            :    * the attr).  It will always be called under a scriptblocker.
+<span class="lineNum">    1432 </span>            :    *
+<span class="lineNum">    1433 </span>            :    * @param aNamespaceID the namespace of the attr being set
+<span class="lineNum">    1434 </span>            :    * @param aName the localname of the attribute being set
+<span class="lineNum">    1435 </span>            :    * @param aValue the value it's being set to.  If null, the attr is being
+<span class="lineNum">    1436 </span>            :    *        removed.
+<span class="lineNum">    1437 </span>            :    * @param aNotify Whether we plan to notify document observers.
+<span class="lineNum">    1438 </span>            :    */
+<a name="1439"><span class="lineNum">    1439 </span>            :   // Note that this is inlined so that when subclasses call it it gets</a>
+<span class="lineNum">    1440 </span>            :   // inlined.  Those calls don't go through a vtable.
+<span class="lineNum">    1441 </span><span class="lineNoCov">          0 :   virtual nsresult AfterSetAttr(int32_t aNamespaceID, nsIAtom* aName,</span>
+<span class="lineNum">    1442 </span>            :                                 const nsAttrValue* aValue, bool aNotify)
+<span class="lineNum">    1443 </span>            :   {
+<span class="lineNum">    1444 </span><span class="lineNoCov">          0 :     return NS_OK;</span>
+<span class="lineNum">    1445 </span>            :   }
+<span class="lineNum">    1446 </span>            : 
+<span class="lineNum">    1447 </span>            :   /**
+<span class="lineNum">    1448 </span>            :    * Hook to allow subclasses to produce a different EventListenerManager if
+<span class="lineNum">    1449 </span>            :    * needed for attachment of attribute-defined handlers
+<span class="lineNum">    1450 </span>            :    */
+<span class="lineNum">    1451 </span>            :   virtual EventListenerManager*
+<span class="lineNum">    1452 </span>            :     GetEventListenerManagerForAttr(nsIAtom* aAttrName, bool* aDefer);
+<span class="lineNum">    1453 </span>            : 
+<span class="lineNum">    1454 </span>            :   /**
+<span class="lineNum">    1455 </span>            :    * Internal hook for converting an attribute name-string to nsAttrName in
+<span class="lineNum">    1456 </span>            :    * case there is such existing attribute. aNameToUse can be passed to get
+<span class="lineNum">    1457 </span>            :    * name which was used for looking for the attribute (lowercase in HTML).
+<span class="lineNum">    1458 </span>            :    */
+<span class="lineNum">    1459 </span>            :   const nsAttrName*
+<span class="lineNum">    1460 </span>            :   InternalGetAttrNameFromQName(const nsAString&amp; aStr,
+<span class="lineNum">    1461 </span>            :                                nsAutoString* aNameToUse = nullptr) const;
+<span class="lineNum">    1462 </span>            : 
+<a name="1463"><span class="lineNum">    1463 </span>            :   nsIFrame* GetStyledFrame();</a>
+<span class="lineNum">    1464 </span>            : 
+<span class="lineNum">    1465 </span><span class="lineNoCov">          0 :   virtual Element* GetNameSpaceElement() override</span>
+<span class="lineNum">    1466 </span>            :   {
+<span class="lineNum">    1467 </span><span class="lineNoCov">          0 :     return this;</span>
+<span class="lineNum">    1468 </span>            :   }
+<span class="lineNum">    1469 </span>            : 
+<span class="lineNum">    1470 </span>            :   Attr* GetAttributeNodeNSInternal(const nsAString&amp; aNamespaceURI,
+<span class="lineNum">    1471 </span>            :                                    const nsAString&amp; aLocalName);
+<span class="lineNum">    1472 </span>            : 
+<span class="lineNum">    1473 </span>            :   inline void RegisterActivityObserver();
+<span class="lineNum">    1474 </span>            :   inline void UnregisterActivityObserver();
+<span class="lineNum">    1475 </span>            : 
+<span class="lineNum">    1476 </span>            :   /**
+<span class="lineNum">    1477 </span>            :    * Add/remove this element to the documents id cache
+<span class="lineNum">    1478 </span>            :    */
+<span class="lineNum">    1479 </span>            :   void AddToIdTable(nsIAtom* aId);
+<span class="lineNum">    1480 </span>            :   void RemoveFromIdTable();
+<span class="lineNum">    1481 </span>            : 
+<span class="lineNum">    1482 </span>            :   /**
+<span class="lineNum">    1483 </span>            :    * Functions to carry out event default actions for links of all types
+<span class="lineNum">    1484 </span>            :    * (HTML links, XLinks, SVG &quot;XLinks&quot;, etc.)
+<span class="lineNum">    1485 </span>            :    */
+<span class="lineNum">    1486 </span>            : 
+<span class="lineNum">    1487 </span>            :   /**
+<span class="lineNum">    1488 </span>            :    * Check that we meet the conditions to handle a link event
+<span class="lineNum">    1489 </span>            :    * and that we are actually on a link.
+<span class="lineNum">    1490 </span>            :    *
+<span class="lineNum">    1491 </span>            :    * @param aVisitor event visitor
+<span class="lineNum">    1492 </span>            :    * @param aURI the uri of the link, set only if the return value is true [OUT]
+<span class="lineNum">    1493 </span>            :    * @return true if we can handle the link event, false otherwise
+<span class="lineNum">    1494 </span>            :    */
+<span class="lineNum">    1495 </span>            :   bool CheckHandleEventForLinksPrecondition(EventChainVisitor&amp; aVisitor,
+<span class="lineNum">    1496 </span>            :                                             nsIURI** aURI) const;
+<span class="lineNum">    1497 </span>            : 
+<span class="lineNum">    1498 </span>            :   /**
+<span class="lineNum">    1499 </span>            :    * Handle status bar updates before they can be cancelled.
+<span class="lineNum">    1500 </span>            :    */
+<span class="lineNum">    1501 </span>            :   nsresult GetEventTargetParentForLinks(EventChainPreVisitor&amp; aVisitor);
+<span class="lineNum">    1502 </span>            : 
+<span class="lineNum">    1503 </span>            :   /**
+<span class="lineNum">    1504 </span>            :    * Handle default actions for link event if the event isn't consumed yet.
+<span class="lineNum">    1505 </span>            :    */
+<span class="lineNum">    1506 </span>            :   nsresult PostHandleEventForLinks(EventChainPostVisitor&amp; aVisitor);
+<span class="lineNum">    1507 </span>            : 
+<span class="lineNum">    1508 </span>            :   /**
+<span class="lineNum">    1509 </span>            :    * Get the target of this link element. Consumers should established that
+<span class="lineNum">    1510 </span>            :    * this element is a link (probably using IsLink) before calling this
+<span class="lineNum">    1511 </span>            :    * function (or else why call it?)
+<span class="lineNum">    1512 </span>            :    *
+<span class="lineNum">    1513 </span>            :    * Note: for HTML this gets the value of the 'target' attribute; for XLink
+<span class="lineNum">    1514 </span>            :    * this gets the value of the xlink:_moz_target attribute, or failing that,
+<span class="lineNum">    1515 </span>            :    * the value of xlink:show, converted to a suitably equivalent named target
+<span class="lineNum">    1516 </span>            :    * (e.g. _blank).
+<span class="lineNum">    1517 </span>            :    */
+<span class="lineNum">    1518 </span>            :   virtual void GetLinkTarget(nsAString&amp; aTarget);
+<span class="lineNum">    1519 </span>            : 
+<span class="lineNum">    1520 </span>            :   nsDOMTokenList* GetTokenList(nsIAtom* aAtom,
+<span class="lineNum">    1521 </span>            :                                const DOMTokenListSupportedTokenArray aSupportedTokens = nullptr);
+<span class="lineNum">    1522 </span>            : 
+<span class="lineNum">    1523 </span>            :   nsDataHashtable&lt;nsRefPtrHashKey&lt;DOMIntersectionObserver&gt;, int32_t&gt;*
+<span class="lineNum">    1524 </span>            :     RegisteredIntersectionObservers();
+<span class="lineNum">    1525 </span>            : 
+<span class="lineNum">    1526 </span>            : private:
+<span class="lineNum">    1527 </span>            :   /**
+<span class="lineNum">    1528 </span>            :    * Hook for implementing GetClasses.  This is guaranteed to only be
+<span class="lineNum">    1529 </span>            :    * called if the NODE_MAY_HAVE_CLASS flag is set.
+<span class="lineNum">    1530 </span>            :    */
+<span class="lineNum">    1531 </span>            :   const nsAttrValue* DoGetClasses() const;
+<span class="lineNum">    1532 </span>            : 
+<span class="lineNum">    1533 </span>            :   /**
+<span class="lineNum">    1534 </span>            :    * Get this element's client area rect in app units.
+<span class="lineNum">    1535 </span>            :    * @return the frame's client area
+<span class="lineNum">    1536 </span>            :    */
+<span class="lineNum">    1537 </span>            :   nsRect GetClientAreaRect();
+<span class="lineNum">    1538 </span>            : 
+<span class="lineNum">    1539 </span>            :   nsIScrollableFrame* GetScrollFrame(nsIFrame **aStyledFrame = nullptr,
+<span class="lineNum">    1540 </span>            :                                      bool aFlushLayout = true);
+<span class="lineNum">    1541 </span>            : 
+<span class="lineNum">    1542 </span>            :   // Data members
+<span class="lineNum">    1543 </span>            :   EventStates mState;
+<span class="lineNum">    1544 </span>            : #ifdef MOZ_STYLO
+<span class="lineNum">    1545 </span>            :   // Per-node data managed by Servo.
+<span class="lineNum">    1546 </span>            :   mozilla::ServoCell&lt;ServoNodeData*&gt; mServoData;
+<span class="lineNum">    1547 </span>            : #endif
+<span class="lineNum">    1548 </span>            : };
+<span class="lineNum">    1549 </span>            : 
+<span class="lineNum">    1550 </span>            : class RemoveFromBindingManagerRunnable : public mozilla::Runnable
+<span class="lineNum">    1551 </span>            : {
+<span class="lineNum">    1552 </span>            : public:
+<span class="lineNum">    1553 </span>            :   RemoveFromBindingManagerRunnable(nsBindingManager* aManager,
+<span class="lineNum">    1554 </span>            :                                    nsIContent* aContent,
+<span class="lineNum">    1555 </span>            :                                    nsIDocument* aDoc);
+<span class="lineNum">    1556 </span>            : 
+<span class="lineNum">    1557 </span>            :   NS_IMETHOD Run() override;
+<span class="lineNum">    1558 </span>            : private:
+<span class="lineNum">    1559 </span>            :   virtual ~RemoveFromBindingManagerRunnable();
+<span class="lineNum">    1560 </span>            :   RefPtr&lt;nsBindingManager&gt; mManager;
+<span class="lineNum">    1561 </span>            :   RefPtr&lt;nsIContent&gt; mContent;
+<span class="lineNum">    1562 </span>            :   nsCOMPtr&lt;nsIDocument&gt; mDoc;
+<span class="lineNum">    1563 </span>            : };
+<span class="lineNum">    1564 </span>            : 
+<span class="lineNum">    1565 </span>            : class DestinationInsertionPointList : public nsINodeList
+<span class="lineNum">    1566 </span>            : {
+<span class="lineNum">    1567 </span>            : public:
+<span class="lineNum">    1568 </span>            :   explicit DestinationInsertionPointList(Element* aElement);
+<a name="1569"><span class="lineNum">    1569 </span>            : </a>
+<span class="lineNum">    1570 </span>            :   NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+<span class="lineNum">    1571 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS(DestinationInsertionPointList)</span>
+<span class="lineNum">    1572 </span>            : 
+<span class="lineNum">    1573 </span>            :   // nsIDOMNodeList
+<span class="lineNum">    1574 </span>            :   NS_DECL_NSIDOMNODELIST
+<span class="lineNum">    1575 </span>            : 
+<span class="lineNum">    1576 </span>            :   // nsINodeList
+<span class="lineNum">    1577 </span>            :   virtual nsIContent* Item(uint32_t aIndex) override;
+<span class="lineNum">    1578 </span>            :   virtual int32_t IndexOf(nsIContent* aContent) override;
+<span class="lineNum">    1579 </span><span class="lineNoCov">          0 :   virtual nsINode* GetParentObject() override { return mParent; }</span>
+<span class="lineNum">    1580 </span>            :   virtual uint32_t Length() const;
+<span class="lineNum">    1581 </span>            :   virtual JSObject* WrapObject(JSContext* aCx, JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">    1582 </span>            : protected:
+<span class="lineNum">    1583 </span>            :   virtual ~DestinationInsertionPointList();
+<span class="lineNum">    1584 </span>            : 
+<span class="lineNum">    1585 </span>            :   RefPtr&lt;Element&gt; mParent;
+<span class="lineNum">    1586 </span>            :   nsCOMArray&lt;nsIContent&gt; mDestinationPoints;
+<span class="lineNum">    1587 </span>            : };
+<span class="lineNum">    1588 </span>            : 
+<span class="lineNum">    1589 </span>            : NS_DEFINE_STATIC_IID_ACCESSOR(Element, NS_ELEMENT_IID)
+<a name="1590"><span class="lineNum">    1590 </span>            : </a>
+<span class="lineNum">    1591 </span>            : inline bool
+<span class="lineNum">    1592 </span><span class="lineNoCov">          0 : Element::HasAttr(int32_t aNameSpaceID, nsIAtom* aName) const</span>
+<span class="lineNum">    1593 </span>            : {
+<span class="lineNum">    1594 </span>            :   NS_ASSERTION(nullptr != aName, &quot;must have attribute name&quot;);
+<span class="lineNum">    1595 </span>            :   NS_ASSERTION(aNameSpaceID != kNameSpaceID_Unknown,
+<span class="lineNum">    1596 </span>            :                &quot;must have a real namespace ID!&quot;);
+<span class="lineNum">    1597 </span>            : 
+<span class="lineNum">    1598 </span><span class="lineNoCov">          0 :   return mAttrsAndChildren.IndexOfAttr(aName, aNameSpaceID) &gt;= 0;</span>
+<span class="lineNum">    1599 </span>            : }
+<a name="1600"><span class="lineNum">    1600 </span>            : </a>
+<span class="lineNum">    1601 </span>            : inline bool
+<span class="lineNum">    1602 </span><span class="lineNoCov">          0 : Element::AttrValueIs(int32_t aNameSpaceID,</span>
+<span class="lineNum">    1603 </span>            :                      nsIAtom* aName,
+<span class="lineNum">    1604 </span>            :                      const nsAString&amp; aValue,
+<span class="lineNum">    1605 </span>            :                      nsCaseTreatment aCaseSensitive) const
+<span class="lineNum">    1606 </span>            : {
+<span class="lineNum">    1607 </span>            :   NS_ASSERTION(aName, &quot;Must have attr name&quot;);
+<span class="lineNum">    1608 </span>            :   NS_ASSERTION(aNameSpaceID != kNameSpaceID_Unknown, &quot;Must have namespace&quot;);
+<span class="lineNum">    1609 </span>            : 
+<span class="lineNum">    1610 </span><span class="lineNoCov">          0 :   const nsAttrValue* val = mAttrsAndChildren.GetAttr(aName, aNameSpaceID);</span>
+<span class="lineNum">    1611 </span><span class="lineNoCov">          0 :   return val &amp;&amp; val-&gt;Equals(aValue, aCaseSensitive);</span>
+<span class="lineNum">    1612 </span>            : }
+<a name="1613"><span class="lineNum">    1613 </span>            : </a>
+<span class="lineNum">    1614 </span>            : inline bool
+<span class="lineNum">    1615 </span><span class="lineNoCov">          0 : Element::AttrValueIs(int32_t aNameSpaceID,</span>
+<span class="lineNum">    1616 </span>            :                      nsIAtom* aName,
+<span class="lineNum">    1617 </span>            :                      nsIAtom* aValue,
+<span class="lineNum">    1618 </span>            :                      nsCaseTreatment aCaseSensitive) const
+<span class="lineNum">    1619 </span>            : {
+<span class="lineNum">    1620 </span>            :   NS_ASSERTION(aName, &quot;Must have attr name&quot;);
+<span class="lineNum">    1621 </span>            :   NS_ASSERTION(aNameSpaceID != kNameSpaceID_Unknown, &quot;Must have namespace&quot;);
+<span class="lineNum">    1622 </span>            :   NS_ASSERTION(aValue, &quot;Null value atom&quot;);
+<span class="lineNum">    1623 </span>            : 
+<span class="lineNum">    1624 </span><span class="lineNoCov">          0 :   const nsAttrValue* val = mAttrsAndChildren.GetAttr(aName, aNameSpaceID);</span>
+<span class="lineNum">    1625 </span><span class="lineNoCov">          0 :   return val &amp;&amp; val-&gt;Equals(aValue, aCaseSensitive);</span>
+<span class="lineNum">    1626 </span>            : }
+<span class="lineNum">    1627 </span>            : 
+<span class="lineNum">    1628 </span>            : } // namespace dom
+<a name="1629"><span class="lineNum">    1629 </span>            : } // namespace mozilla</a>
+<span class="lineNum">    1630 </span>            : 
+<span class="lineNum">    1631 </span><span class="lineNoCov">          0 : inline mozilla::dom::Element* nsINode::AsElement()</span>
+<span class="lineNum">    1632 </span>            : {
+<span class="lineNum">    1633 </span>            :   MOZ_ASSERT(IsElement());
+<span class="lineNum">    1634 </span><span class="lineNoCov">          0 :   return static_cast&lt;mozilla::dom::Element*&gt;(this);</span>
+<span class="lineNum">    1635 </span>            : }
+<span class="lineNum">    1636 </span>            : 
+<span class="lineNum">    1637 </span>            : inline const mozilla::dom::Element* nsINode::AsElement() const
+<span class="lineNum">    1638 </span>            : {
+<span class="lineNum">    1639 </span>            :   MOZ_ASSERT(IsElement());
+<span class="lineNum">    1640 </span>            :   return static_cast&lt;const mozilla::dom::Element*&gt;(this);
+<a name="1641"><span class="lineNum">    1641 </span>            : }</a>
+<span class="lineNum">    1642 </span>            : 
+<span class="lineNum">    1643 </span><span class="lineNoCov">          0 : inline void nsINode::UnsetRestyleFlagsIfGecko()</span>
+<span class="lineNum">    1644 </span>            : {
+<span class="lineNum">    1645 </span><span class="lineNoCov">          0 :   if (IsElement() &amp;&amp; !AsElement()-&gt;IsStyledByServo()) {</span>
+<span class="lineNum">    1646 </span>            :     UnsetFlags(ELEMENT_ALL_RESTYLE_FLAGS);
+<span class="lineNum">    1647 </span>            :   }
+<span class="lineNum">    1648 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">    1649 </span>            : 
+<span class="lineNum">    1650 </span>            : /**
+<span class="lineNum">    1651 </span>            :  * Macros to implement Clone(). _elementName is the class for which to implement
+<span class="lineNum">    1652 </span>            :  * Clone.
+<span class="lineNum">    1653 </span>            :  */
+<span class="lineNum">    1654 </span>            : #define NS_IMPL_ELEMENT_CLONE(_elementName)                                 \
+<span class="lineNum">    1655 </span>            : nsresult                                                                    \
+<span class="lineNum">    1656 </span>            : _elementName::Clone(mozilla::dom::NodeInfo *aNodeInfo, nsINode **aResult) const \
+<span class="lineNum">    1657 </span>            : {                                                                           \
+<span class="lineNum">    1658 </span>            :   *aResult = nullptr;                                                       \
+<span class="lineNum">    1659 </span>            :   already_AddRefed&lt;mozilla::dom::NodeInfo&gt; ni =                             \
+<span class="lineNum">    1660 </span>            :     RefPtr&lt;mozilla::dom::NodeInfo&gt;(aNodeInfo).forget();                   \
+<span class="lineNum">    1661 </span>            :   _elementName *it = new _elementName(ni);                                  \
+<span class="lineNum">    1662 </span>            :   if (!it) {                                                                \
+<span class="lineNum">    1663 </span>            :     return NS_ERROR_OUT_OF_MEMORY;                                          \
+<span class="lineNum">    1664 </span>            :   }                                                                         \
+<span class="lineNum">    1665 </span>            :                                                                             \
+<span class="lineNum">    1666 </span>            :   nsCOMPtr&lt;nsINode&gt; kungFuDeathGrip = it;                                   \
+<span class="lineNum">    1667 </span>            :   nsresult rv = const_cast&lt;_elementName*&gt;(this)-&gt;CopyInnerTo(it);           \
+<span class="lineNum">    1668 </span>            :   if (NS_SUCCEEDED(rv)) {                                                   \
+<span class="lineNum">    1669 </span>            :     kungFuDeathGrip.swap(*aResult);                                         \
+<span class="lineNum">    1670 </span>            :   }                                                                         \
+<span class="lineNum">    1671 </span>            :                                                                             \
+<span class="lineNum">    1672 </span>            :   return rv;                                                                \
+<span class="lineNum">    1673 </span>            : }
+<span class="lineNum">    1674 </span>            : 
+<span class="lineNum">    1675 </span>            : #define NS_IMPL_ELEMENT_CLONE_WITH_INIT(_elementName)                       \
+<span class="lineNum">    1676 </span>            : nsresult                                                                    \
+<span class="lineNum">    1677 </span>            : _elementName::Clone(mozilla::dom::NodeInfo *aNodeInfo, nsINode **aResult) const \
+<span class="lineNum">    1678 </span>            : {                                                                           \
+<span class="lineNum">    1679 </span>            :   *aResult = nullptr;                                                       \
+<span class="lineNum">    1680 </span>            :   already_AddRefed&lt;mozilla::dom::NodeInfo&gt; ni =                             \
+<span class="lineNum">    1681 </span>            :     RefPtr&lt;mozilla::dom::NodeInfo&gt;(aNodeInfo).forget();                   \
+<span class="lineNum">    1682 </span>            :   _elementName *it = new _elementName(ni);                                  \
+<span class="lineNum">    1683 </span>            :   if (!it) {                                                                \
+<span class="lineNum">    1684 </span>            :     return NS_ERROR_OUT_OF_MEMORY;                                          \
+<span class="lineNum">    1685 </span>            :   }                                                                         \
+<span class="lineNum">    1686 </span>            :                                                                             \
+<span class="lineNum">    1687 </span>            :   nsCOMPtr&lt;nsINode&gt; kungFuDeathGrip = it;                                   \
+<span class="lineNum">    1688 </span>            :   nsresult rv = it-&gt;Init();                                                 \
+<span class="lineNum">    1689 </span>            :   nsresult rv2 = const_cast&lt;_elementName*&gt;(this)-&gt;CopyInnerTo(it);          \
+<span class="lineNum">    1690 </span>            :   if (NS_FAILED(rv2)) {                                                     \
+<span class="lineNum">    1691 </span>            :     rv = rv2;                                                               \
+<span class="lineNum">    1692 </span>            :   }                                                                         \
+<span class="lineNum">    1693 </span>            :   if (NS_SUCCEEDED(rv)) {                                                   \
+<span class="lineNum">    1694 </span>            :     kungFuDeathGrip.swap(*aResult);                                         \
+<span class="lineNum">    1695 </span>            :   }                                                                         \
+<span class="lineNum">    1696 </span>            :                                                                             \
+<span class="lineNum">    1697 </span>            :   return rv;                                                                \
+<span class="lineNum">    1698 </span>            : }
+<span class="lineNum">    1699 </span>            : 
+<span class="lineNum">    1700 </span>            : /**
+<span class="lineNum">    1701 </span>            :  * A macro to implement the getter and setter for a given string
+<span class="lineNum">    1702 </span>            :  * valued content property. The method uses the generic GetAttr and
+<span class="lineNum">    1703 </span>            :  * SetAttr methods.  We use the 5-argument form of SetAttr, because
+<span class="lineNum">    1704 </span>            :  * some consumers only implement that one, hiding superclass
+<span class="lineNum">    1705 </span>            :  * 4-argument forms.
+<span class="lineNum">    1706 </span>            :  */
+<span class="lineNum">    1707 </span>            : #define NS_IMPL_STRING_ATTR(_class, _method, _atom)                     \
+<span class="lineNum">    1708 </span>            :   NS_IMETHODIMP                                                         \
+<span class="lineNum">    1709 </span>            :   _class::Get##_method(nsAString&amp; aValue)                               \
+<span class="lineNum">    1710 </span>            :   {                                                                     \
+<span class="lineNum">    1711 </span>            :     GetAttr(kNameSpaceID_None, nsGkAtoms::_atom, aValue);               \
+<span class="lineNum">    1712 </span>            :     return NS_OK;                                                       \
+<span class="lineNum">    1713 </span>            :   }                                                                     \
+<span class="lineNum">    1714 </span>            :   NS_IMETHODIMP                                                         \
+<span class="lineNum">    1715 </span>            :   _class::Set##_method(const nsAString&amp; aValue)                         \
+<span class="lineNum">    1716 </span>            :   {                                                                     \
+<span class="lineNum">    1717 </span>            :     return SetAttr(kNameSpaceID_None, nsGkAtoms::_atom, nullptr, aValue, true); \
+<span class="lineNum">    1718 </span>            :   }
+<span class="lineNum">    1719 </span>            : 
+<span class="lineNum">    1720 </span>            : /**
+<span class="lineNum">    1721 </span>            :  * A macro to implement the getter and setter for a given boolean
+<span class="lineNum">    1722 </span>            :  * valued content property. The method uses the GetBoolAttr and
+<span class="lineNum">    1723 </span>            :  * SetBoolAttr methods.
+<span class="lineNum">    1724 </span>            :  */
+<span class="lineNum">    1725 </span>            : #define NS_IMPL_BOOL_ATTR(_class, _method, _atom)                     \
+<span class="lineNum">    1726 </span>            :   NS_IMETHODIMP                                                       \
+<span class="lineNum">    1727 </span>            :   _class::Get##_method(bool* aValue)                                  \
+<span class="lineNum">    1728 </span>            :   {                                                                   \
+<span class="lineNum">    1729 </span>            :     *aValue = GetBoolAttr(nsGkAtoms::_atom);                          \
+<span class="lineNum">    1730 </span>            :     return NS_OK;                                                     \
+<span class="lineNum">    1731 </span>            :   }                                                                   \
+<span class="lineNum">    1732 </span>            :   NS_IMETHODIMP                                                       \
+<span class="lineNum">    1733 </span>            :   _class::Set##_method(bool aValue)                                   \
+<span class="lineNum">    1734 </span>            :   {                                                                   \
+<span class="lineNum">    1735 </span>            :     return SetBoolAttr(nsGkAtoms::_atom, aValue);                     \
+<span class="lineNum">    1736 </span>            :   }
+<span class="lineNum">    1737 </span>            : 
+<span class="lineNum">    1738 </span>            : #define NS_FORWARD_NSIDOMELEMENT_TO_GENERIC                                   \
+<span class="lineNum">    1739 </span>            : typedef mozilla::dom::Element Element;                                        \
+<span class="lineNum">    1740 </span>            : NS_IMETHOD GetTagName(nsAString&amp; aTagName) final override                     \
+<span class="lineNum">    1741 </span>            : {                                                                             \
+<span class="lineNum">    1742 </span>            :   Element::GetTagName(aTagName);                                              \
+<span class="lineNum">    1743 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1744 </span>            : }                                                                             \
+<span class="lineNum">    1745 </span>            : NS_IMETHOD GetAttributes(nsIDOMMozNamedAttrMap** aAttributes) final override  \
+<span class="lineNum">    1746 </span>            : {                                                                             \
+<span class="lineNum">    1747 </span>            :   NS_ADDREF(*aAttributes = Attributes());                                     \
+<span class="lineNum">    1748 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1749 </span>            : }                                                                             \
+<span class="lineNum">    1750 </span>            : using Element::GetAttribute;                                                  \
+<span class="lineNum">    1751 </span>            : NS_IMETHOD GetAttribute(const nsAString&amp; name, nsAString&amp; _retval) final      \
+<span class="lineNum">    1752 </span>            :   override                                                                    \
+<span class="lineNum">    1753 </span>            : {                                                                             \
+<span class="lineNum">    1754 </span>            :   nsString attr;                                                              \
+<span class="lineNum">    1755 </span>            :   GetAttribute(name, attr);                                                   \
+<span class="lineNum">    1756 </span>            :   _retval = attr;                                                             \
+<span class="lineNum">    1757 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1758 </span>            : }                                                                             \
+<span class="lineNum">    1759 </span>            : NS_IMETHOD SetAttribute(const nsAString&amp; name,                                \
+<span class="lineNum">    1760 </span>            :                         const nsAString&amp; value) override                      \
+<span class="lineNum">    1761 </span>            : {                                                                             \
+<span class="lineNum">    1762 </span>            :   mozilla::ErrorResult rv;                                                    \
+<span class="lineNum">    1763 </span>            :   Element::SetAttribute(name, value, rv);                                     \
+<span class="lineNum">    1764 </span>            :   return rv.StealNSResult();                                                  \
+<span class="lineNum">    1765 </span>            : }                                                                             \
+<span class="lineNum">    1766 </span>            : using Element::HasAttribute;                                                  \
+<span class="lineNum">    1767 </span>            : NS_IMETHOD HasAttribute(const nsAString&amp; name,                                \
+<span class="lineNum">    1768 </span>            :                            bool* _retval) final override                      \
+<span class="lineNum">    1769 </span>            : {                                                                             \
+<span class="lineNum">    1770 </span>            :   *_retval = HasAttribute(name);                                              \
+<span class="lineNum">    1771 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1772 </span>            : }                                                                             \
+<span class="lineNum">    1773 </span>            : NS_IMETHOD GetAttributeNode(const nsAString&amp; name,                            \
+<span class="lineNum">    1774 </span>            :                             nsIDOMAttr** _retval) final override              \
+<span class="lineNum">    1775 </span>            : {                                                                             \
+<span class="lineNum">    1776 </span>            :   NS_IF_ADDREF(*_retval = Element::GetAttributeNode(name));                   \
+<span class="lineNum">    1777 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1778 </span>            : }                                                                             \
+<span class="lineNum">    1779 </span>            : NS_IMETHOD GetAttributeNodeNS(const nsAString&amp; namespaceURI,                  \
+<span class="lineNum">    1780 </span>            :                               const nsAString&amp; localName,                     \
+<span class="lineNum">    1781 </span>            :                               nsIDOMAttr** _retval) final override            \
+<span class="lineNum">    1782 </span>            : {                                                                             \
+<span class="lineNum">    1783 </span>            :   NS_IF_ADDREF(*_retval = Element::GetAttributeNodeNS(namespaceURI,           \
+<span class="lineNum">    1784 </span>            :                                                       localName));            \
+<span class="lineNum">    1785 </span>            :   return NS_OK;                                                               \
+<span class="lineNum">    1786 </span>            : }
+<span class="lineNum">    1787 </span>            : #endif // mozilla_dom_Element_h__
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

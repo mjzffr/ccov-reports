@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - security/nss/lib/freebl/ecdecode.c</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">security/nss/lib/freebl</a> - ecdecode.c<span style="font-size: 80%;"> (source / <a href="ecdecode.c.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">96</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public</a>
+<span class="lineNum">       2 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       3 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef NSS_DISABLE_ECC
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifdef FREEBL_NO_DEPEND
+<span class="lineNum">       8 </span>            : #include &quot;stubs.h&quot;
+<span class="lineNum">       9 </span>            : #endif
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;blapi.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;secoid.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;secitem.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;secerr.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;ec.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;ecl-curve.h&quot;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #define CHECK_OK(func) \
+<span class="lineNum">      19 </span>            :     if (func == NULL)  \
+<span class="lineNum">      20 </span>            :     goto cleanup
+<span class="lineNum">      21 </span>            : #define CHECK_SEC_OK(func)         \
+<span class="lineNum">      22 </span>            :     if (SECSuccess != (rv = func)) \
+<span class="lineNum">      23 </span>            :     goto cleanup
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /* Copy all of the fields from srcParams into dstParams
+<a name="26"><span class="lineNum">      26 </span>            :  */</a>
+<span class="lineNum">      27 </span>            : SECStatus
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 : EC_CopyParams(PLArenaPool *arena, ECParams *dstParams,</span>
+<span class="lineNum">      29 </span>            :               const ECParams *srcParams)
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :     SECStatus rv = SECFailure;</span>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     dstParams-&gt;arena = arena;</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     dstParams-&gt;type = srcParams-&gt;type;</span>
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :     dstParams-&gt;fieldID.size = srcParams-&gt;fieldID.size;</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     dstParams-&gt;fieldID.type = srcParams-&gt;fieldID.type;</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     if (srcParams-&gt;fieldID.type == ec_field_GFp ||</span>
+<span class="lineNum">      38 </span>            :         srcParams-&gt;fieldID.type == ec_field_plain) {
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :         CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;fieldID.u.prime,</span>
+<span class="lineNum">      40 </span>            :                                       &amp;srcParams-&gt;fieldID.u.prime));
+<span class="lineNum">      41 </span>            :     } else {
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :         CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;fieldID.u.poly,</span>
+<span class="lineNum">      43 </span>            :                                       &amp;srcParams-&gt;fieldID.u.poly));
+<span class="lineNum">      44 </span>            :     }
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     dstParams-&gt;fieldID.k1 = srcParams-&gt;fieldID.k1;</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     dstParams-&gt;fieldID.k2 = srcParams-&gt;fieldID.k2;</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :     dstParams-&gt;fieldID.k3 = srcParams-&gt;fieldID.k3;</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;curve.a,</span>
+<span class="lineNum">      49 </span>            :                                   &amp;srcParams-&gt;curve.a));
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;curve.b,</span>
+<span class="lineNum">      51 </span>            :                                   &amp;srcParams-&gt;curve.b));
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;curve.seed,</span>
+<span class="lineNum">      53 </span>            :                                   &amp;srcParams-&gt;curve.seed));
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;base,</span>
+<span class="lineNum">      55 </span>            :                                   &amp;srcParams-&gt;base));
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;order,</span>
+<span class="lineNum">      57 </span>            :                                   &amp;srcParams-&gt;order));
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;DEREncoding,</span>
+<span class="lineNum">      59 </span>            :                                   &amp;srcParams-&gt;DEREncoding));
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     dstParams-&gt;name = srcParams-&gt;name;</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :     CHECK_SEC_OK(SECITEM_CopyItem(arena, &amp;dstParams-&gt;curveOID,</span>
+<span class="lineNum">      62 </span>            :                                   &amp;srcParams-&gt;curveOID));
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     dstParams-&gt;cofactor = srcParams-&gt;cofactor;</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :     return SECSuccess;</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : cleanup:
+<span class="lineNum">      68 </span>            :     return SECFailure;
+<span class="lineNum">      69 </span>            : }
+<a name="70"><span class="lineNum">      70 </span>            : </a>
+<span class="lineNum">      71 </span>            : static SECStatus
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 : gf_populate_params_bytes(ECCurveName name, ECFieldType field_type, ECParams *params)</span>
+<span class="lineNum">      73 </span>            : {
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     SECStatus rv = SECFailure;</span>
+<span class="lineNum">      75 </span>            :     const ECCurveBytes *curveParams;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     if ((name &lt; ECCurve_noName) || (name &gt; ECCurve_pastLastCurve))</span>
+<span class="lineNum">      78 </span>            :         goto cleanup;
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     params-&gt;name = name;</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     curveParams = ecCurve_map[params-&gt;name];</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     CHECK_OK(curveParams);</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     params-&gt;fieldID.size = curveParams-&gt;size;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     params-&gt;fieldID.type = field_type;</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     if (field_type != ec_field_GFp &amp;&amp; field_type != ec_field_plain) {</span>
+<span class="lineNum">      85 </span>            :         return SECFailure;
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     params-&gt;fieldID.u.prime.len = curveParams-&gt;scalarSize;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     params-&gt;fieldID.u.prime.data = (unsigned char *)curveParams-&gt;irr;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     params-&gt;curve.a.len = curveParams-&gt;scalarSize;</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     params-&gt;curve.a.data = (unsigned char *)curveParams-&gt;curvea;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     params-&gt;curve.b.len = curveParams-&gt;scalarSize;</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     params-&gt;curve.b.data = (unsigned char *)curveParams-&gt;curveb;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     params-&gt;base.len = curveParams-&gt;pointSize;</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     params-&gt;base.data = (unsigned char *)curveParams-&gt;base;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     params-&gt;order.len = curveParams-&gt;scalarSize;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     params-&gt;order.data = (unsigned char *)curveParams-&gt;order;</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :     params-&gt;cofactor = curveParams-&gt;cofactor;</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     rv = SECSuccess;</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : cleanup:
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     return rv;</span>
+<span class="lineNum">     103 </span>            : }
+<a name="104"><span class="lineNum">     104 </span>            : </a>
+<span class="lineNum">     105 </span>            : SECStatus
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 : EC_FillParams(PLArenaPool *arena, const SECItem *encodedParams,</span>
+<span class="lineNum">     107 </span>            :               ECParams *params)
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :     SECStatus rv = SECFailure;</span>
+<span class="lineNum">     110 </span>            :     SECOidTag tag;
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     SECItem oid = { siBuffer, NULL, 0 };</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : #if EC_DEBUG
+<span class="lineNum">     114 </span>            :     int i;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :     printf(&quot;Encoded params in EC_DecodeParams: &quot;);
+<span class="lineNum">     117 </span>            :     for (i = 0; i &lt; encodedParams-&gt;len; i++) {
+<span class="lineNum">     118 </span>            :         printf(&quot;%02x:&quot;, encodedParams-&gt;data[i]);
+<span class="lineNum">     119 </span>            :     }
+<span class="lineNum">     120 </span>            :     printf(&quot;\n&quot;);
+<span class="lineNum">     121 </span>            : #endif
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     if ((encodedParams-&gt;len != ANSI_X962_CURVE_OID_TOTAL_LEN) &amp;&amp;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :         (encodedParams-&gt;len != SECG_CURVE_OID_TOTAL_LEN) &amp;&amp;</span>
+<span class="lineNum">     125 </span>            :         (encodedParams-&gt;len != PKIX_NEWCURVES_OID_TOTAL_LEN)) {
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :         PORT_SetError(SEC_ERROR_UNSUPPORTED_ELLIPTIC_CURVE);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :         return SECFailure;</span>
+<span class="lineNum">     128 </span>            :     };
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     oid.len = encodedParams-&gt;len - 2;</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     oid.data = encodedParams-&gt;data + 2;</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     if ((encodedParams-&gt;data[0] != SEC_ASN1_OBJECT_ID) ||</span>
+<span class="lineNum">     133 </span>            :         ((tag = SECOID_FindOIDTag(&amp;oid)) == SEC_OID_UNKNOWN)) {
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :         PORT_SetError(SEC_ERROR_UNSUPPORTED_ELLIPTIC_CURVE);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :         return SECFailure;</span>
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :     params-&gt;arena = arena;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     params-&gt;cofactor = 0;</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     params-&gt;type = ec_params_named;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :     params-&gt;name = ECCurve_noName;</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     /* Fill out curveOID */
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     params-&gt;curveOID.len = oid.len;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     params-&gt;curveOID.data = (unsigned char *)PORT_ArenaAlloc(arena, oid.len);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     if (params-&gt;curveOID.data == NULL)</span>
+<span class="lineNum">     147 </span>            :         goto cleanup;
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     memcpy(params-&gt;curveOID.data, oid.data, oid.len);</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : #if EC_DEBUG
+<span class="lineNum">     151 </span>            :     printf(&quot;Curve: %s\n&quot;, SECOID_FindOIDTagDescription(tag));
+<span class="lineNum">     152 </span>            : #endif
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     switch (tag) {</span>
+<span class="lineNum">     155 </span>            :         case SEC_OID_ANSIX962_EC_PRIME256V1:
+<span class="lineNum">     156 </span>            :             /* Populate params for prime256v1 aka secp256r1
+<span class="lineNum">     157 </span>            :              * (the NIST P-256 curve)
+<span class="lineNum">     158 </span>            :              */
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :             CHECK_SEC_OK(gf_populate_params_bytes(ECCurve_X9_62_PRIME_256V1,</span>
+<span class="lineNum">     160 </span>            :                                                   ec_field_GFp, params));
+<span class="lineNum">     161 </span>            :             break;
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :         case SEC_OID_SECG_EC_SECP384R1:
+<span class="lineNum">     164 </span>            :             /* Populate params for secp384r1
+<span class="lineNum">     165 </span>            :              * (the NIST P-384 curve)
+<span class="lineNum">     166 </span>            :              */
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :             CHECK_SEC_OK(gf_populate_params_bytes(ECCurve_SECG_PRIME_384R1,</span>
+<span class="lineNum">     168 </span>            :                                                   ec_field_GFp, params));
+<span class="lineNum">     169 </span>            :             break;
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :         case SEC_OID_SECG_EC_SECP521R1:
+<span class="lineNum">     172 </span>            :             /* Populate params for secp521r1
+<span class="lineNum">     173 </span>            :              * (the NIST P-521 curve)
+<span class="lineNum">     174 </span>            :              */
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :             CHECK_SEC_OK(gf_populate_params_bytes(ECCurve_SECG_PRIME_521R1,</span>
+<span class="lineNum">     176 </span>            :                                                   ec_field_GFp, params));
+<span class="lineNum">     177 </span>            :             break;
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :         case SEC_OID_CURVE25519:
+<span class="lineNum">     180 </span>            :             /* Populate params for Curve25519 */
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :             CHECK_SEC_OK(gf_populate_params_bytes(ECCurve25519, ec_field_plain,</span>
+<span class="lineNum">     182 </span>            :                                                   params));
+<span class="lineNum">     183 </span>            :             break;
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :         default:
+<span class="lineNum">     186 </span>            :             break;
+<span class="lineNum">     187 </span>            :     };
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : cleanup:
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :     if (!params-&gt;cofactor) {</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         PORT_SetError(SEC_ERROR_UNSUPPORTED_ELLIPTIC_CURVE);</span>
+<span class="lineNum">     192 </span>            : #if EC_DEBUG
+<span class="lineNum">     193 </span>            :         printf(&quot;Unrecognized curve, returning NULL params\n&quot;);
+<span class="lineNum">     194 </span>            : #endif
+<span class="lineNum">     195 </span>            :     }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :     return rv;</span>
+<span class="lineNum">     198 </span>            : }
+<a name="199"><span class="lineNum">     199 </span>            : </a>
+<span class="lineNum">     200 </span>            : SECStatus
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 : EC_DecodeParams(const SECItem *encodedParams, ECParams **ecparams)</span>
+<span class="lineNum">     202 </span>            : {
+<span class="lineNum">     203 </span>            :     PLArenaPool *arena;
+<span class="lineNum">     204 </span>            :     ECParams *params;
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :     SECStatus rv = SECFailure;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :     /* Initialize an arena for the ECParams structure */
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :     if (!(arena = PORT_NewArena(NSS_FREEBL_DEFAULT_CHUNKSIZE)))</span>
+<span class="lineNum">     209 </span>            :         return SECFailure;
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :     params = (ECParams *)PORT_ArenaZAlloc(arena, sizeof(ECParams));</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :     if (!params) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :         PORT_FreeArena(arena, PR_TRUE);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :         return SECFailure;</span>
+<span class="lineNum">     215 </span>            :     }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :     /* Copy the encoded params */
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :     SECITEM_AllocItem(arena, &amp;(params-&gt;DEREncoding),</span>
+<span class="lineNum">     219 </span>            :                       encodedParams-&gt;len);
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :     memcpy(params-&gt;DEREncoding.data, encodedParams-&gt;data, encodedParams-&gt;len);</span>
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :     /* Fill out the rest of the ECParams structure based on
+<span class="lineNum">     223 </span>            :      * the encoded params
+<span class="lineNum">     224 </span>            :      */
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :     rv = EC_FillParams(arena, encodedParams, params);</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :     if (rv == SECFailure) {</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         PORT_FreeArena(arena, PR_TRUE);</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :         return SECFailure;</span>
+<span class="lineNum">     229 </span>            :     } else {
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :         *ecparams = params;</span>
+<span class="lineNum">     231 </span>            :         ;
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :         return SECSuccess;</span>
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            : }
+<a name="235"><span class="lineNum">     235 </span>            : </a>
+<span class="lineNum">     236 </span>            : int
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 : EC_GetPointSize(const ECParams *params)</span>
+<span class="lineNum">     238 </span>            : {
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :     ECCurveName name = params-&gt;name;</span>
+<span class="lineNum">     240 </span>            :     const ECCurveBytes *curveParams;
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :     if ((name &lt; ECCurve_noName) || (name &gt; ECCurve_pastLastCurve) ||</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :         ((curveParams = ecCurve_map[name]) == NULL)) {</span>
+<span class="lineNum">     244 </span>            :         /* unknown curve, calculate point size from params. assume standard curves with 2 points
+<span class="lineNum">     245 </span>            :          * and a point compression indicator byte */
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :         int sizeInBytes = (params-&gt;fieldID.size + 7) / 8;</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :         return sizeInBytes * 2 + 1;</span>
+<span class="lineNum">     248 </span>            :     }
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :     if (name == ECCurve25519) {</span>
+<span class="lineNum">     250 </span>            :         /* Only X here */
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :         return curveParams-&gt;scalarSize;</span>
+<span class="lineNum">     252 </span>            :     }
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :     return curveParams-&gt;pointSize - 1;</span>
+<span class="lineNum">     254 </span>            : }
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            : #endif /* NSS_DISABLE_ECC */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

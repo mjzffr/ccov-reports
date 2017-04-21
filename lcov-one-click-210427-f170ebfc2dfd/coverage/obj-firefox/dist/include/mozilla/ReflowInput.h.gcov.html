@@ -1,0 +1,1102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/ReflowInput.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - ReflowInput.h<span style="font-size: 80%;"> (source / <a href="ReflowInput.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">182</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /* struct containing the input to nsIFrame::Reflow */
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #ifndef mozilla_ReflowInput_h
+<span class="lineNum">       9 </span>            : #define mozilla_ReflowInput_h
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;nsMargin.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsStyleCoord.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsIFrame.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Assertions.h&quot;
+<span class="lineNum">      15 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : class nsPresContext;
+<span class="lineNum">      18 </span>            : class nsRenderingContext;
+<span class="lineNum">      19 </span>            : class nsFloatManager;
+<span class="lineNum">      20 </span>            : class nsLineLayout;
+<span class="lineNum">      21 </span>            : class nsIPercentBSizeObserver;
+<span class="lineNum">      22 </span>            : struct nsHypotheticalPosition;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : /**
+<span class="lineNum">      25 </span>            :  * @return aValue clamped to [aMinValue, aMaxValue].
+<span class="lineNum">      26 </span>            :  *
+<span class="lineNum">      27 </span>            :  * @note This function needs to handle aMinValue &gt; aMaxValue. In that case,
+<span class="lineNum">      28 </span>            :  *       aMinValue is returned.
+<span class="lineNum">      29 </span>            :  * @see http://www.w3.org/TR/CSS21/visudet.html#min-max-widths
+<span class="lineNum">      30 </span>            :  * @see http://www.w3.org/TR/CSS21/visudet.html#min-max-heights
+<span class="lineNum">      31 </span>            :  */
+<span class="lineNum">      32 </span>            : template &lt;class NumericType&gt;
+<span class="lineNum">      33 </span>            : NumericType
+<span class="lineNum">      34 </span>            : NS_CSS_MINMAX(NumericType aValue, NumericType aMinValue, NumericType aMaxValue)
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   NumericType result = aValue;</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   if (aMaxValue &lt; result)</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     result = aMaxValue;</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   if (aMinValue &gt; result)</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     result = aMinValue;</span>
+<span class="lineNum">      41 </span>            :   return result;
+<span class="lineNum">      42 </span>            : }
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : /**
+<span class="lineNum">      45 </span>            :  * CSS Frame type. Included as part of the reflow state.
+<span class="lineNum">      46 </span>            :  */
+<span class="lineNum">      47 </span>            : typedef uint32_t  nsCSSFrameType;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : #define NS_CSS_FRAME_TYPE_UNKNOWN         0
+<span class="lineNum">      50 </span>            : #define NS_CSS_FRAME_TYPE_INLINE          1
+<span class="lineNum">      51 </span>            : #define NS_CSS_FRAME_TYPE_BLOCK           2  /* block-level in normal flow */
+<span class="lineNum">      52 </span>            : #define NS_CSS_FRAME_TYPE_FLOATING        3
+<span class="lineNum">      53 </span>            : #define NS_CSS_FRAME_TYPE_ABSOLUTE        4
+<span class="lineNum">      54 </span>            : #define NS_CSS_FRAME_TYPE_INTERNAL_TABLE  5  /* row group frame, row frame, cell frame, ... */
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : /**
+<span class="lineNum">      57 </span>            :  * Bit-flag that indicates whether the element is replaced. Applies to inline,
+<span class="lineNum">      58 </span>            :  * block-level, floating, and absolutely positioned elements
+<span class="lineNum">      59 </span>            :  */
+<span class="lineNum">      60 </span>            : #define NS_CSS_FRAME_TYPE_REPLACED                0x08000
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : /**
+<span class="lineNum">      63 </span>            :  * Bit-flag that indicates that the element is replaced and contains a block
+<span class="lineNum">      64 </span>            :  * (eg some form controls).  Applies to inline, block-level, floating, and
+<span class="lineNum">      65 </span>            :  * absolutely positioned elements.  Mutually exclusive with
+<span class="lineNum">      66 </span>            :  * NS_CSS_FRAME_TYPE_REPLACED.
+<span class="lineNum">      67 </span>            :  */
+<span class="lineNum">      68 </span>            : #define NS_CSS_FRAME_TYPE_REPLACED_CONTAINS_BLOCK 0x10000
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : /**
+<span class="lineNum">      71 </span>            :  * Helper macros for telling whether items are replaced
+<span class="lineNum">      72 </span>            :  */
+<span class="lineNum">      73 </span>            : #define NS_FRAME_IS_REPLACED_NOBLOCK(_ft) \
+<span class="lineNum">      74 </span>            :   (NS_CSS_FRAME_TYPE_REPLACED == ((_ft) &amp; NS_CSS_FRAME_TYPE_REPLACED))
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : #define NS_FRAME_IS_REPLACED(_ft)            \
+<span class="lineNum">      77 </span>            :   (NS_FRAME_IS_REPLACED_NOBLOCK(_ft) ||      \
+<span class="lineNum">      78 </span>            :    NS_FRAME_IS_REPLACED_CONTAINS_BLOCK(_ft))
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : #define NS_FRAME_REPLACED(_ft) \
+<span class="lineNum">      81 </span>            :   (NS_CSS_FRAME_TYPE_REPLACED | (_ft))
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : #define NS_FRAME_IS_REPLACED_CONTAINS_BLOCK(_ft)         \
+<span class="lineNum">      84 </span>            :   (NS_CSS_FRAME_TYPE_REPLACED_CONTAINS_BLOCK ==         \
+<span class="lineNum">      85 </span>            :    ((_ft) &amp; NS_CSS_FRAME_TYPE_REPLACED_CONTAINS_BLOCK))
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : #define NS_FRAME_REPLACED_CONTAINS_BLOCK(_ft) \
+<span class="lineNum">      88 </span>            :   (NS_CSS_FRAME_TYPE_REPLACED_CONTAINS_BLOCK | (_ft))
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : /**
+<span class="lineNum">      91 </span>            :  * A macro to extract the type. Masks off the 'replaced' bit-flag
+<span class="lineNum">      92 </span>            :  */
+<span class="lineNum">      93 </span>            : #define NS_FRAME_GET_TYPE(_ft)                           \
+<span class="lineNum">      94 </span>            :   ((_ft) &amp; ~(NS_CSS_FRAME_TYPE_REPLACED |                \
+<span class="lineNum">      95 </span>            :              NS_CSS_FRAME_TYPE_REPLACED_CONTAINS_BLOCK))
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : namespace mozilla {
+<span class="lineNum">      98 </span>            : 
+<a name="99"><span class="lineNum">      99 </span>            : // A base class of ReflowInput that computes only the padding,</a>
+<span class="lineNum">     100 </span>            : // border, and margin, since those values are needed more often.
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 : struct SizeComputationInput {</span>
+<span class="lineNum">     102 </span>            : public:
+<span class="lineNum">     103 </span>            :   typedef mozilla::WritingMode WritingMode;
+<span class="lineNum">     104 </span>            :   typedef mozilla::LogicalMargin LogicalMargin;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :   // The frame being reflowed.
+<span class="lineNum">     107 </span>            :   nsIFrame* mFrame;
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :   // Rendering context to use for measurement.
+<span class="lineNum">     110 </span>            :   nsRenderingContext* mRenderingContext;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :   const nsMargin&amp; ComputedPhysicalMargin() const { return mComputedMargin; }</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   const nsMargin&amp; ComputedPhysicalBorderPadding() const { return mComputedBorderPadding; }</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   const nsMargin&amp; ComputedPhysicalPadding() const { return mComputedPadding; }</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   // We may need to eliminate the (few) users of these writable-reference accessors
+<span class="lineNum">     117 </span>            :   // as part of migrating to logical coordinates.
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :   nsMargin&amp; ComputedPhysicalMargin() { return mComputedMargin; }</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   nsMargin&amp; ComputedPhysicalBorderPadding() { return mComputedBorderPadding; }</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   nsMargin&amp; ComputedPhysicalPadding() { return mComputedPadding; }</span>
+<a name="121"><span class="lineNum">     121 </span>            : </a>
+<span class="lineNum">     122 </span>            :   const LogicalMargin ComputedLogicalMargin() const
+<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :     { return LogicalMargin(mWritingMode, mComputedMargin); }</span></a>
+<span class="lineNum">     124 </span>            :   const LogicalMargin ComputedLogicalBorderPadding() const
+<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 :     { return LogicalMargin(mWritingMode, mComputedBorderPadding); }</span></a>
+<span class="lineNum">     126 </span>            :   const LogicalMargin ComputedLogicalPadding() const
+<a name="127"><span class="lineNum">     127 </span><span class="lineNoCov">          0 :     { return LogicalMargin(mWritingMode, mComputedPadding); }</span></a>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   void SetComputedLogicalMargin(mozilla::WritingMode aWM,</span>
+<a name="130"><span class="lineNum">     130 </span>            :                                 const LogicalMargin&amp; aMargin)</a>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     { mComputedMargin = aMargin.GetPhysicalMargin(aWM); }</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :   void SetComputedLogicalMargin(const LogicalMargin&amp; aMargin)</span>
+<a name="133"><span class="lineNum">     133 </span><span class="lineNoCov">          0 :     { SetComputedLogicalMargin(mWritingMode, aMargin); }</span></a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   void SetComputedLogicalBorderPadding(mozilla::WritingMode aWM,</span>
+<a name="136"><span class="lineNum">     136 </span>            :                                        const LogicalMargin&amp; aMargin)</a>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :     { mComputedBorderPadding = aMargin.GetPhysicalMargin(aWM); }</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   void SetComputedLogicalBorderPadding(const LogicalMargin&amp; aMargin)</span>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 :     { SetComputedLogicalBorderPadding(mWritingMode, aMargin); }</span></a>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   void SetComputedLogicalPadding(mozilla::WritingMode aWM,</span>
+<span class="lineNum">     142 </span>            :                                  const LogicalMargin&amp; aMargin)
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     { mComputedPadding = aMargin.GetPhysicalMargin(aWM); }</span>
+<span class="lineNum">     144 </span>            :   void SetComputedLogicalPadding(const LogicalMargin&amp; aMargin)
+<span class="lineNum">     145 </span>            :     { SetComputedLogicalPadding(mWritingMode, aMargin); }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   WritingMode GetWritingMode() const { return mWritingMode; }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : protected:
+<span class="lineNum">     150 </span>            :   // cached copy of the frame's writing-mode, for logical coordinates
+<span class="lineNum">     151 </span>            :   WritingMode      mWritingMode;
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   // These are PHYSICAL coordinates (for now).
+<span class="lineNum">     154 </span>            :   // Will probably become logical in due course.
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :   // Computed margin values
+<span class="lineNum">     157 </span>            :   nsMargin         mComputedMargin;
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   // Cached copy of the border + padding values
+<span class="lineNum">     160 </span>            :   nsMargin         mComputedBorderPadding;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   // Computed padding values
+<span class="lineNum">     163 </span>            :   nsMargin         mComputedPadding;
+<span class="lineNum">     164 </span>            : 
+<a name="165"><span class="lineNum">     165 </span>            : public:</a>
+<span class="lineNum">     166 </span>            :   // Callers using this constructor must call InitOffsets on their own.
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   SizeComputationInput(nsIFrame *aFrame, nsRenderingContext *aRenderingContext)</span>
+<span class="lineNum">     168 </span>            :     : mFrame(aFrame)
+<span class="lineNum">     169 </span>            :     , mRenderingContext(aRenderingContext)
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     , mWritingMode(aFrame-&gt;GetWritingMode())</span>
+<span class="lineNum">     171 </span>            :   {
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :   SizeComputationInput(nsIFrame *aFrame, nsRenderingContext *aRenderingContext,
+<span class="lineNum">     175 </span>            :                    mozilla::WritingMode aContainingBlockWritingMode,
+<span class="lineNum">     176 </span>            :                    nscoord aContainingBlockISize);
+<a name="177"><span class="lineNum">     177 </span>            : </a>
+<span class="lineNum">     178 </span>            :   struct ReflowInputFlags {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     ReflowInputFlags() { memset(this, 0, sizeof(*this)); }</span>
+<span class="lineNum">     180 </span>            :     bool mSpecialBSizeReflow : 1;    // used by tables to communicate special reflow (in process) to handle
+<span class="lineNum">     181 </span>            :                                      // percent bsize frames inside cells which may not have computed bsizes
+<span class="lineNum">     182 </span>            :     bool mNextInFlowUntouched : 1;   // nothing in the frame's next-in-flow (or its descendants)
+<span class="lineNum">     183 </span>            :                                      // is changing
+<span class="lineNum">     184 </span>            :     bool mIsTopOfPage : 1;           // Is the current context at the top of a
+<span class="lineNum">     185 </span>            :                                      // page?  When true, we force something
+<span class="lineNum">     186 </span>            :                                      // that's too tall for a page/column to
+<span class="lineNum">     187 </span>            :                                      // fit anyway to avoid infinite loops.
+<span class="lineNum">     188 </span>            :     bool mAssumingHScrollbar : 1;    // parent frame is an nsIScrollableFrame and it
+<span class="lineNum">     189 </span>            :                                      // is assuming a horizontal scrollbar
+<span class="lineNum">     190 </span>            :     bool mAssumingVScrollbar : 1;    // parent frame is an nsIScrollableFrame and it
+<span class="lineNum">     191 </span>            :                                      // is assuming a vertical scrollbar
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :     bool mIsIResize : 1;             // Is frame (a) not dirty and (b) a
+<span class="lineNum">     194 </span>            :                                      // different inline-size than before?
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :     bool mIsBResize : 1;             // Is frame (a) not dirty and (b) a
+<span class="lineNum">     197 </span>            :                                      // different block-size than before or
+<span class="lineNum">     198 </span>            :                                      // (potentially) in a context where
+<span class="lineNum">     199 </span>            :                                      // percent block-sizes have a different
+<span class="lineNum">     200 </span>            :                                      // basis?
+<span class="lineNum">     201 </span>            :     bool mTableIsSplittable : 1;     // tables are splittable, this should happen only inside a page
+<span class="lineNum">     202 </span>            :                                      // and never insider a column frame
+<span class="lineNum">     203 </span>            :     bool mHeightDependsOnAncestorCell : 1;     // Does frame height depend on
+<span class="lineNum">     204 </span>            :                                                // an ancestor table-cell?
+<span class="lineNum">     205 </span>            :     bool mIsColumnBalancing : 1;     // nsColumnSetFrame is balancing columns
+<span class="lineNum">     206 </span>            :     bool mIsFlexContainerMeasuringHeight : 1;   // nsFlexContainerFrame is
+<span class="lineNum">     207 </span>            :                                                 // reflowing this child to
+<span class="lineNum">     208 </span>            :                                                 // measure its intrinsic height.
+<span class="lineNum">     209 </span>            :     bool mDummyParentReflowInput : 1;   // a &quot;fake&quot; reflow state made
+<span class="lineNum">     210 </span>            :                                         // in order to be the parent
+<span class="lineNum">     211 </span>            :                                         // of a real one
+<span class="lineNum">     212 </span>            :     bool mMustReflowPlaceholders : 1;   // Should this frame reflow its place-
+<span class="lineNum">     213 </span>            :                                         // holder children? If the available
+<span class="lineNum">     214 </span>            :                                         // height of this frame didn't change,
+<span class="lineNum">     215 </span>            :                                         // but its in a paginated environment
+<span class="lineNum">     216 </span>            :                                         // (e.g. columns), it should always
+<span class="lineNum">     217 </span>            :                                         // reflow its placeholder children.
+<span class="lineNum">     218 </span>            :     bool mShrinkWrap : 1; // stores the COMPUTE_SIZE_SHRINK_WRAP ctor flag
+<span class="lineNum">     219 </span>            :     bool mUseAutoBSize : 1; // stores the COMPUTE_SIZE_USE_AUTO_BSIZE ctor flag
+<span class="lineNum">     220 </span>            :     bool mStaticPosIsCBOrigin : 1; // the STATIC_POS_IS_CB_ORIGIN ctor flag
+<span class="lineNum">     221 </span>            :     bool mIClampMarginBoxMinSize : 1; // the I_CLAMP_MARGIN_BOX_MIN_SIZE ctor flag
+<span class="lineNum">     222 </span>            :     bool mBClampMarginBoxMinSize : 1; // the B_CLAMP_MARGIN_BOX_MIN_SIZE ctor flag
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :     // If set, the following two flags indicate that:
+<span class="lineNum">     225 </span>            :     // (1) this frame is absolutely-positioned (or fixed-positioned).
+<span class="lineNum">     226 </span>            :     // (2) this frame's static position depends on the CSS Box Alignment.
+<span class="lineNum">     227 </span>            :     // (3) we do need to compute the static position, because the frame's
+<span class="lineNum">     228 </span>            :     //     {Inline and/or Block} offsets actually depend on it.
+<span class="lineNum">     229 </span>            :     // When these bits are set, the offset values (IStart/IEnd, BStart/BEnd)
+<span class="lineNum">     230 </span>            :     // represent the &quot;start&quot; edge of the frame's CSS Box Alignment container
+<span class="lineNum">     231 </span>            :     // area, in that axis -- and these offsets need to be further-resolved
+<span class="lineNum">     232 </span>            :     // (with CSS Box Alignment) after we know the OOF frame's size.
+<span class="lineNum">     233 </span>            :     // NOTE: The &quot;I&quot; and &quot;B&quot; (for &quot;Inline&quot; and &quot;Block&quot;) refer the axes of the
+<span class="lineNum">     234 </span>            :     // *containing block's writing-mode*, NOT mFrame's own writing-mode. This
+<span class="lineNum">     235 </span>            :     // is purely for convenience, since that's the writing-mode we're dealing
+<span class="lineNum">     236 </span>            :     // with when we set &amp; react to these bits.
+<span class="lineNum">     237 </span>            :     bool mIOffsetsNeedCSSAlign : 1;
+<span class="lineNum">     238 </span>            :     bool mBOffsetsNeedCSSAlign : 1;
+<span class="lineNum">     239 </span>            :   };
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : #ifdef DEBUG
+<span class="lineNum">     242 </span>            :   // Reflow trace methods.  Defined in nsFrame.cpp so they have access
+<span class="lineNum">     243 </span>            :   // to the display-reflow infrastructure.
+<span class="lineNum">     244 </span>            :   static void* DisplayInitOffsetsEnter(
+<span class="lineNum">     245 </span>            :                                      nsIFrame* aFrame,
+<span class="lineNum">     246 </span>            :                                      SizeComputationInput* aState,
+<span class="lineNum">     247 </span>            :                                      const mozilla::LogicalSize&amp; aPercentBasis,
+<span class="lineNum">     248 </span>            :                                      const nsMargin* aBorder,
+<span class="lineNum">     249 </span>            :                                      const nsMargin* aPadding);
+<span class="lineNum">     250 </span>            :   static void DisplayInitOffsetsExit(nsIFrame* aFrame,
+<span class="lineNum">     251 </span>            :                                      SizeComputationInput* aState,
+<span class="lineNum">     252 </span>            :                                      void* aValue);
+<span class="lineNum">     253 </span>            : #endif
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            : private:
+<span class="lineNum">     256 </span>            :   /**
+<span class="lineNum">     257 </span>            :    * Computes margin values from the specified margin style information, and
+<span class="lineNum">     258 </span>            :    * fills in the mComputedMargin member.
+<span class="lineNum">     259 </span>            :    *
+<span class="lineNum">     260 </span>            :    * @param aWM Writing mode of the containing block
+<span class="lineNum">     261 </span>            :    * @param aPercentBasis
+<span class="lineNum">     262 </span>            :    *    Logical size in the writing mode of the containing block to use
+<span class="lineNum">     263 </span>            :    *    for resolving percentage margin values in the inline and block
+<span class="lineNum">     264 </span>            :    *    axes.
+<span class="lineNum">     265 </span>            :    *    The inline size is usually the containing block inline-size
+<span class="lineNum">     266 </span>            :    *    (width if writing mode is horizontal, and height if vertical).
+<span class="lineNum">     267 </span>            :    *    The block size is usually the containing block inline-size, per
+<span class="lineNum">     268 </span>            :    *    CSS21 sec 8.3 (read in conjunction with CSS Writing Modes sec
+<span class="lineNum">     269 </span>            :    *    7.2), but may be the containing block block-size, e.g. in CSS3
+<span class="lineNum">     270 </span>            :    *    Flexbox and Grid.
+<span class="lineNum">     271 </span>            :    * @return true if the margin is dependent on the containing block size.
+<span class="lineNum">     272 </span>            :    */
+<span class="lineNum">     273 </span>            :   bool ComputeMargin(mozilla::WritingMode aWM,
+<span class="lineNum">     274 </span>            :                      const mozilla::LogicalSize&amp; aPercentBasis);
+<span class="lineNum">     275 </span>            :   
+<span class="lineNum">     276 </span>            :   /**
+<span class="lineNum">     277 </span>            :    * Computes padding values from the specified padding style information, and
+<span class="lineNum">     278 </span>            :    * fills in the mComputedPadding member.
+<span class="lineNum">     279 </span>            :    *
+<span class="lineNum">     280 </span>            :    * @param aWM Writing mode of the containing block
+<span class="lineNum">     281 </span>            :    * @param aPercentBasis
+<span class="lineNum">     282 </span>            :    *    Logical size in the writing mode of the containing block to use
+<span class="lineNum">     283 </span>            :    *    for resolving percentage padding values in the inline and block
+<span class="lineNum">     284 </span>            :    *    axes.
+<span class="lineNum">     285 </span>            :    *    The inline size is usually the containing block inline-size
+<span class="lineNum">     286 </span>            :    *    (width if writing mode is horizontal, and height if vertical).
+<span class="lineNum">     287 </span>            :    *    The block size is usually the containing block inline-size, per
+<span class="lineNum">     288 </span>            :    *    CSS21 sec 8.3 (read in conjunction with CSS Writing Modes sec
+<span class="lineNum">     289 </span>            :    *    7.2), but may be the containing block block-size, e.g. in CSS3
+<span class="lineNum">     290 </span>            :    *    Flexbox and Grid.
+<span class="lineNum">     291 </span>            :    * @return true if the padding is dependent on the containing block size.
+<span class="lineNum">     292 </span>            :    */
+<span class="lineNum">     293 </span>            :   bool ComputePadding(mozilla::WritingMode aWM,
+<span class="lineNum">     294 </span>            :                       const mozilla::LogicalSize&amp; aPercentBasis,
+<span class="lineNum">     295 </span>            :                       nsIAtom* aFrameType);
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            : protected:
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            :   void InitOffsets(mozilla::WritingMode aWM,
+<span class="lineNum">     300 </span>            :                    const mozilla::LogicalSize&amp; aPercentBasis,
+<span class="lineNum">     301 </span>            :                    nsIAtom* aFrameType,
+<span class="lineNum">     302 </span>            :                    ReflowInputFlags aFlags,
+<span class="lineNum">     303 </span>            :                    const nsMargin* aBorder = nullptr,
+<span class="lineNum">     304 </span>            :                    const nsMargin* aPadding = nullptr);
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :   /*
+<span class="lineNum">     307 </span>            :    * Convert nsStyleCoord to nscoord when percentages depend on the
+<span class="lineNum">     308 </span>            :    * inline size of the containing block, and enumerated values are for
+<span class="lineNum">     309 </span>            :    * inline size, min-inline-size, or max-inline-size.  Does not handle
+<span class="lineNum">     310 </span>            :    * auto inline sizes.
+<span class="lineNum">     311 </span>            :    */
+<span class="lineNum">     312 </span>            :   inline nscoord ComputeISizeValue(nscoord aContainingBlockISize,
+<span class="lineNum">     313 </span>            :                                    nscoord aContentEdgeToBoxSizing,
+<span class="lineNum">     314 </span>            :                                    nscoord aBoxSizingToMarginEdge,
+<span class="lineNum">     315 </span>            :                                    const nsStyleCoord&amp; aCoord) const;
+<span class="lineNum">     316 </span>            :   // same as previous, but using mComputedBorderPadding, mComputedPadding,
+<span class="lineNum">     317 </span>            :   // and mComputedMargin
+<span class="lineNum">     318 </span>            :   nscoord ComputeISizeValue(nscoord aContainingBlockISize,
+<span class="lineNum">     319 </span>            :                             mozilla::StyleBoxSizing aBoxSizing,
+<span class="lineNum">     320 </span>            :                             const nsStyleCoord&amp; aCoord) const;
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :   nscoord ComputeBSizeValue(nscoord aContainingBlockBSize,
+<span class="lineNum">     323 </span>            :                             mozilla::StyleBoxSizing aBoxSizing,
+<span class="lineNum">     324 </span>            :                             const nsStyleCoord&amp; aCoord) const;
+<span class="lineNum">     325 </span>            : };
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            : /**
+<span class="lineNum">     328 </span>            :  * State passed to a frame during reflow or intrinsic size calculation.
+<span class="lineNum">     329 </span>            :  *
+<span class="lineNum">     330 </span>            :  * XXX Refactor so only a base class (nsSizingState?) is used for intrinsic
+<span class="lineNum">     331 </span>            :  * size calculation.
+<span class="lineNum">     332 </span>            :  *
+<a name="333"><span class="lineNum">     333 </span>            :  * @see nsIFrame#Reflow()</a>
+<span class="lineNum">     334 </span>            :  */
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 : struct ReflowInput : public SizeComputationInput {</span>
+<span class="lineNum">     336 </span>            :   // the reflow states are linked together. this is the pointer to the
+<span class="lineNum">     337 </span>            :   // parent's reflow state
+<span class="lineNum">     338 </span>            :   const ReflowInput* mParentReflowInput;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            :   // A non-owning pointer to the float manager associated with this area,
+<span class="lineNum">     341 </span>            :   // which points to the object owned by nsAutoFloatManager::mNew.
+<span class="lineNum">     342 </span>            :   nsFloatManager* mFloatManager;
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   // LineLayout object (only for inline reflow; set to nullptr otherwise)
+<span class="lineNum">     345 </span>            :   nsLineLayout*    mLineLayout;
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :   // The appropriate reflow state for the containing block (for
+<span class="lineNum">     348 </span>            :   // percentage widths, etc.) of this reflow state's frame.
+<span class="lineNum">     349 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     350 </span>            :   const ReflowInput *mCBReflowInput;
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :   // The type of frame, from css's perspective. This value is
+<span class="lineNum">     353 </span>            :   // initialized by the Init method below.
+<span class="lineNum">     354 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     355 </span>            :   nsCSSFrameType   mFrameType;
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :   // The amount the in-flow position of the block is moving vertically relative
+<span class="lineNum">     358 </span>            :   // to its previous in-flow position (i.e. the amount the line containing the
+<span class="lineNum">     359 </span>            :   // block is moving).
+<span class="lineNum">     360 </span>            :   // This should be zero for anything which is not a block outside, and it
+<span class="lineNum">     361 </span>            :   // should be zero for anything which has a non-block parent.
+<span class="lineNum">     362 </span>            :   // The intended use of this value is to allow the accurate determination
+<span class="lineNum">     363 </span>            :   // of the potential impact of a float
+<span class="lineNum">     364 </span>            :   // This takes on an arbitrary value the first time a block is reflowed
+<span class="lineNum">     365 </span>            :   nscoord mBlockDelta;
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :   // If an ReflowInput finds itself initialized with an unconstrained
+<span class="lineNum">     368 </span>            :   // inline-size, it will look up its parentReflowInput chain for a state
+<span class="lineNum">     369 </span>            :   // with an orthogonal writing mode and a non-NS_UNCONSTRAINEDSIZE value for
+<span class="lineNum">     370 </span>            :   // orthogonal limit; when it finds such a reflow-state, it will use its
+<span class="lineNum">     371 </span>            :   // orthogonal-limit value to constrain inline-size.
+<span class="lineNum">     372 </span>            :   // This is initialized to NS_UNCONSTRAINEDSIZE (so it will be ignored),
+<span class="lineNum">     373 </span>            :   // but reset to a suitable value for the reflow root by nsPresShell.
+<span class="lineNum">     374 </span>            :   nscoord mOrthogonalLimit;
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :   // Accessors for the private fields below. Forcing all callers to use these
+<span class="lineNum">     377 </span>            :   // will allow us to introduce logical-coordinate versions and gradually
+<span class="lineNum">     378 </span>            :   // change clients from physical to logical as needed; and potentially switch
+<span class="lineNum">     379 </span>            :   // the internal fields from physical to logical coordinates in due course,
+<span class="lineNum">     380 </span>            :   // while maintaining compatibility with not-yet-updated code.
+<span class="lineNum">     381 </span>            :   nscoord AvailableWidth() const { return mAvailableWidth; }
+<span class="lineNum">     382 </span>            :   nscoord AvailableHeight() const { return mAvailableHeight; }
+<span class="lineNum">     383 </span>            :   nscoord ComputedWidth() const { return mComputedWidth; }
+<span class="lineNum">     384 </span>            :   nscoord ComputedHeight() const { return mComputedHeight; }
+<span class="lineNum">     385 </span>            :   nscoord ComputedMinWidth() const { return mComputedMinWidth; }
+<span class="lineNum">     386 </span>            :   nscoord ComputedMaxWidth() const { return mComputedMaxWidth; }
+<span class="lineNum">     387 </span>            :   nscoord ComputedMinHeight() const { return mComputedMinHeight; }
+<span class="lineNum">     388 </span>            :   nscoord ComputedMaxHeight() const { return mComputedMaxHeight; }
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :   nscoord&amp; AvailableWidth() { return mAvailableWidth; }
+<span class="lineNum">     391 </span>            :   nscoord&amp; AvailableHeight() { return mAvailableHeight; }
+<span class="lineNum">     392 </span>            :   nscoord&amp; ComputedWidth() { return mComputedWidth; }
+<span class="lineNum">     393 </span>            :   nscoord&amp; ComputedHeight() { return mComputedHeight; }
+<span class="lineNum">     394 </span>            :   nscoord&amp; ComputedMinWidth() { return mComputedMinWidth; }
+<span class="lineNum">     395 </span>            :   nscoord&amp; ComputedMaxWidth() { return mComputedMaxWidth; }
+<span class="lineNum">     396 </span>            :   nscoord&amp; ComputedMinHeight() { return mComputedMinHeight; }
+<span class="lineNum">     397 </span>            :   nscoord&amp; ComputedMaxHeight() { return mComputedMaxHeight; }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :   // ISize and BSize are logical-coordinate dimensions:
+<span class="lineNum">     400 </span>            :   // ISize is the size in the writing mode's inline direction (which equates to
+<a name="401"><span class="lineNum">     401 </span>            :   // width in horizontal writing modes, height in vertical ones), and BSize is</a>
+<span class="lineNum">     402 </span>            :   // the size in the block-progression direction.
+<a name="403"><span class="lineNum">     403 </span><span class="lineNoCov">          0 :   nscoord AvailableISize() const</span></a>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mAvailableHeight : mAvailableWidth; }</span>
+<a name="405"><span class="lineNum">     405 </span><span class="lineNoCov">          0 :   nscoord AvailableBSize() const</span></a>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mAvailableWidth : mAvailableHeight; }</span>
+<a name="407"><span class="lineNum">     407 </span><span class="lineNoCov">          0 :   nscoord ComputedISize() const</span></a>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedHeight : mComputedWidth; }</span>
+<a name="409"><span class="lineNum">     409 </span><span class="lineNoCov">          0 :   nscoord ComputedBSize() const</span></a>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedWidth : mComputedHeight; }</span>
+<a name="411"><span class="lineNum">     411 </span><span class="lineNoCov">          0 :   nscoord ComputedMinISize() const</span></a>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMinHeight : mComputedMinWidth; }</span>
+<a name="413"><span class="lineNum">     413 </span><span class="lineNoCov">          0 :   nscoord ComputedMaxISize() const</span></a>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMaxHeight : mComputedMaxWidth; }</span>
+<a name="415"><span class="lineNum">     415 </span><span class="lineNoCov">          0 :   nscoord ComputedMinBSize() const</span></a>
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMinWidth : mComputedMinHeight; }</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :   nscoord ComputedMaxBSize() const</span>
+<a name="418"><span class="lineNum">     418 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMaxWidth : mComputedMaxHeight; }</span></a>
+<span class="lineNum">     419 </span>            : 
+<a name="420"><span class="lineNum">     420 </span><span class="lineNoCov">          0 :   nscoord&amp; AvailableISize()</span></a>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mAvailableHeight : mAvailableWidth; }</span>
+<a name="422"><span class="lineNum">     422 </span><span class="lineNoCov">          0 :   nscoord&amp; AvailableBSize()</span></a>
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mAvailableWidth : mAvailableHeight; }</span>
+<a name="424"><span class="lineNum">     424 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedISize()</span></a>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedHeight : mComputedWidth; }</span>
+<a name="426"><span class="lineNum">     426 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedBSize()</span></a>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedWidth : mComputedHeight; }</span>
+<a name="428"><span class="lineNum">     428 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedMinISize()</span></a>
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMinHeight : mComputedMinWidth; }</span>
+<a name="430"><span class="lineNum">     430 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedMaxISize()</span></a>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMaxHeight : mComputedMaxWidth; }</span>
+<a name="432"><span class="lineNum">     432 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedMinBSize()</span></a>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMinWidth : mComputedMinHeight; }</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :   nscoord&amp; ComputedMaxBSize()</span>
+<a name="435"><span class="lineNum">     435 </span><span class="lineNoCov">          0 :     { return mWritingMode.IsVertical() ? mComputedMaxWidth : mComputedMaxHeight; }</span></a>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize AvailableSize() const {</span>
+<span class="lineNum">     438 </span>            :     return mozilla::LogicalSize(mWritingMode,
+<a name="439"><span class="lineNum">     439 </span><span class="lineNoCov">          0 :                                 AvailableISize(), AvailableBSize());</span></a>
+<span class="lineNum">     440 </span>            :   }
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedSize() const {</span>
+<span class="lineNum">     442 </span>            :     return mozilla::LogicalSize(mWritingMode,
+<a name="443"><span class="lineNum">     443 </span><span class="lineNoCov">          0 :                                 ComputedISize(), ComputedBSize());</span></a>
+<span class="lineNum">     444 </span>            :   }
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedMinSize() const {</span>
+<span class="lineNum">     446 </span>            :     return mozilla::LogicalSize(mWritingMode,
+<a name="447"><span class="lineNum">     447 </span><span class="lineNoCov">          0 :                                 ComputedMinISize(), ComputedMinBSize());</span></a>
+<span class="lineNum">     448 </span>            :   }
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedMaxSize() const {</span>
+<span class="lineNum">     450 </span>            :     return mozilla::LogicalSize(mWritingMode,
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :                                 ComputedMaxISize(), ComputedMaxBSize());</span>
+<a name="452"><span class="lineNum">     452 </span>            :   }</a>
+<span class="lineNum">     453 </span>            : 
+<a name="454"><span class="lineNum">     454 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize AvailableSize(mozilla::WritingMode aWM) const</span></a>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :   { return AvailableSize().ConvertTo(aWM, mWritingMode); }</span>
+<a name="456"><span class="lineNum">     456 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedSize(mozilla::WritingMode aWM) const</span></a>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :     { return ComputedSize().ConvertTo(aWM, mWritingMode); }</span>
+<a name="458"><span class="lineNum">     458 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedMinSize(mozilla::WritingMode aWM) const</span></a>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :     { return ComputedMinSize().ConvertTo(aWM, mWritingMode); }</span>
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedMaxSize(mozilla::WritingMode aWM) const</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :     { return ComputedMaxSize().ConvertTo(aWM, mWritingMode); }</span>
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedSizeWithPadding() const {</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :     mozilla::WritingMode wm = GetWritingMode();</span>
+<span class="lineNum">     465 </span>            :     return mozilla::LogicalSize(wm,
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :                                 ComputedISize() +</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :                                 ComputedLogicalPadding().IStartEnd(wm),</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :                                 ComputedBSize() +</span>
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :                                 ComputedLogicalPadding().BStartEnd(wm));</span>
+<a name="470"><span class="lineNum">     470 </span>            :   }</a>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedSizeWithPadding(mozilla::WritingMode aWM) const {</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :     return ComputedSizeWithPadding().ConvertTo(aWM, GetWritingMode());</span>
+<span class="lineNum">     474 </span>            :   }
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :   mozilla::LogicalSize ComputedSizeWithBorderPadding() const {</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :     mozilla::WritingMode wm = GetWritingMode();</span>
+<span class="lineNum">     478 </span>            :     return mozilla::LogicalSize(wm,
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :                                 ComputedISize() +</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :                                 ComputedLogicalBorderPadding().IStartEnd(wm),</span>
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :                                 ComputedBSize() +</span>
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :                                 ComputedLogicalBorderPadding().BStartEnd(wm));</span>
+<span class="lineNum">     483 </span>            :   }
+<a name="484"><span class="lineNum">     484 </span>            : </a>
+<span class="lineNum">     485 </span>            :   mozilla::LogicalSize
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :   ComputedSizeWithBorderPadding(mozilla::WritingMode aWM) const {</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :     return ComputedSizeWithBorderPadding().ConvertTo(aWM, GetWritingMode());</span>
+<span class="lineNum">     488 </span>            :   }
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            :   mozilla::LogicalSize
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :   ComputedSizeWithMarginBorderPadding() const {</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :     mozilla::WritingMode wm = GetWritingMode();</span>
+<span class="lineNum">     493 </span>            :     return mozilla::LogicalSize(wm,
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :                                 ComputedISize() +</span>
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :                                 ComputedLogicalMargin().IStartEnd(wm) +</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :                                 ComputedLogicalBorderPadding().IStartEnd(wm),</span>
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :                                 ComputedBSize() +</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :                                 ComputedLogicalMargin().BStartEnd(wm) +</span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :                                 ComputedLogicalBorderPadding().BStartEnd(wm));</span>
+<span class="lineNum">     500 </span>            :   }
+<a name="501"><span class="lineNum">     501 </span>            : </a>
+<span class="lineNum">     502 </span>            :   mozilla::LogicalSize
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :   ComputedSizeWithMarginBorderPadding(mozilla::WritingMode aWM) const {</span>
+<span class="lineNum">     504 </span>            :     return ComputedSizeWithMarginBorderPadding().ConvertTo(aWM,
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :                                                            GetWritingMode());</span>
+<span class="lineNum">     506 </span>            :   }
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :   nsSize
+<span class="lineNum">     509 </span>            :   ComputedPhysicalSize() const {
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :     return nsSize(ComputedWidth(), ComputedHeight());</span>
+<span class="lineNum">     511 </span>            :   }
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :   // XXX this will need to change when we make mComputedOffsets logical;
+<span class="lineNum">     514 </span>            :   // we won't be able to return a reference for the physical offsets
+<span class="lineNum">     515 </span>            :   const nsMargin&amp; ComputedPhysicalOffsets() const { return mComputedOffsets; }
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :   nsMargin&amp; ComputedPhysicalOffsets() { return mComputedOffsets; }</span>
+<a name="517"><span class="lineNum">     517 </span>            : </a>
+<span class="lineNum">     518 </span>            :   const LogicalMargin ComputedLogicalOffsets() const
+<a name="519"><span class="lineNum">     519 </span><span class="lineNoCov">          0 :     { return LogicalMargin(mWritingMode, mComputedOffsets); }</span></a>
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :   void SetComputedLogicalOffsets(const LogicalMargin&amp; aOffsets)</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :     { mComputedOffsets = aOffsets.GetPhysicalMargin(mWritingMode); }</span>
+<span class="lineNum">     523 </span>            : 
+<a name="524"><span class="lineNum">     524 </span>            :   // Return the state's computed size including border-padding, with</a>
+<span class="lineNum">     525 </span>            :   // unconstrained dimensions replaced by zero.
+<span class="lineNum">     526 </span><span class="lineNoCov">          0 :   nsSize ComputedSizeAsContainerIfConstrained() const {</span>
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :     const nscoord wd = ComputedWidth();</span>
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :     const nscoord ht = ComputedHeight();</span>
+<span class="lineNum">     529 </span>            :     return nsSize(wd == NS_UNCONSTRAINEDSIZE
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :                   ? 0 : wd + ComputedPhysicalBorderPadding().LeftRight(),</span>
+<span class="lineNum">     531 </span>            :                   ht == NS_UNCONSTRAINEDSIZE
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :                   ? 0 : ht + ComputedPhysicalBorderPadding().TopBottom());</span>
+<span class="lineNum">     533 </span>            :   }
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            : private:
+<span class="lineNum">     536 </span>            :   // the available width in which to reflow the frame. The space
+<span class="lineNum">     537 </span>            :   // represents the amount of room for the frame's margin, border,
+<span class="lineNum">     538 </span>            :   // padding, and content area. The frame size you choose should fit
+<span class="lineNum">     539 </span>            :   // within the available width.
+<span class="lineNum">     540 </span>            :   nscoord              mAvailableWidth;
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            :   // A value of NS_UNCONSTRAINEDSIZE for the available height means
+<span class="lineNum">     543 </span>            :   // you can choose whatever size you want. In galley mode the
+<span class="lineNum">     544 </span>            :   // available height is always NS_UNCONSTRAINEDSIZE, and only page
+<span class="lineNum">     545 </span>            :   // mode or multi-column layout involves a constrained height. The
+<span class="lineNum">     546 </span>            :   // element's the top border and padding, and content, must fit. If the
+<span class="lineNum">     547 </span>            :   // element is complete after reflow then its bottom border, padding
+<span class="lineNum">     548 </span>            :   // and margin (and similar for its complete ancestors) will need to
+<span class="lineNum">     549 </span>            :   // fit in this height.
+<span class="lineNum">     550 </span>            :   nscoord              mAvailableHeight;
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span>            :   // The computed width specifies the frame's content area width, and it does
+<span class="lineNum">     553 </span>            :   // not apply to inline non-replaced elements
+<span class="lineNum">     554 </span>            :   //
+<span class="lineNum">     555 </span>            :   // For replaced inline frames, a value of NS_INTRINSICSIZE means you should
+<span class="lineNum">     556 </span>            :   // use your intrinsic width as the computed width
+<span class="lineNum">     557 </span>            :   //
+<span class="lineNum">     558 </span>            :   // For block-level frames, the computed width is based on the width of the
+<span class="lineNum">     559 </span>            :   // containing block, the margin/border/padding areas, and the min/max width.
+<span class="lineNum">     560 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     561 </span>            :   nscoord          mComputedWidth; 
+<span class="lineNum">     562 </span>            : 
+<span class="lineNum">     563 </span>            :   // The computed height specifies the frame's content height, and it does
+<span class="lineNum">     564 </span>            :   // not apply to inline non-replaced elements
+<span class="lineNum">     565 </span>            :   //
+<span class="lineNum">     566 </span>            :   // For replaced inline frames, a value of NS_INTRINSICSIZE means you should
+<span class="lineNum">     567 </span>            :   // use your intrinsic height as the computed height
+<span class="lineNum">     568 </span>            :   //
+<span class="lineNum">     569 </span>            :   // For non-replaced block-level frames in the flow and floated, a value of
+<span class="lineNum">     570 </span>            :   // NS_AUTOHEIGHT means you choose a height to shrink wrap around the normal
+<span class="lineNum">     571 </span>            :   // flow child frames. The height must be within the limit of the min/max
+<span class="lineNum">     572 </span>            :   // height if there is such a limit
+<span class="lineNum">     573 </span>            :   //
+<span class="lineNum">     574 </span>            :   // For replaced block-level frames, a value of NS_INTRINSICSIZE
+<span class="lineNum">     575 </span>            :   // means you use your intrinsic height as the computed height
+<span class="lineNum">     576 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     577 </span>            :   nscoord          mComputedHeight;
+<span class="lineNum">     578 </span>            : 
+<span class="lineNum">     579 </span>            :   // Computed values for 'left/top/right/bottom' offsets. Only applies to
+<span class="lineNum">     580 </span>            :   // 'positioned' elements. These are PHYSICAL coordinates (for now).
+<span class="lineNum">     581 </span>            :   nsMargin         mComputedOffsets;
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span>            :   // Computed values for 'min-width/max-width' and 'min-height/max-height'
+<span class="lineNum">     584 </span>            :   // XXXldb The width ones here should go; they should be needed only
+<span class="lineNum">     585 </span>            :   // internally.
+<span class="lineNum">     586 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     587 </span>            :   nscoord          mComputedMinWidth, mComputedMaxWidth;
+<span class="lineNum">     588 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     589 </span>            :   nscoord          mComputedMinHeight, mComputedMaxHeight;
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            : public:
+<span class="lineNum">     592 </span>            :   // Cached pointers to the various style structs used during intialization
+<span class="lineNum">     593 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     594 </span>            :   const nsStyleDisplay*    mStyleDisplay;
+<span class="lineNum">     595 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     596 </span>            :   const nsStyleVisibility* mStyleVisibility;
+<span class="lineNum">     597 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     598 </span>            :   const nsStylePosition*   mStylePosition;
+<span class="lineNum">     599 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     600 </span>            :   const nsStyleBorder*     mStyleBorder;
+<span class="lineNum">     601 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     602 </span>            :   const nsStyleMargin*     mStyleMargin;
+<span class="lineNum">     603 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     604 </span>            :   const nsStylePadding*    mStylePadding;
+<span class="lineNum">     605 </span>            :   MOZ_INIT_OUTSIDE_CTOR
+<span class="lineNum">     606 </span>            :   const nsStyleText*       mStyleText;
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            :   bool IsFloating() const;
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            :   mozilla::StyleDisplay GetDisplay() const;
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span>            :   // a frame (e.g. nsTableCellFrame) which may need to generate a special 
+<span class="lineNum">     613 </span>            :   // reflow for percent bsize calculations
+<span class="lineNum">     614 </span>            :   nsIPercentBSizeObserver* mPercentBSizeObserver;
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span>            :   // CSS margin collapsing sometimes requires us to reflow
+<span class="lineNum">     617 </span>            :   // optimistically assuming that margins collapse to see if clearance
+<span class="lineNum">     618 </span>            :   // is required. When we discover that clearance is required, we
+<span class="lineNum">     619 </span>            :   // store the frame in which clearance was discovered to the location
+<span class="lineNum">     620 </span>            :   // requested here.
+<span class="lineNum">     621 </span>            :   nsIFrame** mDiscoveredClearance;
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span>            :   ReflowInputFlags mFlags;
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span>            :   // This value keeps track of how deeply nested a given reflow state
+<span class="lineNum">     626 </span>            :   // is from the top of the frame tree.
+<span class="lineNum">     627 </span>            :   int16_t mReflowDepth;
+<span class="lineNum">     628 </span>            : 
+<span class="lineNum">     629 </span>            :   // Logical and physical accessors for the resize flags. All users should go
+<span class="lineNum">     630 </span>            :   // via these accessors, so that in due course we can change the storage from
+<span class="lineNum">     631 </span>            :   // physical to logical.
+<span class="lineNum">     632 </span>            :   bool IsHResize() const {
+<span class="lineNum">     633 </span>            :     return mWritingMode.IsVertical() ? mFlags.mIsBResize : mFlags.mIsIResize;
+<span class="lineNum">     634 </span>            :   }
+<span class="lineNum">     635 </span>            :   bool IsVResize() const {
+<span class="lineNum">     636 </span>            :     return mWritingMode.IsVertical() ? mFlags.mIsIResize : mFlags.mIsBResize;
+<a name="637"><span class="lineNum">     637 </span>            :   }</a>
+<span class="lineNum">     638 </span>            :   bool IsIResize() const {
+<span class="lineNum">     639 </span><span class="lineNoCov">          0 :     return mFlags.mIsIResize;</span>
+<span class="lineNum">     640 </span>            :   }
+<span class="lineNum">     641 </span>            :   bool IsBResize() const {
+<a name="642"><span class="lineNum">     642 </span><span class="lineNoCov">          0 :     return mFlags.mIsBResize;</span></a>
+<span class="lineNum">     643 </span>            :   }
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :   bool IsBResizeForWM(mozilla::WritingMode aWM) const {</span>
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :     return aWM.IsOrthogonalTo(mWritingMode) ? mFlags.mIsIResize</span>
+<a name="646"><span class="lineNum">     646 </span><span class="lineNoCov">          0 :                                             : mFlags.mIsBResize;</span></a>
+<span class="lineNum">     647 </span>            :   }
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :   void SetHResize(bool aValue) {</span>
+<span class="lineNum">     649 </span><span class="lineNoCov">          0 :     if (mWritingMode.IsVertical()) {</span>
+<span class="lineNum">     650 </span><span class="lineNoCov">          0 :       mFlags.mIsBResize = aValue;</span>
+<span class="lineNum">     651 </span>            :     } else {
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :       mFlags.mIsIResize = aValue;</span>
+<a name="653"><span class="lineNum">     653 </span>            :     }</a>
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     655 </span><span class="lineNoCov">          0 :   void SetVResize(bool aValue) {</span>
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :     if (mWritingMode.IsVertical()) {</span>
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :       mFlags.mIsIResize = aValue;</span>
+<span class="lineNum">     658 </span>            :     } else {
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :       mFlags.mIsBResize = aValue;</span>
+<span class="lineNum">     660 </span>            :     }
+<span class="lineNum">     661 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     662 </span>            :   void SetIResize(bool aValue) {
+<span class="lineNum">     663 </span><span class="lineNoCov">          0 :     mFlags.mIsIResize = aValue;</span>
+<span class="lineNum">     664 </span>            :   }
+<span class="lineNum">     665 </span>            :   void SetBResize(bool aValue) {
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :     mFlags.mIsBResize = aValue;</span>
+<span class="lineNum">     667 </span>            :   }
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span>            :   // Note: The copy constructor is written by the compiler automatically. You
+<span class="lineNum">     670 </span>            :   // can use that and then override specific values if you want, or you can
+<span class="lineNum">     671 </span>            :   // call Init as desired...
+<span class="lineNum">     672 </span>            : 
+<span class="lineNum">     673 </span>            :   /**
+<span class="lineNum">     674 </span>            :    * Initialize a ROOT reflow state.
+<span class="lineNum">     675 </span>            :    *
+<span class="lineNum">     676 </span>            :    * @param aPresContext Must be equal to aFrame-&gt;PresContext().
+<span class="lineNum">     677 </span>            :    * @param aFrame The frame for whose reflow state is being constructed.
+<span class="lineNum">     678 </span>            :    * @param aRenderingContext The rendering context to be used for measurements.
+<span class="lineNum">     679 </span>            :    * @param aAvailableSpace See comments for availableHeight and availableWidth
+<span class="lineNum">     680 </span>            :    *        members.
+<span class="lineNum">     681 </span>            :    * @param aFlags A set of flags used for additional boolean parameters (see
+<span class="lineNum">     682 </span>            :    *        below).
+<span class="lineNum">     683 </span>            :    */
+<span class="lineNum">     684 </span>            :   ReflowInput(nsPresContext*              aPresContext,
+<span class="lineNum">     685 </span>            :               nsIFrame*                   aFrame,
+<span class="lineNum">     686 </span>            :               nsRenderingContext*         aRenderingContext,
+<span class="lineNum">     687 </span>            :               const mozilla::LogicalSize&amp; aAvailableSpace,
+<span class="lineNum">     688 </span>            :               uint32_t                    aFlags = 0);
+<span class="lineNum">     689 </span>            : 
+<span class="lineNum">     690 </span>            :   /**
+<span class="lineNum">     691 </span>            :    * Initialize a reflow state for a child frame's reflow. Some parts of the
+<span class="lineNum">     692 </span>            :    * state are copied from the parent's reflow state. The remainder is computed.
+<span class="lineNum">     693 </span>            :    *
+<span class="lineNum">     694 </span>            :    * @param aPresContext Must be equal to aFrame-&gt;PresContext().
+<span class="lineNum">     695 </span>            :    * @param aParentReflowInput A reference to an ReflowInput object that
+<span class="lineNum">     696 </span>            :    *        is to be the parent of this object.
+<span class="lineNum">     697 </span>            :    * @param aFrame The frame for whose reflow state is being constructed.
+<span class="lineNum">     698 </span>            :    * @param aAvailableSpace See comments for availableHeight and availableWidth
+<span class="lineNum">     699 </span>            :    *        members.
+<span class="lineNum">     700 </span>            :    * @param aContainingBlockSize An optional size, in app units, specifying
+<span class="lineNum">     701 </span>            :    *        the containing block size to use instead of the default which is
+<span class="lineNum">     702 </span>            :    *        to use the aAvailableSpace.
+<span class="lineNum">     703 </span>            :    * @param aFlags A set of flags used for additional boolean parameters (see
+<span class="lineNum">     704 </span>            :    *        below).
+<span class="lineNum">     705 </span>            :    */
+<span class="lineNum">     706 </span>            :   ReflowInput(nsPresContext*              aPresContext,
+<span class="lineNum">     707 </span>            :               const ReflowInput&amp;    aParentReflowInput,
+<span class="lineNum">     708 </span>            :               nsIFrame*                   aFrame,
+<span class="lineNum">     709 </span>            :               const mozilla::LogicalSize&amp; aAvailableSpace,
+<span class="lineNum">     710 </span>            :               const mozilla::LogicalSize* aContainingBlockSize = nullptr,
+<span class="lineNum">     711 </span>            :               uint32_t                    aFlags = 0);
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            :   // Values for |aFlags| passed to constructor
+<span class="lineNum">     714 </span>            :   enum {
+<span class="lineNum">     715 </span>            :     // Indicates that the parent of this reflow state is &quot;fake&quot; (see
+<span class="lineNum">     716 </span>            :     // mDummyParentReflowInput in mFlags).
+<span class="lineNum">     717 </span>            :     DUMMY_PARENT_REFLOW_STATE = (1&lt;&lt;0),
+<span class="lineNum">     718 </span>            : 
+<span class="lineNum">     719 </span>            :     // Indicates that the calling function will initialize the reflow state, and
+<span class="lineNum">     720 </span>            :     // that the constructor should not call Init().
+<span class="lineNum">     721 </span>            :     CALLER_WILL_INIT = (1&lt;&lt;1),
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            :     // The caller wants shrink-wrap behavior (i.e. ComputeSizeFlags::eShrinkWrap
+<span class="lineNum">     724 </span>            :     // will be passed to ComputeSize()).
+<span class="lineNum">     725 </span>            :     COMPUTE_SIZE_SHRINK_WRAP = (1&lt;&lt;2),
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            :     // The caller wants 'auto' bsize behavior (ComputeSizeFlags::eUseAutoBSize
+<span class="lineNum">     728 </span>            :     // will be be passed to ComputeSize()).
+<span class="lineNum">     729 </span>            :     COMPUTE_SIZE_USE_AUTO_BSIZE = (1&lt;&lt;3),
+<span class="lineNum">     730 </span>            : 
+<span class="lineNum">     731 </span>            :     // The caller wants the abs.pos. static-position resolved at the origin of
+<span class="lineNum">     732 </span>            :     // the containing block, i.e. at LogicalPoint(0, 0). (Note that this
+<span class="lineNum">     733 </span>            :     // doesn't necessarily mean that (0, 0) is the *correct* static position
+<span class="lineNum">     734 </span>            :     // for the frame in question.)
+<span class="lineNum">     735 </span>            :     STATIC_POS_IS_CB_ORIGIN = (1&lt;&lt;4),
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span>            :     // Pass ComputeSizeFlags::eIClampMarginBoxMinSize to ComputeSize().
+<span class="lineNum">     738 </span>            :     I_CLAMP_MARGIN_BOX_MIN_SIZE = (1&lt;&lt;5),
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :     // Pass ComputeSizeFlags::eBClampMarginBoxMinSize to ComputeSize().
+<span class="lineNum">     741 </span>            :     B_CLAMP_MARGIN_BOX_MIN_SIZE = (1&lt;&lt;6),
+<span class="lineNum">     742 </span>            :   };
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span>            :   // This method initializes various data members. It is automatically
+<span class="lineNum">     745 </span>            :   // called by the various constructors
+<span class="lineNum">     746 </span>            :   void Init(nsPresContext*              aPresContext,
+<span class="lineNum">     747 </span>            :             const mozilla::LogicalSize* aContainingBlockSize = nullptr,
+<span class="lineNum">     748 </span>            :             const nsMargin*             aBorder = nullptr,
+<span class="lineNum">     749 </span>            :             const nsMargin*             aPadding = nullptr);
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            :   /**
+<span class="lineNum">     752 </span>            :    * Find the content isize of our containing block for the given writing mode,
+<span class="lineNum">     753 </span>            :    * which need not be the same as the reflow state's mode.
+<span class="lineNum">     754 </span>            :    */
+<span class="lineNum">     755 </span>            :   nscoord GetContainingBlockContentISize(mozilla::WritingMode aWritingMode) const;
+<span class="lineNum">     756 </span>            : 
+<span class="lineNum">     757 </span>            :   /**
+<span class="lineNum">     758 </span>            :    * Calculate the used line-height property. The return value will be &gt;= 0.
+<span class="lineNum">     759 </span>            :    */
+<span class="lineNum">     760 </span>            :   nscoord CalcLineHeight() const;
+<span class="lineNum">     761 </span>            : 
+<span class="lineNum">     762 </span>            :   /**
+<span class="lineNum">     763 </span>            :    * Same as CalcLineHeight() above, but doesn't need a reflow state.
+<span class="lineNum">     764 </span>            :    *
+<span class="lineNum">     765 </span>            :    * @param aBlockBSize The computed block size of the content rect of the block
+<span class="lineNum">     766 </span>            :    *                     that the line should fill.
+<span class="lineNum">     767 </span>            :    *                     Only used with line-height:-moz-block-height.
+<span class="lineNum">     768 </span>            :    *                     NS_AUTOHEIGHT results in a normal line-height for
+<span class="lineNum">     769 </span>            :    *                     line-height:-moz-block-height.
+<span class="lineNum">     770 </span>            :    * @param aFontSizeInflation The result of the appropriate
+<span class="lineNum">     771 </span>            :    *                           nsLayoutUtils::FontSizeInflationFor call,
+<span class="lineNum">     772 </span>            :    *                           or 1.0 if during intrinsic size
+<span class="lineNum">     773 </span>            :    *                           calculation.
+<span class="lineNum">     774 </span>            :    */
+<span class="lineNum">     775 </span>            :   static nscoord CalcLineHeight(nsIContent* aContent,
+<span class="lineNum">     776 </span>            :                                 nsStyleContext* aStyleContext,
+<span class="lineNum">     777 </span>            :                                 nscoord aBlockBSize,
+<span class="lineNum">     778 </span>            :                                 float aFontSizeInflation);
+<span class="lineNum">     779 </span>            : 
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span>            :   mozilla::LogicalSize ComputeContainingBlockRectangle(
+<span class="lineNum">     782 </span>            :          nsPresContext*           aPresContext,
+<span class="lineNum">     783 </span>            :          const ReflowInput* aContainingBlockRI) const;
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            :   /**
+<span class="lineNum">     786 </span>            :    * Apply the mComputed(Min/Max)Width constraints to the content
+<a name="787"><span class="lineNum">     787 </span>            :    * size computed so far.</a>
+<span class="lineNum">     788 </span>            :    */
+<span class="lineNum">     789 </span><span class="lineNoCov">          0 :   nscoord ApplyMinMaxWidth(nscoord aWidth) const {</span>
+<span class="lineNum">     790 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMaxWidth()) {</span>
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :       aWidth = std::min(aWidth, ComputedMaxWidth());</span>
+<span class="lineNum">     792 </span>            :     }
+<span class="lineNum">     793 </span><span class="lineNoCov">          0 :     return std::max(aWidth, ComputedMinWidth());</span>
+<span class="lineNum">     794 </span>            :   }
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span>            :   /**
+<span class="lineNum">     797 </span>            :    * Apply the mComputed(Min/Max)ISize constraints to the content
+<a name="798"><span class="lineNum">     798 </span>            :    * size computed so far.</a>
+<span class="lineNum">     799 </span>            :    */
+<span class="lineNum">     800 </span><span class="lineNoCov">          0 :   nscoord ApplyMinMaxISize(nscoord aISize) const {</span>
+<span class="lineNum">     801 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMaxISize()) {</span>
+<span class="lineNum">     802 </span><span class="lineNoCov">          0 :       aISize = std::min(aISize, ComputedMaxISize());</span>
+<span class="lineNum">     803 </span>            :     }
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :     return std::max(aISize, ComputedMinISize());</span>
+<span class="lineNum">     805 </span>            :   }
+<span class="lineNum">     806 </span>            : 
+<span class="lineNum">     807 </span>            :   /**
+<span class="lineNum">     808 </span>            :    * Apply the mComputed(Min/Max)Height constraints to the content
+<span class="lineNum">     809 </span>            :    * size computed so far.
+<span class="lineNum">     810 </span>            :    *
+<span class="lineNum">     811 </span>            :    * @param aHeight The height that we've computed an to which we want to apply
+<span class="lineNum">     812 </span>            :    *        min/max constraints.
+<span class="lineNum">     813 </span>            :    * @param aConsumed The amount of the computed height that was consumed by
+<a name="814"><span class="lineNum">     814 </span>            :    *        our prev-in-flows.</a>
+<span class="lineNum">     815 </span>            :    */
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :   nscoord ApplyMinMaxHeight(nscoord aHeight, nscoord aConsumed = 0) const {</span>
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :     aHeight += aConsumed;</span>
+<span class="lineNum">     818 </span>            : 
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMaxHeight()) {</span>
+<span class="lineNum">     820 </span><span class="lineNoCov">          0 :       aHeight = std::min(aHeight, ComputedMaxHeight());</span>
+<span class="lineNum">     821 </span>            :     }
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMinHeight()) {</span>
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :       aHeight = std::max(aHeight, ComputedMinHeight());</span>
+<span class="lineNum">     825 </span>            :     }
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :     return aHeight - aConsumed;</span>
+<span class="lineNum">     828 </span>            :   }
+<span class="lineNum">     829 </span>            : 
+<span class="lineNum">     830 </span>            :   /**
+<span class="lineNum">     831 </span>            :    * Apply the mComputed(Min/Max)BSize constraints to the content
+<span class="lineNum">     832 </span>            :    * size computed so far.
+<span class="lineNum">     833 </span>            :    *
+<span class="lineNum">     834 </span>            :    * @param aBSize The block-size that we've computed an to which we want to apply
+<span class="lineNum">     835 </span>            :    *        min/max constraints.
+<span class="lineNum">     836 </span>            :    * @param aConsumed The amount of the computed block-size that was consumed by
+<a name="837"><span class="lineNum">     837 </span>            :    *        our prev-in-flows.</a>
+<span class="lineNum">     838 </span>            :    */
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 :   nscoord ApplyMinMaxBSize(nscoord aBSize, nscoord aConsumed = 0) const {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :     aBSize += aConsumed;</span>
+<span class="lineNum">     841 </span>            : 
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMaxBSize()) {</span>
+<span class="lineNum">     843 </span><span class="lineNoCov">          0 :       aBSize = std::min(aBSize, ComputedMaxBSize());</span>
+<span class="lineNum">     844 </span>            :     }
+<span class="lineNum">     845 </span>            : 
+<span class="lineNum">     846 </span><span class="lineNoCov">          0 :     if (NS_UNCONSTRAINEDSIZE != ComputedMinBSize()) {</span>
+<span class="lineNum">     847 </span><span class="lineNoCov">          0 :       aBSize = std::max(aBSize, ComputedMinBSize());</span>
+<span class="lineNum">     848 </span>            :     }
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :     return aBSize - aConsumed;</span>
+<span class="lineNum">     851 </span>            :   }
+<span class="lineNum">     852 </span>            : 
+<span class="lineNum">     853 </span><span class="lineNoCov">          0 :   bool ShouldReflowAllKids() const {</span>
+<span class="lineNum">     854 </span>            :     // Note that we could make a stronger optimization for IsBResize if
+<span class="lineNum">     855 </span>            :     // we use it in a ShouldReflowChild test that replaces the current
+<span class="lineNum">     856 </span>            :     // checks of NS_FRAME_IS_DIRTY | NS_FRAME_HAS_DIRTY_CHILDREN, if it
+<span class="lineNum">     857 </span>            :     // were tested there along with NS_FRAME_CONTAINS_RELATIVE_BSIZE.
+<span class="lineNum">     858 </span>            :     // This would need to be combined with a slight change in which
+<span class="lineNum">     859 </span>            :     // frames NS_FRAME_CONTAINS_RELATIVE_BSIZE is marked on.
+<span class="lineNum">     860 </span><span class="lineNoCov">          0 :     return (mFrame-&gt;GetStateBits() &amp; NS_FRAME_IS_DIRTY) ||</span>
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :            IsIResize() ||</span>
+<span class="lineNum">     862 </span><span class="lineNoCov">          0 :            (IsBResize() &amp;&amp; </span>
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :             (mFrame-&gt;GetStateBits() &amp; NS_FRAME_CONTAINS_RELATIVE_BSIZE));</span>
+<span class="lineNum">     864 </span>            :   }
+<span class="lineNum">     865 </span>            : 
+<span class="lineNum">     866 </span>            :   // This method doesn't apply min/max computed widths to the value passed in.
+<span class="lineNum">     867 </span>            :   void SetComputedWidth(nscoord aComputedWidth);
+<span class="lineNum">     868 </span>            : 
+<span class="lineNum">     869 </span>            :   // This method doesn't apply min/max computed heights to the value passed in.
+<a name="870"><span class="lineNum">     870 </span>            :   void SetComputedHeight(nscoord aComputedHeight);</a>
+<span class="lineNum">     871 </span>            : 
+<span class="lineNum">     872 </span><span class="lineNoCov">          0 :   void SetComputedISize(nscoord aComputedISize) {</span>
+<span class="lineNum">     873 </span><span class="lineNoCov">          0 :     if (mWritingMode.IsVertical()) {</span>
+<span class="lineNum">     874 </span><span class="lineNoCov">          0 :       SetComputedHeight(aComputedISize);</span>
+<span class="lineNum">     875 </span>            :     } else {
+<span class="lineNum">     876 </span><span class="lineNoCov">          0 :       SetComputedWidth(aComputedISize);</span>
+<span class="lineNum">     877 </span>            :     }
+<a name="878"><span class="lineNum">     878 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     879 </span>            : 
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :   void SetComputedBSize(nscoord aComputedBSize) {</span>
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :     if (mWritingMode.IsVertical()) {</span>
+<span class="lineNum">     882 </span><span class="lineNoCov">          0 :       SetComputedWidth(aComputedBSize);</span>
+<span class="lineNum">     883 </span>            :     } else {
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 :       SetComputedHeight(aComputedBSize);</span>
+<span class="lineNum">     885 </span>            :     }
+<a name="886"><span class="lineNum">     886 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     887 </span>            : 
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :   void SetComputedBSizeWithoutResettingResizeFlags(nscoord aComputedBSize) {</span>
+<span class="lineNum">     889 </span>            :     // Viewport frames reset the computed block size on a copy of their reflow
+<span class="lineNum">     890 </span>            :     // state when reflowing fixed-pos kids.  In that case we actually don't
+<span class="lineNum">     891 </span>            :     // want to mess with the resize flags, because comparing the frame's rect
+<span class="lineNum">     892 </span>            :     // to the munged computed isize is pointless.
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :     ComputedBSize() = aComputedBSize;</span>
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     895 </span>            : 
+<a name="896"><span class="lineNum">     896 </span>            :   void SetTruncated(const ReflowOutput&amp; aMetrics, nsReflowStatus* aStatus) const;</a>
+<span class="lineNum">     897 </span>            : 
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 :   bool WillReflowAgainForClearance() const {</span>
+<span class="lineNum">     899 </span><span class="lineNoCov">          0 :     return mDiscoveredClearance &amp;&amp; *mDiscoveredClearance;</span>
+<span class="lineNum">     900 </span>            :   }
+<span class="lineNum">     901 </span>            : 
+<span class="lineNum">     902 </span>            :   // Compute the offsets for a relative position element
+<span class="lineNum">     903 </span>            :   static void ComputeRelativeOffsets(mozilla::WritingMode aWM,
+<span class="lineNum">     904 </span>            :                                      nsIFrame* aFrame,
+<span class="lineNum">     905 </span>            :                                      const mozilla::LogicalSize&amp; aCBSize,
+<span class="lineNum">     906 </span>            :                                      nsMargin&amp; aComputedOffsets);
+<span class="lineNum">     907 </span>            : 
+<span class="lineNum">     908 </span>            :   // If a relatively positioned element, adjust the position appropriately.
+<span class="lineNum">     909 </span>            :   static void ApplyRelativePositioning(nsIFrame* aFrame,
+<span class="lineNum">     910 </span>            :                                        const nsMargin&amp; aComputedOffsets,
+<span class="lineNum">     911 </span>            :                                        nsPoint* aPosition);
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span>            :   void ApplyRelativePositioning(nsPoint* aPosition) const {
+<span class="lineNum">     914 </span>            :     ApplyRelativePositioning(mFrame, ComputedPhysicalOffsets(), aPosition);
+<span class="lineNum">     915 </span>            :   }
+<a name="916"><span class="lineNum">     916 </span>            : </a>
+<span class="lineNum">     917 </span>            :   static void
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :   ApplyRelativePositioning(nsIFrame* aFrame,</span>
+<span class="lineNum">     919 </span>            :                            mozilla::WritingMode aWritingMode,
+<span class="lineNum">     920 </span>            :                            const mozilla::LogicalMargin&amp; aComputedOffsets,
+<span class="lineNum">     921 </span>            :                            mozilla::LogicalPoint* aPosition,
+<span class="lineNum">     922 </span>            :                            const nsSize&amp; aContainerSize) {
+<span class="lineNum">     923 </span>            :     // Subtract the size of the frame from the container size that we
+<span class="lineNum">     924 </span>            :     // use for converting between the logical and physical origins of
+<span class="lineNum">     925 </span>            :     // the frame. This accounts for the fact that logical origins in RTL
+<span class="lineNum">     926 </span>            :     // coordinate systems are at the top right of the frame instead of
+<span class="lineNum">     927 </span>            :     // the top left.
+<span class="lineNum">     928 </span><span class="lineNoCov">          0 :     nsSize frameSize = aFrame-&gt;GetSize();</span>
+<span class="lineNum">     929 </span>            :     nsPoint pos = aPosition-&gt;GetPhysicalPoint(aWritingMode,
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :                                               aContainerSize - frameSize);</span>
+<span class="lineNum">     931 </span>            :     ApplyRelativePositioning(aFrame,
+<span class="lineNum">     932 </span>            :                              aComputedOffsets.GetPhysicalMargin(aWritingMode),
+<span class="lineNum">     933 </span><span class="lineNoCov">          0 :                              &amp;pos);</span>
+<span class="lineNum">     934 </span>            :     *aPosition = mozilla::LogicalPoint(aWritingMode, pos,
+<span class="lineNum">     935 </span><span class="lineNoCov">          0 :                                        aContainerSize - frameSize);</span>
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     937 </span>            : 
+<span class="lineNum">     938 </span><span class="lineNoCov">          0 :   void ApplyRelativePositioning(mozilla::LogicalPoint* aPosition,</span>
+<span class="lineNum">     939 </span>            :                                 const nsSize&amp; aContainerSize) const {
+<span class="lineNum">     940 </span>            :     ApplyRelativePositioning(mFrame, mWritingMode,
+<span class="lineNum">     941 </span>            :                              ComputedLogicalOffsets(), aPosition,
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 :                              aContainerSize);</span>
+<span class="lineNum">     943 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     944 </span>            : 
+<span class="lineNum">     945 </span>            : #ifdef DEBUG
+<span class="lineNum">     946 </span>            :   // Reflow trace methods.  Defined in nsFrame.cpp so they have access
+<span class="lineNum">     947 </span>            :   // to the display-reflow infrastructure.
+<span class="lineNum">     948 </span>            :   static void* DisplayInitConstraintsEnter(nsIFrame* aFrame,
+<span class="lineNum">     949 </span>            :                                            ReflowInput* aState,
+<span class="lineNum">     950 </span>            :                                            nscoord aCBISize,
+<span class="lineNum">     951 </span>            :                                            nscoord aCBBSize,
+<span class="lineNum">     952 </span>            :                                            const nsMargin* aBorder,
+<span class="lineNum">     953 </span>            :                                            const nsMargin* aPadding);
+<span class="lineNum">     954 </span>            :   static void DisplayInitConstraintsExit(nsIFrame* aFrame,
+<span class="lineNum">     955 </span>            :                                          ReflowInput* aState,
+<span class="lineNum">     956 </span>            :                                          void* aValue);
+<span class="lineNum">     957 </span>            :   static void* DisplayInitFrameTypeEnter(nsIFrame* aFrame,
+<span class="lineNum">     958 </span>            :                                          ReflowInput* aState);
+<span class="lineNum">     959 </span>            :   static void DisplayInitFrameTypeExit(nsIFrame* aFrame,
+<span class="lineNum">     960 </span>            :                                        ReflowInput* aState,
+<span class="lineNum">     961 </span>            :                                        void* aValue);
+<span class="lineNum">     962 </span>            : #endif
+<span class="lineNum">     963 </span>            : 
+<span class="lineNum">     964 </span>            : protected:
+<span class="lineNum">     965 </span>            :   void InitFrameType(nsIAtom* aFrameType);
+<span class="lineNum">     966 </span>            :   void InitCBReflowInput();
+<span class="lineNum">     967 </span>            :   void InitResizeFlags(nsPresContext* aPresContext, nsIAtom* aFrameType);
+<span class="lineNum">     968 </span>            : 
+<span class="lineNum">     969 </span>            :   void InitConstraints(nsPresContext*              aPresContext,
+<span class="lineNum">     970 </span>            :                        const mozilla::LogicalSize&amp; aContainingBlockSize,
+<span class="lineNum">     971 </span>            :                        const nsMargin*             aBorder,
+<span class="lineNum">     972 </span>            :                        const nsMargin*             aPadding,
+<span class="lineNum">     973 </span>            :                        nsIAtom*                    aFrameType);
+<span class="lineNum">     974 </span>            : 
+<span class="lineNum">     975 </span>            :   // Returns the nearest containing block or block frame (whether or not
+<span class="lineNum">     976 </span>            :   // it is a containing block) for the specified frame.  Also returns
+<span class="lineNum">     977 </span>            :   // the inline-start edge and logical size of the containing block's
+<span class="lineNum">     978 </span>            :   // content area.
+<span class="lineNum">     979 </span>            :   // These are returned in the coordinate space of the containing block.
+<span class="lineNum">     980 </span>            :   nsIFrame* GetHypotheticalBoxContainer(nsIFrame* aFrame,
+<span class="lineNum">     981 </span>            :                                         nscoord&amp; aCBIStartEdge,
+<span class="lineNum">     982 </span>            :                                         mozilla::LogicalSize&amp; aCBSize) const;
+<span class="lineNum">     983 </span>            : 
+<span class="lineNum">     984 </span>            :   // Calculate a &quot;hypothetical box&quot; position where the placeholder frame
+<span class="lineNum">     985 </span>            :   // (for a position:fixed/absolute element) would have been placed if it were
+<span class="lineNum">     986 </span>            :   // positioned statically. The hypothetical box position will have a writing
+<span class="lineNum">     987 </span>            :   // mode with the same block direction as the absolute containing block
+<span class="lineNum">     988 </span>            :   // (cbrs-&gt;frame), though it may differ in inline direction.
+<span class="lineNum">     989 </span>            :   void CalculateHypotheticalPosition(nsPresContext* aPresContext,
+<span class="lineNum">     990 </span>            :                                      nsIFrame* aPlaceholderFrame,
+<span class="lineNum">     991 </span>            :                                      const ReflowInput* cbrs,
+<span class="lineNum">     992 </span>            :                                      nsHypotheticalPosition&amp; aHypotheticalPos,
+<span class="lineNum">     993 </span>            :                                      nsIAtom* aFrameType) const;
+<span class="lineNum">     994 </span>            : 
+<span class="lineNum">     995 </span>            :   void InitAbsoluteConstraints(nsPresContext* aPresContext,
+<span class="lineNum">     996 </span>            :                                const ReflowInput* cbrs,
+<span class="lineNum">     997 </span>            :                                const mozilla::LogicalSize&amp; aContainingBlockSize,
+<span class="lineNum">     998 </span>            :                                nsIAtom* aFrameType);
+<span class="lineNum">     999 </span>            : 
+<span class="lineNum">    1000 </span>            :   // Calculates the computed values for the 'min-Width', 'max-Width',
+<span class="lineNum">    1001 </span>            :   // 'min-Height', and 'max-Height' properties, and stores them in the assorted
+<span class="lineNum">    1002 </span>            :   // data members
+<span class="lineNum">    1003 </span>            :   void ComputeMinMaxValues(const mozilla::LogicalSize&amp; aContainingBlockSize);
+<span class="lineNum">    1004 </span>            : 
+<span class="lineNum">    1005 </span>            :   // aInsideBoxSizing returns the part of the padding, border, and margin
+<span class="lineNum">    1006 </span>            :   // in the aAxis dimension that goes inside the edge given by box-sizing;
+<span class="lineNum">    1007 </span>            :   // aOutsideBoxSizing returns the rest.
+<span class="lineNum">    1008 </span>            :   void CalculateBorderPaddingMargin(mozilla::LogicalAxis aAxis,
+<span class="lineNum">    1009 </span>            :                                     nscoord aContainingBlockSize,
+<span class="lineNum">    1010 </span>            :                                     nscoord* aInsideBoxSizing,
+<span class="lineNum">    1011 </span>            :                                     nscoord* aOutsideBoxSizing) const;
+<span class="lineNum">    1012 </span>            : 
+<span class="lineNum">    1013 </span>            :   void CalculateBlockSideMargins(nsIAtom* aFrameType);
+<span class="lineNum">    1014 </span>            : };
+<span class="lineNum">    1015 </span>            : 
+<span class="lineNum">    1016 </span>            : } // namespace mozilla
+<span class="lineNum">    1017 </span>            : 
+<span class="lineNum">    1018 </span>            : #endif // mozilla_ReflowInput_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

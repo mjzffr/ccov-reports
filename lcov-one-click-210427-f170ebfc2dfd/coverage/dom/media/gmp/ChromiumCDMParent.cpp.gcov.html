@@ -1,0 +1,1065 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - dom/media/gmp/ChromiumCDMParent.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">dom/media/gmp</a> - ChromiumCDMParent.cpp<span style="font-size: 80%;"> (source / <a href="ChromiumCDMParent.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">335</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &quot;ChromiumCDMParent.h&quot;
+<span class="lineNum">       7 </span>            : #include &quot;mozilla/gmp/GMPTypes.h&quot;
+<span class="lineNum">       8 </span>            : #include &quot;GMPContentChild.h&quot;
+<span class="lineNum">       9 </span>            : #include &quot;GMPContentParent.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/Unused.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;ChromiumCDMProxy.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/dom/MediaKeyMessageEventBinding.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;content_decryption_module.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;GMPLog.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;MediaPrefs.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;GMPUtils.h&quot;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace mozilla {
+<span class="lineNum">      19 </span>            : namespace gmp {
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 : ChromiumCDMParent::ChromiumCDMParent(GMPContentParent* aContentParent,</span>
+<span class="lineNum">      22 </span>            :                                      uint32_t aPluginId)
+<span class="lineNum">      23 </span>            :   : mPluginId(aPluginId)
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :   , mContentParent(aContentParent)</span>
+<span class="lineNum">      25 </span>            : {
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :   GMP_LOG(</span>
+<span class="lineNum">      27 </span>            :     &quot;ChromiumCDMParent::ChromiumCDMParent(this=%p, contentParent=%p, id=%u)&quot;,
+<span class="lineNum">      28 </span>            :     this,
+<span class="lineNum">      29 </span>            :     aContentParent,
+<span class="lineNum">      30 </span>            :     aPluginId);
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 : }</span>
+<a name="32"><span class="lineNum">      32 </span>            : </a>
+<span class="lineNum">      33 </span>            : bool
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 : ChromiumCDMParent::Init(ChromiumCDMProxy* aProxy,</span>
+<span class="lineNum">      35 </span>            :                         bool aAllowDistinctiveIdentifier,
+<span class="lineNum">      36 </span>            :                         bool aAllowPersistentState)
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::Init(this=%p)&quot;, this);</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   if (!aProxy) {</span>
+<span class="lineNum">      40 </span>            :     return false;
+<span class="lineNum">      41 </span>            :   }
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :   mProxy = aProxy;</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :   return SendInit(aAllowDistinctiveIdentifier, aAllowPersistentState);</span>
+<span class="lineNum">      44 </span>            : }
+<a name="45"><span class="lineNum">      45 </span>            : </a>
+<span class="lineNum">      46 </span>            : void
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 : ChromiumCDMParent::CreateSession(uint32_t aCreateSessionToken,</span>
+<span class="lineNum">      48 </span>            :                                  uint32_t aSessionType,
+<span class="lineNum">      49 </span>            :                                  uint32_t aInitDataType,
+<span class="lineNum">      50 </span>            :                                  uint32_t aPromiseId,
+<span class="lineNum">      51 </span>            :                                  const nsTArray&lt;uint8_t&gt;&amp; aInitData)
+<span class="lineNum">      52 </span>            : {
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::CreateSession(this=%p)&quot;, this);</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">      55 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">      56 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      59 </span>            :   }
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :   if (!SendCreateSessionAndGenerateRequest(</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :         aPromiseId, aSessionType, aInitDataType, aInitData)) {</span>
+<span class="lineNum">      62 </span>            :     RejectPromise(
+<span class="lineNum">      63 </span>            :       aPromiseId,
+<span class="lineNum">      64 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send generateRequest to CDM process.&quot;));</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   mPromiseToCreateSessionToken.Put(aPromiseId, aCreateSessionToken);</span>
+<span class="lineNum">      69 </span>            : }
+<a name="70"><span class="lineNum">      70 </span>            : </a>
+<span class="lineNum">      71 </span>            : void
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 : ChromiumCDMParent::LoadSession(uint32_t aPromiseId,</span>
+<span class="lineNum">      73 </span>            :                                uint32_t aSessionType,
+<span class="lineNum">      74 </span>            :                                nsString aSessionId)
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::LoadSession(this=%p, pid=%u, type=%u, sid=%s)&quot;,</span>
+<span class="lineNum">      77 </span>            :           this,
+<span class="lineNum">      78 </span>            :           aPromiseId,
+<span class="lineNum">      79 </span>            :           aSessionType,
+<span class="lineNum">      80 </span>            :           NS_ConvertUTF16toUTF8(aSessionId).get());
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">      82 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">      83 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      86 </span>            :   }
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   if (!SendLoadSession(</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         aPromiseId, aSessionType, NS_ConvertUTF16toUTF8(aSessionId))) {</span>
+<span class="lineNum">      89 </span>            :     RejectPromise(
+<span class="lineNum">      90 </span>            :       aPromiseId,
+<span class="lineNum">      91 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send loadSession to CDM process.&quot;));</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span>            : }
+<a name="96"><span class="lineNum">      96 </span>            : </a>
+<span class="lineNum">      97 </span>            : void
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 : ChromiumCDMParent::SetServerCertificate(uint32_t aPromiseId,</span>
+<span class="lineNum">      99 </span>            :                                         const nsTArray&lt;uint8_t&gt;&amp; aCert)
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::SetServerCertificate(this=%p)&quot;, this);</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     103 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">     104 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     107 </span>            :   }
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :   if (!SendSetServerCertificate(aPromiseId, aCert)) {</span>
+<span class="lineNum">     109 </span>            :     RejectPromise(
+<span class="lineNum">     110 </span>            :       aPromiseId,
+<span class="lineNum">     111 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send setServerCertificate to CDM process&quot;));</span>
+<span class="lineNum">     113 </span>            :   }
+<span class="lineNum">     114 </span>            : }
+<a name="115"><span class="lineNum">     115 </span>            : </a>
+<span class="lineNum">     116 </span>            : void
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 : ChromiumCDMParent::UpdateSession(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     118 </span>            :                                  uint32_t aPromiseId,
+<span class="lineNum">     119 </span>            :                                  const nsTArray&lt;uint8_t&gt;&amp; aResponse)
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::UpdateSession(this=%p)&quot;, this);</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     123 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">     124 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     127 </span>            :   }
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   if (!SendUpdateSession(aPromiseId, aSessionId, aResponse)) {</span>
+<span class="lineNum">     129 </span>            :     RejectPromise(
+<span class="lineNum">     130 </span>            :       aPromiseId,
+<span class="lineNum">     131 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send updateSession to CDM process&quot;));</span>
+<span class="lineNum">     133 </span>            :   }
+<span class="lineNum">     134 </span>            : }
+<a name="135"><span class="lineNum">     135 </span>            : </a>
+<span class="lineNum">     136 </span>            : void
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 : ChromiumCDMParent::CloseSession(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     138 </span>            :                                 uint32_t aPromiseId)
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::CloseSession(this=%p)&quot;, this);</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     142 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">     143 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     146 </span>            :   }
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :   if (!SendCloseSession(aPromiseId, aSessionId)) {</span>
+<span class="lineNum">     148 </span>            :     RejectPromise(
+<span class="lineNum">     149 </span>            :       aPromiseId,
+<span class="lineNum">     150 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send closeSession to CDM process&quot;));</span>
+<span class="lineNum">     152 </span>            :   }
+<span class="lineNum">     153 </span>            : }
+<a name="154"><span class="lineNum">     154 </span>            : </a>
+<span class="lineNum">     155 </span>            : void
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RemoveSession(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     157 </span>            :                                  uint32_t aPromiseId)
+<span class="lineNum">     158 </span>            : {
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RemoveSession(this=%p)&quot;, this);</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     161 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">     162 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;CDM is shutdown.&quot;));</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     165 </span>            :   }
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :   if (!SendRemoveSession(aPromiseId, aSessionId)) {</span>
+<span class="lineNum">     167 </span>            :     RejectPromise(
+<span class="lineNum">     168 </span>            :       aPromiseId,
+<span class="lineNum">     169 </span>            :       NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :       NS_LITERAL_CSTRING(&quot;Failed to send removeSession to CDM process&quot;));</span>
+<span class="lineNum">     171 </span>            :   }
+<span class="lineNum">     172 </span>            : }
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            : bool
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 : ChromiumCDMParent::InitCDMInputBuffer(gmp::CDMInputBuffer&amp; aBuffer,</span>
+<span class="lineNum">     176 </span>            :                                       MediaRawData* aSample)
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :   const CryptoSample&amp; crypto = aSample-&gt;mCrypto;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :   if (crypto.mEncryptedSizes.Length() != crypto.mPlainSizes.Length()) {</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     GMP_LOG(&quot;InitCDMInputBuffer clear/cipher subsamples don't match&quot;);</span>
+<span class="lineNum">     181 </span>            :     return false;
+<span class="lineNum">     182 </span>            :   }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   Shmem shmem;
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   if (!AllocShmem(aSample-&gt;Size(), Shmem::SharedMemory::TYPE_BASIC, &amp;shmem)) {</span>
+<span class="lineNum">     186 </span>            :     return false;
+<span class="lineNum">     187 </span>            :   }
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :   memcpy(shmem.get&lt;uint8_t&gt;(), aSample-&gt;Data(), aSample-&gt;Size());</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   aBuffer = gmp::CDMInputBuffer(shmem,</span>
+<span class="lineNum">     191 </span>            :                                 crypto.mKeyId,
+<span class="lineNum">     192 </span>            :                                 crypto.mIV,
+<span class="lineNum">     193 </span>            :                                 aSample-&gt;mTime,
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                                 aSample-&gt;mDuration.ToMicroseconds(),</span>
+<span class="lineNum">     195 </span>            :                                 crypto.mPlainSizes,
+<span class="lineNum">     196 </span>            :                                 crypto.mEncryptedSizes,
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :                                 crypto.mValid);</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     199 </span>            : }
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            : bool
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 : ChromiumCDMParent::SendBufferToCDM(uint32_t aSizeInBytes)</span>
+<span class="lineNum">     203 </span>            : {
+<span class="lineNum">     204 </span>            :   Shmem shmem;
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   if (!AllocShmem(aSizeInBytes, Shmem::SharedMemory::TYPE_BASIC, &amp;shmem)) {</span>
+<span class="lineNum">     206 </span>            :     return false;
+<span class="lineNum">     207 </span>            :   }
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :   if (!SendGiveBuffer(shmem)) {</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :     DeallocShmem(shmem);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     211 </span>            :   }
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     213 </span>            : }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : RefPtr&lt;DecryptPromise&gt;
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 : ChromiumCDMParent::Decrypt(MediaRawData* aSample)</span>
+<span class="lineNum">     217 </span>            : {
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     219 </span>            :     return DecryptPromise::CreateAndReject(DecryptResult(GenericErr, aSample),
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                                            __func__);</span>
+<span class="lineNum">     221 </span>            :   }
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :   CDMInputBuffer buffer;</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :   if (!InitCDMInputBuffer(buffer, aSample)) {</span>
+<span class="lineNum">     224 </span>            :     return DecryptPromise::CreateAndReject(DecryptResult(GenericErr, aSample),
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                                            __func__);</span>
+<span class="lineNum">     226 </span>            :   }
+<span class="lineNum">     227 </span>            :   // Send a buffer to the CDM to store the output. The CDM will either fill
+<span class="lineNum">     228 </span>            :   // it with the decrypted sample and return it, or deallocate it on failure.
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :   if (!SendBufferToCDM(aSample-&gt;Size())) {</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :     DeallocShmem(buffer.mData());</span>
+<span class="lineNum">     231 </span>            :     return DecryptPromise::CreateAndReject(DecryptResult(GenericErr, aSample),
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :                                            __func__);</span>
+<span class="lineNum">     233 </span>            :   }
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   RefPtr&lt;DecryptJob&gt; job = new DecryptJob(aSample);</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :   if (!SendDecrypt(job-&gt;mId, buffer)) {</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :     GMP_LOG(</span>
+<span class="lineNum">     238 </span>            :       &quot;ChromiumCDMParent::Decrypt(this=%p) failed to send decrypt message&quot;,
+<span class="lineNum">     239 </span>            :       this);
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :     DeallocShmem(buffer.mData());</span>
+<span class="lineNum">     241 </span>            :     return DecryptPromise::CreateAndReject(DecryptResult(GenericErr, aSample),
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :                                            __func__);</span>
+<span class="lineNum">     243 </span>            :   }
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :   RefPtr&lt;DecryptPromise&gt; promise = job-&gt;Ensure();</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :   mDecrypts.AppendElement(job);</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   return promise;</span>
+<span class="lineNum">     247 </span>            : }
+<a name="248"><span class="lineNum">     248 </span>            : </a>
+<span class="lineNum">     249 </span>            : ipc::IPCResult
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 : ChromiumCDMParent::Recv__delete__()</span>
+<span class="lineNum">     251 </span>            : {
+<span class="lineNum">     252 </span>            :   MOZ_ASSERT(mIsShutdown);
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::Recv__delete__(this=%p)&quot;, this);</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :   if (mContentParent) {</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :     mContentParent-&gt;ChromiumCDMDestroyed(this);</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :     mContentParent = nullptr;</span>
+<span class="lineNum">     257 </span>            :   }
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     259 </span>            : }
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            : ipc::IPCResult
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnResolveNewSessionPromise(const uint32_t&amp; aPromiseId,</span>
+<span class="lineNum">     263 </span>            :                                                   const nsCString&amp; aSessionId)
+<span class="lineNum">     264 </span>            : {
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnResolveNewSessionPromise(this=%p, pid=%u, &quot;</span>
+<span class="lineNum">     266 </span>            :           &quot;sid=%s)&quot;,
+<span class="lineNum">     267 </span>            :           this,
+<span class="lineNum">     268 </span>            :           aPromiseId,
+<span class="lineNum">     269 </span>            :           aSessionId.get());
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     271 </span>            :     return IPC_OK();
+<span class="lineNum">     272 </span>            :   }
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :   Maybe&lt;uint32_t&gt; token = mPromiseToCreateSessionToken.GetAndRemove(aPromiseId);</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :   if (token.isNothing()) {</span>
+<span class="lineNum">     276 </span>            :     RejectPromise(aPromiseId,
+<span class="lineNum">     277 </span>            :                   NS_ERROR_DOM_INVALID_STATE_ERR,
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                   NS_LITERAL_CSTRING(&quot;Lost session token for new session.&quot;));</span>
+<span class="lineNum">     279 </span>            :     return IPC_OK();
+<span class="lineNum">     280 </span>            :   }
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            :   RefPtr&lt;Runnable&gt; task =
+<span class="lineNum">     283 </span>            :     NewRunnableMethod&lt;uint32_t, nsString&gt;(mProxy,
+<span class="lineNum">     284 </span>            :                                           &amp;ChromiumCDMProxy::OnSetSessionId,
+<span class="lineNum">     285 </span>            :                                           token.value(),
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :                                           NS_ConvertUTF8toUTF16(aSessionId));</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :   NS_DispatchToMainThread(task);</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :   ResolvePromise(aPromiseId);</span>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :   return IPC_OK();
+<span class="lineNum">     292 </span>            : }
+<a name="293"><span class="lineNum">     293 </span>            : </a>
+<span class="lineNum">     294 </span>            : ipc::IPCResult
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvResolveLoadSessionPromise(const uint32_t&amp; aPromiseId,</span>
+<span class="lineNum">     296 </span>            :                                                  const bool&amp; aSuccessful)
+<span class="lineNum">     297 </span>            : {
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvResolveLoadSessionPromise(this=%p, pid=%u, &quot;</span>
+<span class="lineNum">     299 </span>            :           &quot;successful=%d)&quot;,
+<span class="lineNum">     300 </span>            :           this,
+<span class="lineNum">     301 </span>            :           aPromiseId,
+<span class="lineNum">     302 </span>            :           aSuccessful);
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     304 </span>            :     return IPC_OK();
+<span class="lineNum">     305 </span>            :   }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :   NS_DispatchToMainThread(NewRunnableMethod&lt;uint32_t, bool&gt;(
+<span class="lineNum">     308 </span>            :     mProxy,
+<span class="lineNum">     309 </span>            :     &amp;ChromiumCDMProxy::OnResolveLoadSessionPromise,
+<span class="lineNum">     310 </span>            :     aPromiseId,
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :     aSuccessful));</span>
+<span class="lineNum">     312 </span>            :   return IPC_OK();
+<a name="313"><span class="lineNum">     313 </span>            : }</a>
+<span class="lineNum">     314 </span>            : void
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 : ChromiumCDMParent::ResolvePromise(uint32_t aPromiseId)</span>
+<span class="lineNum">     316 </span>            : {
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :   GMP_LOG(</span>
+<span class="lineNum">     318 </span>            :     &quot;ChromiumCDMParent::ResolvePromise(this=%p, pid=%u)&quot;, this, aPromiseId);
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :   // Note: The MediaKeys rejects all pending DOM promises when it
+<span class="lineNum">     321 </span>            :   // initiates shutdown.
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     324 </span>            :   }
+<span class="lineNum">     325 </span>            :   NS_DispatchToMainThread(NewRunnableMethod&lt;uint32_t&gt;(
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :     mProxy, &amp;ChromiumCDMProxy::ResolvePromise, aPromiseId));</span>
+<span class="lineNum">     327 </span>            : }
+<a name="328"><span class="lineNum">     328 </span>            : </a>
+<span class="lineNum">     329 </span>            : ipc::IPCResult
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnResolvePromise(const uint32_t&amp; aPromiseId)</span>
+<span class="lineNum">     331 </span>            : {
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :   ResolvePromise(aPromiseId);</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     334 </span>            : }
+<a name="335"><span class="lineNum">     335 </span>            : </a>
+<span class="lineNum">     336 </span>            : static nsresult
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 : ToNsresult(uint32_t aError)</span>
+<span class="lineNum">     338 </span>            : {
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :   switch (static_cast&lt;cdm::Error&gt;(aError)) {</span>
+<span class="lineNum">     340 </span>            :     case cdm::kNotSupportedError:
+<span class="lineNum">     341 </span>            :       return NS_ERROR_DOM_NOT_SUPPORTED_ERR;
+<span class="lineNum">     342 </span>            :     case cdm::kInvalidStateError:
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_INVALID_STATE_ERR;</span>
+<span class="lineNum">     344 </span>            :     case cdm::kInvalidAccessError:
+<span class="lineNum">     345 </span>            :       // Note: Chrome converts kInvalidAccessError to TypeError, since the
+<span class="lineNum">     346 </span>            :       // Chromium CDM API doesn't have a type error enum value. The EME spec
+<span class="lineNum">     347 </span>            :       // requires TypeError in some places, so we do the same conversion.
+<span class="lineNum">     348 </span>            :       // See bug 1313202.
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_TYPE_ERR;</span>
+<span class="lineNum">     350 </span>            :     case cdm::kQuotaExceededError:
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_QUOTA_EXCEEDED_ERR;</span>
+<span class="lineNum">     352 </span>            :     case cdm::kUnknownError:
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_UNKNOWN_ERR; // Note: Unique placeholder.</span>
+<span class="lineNum">     354 </span>            :     case cdm::kClientError:
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_ABORT_ERR; // Note: Unique placeholder.</span>
+<span class="lineNum">     356 </span>            :     case cdm::kOutputError:
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :       return NS_ERROR_DOM_SECURITY_ERR; // Note: Unique placeholder.</span>
+<span class="lineNum">     358 </span>            :   };
+<span class="lineNum">     359 </span>            :   MOZ_ASSERT_UNREACHABLE(&quot;Invalid cdm::Error enum value.&quot;);
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :   return NS_ERROR_DOM_TIMEOUT_ERR; // Note: Unique placeholder.</span>
+<span class="lineNum">     361 </span>            : }
+<a name="362"><span class="lineNum">     362 </span>            : </a>
+<span class="lineNum">     363 </span>            : void
+<span class="lineNum">     364 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RejectPromise(uint32_t aPromiseId,</span>
+<span class="lineNum">     365 </span>            :                                  nsresult aError,
+<span class="lineNum">     366 </span>            :                                  const nsCString&amp; aErrorMessage)
+<span class="lineNum">     367 </span>            : {
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :   GMP_LOG(</span>
+<span class="lineNum">     369 </span>            :     &quot;ChromiumCDMParent::RejectPromise(this=%p, pid=%u)&quot;, this, aPromiseId);
+<span class="lineNum">     370 </span>            :   // Note: The MediaKeys rejects all pending DOM promises when it
+<span class="lineNum">     371 </span>            :   // initiates shutdown.
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     374 </span>            :   }
+<span class="lineNum">     375 </span>            :   NS_DispatchToMainThread(NewRunnableMethod&lt;uint32_t, nsresult, nsCString&gt;(
+<span class="lineNum">     376 </span>            :     mProxy,
+<span class="lineNum">     377 </span>            :     &amp;ChromiumCDMProxy::RejectPromise,
+<span class="lineNum">     378 </span>            :     aPromiseId,
+<span class="lineNum">     379 </span>            :     aError,
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :     aErrorMessage));</span>
+<span class="lineNum">     381 </span>            : }
+<a name="382"><span class="lineNum">     382 </span>            : </a>
+<span class="lineNum">     383 </span>            : ipc::IPCResult
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnRejectPromise(const uint32_t&amp; aPromiseId,</span>
+<span class="lineNum">     385 </span>            :                                        const uint32_t&amp; aError,
+<span class="lineNum">     386 </span>            :                                        const uint32_t&amp; aSystemCode,
+<span class="lineNum">     387 </span>            :                                        const nsCString&amp; aErrorMessage)
+<span class="lineNum">     388 </span>            : {
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :   RejectPromise(aPromiseId, ToNsresult(aError), aErrorMessage);</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     391 </span>            : }
+<a name="392"><span class="lineNum">     392 </span>            : </a>
+<span class="lineNum">     393 </span>            : static dom::MediaKeyMessageType
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 : ToDOMMessageType(uint32_t aMessageType)</span>
+<span class="lineNum">     395 </span>            : {
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :   switch (static_cast&lt;cdm::MessageType&gt;(aMessageType)) {</span>
+<span class="lineNum">     397 </span>            :     case cdm::kLicenseRequest:
+<span class="lineNum">     398 </span>            :       return dom::MediaKeyMessageType::License_request;
+<span class="lineNum">     399 </span>            :     case cdm::kLicenseRenewal:
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :       return dom::MediaKeyMessageType::License_renewal;</span>
+<span class="lineNum">     401 </span>            :     case cdm::kLicenseRelease:
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :       return dom::MediaKeyMessageType::License_release;</span>
+<span class="lineNum">     403 </span>            :   }
+<span class="lineNum">     404 </span>            :   MOZ_ASSERT_UNREACHABLE(&quot;Invalid cdm::MessageType enum value.&quot;);
+<span class="lineNum">     405 </span>            :   return dom::MediaKeyMessageType::License_request;
+<span class="lineNum">     406 </span>            : }
+<a name="407"><span class="lineNum">     407 </span>            : </a>
+<span class="lineNum">     408 </span>            : ipc::IPCResult
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnSessionMessage(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     410 </span>            :                                         const uint32_t&amp; aMessageType,
+<span class="lineNum">     411 </span>            :                                         nsTArray&lt;uint8_t&gt;&amp;&amp; aMessage)
+<span class="lineNum">     412 </span>            : {
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnSessionMessage(this=%p, sid=%s)&quot;,</span>
+<span class="lineNum">     414 </span>            :           this,
+<span class="lineNum">     415 </span>            :           aSessionId.get());
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     417 </span>            :     return IPC_OK();
+<span class="lineNum">     418 </span>            :   }
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :   RefPtr&lt;CDMProxy&gt; proxy = mProxy;</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :   nsString sid = NS_ConvertUTF8toUTF16(aSessionId);</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :   dom::MediaKeyMessageType messageType = ToDOMMessageType(aMessageType);</span>
+<a name="422"><span class="lineNum">     422 </span><span class="lineNoCov">          0 :   nsTArray&lt;uint8_t&gt; msg(Move(aMessage));</span></a>
+<span class="lineNum">     423 </span>            :   NS_DispatchToMainThread(
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :     NS_NewRunnableFunction([proxy, sid, messageType, msg]() mutable {</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :       proxy-&gt;OnSessionMessage(sid, messageType, msg);</span>
+<span class="lineNum">     426 </span><span class="lineNoCov">          0 :     }));</span>
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     428 </span>            : }
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            : static dom::MediaKeyStatus
+<span class="lineNum">     431 </span>            : ToDOMMediaKeyStatus(uint32_t aStatus)
+<span class="lineNum">     432 </span>            : {
+<span class="lineNum">     433 </span>            :   switch (static_cast&lt;cdm::KeyStatus&gt;(aStatus)) {
+<span class="lineNum">     434 </span>            :     case cdm::kUsable:
+<span class="lineNum">     435 </span>            :       return dom::MediaKeyStatus::Usable;
+<span class="lineNum">     436 </span>            :     case cdm::kInternalError:
+<span class="lineNum">     437 </span>            :       return dom::MediaKeyStatus::Internal_error;
+<span class="lineNum">     438 </span>            :     case cdm::kExpired:
+<span class="lineNum">     439 </span>            :       return dom::MediaKeyStatus::Expired;
+<span class="lineNum">     440 </span>            :     case cdm::kOutputRestricted:
+<span class="lineNum">     441 </span>            :       return dom::MediaKeyStatus::Output_restricted;
+<span class="lineNum">     442 </span>            :     case cdm::kOutputDownscaled:
+<span class="lineNum">     443 </span>            :       return dom::MediaKeyStatus::Output_downscaled;
+<span class="lineNum">     444 </span>            :     case cdm::kStatusPending:
+<span class="lineNum">     445 </span>            :       return dom::MediaKeyStatus::Status_pending;
+<span class="lineNum">     446 </span>            :     case cdm::kReleased:
+<span class="lineNum">     447 </span>            :       return dom::MediaKeyStatus::Released;
+<span class="lineNum">     448 </span>            :   }
+<span class="lineNum">     449 </span>            :   MOZ_ASSERT_UNREACHABLE(&quot;Invalid cdm::KeyStatus enum value.&quot;);
+<span class="lineNum">     450 </span>            :   return dom::MediaKeyStatus::Internal_error;
+<span class="lineNum">     451 </span>            : }
+<a name="452"><span class="lineNum">     452 </span>            : </a>
+<span class="lineNum">     453 </span>            : ipc::IPCResult
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnSessionKeysChange(</span>
+<span class="lineNum">     455 </span>            :   const nsCString&amp; aSessionId,
+<span class="lineNum">     456 </span>            :   nsTArray&lt;CDMKeyInformation&gt;&amp;&amp; aKeysInfo)
+<span class="lineNum">     457 </span>            : {
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnSessionKeysChange(this=%p)&quot;, this);</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     460 </span>            :     return IPC_OK();
+<span class="lineNum">     461 </span>            :   }
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :   bool keyStatusesChange = false;</span>
+<span class="lineNum">     463 </span>            :   {
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :     CDMCaps::AutoLock caps(mProxy-&gt;Capabilites());</span>
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; aKeysInfo.Length(); i++) {</span>
+<span class="lineNum">     466 </span>            :       keyStatusesChange |=
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :         caps.SetKeyStatus(aKeysInfo[i].mKeyId(),</span>
+<span class="lineNum">     468 </span>            :                           NS_ConvertUTF8toUTF16(aSessionId),
+<span class="lineNum">     469 </span>            :                           dom::Optional&lt;dom::MediaKeyStatus&gt;(
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :                             ToDOMMediaKeyStatus(aKeysInfo[i].mStatus())));</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     472 </span>            :   }
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :   if (keyStatusesChange) {</span>
+<span class="lineNum">     474 </span>            :     NS_DispatchToMainThread(
+<span class="lineNum">     475 </span>            :       NewRunnableMethod&lt;nsString&gt;(mProxy,
+<span class="lineNum">     476 </span>            :                                   &amp;ChromiumCDMProxy::OnKeyStatusesChange,
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :                                   NS_ConvertUTF8toUTF16(aSessionId)));</span>
+<span class="lineNum">     478 </span>            :   }
+<span class="lineNum">     479 </span>            :   return IPC_OK();
+<span class="lineNum">     480 </span>            : }
+<a name="481"><span class="lineNum">     481 </span>            : </a>
+<span class="lineNum">     482 </span>            : ipc::IPCResult
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnExpirationChange(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     484 </span>            :                                           const double&amp; aSecondsSinceEpoch)
+<span class="lineNum">     485 </span>            : {
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnExpirationChange(this=%p) time=%lf&quot;,</span>
+<span class="lineNum">     487 </span>            :           this,
+<span class="lineNum">     488 </span>            :           aSecondsSinceEpoch);
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     490 </span>            :     return IPC_OK();
+<span class="lineNum">     491 </span>            :   }
+<span class="lineNum">     492 </span>            :   NS_DispatchToMainThread(NewRunnableMethod&lt;nsString, UnixTime&gt;(
+<span class="lineNum">     493 </span>            :     mProxy,
+<span class="lineNum">     494 </span>            :     &amp;ChromiumCDMProxy::OnExpirationChange,
+<span class="lineNum">     495 </span>            :     NS_ConvertUTF8toUTF16(aSessionId),
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     GMPTimestamp(aSecondsSinceEpoch * 1000)));</span>
+<span class="lineNum">     497 </span>            :   return IPC_OK();
+<span class="lineNum">     498 </span>            : }
+<a name="499"><span class="lineNum">     499 </span>            : </a>
+<span class="lineNum">     500 </span>            : ipc::IPCResult
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnSessionClosed(const nsCString&amp; aSessionId)</span>
+<span class="lineNum">     502 </span>            : {
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnSessionClosed(this=%p)&quot;, this);</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     505 </span>            :     return IPC_OK();
+<span class="lineNum">     506 </span>            :   }
+<span class="lineNum">     507 </span>            :   NS_DispatchToMainThread(
+<span class="lineNum">     508 </span>            :     NewRunnableMethod&lt;nsString&gt;(mProxy,
+<span class="lineNum">     509 </span>            :                                 &amp;ChromiumCDMProxy::OnSessionClosed,
+<span class="lineNum">     510 </span><span class="lineNoCov">          0 :                                 NS_ConvertUTF8toUTF16(aSessionId)));</span>
+<span class="lineNum">     511 </span>            :   return IPC_OK();
+<span class="lineNum">     512 </span>            : }
+<a name="513"><span class="lineNum">     513 </span>            : </a>
+<span class="lineNum">     514 </span>            : ipc::IPCResult
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnLegacySessionError(const nsCString&amp; aSessionId,</span>
+<span class="lineNum">     516 </span>            :                                             const uint32_t&amp; aError,
+<span class="lineNum">     517 </span>            :                                             const uint32_t&amp; aSystemCode,
+<span class="lineNum">     518 </span>            :                                             const nsCString&amp; aMessage)
+<span class="lineNum">     519 </span>            : {
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnLegacySessionError(this=%p)&quot;, this);</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :   if (!mProxy || mIsShutdown) {</span>
+<span class="lineNum">     522 </span>            :     return IPC_OK();
+<span class="lineNum">     523 </span>            :   }
+<span class="lineNum">     524 </span>            :   NS_DispatchToMainThread(
+<span class="lineNum">     525 </span>            :     NewRunnableMethod&lt;nsString, nsresult, uint32_t, nsString&gt;(
+<span class="lineNum">     526 </span>            :       mProxy,
+<span class="lineNum">     527 </span>            :       &amp;ChromiumCDMProxy::OnSessionError,
+<span class="lineNum">     528 </span>            :       NS_ConvertUTF8toUTF16(aSessionId),
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :       ToNsresult(aError),</span>
+<span class="lineNum">     530 </span>            :       aSystemCode,
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :       NS_ConvertUTF8toUTF16(aMessage)));</span>
+<span class="lineNum">     532 </span>            :   return IPC_OK();
+<span class="lineNum">     533 </span>            : }
+<a name="534"><span class="lineNum">     534 </span>            : </a>
+<span class="lineNum">     535 </span>            : DecryptStatus
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 : ToDecryptStatus(uint32_t aError)</span>
+<span class="lineNum">     537 </span>            : {
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :   switch (static_cast&lt;cdm::Status&gt;(aError)) {</span>
+<span class="lineNum">     539 </span>            :     case cdm::kSuccess:
+<span class="lineNum">     540 </span>            :       return DecryptStatus::Ok;
+<span class="lineNum">     541 </span>            :     case cdm::kNoKey:
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :       return DecryptStatus::NoKeyErr;</span>
+<span class="lineNum">     543 </span>            :     default:
+<span class="lineNum">     544 </span><span class="lineNoCov">          0 :       return DecryptStatus::GenericErr;</span>
+<span class="lineNum">     545 </span>            :   }
+<span class="lineNum">     546 </span>            : }
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            : ipc::IPCResult
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvDecryptFailed(const uint32_t&amp; aId,</span>
+<span class="lineNum">     550 </span>            :                                      const uint32_t&amp; aStatus)
+<span class="lineNum">     551 </span>            : {
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvDecryptFailed(this=%p, id=%u, status=%u)&quot;,</span>
+<span class="lineNum">     553 </span>            :           this,
+<span class="lineNum">     554 </span>            :           aId,
+<span class="lineNum">     555 </span>            :           aStatus);
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     558 </span>            :     MOZ_ASSERT(mDecrypts.IsEmpty());
+<span class="lineNum">     559 </span>            :     return IPC_OK();
+<span class="lineNum">     560 </span>            :   }
+<span class="lineNum">     561 </span>            : 
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :   for (size_t i = 0; i &lt; mDecrypts.Length(); i++) {</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :     if (mDecrypts[i]-&gt;mId == aId) {</span>
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :       mDecrypts[i]-&gt;PostResult(ToDecryptStatus(aStatus));</span>
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :       mDecrypts.RemoveElementAt(i);</span>
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     567 </span>            :     }
+<span class="lineNum">     568 </span>            :   }
+<span class="lineNum">     569 </span>            :   return IPC_OK();
+<span class="lineNum">     570 </span>            : }
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            : ipc::IPCResult
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvDecrypted(const uint32_t&amp; aId,</span>
+<span class="lineNum">     574 </span>            :                                  const uint32_t&amp; aStatus,
+<span class="lineNum">     575 </span>            :                                  ipc::Shmem&amp;&amp; aShmem)
+<span class="lineNum">     576 </span>            : {
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvDecrypted(this=%p, id=%u, status=%u)&quot;,</span>
+<span class="lineNum">     578 </span>            :           this,
+<span class="lineNum">     579 </span>            :           aId,
+<span class="lineNum">     580 </span>            :           aStatus);
+<span class="lineNum">     581 </span>            : 
+<a name="582"><span class="lineNum">     582 </span>            :   // We must deallocate the shmem once we've copied the result out of it</a>
+<span class="lineNum">     583 </span>            :   // in PostResult below.
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :   auto autoDeallocateShmem = MakeScopeExit([&amp;, this] { DeallocShmem(aShmem); });</span>
+<span class="lineNum">     585 </span>            : 
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     587 </span>            :     MOZ_ASSERT(mDecrypts.IsEmpty());
+<span class="lineNum">     588 </span>            :     return IPC_OK();
+<span class="lineNum">     589 </span>            :   }
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :   for (size_t i = 0; i &lt; mDecrypts.Length(); i++) {</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :     if (mDecrypts[i]-&gt;mId == aId) {</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :       mDecrypts[i]-&gt;PostResult(</span>
+<span class="lineNum">     593 </span>            :         ToDecryptStatus(aStatus),
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :         MakeSpan&lt;const uint8_t&gt;(aShmem.get&lt;uint8_t&gt;(), aShmem.Size&lt;uint8_t&gt;()));</span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :       mDecrypts.RemoveElementAt(i);</span>
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     597 </span>            :     }
+<span class="lineNum">     598 </span>            :   }
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     600 </span>            : }
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : ipc::IPCResult
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvDecoded(const CDMVideoFrame&amp; aFrame)</span>
+<span class="lineNum">     604 </span>            : {
+<span class="lineNum">     605 </span>            :   // On failure we need to deallocate the shmem used to store the decrypted
+<a name="606"><span class="lineNum">     606 </span>            :   // sample. On success we return it to the CDM to be reused.</a>
+<span class="lineNum">     607 </span>            :   auto autoDeallocateShmem =
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :     MakeScopeExit([&amp;, this] { this-&gt;DeallocShmem(aFrame.mData()); });</span>
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :   if (mIsShutdown || mDecodePromise.IsEmpty()) {</span>
+<span class="lineNum">     611 </span>            :     return IPC_OK();
+<span class="lineNum">     612 </span>            :   }
+<span class="lineNum">     613 </span>            :   VideoData::YCbCrBuffer b;
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :   uint8_t* data = aFrame.mData().get&lt;uint8_t&gt;();</span>
+<span class="lineNum">     615 </span>            :   MOZ_ASSERT(aFrame.mData().Size&lt;uint8_t&gt;() &gt; 0);
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mData = data;</span>
+<span class="lineNum">     618 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mWidth = aFrame.mImageWidth();</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mHeight = aFrame.mImageHeight();</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mStride = aFrame.mYPlane().mStride();</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mOffset = aFrame.mYPlane().mPlaneOffset();</span>
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :   b.mPlanes[0].mSkip = 0;</span>
+<span class="lineNum">     623 </span>            : 
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mData = data;</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mWidth = (aFrame.mImageWidth() + 1) / 2;</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mHeight = (aFrame.mImageHeight() + 1) / 2;</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mStride = aFrame.mUPlane().mStride();</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mOffset = aFrame.mUPlane().mPlaneOffset();</span>
+<span class="lineNum">     629 </span><span class="lineNoCov">          0 :   b.mPlanes[1].mSkip = 0;</span>
+<span class="lineNum">     630 </span>            : 
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mData = data;</span>
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mWidth = (aFrame.mImageWidth() + 1) / 2;</span>
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mHeight = (aFrame.mImageHeight() + 1) / 2;</span>
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mStride = aFrame.mVPlane().mStride();</span>
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mOffset = aFrame.mVPlane().mPlaneOffset();</span>
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :   b.mPlanes[2].mSkip = 0;</span>
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :   gfx::IntRect pictureRegion(0, 0, aFrame.mImageWidth(), aFrame.mImageHeight());</span>
+<span class="lineNum">     639 </span>            :   RefPtr&lt;VideoData&gt; v = VideoData::CreateAndCopyData(
+<span class="lineNum">     640 </span>            :     mVideoInfo,
+<span class="lineNum">     641 </span>            :     mImageContainer,
+<span class="lineNum">     642 </span>            :     mLastStreamOffset,
+<span class="lineNum">     643 </span>            :     aFrame.mTimestamp(),
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :     media::TimeUnit::FromMicroseconds(aFrame.mDuration()),</span>
+<span class="lineNum">     645 </span>            :     b,
+<span class="lineNum">     646 </span>            :     false,
+<span class="lineNum">     647 </span>            :     -1,
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :     pictureRegion);</span>
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span>            :   // Return the shmem to the CDM so the shmem can be reused to send us
+<span class="lineNum">     651 </span>            :   // another frame.
+<span class="lineNum">     652 </span><span class="lineNoCov">          0 :   if (!SendGiveBuffer(aFrame.mData())) {</span>
+<span class="lineNum">     653 </span>            :     mDecodePromise.RejectIfExists(
+<span class="lineNum">     654 </span>            :       MediaResult(NS_ERROR_OUT_OF_MEMORY,
+<span class="lineNum">     655 </span>            :                   RESULT_DETAIL(&quot;Can't return shmem to CDM process&quot;)),
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     657 </span>            :     return IPC_OK();
+<span class="lineNum">     658 </span>            :   }
+<span class="lineNum">     659 </span>            :   // Don't need to deallocate the shmem since the CDM process is responsible
+<span class="lineNum">     660 </span>            :   // for it again.
+<span class="lineNum">     661 </span><span class="lineNoCov">          0 :   autoDeallocateShmem.release();</span>
+<span class="lineNum">     662 </span>            : 
+<span class="lineNum">     663 </span><span class="lineNoCov">          0 :   if (v) {</span>
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :     mDecodePromise.ResolveIfExists({ Move(v) }, __func__);</span>
+<span class="lineNum">     665 </span>            :   } else {
+<span class="lineNum">     666 </span>            :     mDecodePromise.RejectIfExists(
+<span class="lineNum">     667 </span>            :       MediaResult(NS_ERROR_OUT_OF_MEMORY,
+<span class="lineNum">     668 </span>            :                   RESULT_DETAIL(&quot;CallBack::CreateAndCopyData&quot;)),
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     670 </span>            :   }
+<span class="lineNum">     671 </span>            : 
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     673 </span>            : }
+<a name="674"><span class="lineNum">     674 </span>            : </a>
+<span class="lineNum">     675 </span>            : ipc::IPCResult
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvDecodeFailed(const uint32_t&amp; aStatus)</span>
+<span class="lineNum">     677 </span>            : {
+<span class="lineNum">     678 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     679 </span>            :     MOZ_ASSERT(mDecodePromise.IsEmpty());
+<span class="lineNum">     680 </span>            :     return IPC_OK();
+<span class="lineNum">     681 </span>            :   }
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :   if (aStatus == cdm::kNeedMoreData) {</span>
+<span class="lineNum">     684 </span><span class="lineNoCov">          0 :     mDecodePromise.ResolveIfExists(nsTArray&lt;RefPtr&lt;MediaData&gt;&gt;(), __func__);</span>
+<span class="lineNum">     685 </span>            :     return IPC_OK();
+<span class="lineNum">     686 </span>            :   }
+<span class="lineNum">     687 </span>            : 
+<span class="lineNum">     688 </span>            :   mDecodePromise.RejectIfExists(
+<span class="lineNum">     689 </span>            :     MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     690 </span>            :                 RESULT_DETAIL(&quot;ChromiumCDMParent::RecvDecodeFailed&quot;)),
+<span class="lineNum">     691 </span><span class="lineNoCov">          0 :     __func__);</span>
+<span class="lineNum">     692 </span>            :   return IPC_OK();
+<span class="lineNum">     693 </span>            : }
+<a name="694"><span class="lineNum">     694 </span>            : </a>
+<span class="lineNum">     695 </span>            : ipc::IPCResult
+<span class="lineNum">     696 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvShutdown()</span>
+<span class="lineNum">     697 </span>            : {
+<span class="lineNum">     698 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvShutdown(this=%p)&quot;, this);</span>
+<span class="lineNum">     699 </span><span class="lineNoCov">          0 :   Shutdown();</span>
+<span class="lineNum">     700 </span><span class="lineNoCov">          0 :   return IPC_OK();</span>
+<span class="lineNum">     701 </span>            : }
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span>            : void
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 : ChromiumCDMParent::ActorDestroy(ActorDestroyReason aWhy)</span>
+<span class="lineNum">     705 </span>            : {
+<span class="lineNum">     706 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::ActorDestroy(this=%p, reason=%d)&quot;, this, aWhy);</span>
+<span class="lineNum">     707 </span>            :   MOZ_ASSERT(!mActorDestroyed);
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :   mActorDestroyed = true;</span>
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :   if (!mIsShutdown) {</span>
+<span class="lineNum">     710 </span>            :     // Plugin crash.
+<span class="lineNum">     711 </span>            :     MOZ_ASSERT(aWhy == AbnormalShutdown);
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :     Shutdown();</span>
+<span class="lineNum">     713 </span>            :   }
+<span class="lineNum">     714 </span>            :   MOZ_ASSERT(mIsShutdown);
+<span class="lineNum">     715 </span><span class="lineNoCov">          0 :   RefPtr&lt;ChromiumCDMParent&gt; kungFuDeathGrip(this);</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :   if (mContentParent) {</span>
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :     mContentParent-&gt;ChromiumCDMDestroyed(this);</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :     mContentParent = nullptr;</span>
+<span class="lineNum">     719 </span>            :   }
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :   bool abnormalShutdown = (aWhy == AbnormalShutdown);</span>
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :   if (abnormalShutdown &amp;&amp; mProxy) {</span>
+<span class="lineNum">     722 </span>            :     RefPtr&lt;Runnable&gt; task =
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :       NewRunnableMethod(mProxy, &amp;ChromiumCDMProxy::Terminated);</span>
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :     NS_DispatchToMainThread(task);</span>
+<span class="lineNum">     725 </span>            :   }
+<span class="lineNum">     726 </span><span class="lineNoCov">          0 :   MaybeDisconnect(abnormalShutdown);</span>
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            : RefPtr&lt;MediaDataDecoder::InitPromise&gt;
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 : ChromiumCDMParent::InitializeVideoDecoder(</span>
+<span class="lineNum">     731 </span>            :   const gmp::CDMVideoDecoderConfig&amp; aConfig,
+<span class="lineNum">     732 </span>            :   const VideoInfo&amp; aInfo,
+<span class="lineNum">     733 </span>            :   RefPtr&lt;layers::ImageContainer&gt; aImageContainer)
+<span class="lineNum">     734 </span>            : {
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     736 </span>            :     return MediaDataDecoder::InitPromise::CreateAndReject(
+<span class="lineNum">     737 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     738 </span>            :                   RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     740 </span>            :   }
+<span class="lineNum">     741 </span>            : 
+<span class="lineNum">     742 </span>            :   const int32_t bufferSize =
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :     I420FrameBufferSizePadded(aInfo.mImage.width, aInfo.mImage.height);</span>
+<span class="lineNum">     744 </span><span class="lineNoCov">          0 :   if (bufferSize &lt;= 0) {</span>
+<span class="lineNum">     745 </span>            :     return MediaDataDecoder::InitPromise::CreateAndReject(
+<span class="lineNum">     746 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     747 </span>            :                   RESULT_DETAIL(&quot;Video frame buffer size is invalid.&quot;)),
+<span class="lineNum">     748 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     749 </span>            :   }
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :   if (!SendInitializeVideoDecoder(aConfig)) {</span>
+<span class="lineNum">     752 </span>            :     return MediaDataDecoder::InitPromise::CreateAndReject(
+<span class="lineNum">     753 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     754 </span>            :                   RESULT_DETAIL(&quot;Failed to send init video decoder to CDM&quot;)),
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     756 </span>            :   }
+<span class="lineNum">     757 </span>            : 
+<span class="lineNum">     758 </span><span class="lineNoCov">          0 :   mVideoDecoderInitialized = true;</span>
+<span class="lineNum">     759 </span><span class="lineNoCov">          0 :   mImageContainer = aImageContainer;</span>
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :   mVideoInfo = aInfo;</span>
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :   mVideoFrameBufferSize = bufferSize;</span>
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :   return mInitVideoDecoderPromise.Ensure(__func__);</span>
+<span class="lineNum">     764 </span>            : }
+<a name="765"><span class="lineNum">     765 </span>            : </a>
+<span class="lineNum">     766 </span>            : ipc::IPCResult
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvOnDecoderInitDone(const uint32_t&amp; aStatus)</span>
+<span class="lineNum">     768 </span>            : {
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::RecvOnDecoderInitDone(this=%p, status=%u)&quot;,</span>
+<span class="lineNum">     770 </span>            :           this,
+<span class="lineNum">     771 </span>            :           aStatus);
+<span class="lineNum">     772 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     773 </span>            :     MOZ_ASSERT(mInitVideoDecoderPromise.IsEmpty());
+<span class="lineNum">     774 </span>            :     return IPC_OK();
+<span class="lineNum">     775 </span>            :   }
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :   if (aStatus == static_cast&lt;uint32_t&gt;(cdm::kSuccess)) {</span>
+<span class="lineNum">     777 </span>            :     // The Chromium CDM API requires us to implement a synchronous
+<span class="lineNum">     778 </span>            :     // interface to supply buffers to the CDM for it to write decrypted samples
+<span class="lineNum">     779 </span>            :     // into. We want our buffers to be backed by shmems, in order to reduce
+<span class="lineNum">     780 </span>            :     // the overhead of transferring decoded frames. However due to sandboxing
+<span class="lineNum">     781 </span>            :     // restrictions, the CDM process cannot allocate shmems itself.
+<span class="lineNum">     782 </span>            :     // We don't want to be doing synchronous IPC to request shmems from the
+<span class="lineNum">     783 </span>            :     // content process, nor do we want to have to do intr IPC or make async
+<span class="lineNum">     784 </span>            :     // IPC conform to the sync allocation interface. So instead we have the
+<span class="lineNum">     785 </span>            :     // content process pre-allocate a set of shmems and give them to the CDM
+<span class="lineNum">     786 </span>            :     // process in advance of them being needed.
+<span class="lineNum">     787 </span>            :     //
+<span class="lineNum">     788 </span>            :     // When the CDM needs to allocate a buffer for storing a decrypted sample,
+<span class="lineNum">     789 </span>            :     // the CDM host gives it one of these shmems' buffers. When this is sent
+<span class="lineNum">     790 </span>            :     // back to the content process, we copy the result out (uploading to a
+<span class="lineNum">     791 </span>            :     // GPU surface for video frames), and send the shmem back to the CDM
+<span class="lineNum">     792 </span>            :     // process so it can reuse it.
+<span class="lineNum">     793 </span>            :     //
+<span class="lineNum">     794 </span>            :     // We predict the size of buffer the CDM will allocate, and prepopulate
+<span class="lineNum">     795 </span>            :     // the CDM's list of shmems with shmems of at least that size, plus a bit
+<span class="lineNum">     796 </span>            :     // of padding for safety.
+<span class="lineNum">     797 </span>            :     //
+<span class="lineNum">     798 </span>            :     // Normally the CDM won't allocate more than one buffer at once, but
+<span class="lineNum">     799 </span>            :     // we've seen cases where it allocates two buffers, returns one and holds
+<span class="lineNum">     800 </span>            :     // onto the other. So the minimum number of shmems we give to the CDM
+<span class="lineNum">     801 </span>            :     // must be at least two, and the default is three for safety.
+<span class="lineNum">     802 </span>            :     const uint32_t count =
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :       std::max&lt;uint32_t&gt;(2u, MediaPrefs::EMEChromiumAPIVideoShmemCount());</span>
+<span class="lineNum">     804 </span><span class="lineNoCov">          0 :     for (uint32_t i = 0; i &lt; count; i++) {</span>
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 :       if (!SendBufferToCDM(mVideoFrameBufferSize)) {</span>
+<span class="lineNum">     806 </span><span class="lineNoCov">          0 :         mVideoDecoderInitialized = false;</span>
+<span class="lineNum">     807 </span>            :         mInitVideoDecoderPromise.RejectIfExists(
+<span class="lineNum">     808 </span>            :           MediaResult(
+<span class="lineNum">     809 </span>            :             NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     810 </span>            :             RESULT_DETAIL(&quot;Failled to send shmems to CDM after decode init.&quot;)),
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :           __func__);</span>
+<span class="lineNum">     812 </span>            :         return IPC_OK();
+<span class="lineNum">     813 </span>            :       }
+<span class="lineNum">     814 </span>            :     }
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :     mInitVideoDecoderPromise.ResolveIfExists(TrackInfo::kVideoTrack, __func__);</span>
+<span class="lineNum">     816 </span>            :   } else {
+<span class="lineNum">     817 </span><span class="lineNoCov">          0 :     mVideoDecoderInitialized = false;</span>
+<span class="lineNum">     818 </span>            :     mInitVideoDecoderPromise.RejectIfExists(
+<span class="lineNum">     819 </span>            :       MediaResult(
+<span class="lineNum">     820 </span>            :         NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     821 </span>            :         RESULT_DETAIL(&quot;CDM init decode failed with %&quot; PRIu32, aStatus)),
+<span class="lineNum">     822 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     823 </span>            :   }
+<span class="lineNum">     824 </span>            :   return IPC_OK();
+<span class="lineNum">     825 </span>            : }
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            : RefPtr&lt;MediaDataDecoder::DecodePromise&gt;
+<span class="lineNum">     828 </span><span class="lineNoCov">          0 : ChromiumCDMParent::DecryptAndDecodeFrame(MediaRawData* aSample)</span>
+<span class="lineNum">     829 </span>            : {
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     831 </span>            :     return MediaDataDecoder::DecodePromise::CreateAndReject(
+<span class="lineNum">     832 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     833 </span>            :                   RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     835 </span>            :   }
+<span class="lineNum">     836 </span>            : 
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::DecryptAndDecodeFrame t=%&quot; PRId64,</span>
+<span class="lineNum">     838 </span>            :           aSample-&gt;mTime);
+<span class="lineNum">     839 </span>            : 
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :   CDMInputBuffer buffer;</span>
+<span class="lineNum">     841 </span>            : 
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :   if (!InitCDMInputBuffer(buffer, aSample)) {</span>
+<span class="lineNum">     843 </span>            :     return MediaDataDecoder::DecodePromise::CreateAndReject(
+<span class="lineNum">     844 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR, &quot;Failed to init CDM buffer.&quot;),
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     846 </span>            :   }
+<span class="lineNum">     847 </span>            : 
+<span class="lineNum">     848 </span><span class="lineNoCov">          0 :   mLastStreamOffset = aSample-&gt;mOffset;</span>
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :   if (!SendDecryptAndDecodeFrame(buffer)) {</span>
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 :     GMP_LOG(</span>
+<span class="lineNum">     852 </span>            :       &quot;ChromiumCDMParent::Decrypt(this=%p) failed to send decrypt message.&quot;,
+<span class="lineNum">     853 </span>            :       this);
+<span class="lineNum">     854 </span><span class="lineNoCov">          0 :     DeallocShmem(buffer.mData());</span>
+<span class="lineNum">     855 </span>            :     return MediaDataDecoder::DecodePromise::CreateAndReject(
+<span class="lineNum">     856 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     857 </span>            :                   &quot;Failed to send decrypt to CDM process.&quot;),
+<span class="lineNum">     858 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     859 </span>            :   }
+<span class="lineNum">     860 </span>            : 
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :   return mDecodePromise.Ensure(__func__);</span>
+<span class="lineNum">     862 </span>            : }
+<span class="lineNum">     863 </span>            : 
+<span class="lineNum">     864 </span>            : RefPtr&lt;MediaDataDecoder::FlushPromise&gt;
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 : ChromiumCDMParent::FlushVideoDecoder()</span>
+<span class="lineNum">     866 </span>            : {
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     868 </span>            :     return MediaDataDecoder::FlushPromise::CreateAndReject(
+<span class="lineNum">     869 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     870 </span>            :                   RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     872 </span>            :   }
+<span class="lineNum">     873 </span>            : 
+<span class="lineNum">     874 </span><span class="lineNoCov">          0 :   mDecodePromise.RejectIfExists(NS_ERROR_DOM_MEDIA_CANCELED, __func__);</span>
+<span class="lineNum">     875 </span><span class="lineNoCov">          0 :   if (!SendResetVideoDecoder()) {</span>
+<span class="lineNum">     876 </span>            :     return MediaDataDecoder::FlushPromise::CreateAndReject(
+<span class="lineNum">     877 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR, &quot;Failed to send flush to CDM.&quot;),
+<span class="lineNum">     878 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     879 </span>            :   }
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :   return mFlushDecoderPromise.Ensure(__func__);</span>
+<span class="lineNum">     881 </span>            : }
+<a name="882"><span class="lineNum">     882 </span>            : </a>
+<span class="lineNum">     883 </span>            : ipc::IPCResult
+<span class="lineNum">     884 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvResetVideoDecoderComplete()</span>
+<span class="lineNum">     885 </span>            : {
+<span class="lineNum">     886 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     887 </span>            :     MOZ_ASSERT(mFlushDecoderPromise.IsEmpty());
+<span class="lineNum">     888 </span>            :     return IPC_OK();
+<span class="lineNum">     889 </span>            :   }
+<span class="lineNum">     890 </span><span class="lineNoCov">          0 :   mFlushDecoderPromise.ResolveIfExists(true, __func__);</span>
+<span class="lineNum">     891 </span>            :   return IPC_OK();
+<span class="lineNum">     892 </span>            : }
+<span class="lineNum">     893 </span>            : 
+<span class="lineNum">     894 </span>            : RefPtr&lt;MediaDataDecoder::DecodePromise&gt;
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 : ChromiumCDMParent::Drain()</span>
+<span class="lineNum">     896 </span>            : {
+<span class="lineNum">     897 </span>            :   MOZ_ASSERT(mDecodePromise.IsEmpty(), &quot;Must wait for decoding to complete&quot;);
+<span class="lineNum">     898 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     899 </span>            :     return MediaDataDecoder::DecodePromise::CreateAndReject(
+<span class="lineNum">     900 </span>            :       MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     901 </span>            :                   RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     902 </span><span class="lineNoCov">          0 :       __func__);</span>
+<span class="lineNum">     903 </span>            :   }
+<span class="lineNum">     904 </span>            : 
+<span class="lineNum">     905 </span><span class="lineNoCov">          0 :   RefPtr&lt;MediaDataDecoder::DecodePromise&gt; p = mDecodePromise.Ensure(__func__);</span>
+<span class="lineNum">     906 </span><span class="lineNoCov">          0 :   if (!SendDrain()) {</span>
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :     mDecodePromise.Resolve(MediaDataDecoder::DecodedData(), __func__);</span>
+<span class="lineNum">     908 </span>            :   }
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :   return p;</span>
+<span class="lineNum">     910 </span>            : }
+<a name="911"><span class="lineNum">     911 </span>            : </a>
+<span class="lineNum">     912 </span>            : ipc::IPCResult
+<span class="lineNum">     913 </span><span class="lineNoCov">          0 : ChromiumCDMParent::RecvDrainComplete()</span>
+<span class="lineNum">     914 </span>            : {
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     916 </span>            :     MOZ_ASSERT(mDecodePromise.IsEmpty());
+<span class="lineNum">     917 </span>            :     return IPC_OK();
+<span class="lineNum">     918 </span>            :   }
+<span class="lineNum">     919 </span><span class="lineNoCov">          0 :   mDecodePromise.ResolveIfExists(MediaDataDecoder::DecodedData(), __func__);</span>
+<span class="lineNum">     920 </span>            :   return IPC_OK();
+<a name="921"><span class="lineNum">     921 </span>            : }</a>
+<span class="lineNum">     922 </span>            : RefPtr&lt;ShutdownPromise&gt;
+<span class="lineNum">     923 </span><span class="lineNoCov">          0 : ChromiumCDMParent::ShutdownVideoDecoder()</span>
+<span class="lineNum">     924 </span>            : {
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :   if (mIsShutdown || !mVideoDecoderInitialized) {</span>
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :     return ShutdownPromise::CreateAndResolve(true, __func__);</span>
+<span class="lineNum">     927 </span>            :   }
+<span class="lineNum">     928 </span>            :   mInitVideoDecoderPromise.RejectIfExists(NS_ERROR_DOM_MEDIA_CANCELED,
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :                                           __func__);</span>
+<span class="lineNum">     930 </span><span class="lineNoCov">          0 :   mDecodePromise.RejectIfExists(NS_ERROR_DOM_MEDIA_CANCELED, __func__);</span>
+<span class="lineNum">     931 </span>            :   MOZ_ASSERT(mFlushDecoderPromise.IsEmpty());
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :   if (!SendDeinitializeVideoDecoder()) {</span>
+<span class="lineNum">     933 </span><span class="lineNoCov">          0 :     return ShutdownPromise::CreateAndResolve(true, __func__);</span>
+<span class="lineNum">     934 </span>            :   }
+<span class="lineNum">     935 </span><span class="lineNoCov">          0 :   mVideoDecoderInitialized = false;</span>
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :   return ShutdownPromise::CreateAndResolve(true, __func__);</span>
+<span class="lineNum">     937 </span>            : }
+<span class="lineNum">     938 </span>            : 
+<span class="lineNum">     939 </span>            : void
+<span class="lineNum">     940 </span><span class="lineNoCov">          0 : ChromiumCDMParent::Shutdown()</span>
+<span class="lineNum">     941 </span>            : {
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 :   GMP_LOG(&quot;ChromiumCDMParent::Shutdown(this=%p)&quot;, this);</span>
+<span class="lineNum">     943 </span>            : 
+<span class="lineNum">     944 </span><span class="lineNoCov">          0 :   if (mIsShutdown) {</span>
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">     946 </span>            :   }
+<span class="lineNum">     947 </span><span class="lineNoCov">          0 :   mIsShutdown = true;</span>
+<span class="lineNum">     948 </span>            : 
+<span class="lineNum">     949 </span><span class="lineNoCov">          0 :   for (RefPtr&lt;DecryptJob&gt;&amp; decrypt : mDecrypts) {</span>
+<span class="lineNum">     950 </span><span class="lineNoCov">          0 :     decrypt-&gt;PostResult(AbortedErr);</span>
+<span class="lineNum">     951 </span>            :   }
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 :   mDecrypts.Clear();</span>
+<span class="lineNum">     953 </span>            : 
+<span class="lineNum">     954 </span><span class="lineNoCov">          0 :   if (mVideoDecoderInitialized &amp;&amp; !mActorDestroyed) {</span>
+<span class="lineNum">     955 </span><span class="lineNoCov">          0 :     Unused &lt;&lt; SendDeinitializeVideoDecoder();</span>
+<span class="lineNum">     956 </span><span class="lineNoCov">          0 :     mVideoDecoderInitialized = false;</span>
+<span class="lineNum">     957 </span>            :   }
+<span class="lineNum">     958 </span>            : 
+<span class="lineNum">     959 </span>            :   // Note: MediaKeys rejects all outstanding promises when it initiates shutdown.
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :   mPromiseToCreateSessionToken.Clear();</span>
+<span class="lineNum">     961 </span>            : 
+<span class="lineNum">     962 </span>            :   mInitVideoDecoderPromise.RejectIfExists(
+<span class="lineNum">     963 </span>            :     MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     964 </span>            :                 RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :     __func__);</span>
+<span class="lineNum">     966 </span>            :   mDecodePromise.RejectIfExists(
+<span class="lineNum">     967 </span>            :     MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     968 </span>            :                 RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     969 </span><span class="lineNoCov">          0 :     __func__);</span>
+<span class="lineNum">     970 </span>            :   mFlushDecoderPromise.RejectIfExists(
+<span class="lineNum">     971 </span>            :     MediaResult(NS_ERROR_DOM_MEDIA_FATAL_ERR,
+<span class="lineNum">     972 </span>            :                 RESULT_DETAIL(&quot;ChromiumCDMParent is shutdown&quot;)),
+<span class="lineNum">     973 </span><span class="lineNoCov">          0 :     __func__);</span>
+<span class="lineNum">     974 </span>            : 
+<span class="lineNum">     975 </span><span class="lineNoCov">          0 :   if (!mActorDestroyed) {</span>
+<span class="lineNum">     976 </span><span class="lineNoCov">          0 :     Unused &lt;&lt; SendDestroy();</span>
+<span class="lineNum">     977 </span>            :   }
+<span class="lineNum">     978 </span>            : }
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span>            : } // namespace gmp
+<span class="lineNum">     981 </span>            : } // namespace mozilla
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

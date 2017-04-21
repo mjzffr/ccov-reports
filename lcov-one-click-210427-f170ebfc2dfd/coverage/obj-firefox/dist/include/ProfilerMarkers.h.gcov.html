@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/ProfilerMarkers.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - ProfilerMarkers.h<span style="font-size: 80%;"> (source / <a href="ProfilerMarkers.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #ifndef PROFILER_MARKERS_H
+<span class="lineNum">       7 </span>            : #define PROFILER_MARKERS_H
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;mozilla/TimeStamp.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;GeckoProfiler.h&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &quot;gfxASurface.h&quot;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace mozilla {
+<span class="lineNum">      17 </span>            : namespace layers {
+<span class="lineNum">      18 </span>            : class Layer;
+<span class="lineNum">      19 </span>            : } // namespace layers
+<span class="lineNum">      20 </span>            : } // namespace mozilla
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : class SpliceableJSONWriter;
+<span class="lineNum">      23 </span>            : class UniqueStacks;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  * This is an abstract object that can be implied to supply
+<span class="lineNum">      27 </span>            :  * data to be attached with a profiler marker. Most data inserted
+<span class="lineNum">      28 </span>            :  * into a profile is stored in a circular buffer. This buffer
+<span class="lineNum">      29 </span>            :  * typically wraps around and overwrites most entries. Because
+<span class="lineNum">      30 </span>            :  * of this, this structure is designed to defer the work of
+<span class="lineNum">      31 </span>            :  * prepare the payload only when 'preparePayload' is called.
+<span class="lineNum">      32 </span>            :  *
+<span class="lineNum">      33 </span>            :  * Note when implementing that this object is typically constructed
+<span class="lineNum">      34 </span>            :  * on a particular thread but 'preparePayload' and the destructor
+<span class="lineNum">      35 </span>            :  * is called from the main thread.
+<span class="lineNum">      36 </span>            :  */
+<span class="lineNum">      37 </span>            : class ProfilerMarkerPayload
+<span class="lineNum">      38 </span>            : {
+<span class="lineNum">      39 </span>            : public:
+<span class="lineNum">      40 </span>            :   explicit ProfilerMarkerPayload(UniqueProfilerBacktrace aStack = nullptr);
+<span class="lineNum">      41 </span>            :   ProfilerMarkerPayload(const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">      42 </span>            :                         const mozilla::TimeStamp&amp; aEndTime,
+<span class="lineNum">      43 </span>            :                         UniqueProfilerBacktrace aStack = nullptr);
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   /**
+<span class="lineNum">      46 </span>            :    * Called from the main thread
+<span class="lineNum">      47 </span>            :    */
+<span class="lineNum">      48 </span>            :   virtual ~ProfilerMarkerPayload();
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   /**
+<span class="lineNum">      51 </span>            :    * Called from the main thread
+<span class="lineNum">      52 </span>            :    */
+<span class="lineNum">      53 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">      54 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">      55 </span>            :                              UniqueStacks&amp; aUniqueStacks) = 0;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   mozilla::TimeStamp GetStartTime() const { return mStartTime; }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : protected:
+<span class="lineNum">      60 </span>            :   /**
+<span class="lineNum">      61 </span>            :    * Called from the main thread
+<span class="lineNum">      62 </span>            :    */
+<span class="lineNum">      63 </span>            :   void streamCommonProps(const char* aMarkerType,
+<span class="lineNum">      64 </span>            :                          SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">      65 </span>            :                          const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">      66 </span>            :                          UniqueStacks&amp; aUniqueStacks);
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   void SetStack(UniqueProfilerBacktrace aStack) { mStack = mozilla::Move(aStack); }</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : private:
+<span class="lineNum">      71 </span>            :   mozilla::TimeStamp  mStartTime;
+<span class="lineNum">      72 </span>            :   mozilla::TimeStamp  mEndTime;
+<span class="lineNum">      73 </span>            :   UniqueProfilerBacktrace  mStack;
+<a name="74"><span class="lineNum">      74 </span>            : };</a>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 : class ProfilerMarkerTracing : public ProfilerMarkerPayload</span>
+<span class="lineNum">      77 </span>            : {
+<span class="lineNum">      78 </span>            : public:
+<span class="lineNum">      79 </span>            :   ProfilerMarkerTracing(const char* aCategory, TracingKind aKind);
+<span class="lineNum">      80 </span>            :   ProfilerMarkerTracing(const char* aCategory, TracingKind aKind,
+<span class="lineNum">      81 </span>            :                         UniqueProfilerBacktrace aCause);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :   const char *GetCategory() const { return mCategory; }
+<span class="lineNum">      84 </span>            :   TracingKind GetKind() const { return mKind; }
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">      87 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">      88 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : private:
+<span class="lineNum">      91 </span>            :   const char *mCategory;
+<span class="lineNum">      92 </span>            :   TracingKind mKind;
+<a name="93"><span class="lineNum">      93 </span>            : };</a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 : class ProfilerMarkerImagePayload : public ProfilerMarkerPayload</span>
+<span class="lineNum">      96 </span>            : {
+<span class="lineNum">      97 </span>            : public:
+<span class="lineNum">      98 </span>            :   explicit ProfilerMarkerImagePayload(gfxASurface *aImg);
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     101 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     102 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            : private:
+<span class="lineNum">     105 </span>            :   RefPtr&lt;gfxASurface&gt; mImg;
+<span class="lineNum">     106 </span>            : };
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : class IOMarkerPayload : public ProfilerMarkerPayload
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span>            : public:
+<span class="lineNum">     111 </span>            :   IOMarkerPayload(const char* aSource, const char* aFilename, const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     112 </span>            :                   const mozilla::TimeStamp&amp; aEndTime,
+<span class="lineNum">     113 </span>            :                   UniqueProfilerBacktrace aStack);
+<span class="lineNum">     114 </span>            :   ~IOMarkerPayload();
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     117 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     118 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : private:
+<span class="lineNum">     121 </span>            :   const char* mSource;
+<span class="lineNum">     122 </span>            :   char* mFilename;
+<span class="lineNum">     123 </span>            : };
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : class DOMEventMarkerPayload : public ProfilerMarkerPayload
+<span class="lineNum">     126 </span>            : {
+<span class="lineNum">     127 </span>            : public:
+<span class="lineNum">     128 </span>            :   DOMEventMarkerPayload(const nsAString&amp; aType, uint16_t aPhase,
+<span class="lineNum">     129 </span>            :                         const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     130 </span>            :                         const mozilla::TimeStamp&amp; aEndTime);
+<span class="lineNum">     131 </span>            :   ~DOMEventMarkerPayload();
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     134 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     135 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : private:
+<span class="lineNum">     138 </span>            :   nsString mType;
+<span class="lineNum">     139 </span>            :   uint16_t mPhase;
+<span class="lineNum">     140 </span>            : };
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : /**
+<span class="lineNum">     143 </span>            :  * Contains the translation applied to a 2d layer so we can
+<a name="144"><span class="lineNum">     144 </span>            :  * track the layer position at each frame.</a>
+<span class="lineNum">     145 </span>            :  */
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 : class LayerTranslationPayload : public ProfilerMarkerPayload</span>
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span>            : public:
+<span class="lineNum">     149 </span>            :   LayerTranslationPayload(mozilla::layers::Layer* aLayer,
+<span class="lineNum">     150 </span>            :                           mozilla::gfx::Point aPoint);
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     153 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     154 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : private:
+<span class="lineNum">     157 </span>            :   mozilla::layers::Layer* mLayer;
+<span class="lineNum">     158 </span>            :   mozilla::gfx::Point mPoint;
+<span class="lineNum">     159 </span>            : };
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : #include &quot;Units.h&quot;    // For ScreenIntPoint
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : /**
+<span class="lineNum">     164 </span>            :  * Tracks when touch events are processed by gecko, not when
+<span class="lineNum">     165 </span>            :  * the touch actually occured in gonk/android.
+<span class="lineNum">     166 </span>            :  */
+<span class="lineNum">     167 </span>            : class TouchDataPayload : public ProfilerMarkerPayload
+<span class="lineNum">     168 </span>            : {
+<a name="169"><span class="lineNum">     169 </span>            : public:</a>
+<span class="lineNum">     170 </span>            :   explicit TouchDataPayload(const mozilla::ScreenIntPoint&amp; aPoint);
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   virtual ~TouchDataPayload() {}</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     174 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     175 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : private:
+<span class="lineNum">     178 </span>            :   mozilla::ScreenIntPoint mPoint;
+<span class="lineNum">     179 </span>            : };
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            : /**
+<span class="lineNum">     182 </span>            :  * Tracks when a vsync occurs according to the HardwareComposer.
+<span class="lineNum">     183 </span>            :  */
+<span class="lineNum">     184 </span>            : class VsyncPayload : public ProfilerMarkerPayload
+<span class="lineNum">     185 </span>            : {
+<a name="186"><span class="lineNum">     186 </span>            : public:</a>
+<span class="lineNum">     187 </span>            :   explicit VsyncPayload(mozilla::TimeStamp aVsyncTimestamp);
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :   virtual ~VsyncPayload() {}</span>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     191 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     192 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            : private:
+<span class="lineNum">     195 </span>            :   mozilla::TimeStamp mVsyncTimestamp;
+<span class="lineNum">     196 </span>            : };
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : class GPUMarkerPayload : public ProfilerMarkerPayload
+<span class="lineNum">     199 </span>            : {
+<span class="lineNum">     200 </span>            : public:
+<span class="lineNum">     201 </span>            :   GPUMarkerPayload(const mozilla::TimeStamp&amp; aCpuTimeStart,
+<span class="lineNum">     202 </span>            :                    const mozilla::TimeStamp&amp; aCpuTimeEnd,
+<a name="203"><span class="lineNum">     203 </span>            :                    uint64_t aGpuTimeStart,</a>
+<span class="lineNum">     204 </span>            :                    uint64_t aGpuTimeEnd);
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   ~GPUMarkerPayload() {}</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :   virtual void StreamPayload(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     208 </span>            :                              const mozilla::TimeStamp&amp; aStartTime,
+<span class="lineNum">     209 </span>            :                              UniqueStacks&amp; aUniqueStacks) override;
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            : private:
+<span class="lineNum">     212 </span>            :   mozilla::TimeStamp mCpuTimeStart;
+<span class="lineNum">     213 </span>            :   mozilla::TimeStamp mCpuTimeEnd;
+<span class="lineNum">     214 </span>            :   uint64_t mGpuTimeStart;
+<span class="lineNum">     215 </span>            :   uint64_t mGpuTimeEnd;
+<span class="lineNum">     216 </span>            : };
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : #endif // PROFILER_MARKERS_H
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

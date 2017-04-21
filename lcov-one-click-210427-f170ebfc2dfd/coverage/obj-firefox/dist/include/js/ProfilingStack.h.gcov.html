@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/js/ProfilingStack.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/js</a> - ProfilingStack.h<span style="font-size: 80%;"> (source / <a href="ProfilingStack.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-</a>
+<span class="lineNum">       2 </span>            :  * vim: set ts=8 sts=4 et sw=4 tw=99:
+<span class="lineNum">       3 </span>            :  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef js_ProfilingStack_h
+<span class="lineNum">       8 </span>            : #define js_ProfilingStack_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;jsbytecode.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;jstypes.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;js/TypeDecls.h&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &quot;js/Utility.h&quot;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : struct JSRuntime;
+<span class="lineNum">      17 </span>            : class JSTracer;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : namespace js {
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : // A call stack can be specified to the JS engine such that all JS entry/exits
+<span class="lineNum">      22 </span>            : // to functions push/pop an entry to/from the specified stack.
+<span class="lineNum">      23 </span>            : //
+<span class="lineNum">      24 </span>            : // For more detailed information, see vm/GeckoProfiler.h.
+<span class="lineNum">      25 </span>            : //
+<span class="lineNum">      26 </span>            : class ProfileEntry
+<span class="lineNum">      27 </span>            : {
+<span class="lineNum">      28 </span>            :     // All fields are marked volatile to prevent the compiler from re-ordering
+<span class="lineNum">      29 </span>            :     // instructions. Namely this sequence:
+<span class="lineNum">      30 </span>            :     //
+<span class="lineNum">      31 </span>            :     //    entry[size] = ...;
+<span class="lineNum">      32 </span>            :     //    size++;
+<span class="lineNum">      33 </span>            :     //
+<span class="lineNum">      34 </span>            :     // If the size modification were somehow reordered before the stores, then
+<span class="lineNum">      35 </span>            :     // if a sample were taken it would be examining bogus information.
+<span class="lineNum">      36 </span>            :     //
+<span class="lineNum">      37 </span>            :     // A ProfileEntry represents both a C++ profile entry and a JS one.
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :     // Descriptive string of this entry. Can be a static string or a dynamic
+<span class="lineNum">      40 </span>            :     // string. If it's a dynamic string (which will need to be copied during
+<span class="lineNum">      41 </span>            :     // sampling), then isCopyLabel() needs to return true.
+<span class="lineNum">      42 </span>            :     const char * volatile string;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :     // An additional descriptive string of this entry. Can be null.
+<span class="lineNum">      45 </span>            :     const char * volatile dynamicString;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :     // Stack pointer for non-JS entries, the script pointer otherwise.
+<span class="lineNum">      48 </span>            :     void * volatile spOrScript;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     // Line number for non-JS entries, the bytecode offset otherwise.
+<span class="lineNum">      51 </span>            :     int32_t volatile lineOrPcOffset;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :     // General purpose storage describing this frame.
+<span class="lineNum">      54 </span>            :     uint32_t volatile flags_;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :   public:
+<span class="lineNum">      57 </span>            :     // These traits are bit masks. Make sure they're powers of 2.
+<span class="lineNum">      58 </span>            :     enum Flags : uint32_t {
+<span class="lineNum">      59 </span>            :         // Indicate whether a profile entry represents a CPP frame. If not set,
+<span class="lineNum">      60 </span>            :         // a JS frame is assumed by default. You're not allowed to publicly
+<span class="lineNum">      61 </span>            :         // change the frame type. Instead, initialize the ProfileEntry as either
+<span class="lineNum">      62 </span>            :         // a JS or CPP frame with `initJsFrame` or `initCppFrame` respectively.
+<span class="lineNum">      63 </span>            :         IS_CPP_ENTRY = 0x01,
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :         // Indicates that the label string is not a static string and needs to
+<span class="lineNum">      66 </span>            :         // be copied during sampling.
+<span class="lineNum">      67 </span>            :         FRAME_LABEL_COPY = 0x02,
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :         // This ProfileEntry is a dummy entry indicating the start of a run
+<span class="lineNum">      70 </span>            :         // of JS pseudostack entries.
+<span class="lineNum">      71 </span>            :         BEGIN_PSEUDO_JS = 0x04,
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :         // This flag is used to indicate that an interpreter JS entry has OSR-ed
+<span class="lineNum">      74 </span>            :         // into baseline.
+<span class="lineNum">      75 </span>            :         OSR = 0x08,
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :         // Union of all flags.
+<span class="lineNum">      78 </span>            :         ALL = IS_CPP_ENTRY|FRAME_LABEL_COPY|BEGIN_PSEUDO_JS|OSR,
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :         // Mask for removing all flags except the category information.
+<span class="lineNum">      81 </span>            :         CATEGORY_MASK = ~ALL
+<span class="lineNum">      82 </span>            :     };
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :     // Keep these in sync with devtools/client/performance/modules/categories.js
+<span class="lineNum">      85 </span>            :     enum class Category : uint32_t {
+<span class="lineNum">      86 </span>            :         OTHER    = 0x10,
+<span class="lineNum">      87 </span>            :         CSS      = 0x20,
+<span class="lineNum">      88 </span>            :         JS       = 0x40,
+<span class="lineNum">      89 </span>            :         GC       = 0x80,
+<span class="lineNum">      90 </span>            :         CC       = 0x100,
+<span class="lineNum">      91 </span>            :         NETWORK  = 0x200,
+<span class="lineNum">      92 </span>            :         GRAPHICS = 0x400,
+<span class="lineNum">      93 </span>            :         STORAGE  = 0x800,
+<span class="lineNum">      94 </span>            :         EVENTS   = 0x1000,
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :         FIRST    = OTHER,
+<span class="lineNum">      97 </span>            :         LAST     = EVENTS
+<span class="lineNum">      98 </span>            :     };
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     static_assert((static_cast&lt;int&gt;(Category::FIRST) &amp; Flags::ALL) == 0,
+<span class="lineNum">     101 </span>            :                   &quot;The category bitflags should not intersect with the other flags!&quot;);
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :     // All of these methods are marked with the 'volatile' keyword because the
+<span class="lineNum">     104 </span>            :     // Gecko Profiler's representation of the stack is stored such that all
+<span class="lineNum">     105 </span>            :     // ProfileEntry instances are volatile. These methods would not be
+<span class="lineNum">     106 </span>            :     // available unless they were marked as volatile as well.
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     bool isCpp() const volatile { return hasFlag(IS_CPP_ENTRY); }
+<span class="lineNum">     109 </span>            :     bool isJs() const volatile { return !isCpp(); }
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     bool isCopyLabel() const volatile { return hasFlag(FRAME_LABEL_COPY); }
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">      67663 :     void setLabel(const char* aString) volatile { string = aString; }</span>
+<span class="lineNum">     114 </span><span class="lineCov">         20 :     const char* label() const volatile { return string; }</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">      33997 :     void setDynamicString(const char* aDynamicString) volatile { dynamicString = aDynamicString; }</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     const char* getDynamicString() const volatile { return dynamicString; }</span>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     void initJsFrame(JSScript* aScript, jsbytecode* aPc) volatile {
+<span class="lineNum">     120 </span><span class="lineCov">      29808 :         flags_ = 0;</span>
+<span class="lineNum">     121 </span><span class="lineCov">      29808 :         spOrScript = aScript;</span>
+<span class="lineNum">     122 </span><span class="lineCov">      29808 :         setPC(aPc);</span>
+<span class="lineNum">     123 </span>            :     }
+<span class="lineNum">     124 </span>            :     void initCppFrame(void* aSp, uint32_t aLine) volatile {
+<span class="lineNum">     125 </span><span class="lineCov">      37855 :         flags_ = IS_CPP_ENTRY;</span>
+<span class="lineNum">     126 </span><span class="lineCov">      37855 :         spOrScript = aSp;</span>
+<span class="lineNum">     127 </span><span class="lineCov">      37855 :         lineOrPcOffset = static_cast&lt;int32_t&gt;(aLine);</span>
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span>            : 
+<a name="130"><span class="lineNum">     130 </span>            :     void setFlag(uint32_t flag) volatile {</a>
+<span class="lineNum">     131 </span>            :         MOZ_ASSERT(flag != IS_CPP_ENTRY);
+<span class="lineNum">     132 </span><span class="lineCov">      67668 :         flags_ |= flag;</span>
+<span class="lineNum">     133 </span>            :     }
+<span class="lineNum">     134 </span>            :     void unsetFlag(uint32_t flag) volatile {
+<span class="lineNum">     135 </span>            :         MOZ_ASSERT(flag != IS_CPP_ENTRY);
+<span class="lineNum">     136 </span><span class="lineCov">      33992 :         flags_ &amp;= ~flag;</span>
+<span class="lineNum">     137 </span>            :     }
+<span class="lineNum">     138 </span>            :     bool hasFlag(uint32_t flag) const volatile {
+<span class="lineNum">     139 </span><span class="lineCov">        676 :         return bool(flags_ &amp; flag);</span>
+<span class="lineNum">     140 </span>            :     }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :     uint32_t flags() const volatile {
+<span class="lineNum">     143 </span>            :         return flags_;
+<span class="lineNum">     144 </span>            :     }
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :     uint32_t category() const volatile {
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :         return flags_ &amp; CATEGORY_MASK;</span>
+<span class="lineNum">     148 </span>            :     }
+<span class="lineNum">     149 </span><span class="lineCov">        331 :     void setCategory(Category c) volatile {</span>
+<span class="lineNum">     150 </span>            :         MOZ_ASSERT(c &gt;= Category::FIRST);
+<span class="lineNum">     151 </span>            :         MOZ_ASSERT(c &lt;= Category::LAST);
+<span class="lineNum">     152 </span><span class="lineCov">      33997 :         flags_ &amp;= ~CATEGORY_MASK;</span>
+<span class="lineNum">     153 </span>            :         setFlag(static_cast&lt;uint32_t&gt;(c));
+<span class="lineNum">     154 </span><span class="lineCov">        331 :     }</span>
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     void setOSR() volatile {
+<span class="lineNum">     157 </span>            :         MOZ_ASSERT(isJs());
+<span class="lineNum">     158 </span>            :         setFlag(OSR);
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span>            :     void unsetOSR() volatile {
+<span class="lineNum">     161 </span>            :         MOZ_ASSERT(isJs());
+<span class="lineNum">     162 </span>            :         unsetFlag(OSR);
+<span class="lineNum">     163 </span>            :     }
+<span class="lineNum">     164 </span>            :     bool isOSR() const volatile {
+<span class="lineNum">     165 </span>            :         return hasFlag(OSR);
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :     void* stackAddress() const volatile {
+<span class="lineNum">     169 </span>            :         MOZ_ASSERT(!isJs());
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :         return spOrScript;</span>
+<span class="lineNum">     171 </span>            :     }
+<span class="lineNum">     172 </span>            :     JS_PUBLIC_API(JSScript*) script() const volatile;
+<span class="lineNum">     173 </span>            :     uint32_t line() const volatile {
+<span class="lineNum">     174 </span>            :         MOZ_ASSERT(!isJs());
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :         return static_cast&lt;uint32_t&gt;(lineOrPcOffset);</span>
+<span class="lineNum">     176 </span>            :     }
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :     // Note that the pointer returned might be invalid.
+<span class="lineNum">     179 </span>            :     JSScript* rawScript() const volatile {
+<span class="lineNum">     180 </span>            :         MOZ_ASSERT(isJs());
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         return (JSScript*)spOrScript;</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :     // We can't know the layout of JSScript, so look in vm/GeckoProfiler.cpp.
+<span class="lineNum">     185 </span>            :     JS_FRIEND_API(jsbytecode*) pc() const volatile;
+<span class="lineNum">     186 </span>            :     JS_FRIEND_API(void) setPC(jsbytecode* pc) volatile;
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :     void trace(JSTracer* trc);
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :     // The offset of a pc into a script's code can actually be 0, so to
+<span class="lineNum">     191 </span>            :     // signify a nullptr pc, use a -1 index. This is checked against in
+<span class="lineNum">     192 </span>            :     // pc() and setPC() to set/get the right pc.
+<span class="lineNum">     193 </span>            :     static const int32_t NullPCOffset = -1;
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :     static size_t offsetOfLabel() { return offsetof(ProfileEntry, string); }
+<span class="lineNum">     196 </span>            :     static size_t offsetOfSpOrScript() { return offsetof(ProfileEntry, spOrScript); }
+<span class="lineNum">     197 </span>            :     static size_t offsetOfLineOrPcOffset() { return offsetof(ProfileEntry, lineOrPcOffset); }
+<span class="lineNum">     198 </span>            :     static size_t offsetOfFlags() { return offsetof(ProfileEntry, flags_); }
+<span class="lineNum">     199 </span>            : };
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            : JS_FRIEND_API(void)
+<span class="lineNum">     202 </span>            : SetContextProfilingStack(JSContext* cx, ProfileEntry* stack, uint32_t* size,
+<span class="lineNum">     203 </span>            :                          uint32_t max);
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            : JS_FRIEND_API(void)
+<span class="lineNum">     206 </span>            : EnableContextProfilingStack(JSContext* cx, bool enabled);
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            : JS_FRIEND_API(void)
+<span class="lineNum">     209 </span>            : RegisterContextProfilingEventMarker(JSContext* cx, void (*fn)(const char*));
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            : JS_FRIEND_API(jsbytecode*)
+<span class="lineNum">     212 </span>            : ProfilingGetPC(JSContext* cx, JSScript* script, void* ip);
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : } // namespace js
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : #endif  /* js_ProfilingStack_h */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

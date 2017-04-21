@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/dom/Selection.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/dom</a> - Selection.h<span style="font-size: 80%;"> (source / <a href="Selection.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+<span class="lineNum">       5 </span>            :  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_Selection_h__
+<span class="lineNum">       8 </span>            : #define mozilla_Selection_h__
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;nsIWeakReference.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/AutoRestore.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/TextRange.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;nsISelection.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsISelectionController.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsISelectionListener.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsISelectionPrivate.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsRange.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsThreadUtils.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsWrapperCache.h&quot;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : struct CachedOffsetForFrame;
+<span class="lineNum">      24 </span>            : class nsAutoScrollTimer;
+<span class="lineNum">      25 </span>            : class nsIContentIterator;
+<span class="lineNum">      26 </span>            : class nsIDocument;
+<span class="lineNum">      27 </span>            : class nsIEditor;
+<span class="lineNum">      28 </span>            : class nsIFrame;
+<span class="lineNum">      29 </span>            : class nsIHTMLEditor;
+<span class="lineNum">      30 </span>            : class nsFrameSelection;
+<span class="lineNum">      31 </span>            : class nsPIDOMWindowOuter;
+<span class="lineNum">      32 </span>            : struct SelectionDetails;
+<span class="lineNum">      33 </span>            : class nsCopySupport;
+<span class="lineNum">      34 </span>            : class nsHTMLCopyEncoder;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : namespace mozilla {
+<span class="lineNum">      37 </span>            : class ErrorResult;
+<span class="lineNum">      38 </span>            : struct AutoPrepareFocusRange;
+<a name="39"><span class="lineNum">      39 </span>            : } // namespace mozilla</a>
+<span class="lineNum">      40 </span>            : 
+<a name="41"><span class="lineNum">      41 </span><span class="lineNoCov">          0 : struct RangeData</span></a>
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :   explicit RangeData(nsRange* aRange)</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :     : mRange(aRange)</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   {}</span>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :   RefPtr&lt;nsRange&gt; mRange;
+<span class="lineNum">      48 </span>            :   mozilla::TextRangeStyle mTextRangeStyle;
+<span class="lineNum">      49 </span>            : };
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : // Note, the ownership of mozilla::dom::Selection depends on which way the
+<span class="lineNum">      52 </span>            : // object is created. When nsFrameSelection has created Selection,
+<span class="lineNum">      53 </span>            : // addreffing/releasing the Selection object is aggregated to nsFrameSelection.
+<span class="lineNum">      54 </span>            : // Otherwise normal addref/release is used.  This ensures that nsFrameSelection
+<span class="lineNum">      55 </span>            : // is never deleted before its Selections.
+<span class="lineNum">      56 </span>            : namespace mozilla {
+<span class="lineNum">      57 </span>            : namespace dom {
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : class Selection final : public nsISelectionPrivate,
+<span class="lineNum">      60 </span>            :                         public nsWrapperCache,
+<span class="lineNum">      61 </span>            :                         public nsSupportsWeakReference
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span>            : protected:
+<span class="lineNum">      64 </span>            :   virtual ~Selection();
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : public:
+<span class="lineNum">      67 </span>            :   Selection();
+<span class="lineNum">      68 </span>            :   explicit Selection(nsFrameSelection *aList);
+<a name="69"><span class="lineNum">      69 </span>            : </a>
+<span class="lineNum">      70 </span>            :   NS_DECL_CYCLE_COLLECTING_ISUPPORTS
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_AMBIGUOUS(Selection, nsISelectionPrivate)</span>
+<span class="lineNum">      72 </span>            :   NS_DECL_NSISELECTION
+<a name="73"><span class="lineNum">      73 </span>            :   NS_DECL_NSISELECTIONPRIVATE</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   virtual Selection* AsSelection() override { return this; }</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   nsresult EndBatchChangesInternal(int16_t aReason = nsISelectionListener::NO_REASON);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   nsIDocument* GetParentObject() const;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   // utility methods for scrolling the selection into view
+<span class="lineNum">      82 </span>            :   nsPresContext* GetPresContext() const;
+<span class="lineNum">      83 </span>            :   nsIPresShell* GetPresShell() const;
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :   nsFrameSelection* GetFrameSelection() const { return mFrameSelection; }</span>
+<span class="lineNum">      85 </span>            :   // Returns a rect containing the selection region, and frame that that
+<span class="lineNum">      86 </span>            :   // position is relative to. For SELECTION_ANCHOR_REGION or
+<span class="lineNum">      87 </span>            :   // SELECTION_FOCUS_REGION the rect is a zero-width rectangle. For
+<span class="lineNum">      88 </span>            :   // SELECTION_WHOLE_SELECTION the rect contains both the anchor and focus
+<span class="lineNum">      89 </span>            :   // region rects.
+<span class="lineNum">      90 </span>            :   nsIFrame*     GetSelectionAnchorGeometry(SelectionRegion aRegion, nsRect *aRect);
+<span class="lineNum">      91 </span>            :   // Returns the position of the region (SELECTION_ANCHOR_REGION or
+<span class="lineNum">      92 </span>            :   // SELECTION_FOCUS_REGION only), and frame that that position is relative to.
+<span class="lineNum">      93 </span>            :   // The 'position' is a zero-width rectangle.
+<span class="lineNum">      94 </span>            :   nsIFrame*     GetSelectionEndPointGeometry(SelectionRegion aRegion, nsRect *aRect);
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   nsresult      PostScrollSelectionIntoViewEvent(
+<span class="lineNum">      97 </span>            :                                         SelectionRegion aRegion,
+<span class="lineNum">      98 </span>            :                                         int32_t aFlags,
+<span class="lineNum">      99 </span>            :                                         nsIPresShell::ScrollAxis aVertical,
+<span class="lineNum">     100 </span>            :                                         nsIPresShell::ScrollAxis aHorizontal);
+<span class="lineNum">     101 </span>            :   enum {
+<span class="lineNum">     102 </span>            :     SCROLL_SYNCHRONOUS = 1&lt;&lt;1,
+<span class="lineNum">     103 </span>            :     SCROLL_FIRST_ANCESTOR_ONLY = 1&lt;&lt;2,
+<span class="lineNum">     104 </span>            :     SCROLL_DO_FLUSH = 1&lt;&lt;3,  // only matters if SCROLL_SYNCHRONOUS is passed too
+<span class="lineNum">     105 </span>            :     SCROLL_OVERFLOW_HIDDEN = 1&lt;&lt;5,
+<span class="lineNum">     106 </span>            :     SCROLL_FOR_CARET_MOVE = 1&lt;&lt;6
+<span class="lineNum">     107 </span>            :   };
+<span class="lineNum">     108 </span>            :   // If aFlags doesn't contain SCROLL_SYNCHRONOUS, then we'll flush when
+<span class="lineNum">     109 </span>            :   // the scroll event fires so we make sure to scroll to the right place.
+<span class="lineNum">     110 </span>            :   // Otherwise, if SCROLL_DO_FLUSH is also in aFlags, then this method will
+<span class="lineNum">     111 </span>            :   // flush layout and you MUST hold a strong ref on 'this' for the duration
+<span class="lineNum">     112 </span>            :   // of this call.  This might destroy arbitrary layout objects.
+<span class="lineNum">     113 </span>            :   nsresult      ScrollIntoView(SelectionRegion aRegion,
+<span class="lineNum">     114 </span>            :                                nsIPresShell::ScrollAxis aVertical =
+<span class="lineNum">     115 </span>            :                                  nsIPresShell::ScrollAxis(),
+<span class="lineNum">     116 </span>            :                                nsIPresShell::ScrollAxis aHorizontal =
+<span class="lineNum">     117 </span>            :                                  nsIPresShell::ScrollAxis(),
+<span class="lineNum">     118 </span>            :                                int32_t aFlags = 0);
+<span class="lineNum">     119 </span>            :   nsresult      SubtractRange(RangeData* aRange, nsRange* aSubtract,
+<span class="lineNum">     120 </span>            :                               nsTArray&lt;RangeData&gt;* aOutput);
+<span class="lineNum">     121 </span>            :   /**
+<span class="lineNum">     122 </span>            :    * AddItem adds aRange to this Selection.  If mUserInitiated is true,
+<span class="lineNum">     123 </span>            :    * then aRange is first scanned for -moz-user-select:none nodes and split up
+<span class="lineNum">     124 </span>            :    * into multiple ranges to exclude those before adding the resulting ranges
+<span class="lineNum">     125 </span>            :    * to this Selection.
+<span class="lineNum">     126 </span>            :    */
+<span class="lineNum">     127 </span>            :   nsresult      AddItem(nsRange* aRange, int32_t* aOutIndex, bool aNoStartSelect = false);
+<span class="lineNum">     128 </span>            :   nsresult      RemoveItem(nsRange* aRange);
+<span class="lineNum">     129 </span>            :   nsresult      RemoveCollapsedRanges();
+<span class="lineNum">     130 </span>            :   nsresult      Clear(nsPresContext* aPresContext);
+<span class="lineNum">     131 </span>            :   nsresult      Collapse(nsINode* aParentNode, int32_t aOffset);
+<span class="lineNum">     132 </span>            :   nsresult      Extend(nsINode* aParentNode, int32_t aOffset);
+<span class="lineNum">     133 </span>            :   nsRange*      GetRangeAt(int32_t aIndex) const;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :   // Get the anchor-to-focus range if we don't care which end is
+<span class="lineNum">     136 </span>            :   // anchor and which end is focus.
+<span class="lineNum">     137 </span>            :   const nsRange* GetAnchorFocusRange() const {
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :     return mAnchorFocusRange;</span>
+<span class="lineNum">     139 </span>            :   }
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   nsDirection  GetDirection(){return mDirection;}
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   void         SetDirection(nsDirection aDir){mDirection = aDir;}</span>
+<span class="lineNum">     143 </span>            :   nsresult     SetAnchorFocusToRange(nsRange *aRange);
+<span class="lineNum">     144 </span>            :   void         ReplaceAnchorFocusRange(nsRange *aRange);
+<span class="lineNum">     145 </span>            :   void         AdjustAnchorFocusForMultiRange(nsDirection aDirection);
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   //  NS_IMETHOD   GetPrimaryFrameForRangeEndpoint(nsIDOMNode *aNode, int32_t aOffset, bool aIsEndNode, nsIFrame **aResultFrame);
+<span class="lineNum">     148 </span>            :   NS_IMETHOD   GetPrimaryFrameForAnchorNode(nsIFrame **aResultFrame);
+<span class="lineNum">     149 </span>            :   NS_IMETHOD   GetPrimaryFrameForFocusNode(nsIFrame **aResultFrame, int32_t *aOffset, bool aVisual);
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :   UniquePtr&lt;SelectionDetails&gt; LookUpSelection(
+<span class="lineNum">     152 </span>            :     nsIContent* aContent,
+<span class="lineNum">     153 </span>            :     int32_t aContentOffset,
+<span class="lineNum">     154 </span>            :     int32_t aContentLength,
+<span class="lineNum">     155 </span>            :     UniquePtr&lt;SelectionDetails&gt; aDetailsHead,
+<span class="lineNum">     156 </span>            :     SelectionType aSelectionType,
+<span class="lineNum">     157 </span>            :     bool aSlowCheck);
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   NS_IMETHOD   Repaint(nsPresContext* aPresContext);
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :   // Note: StartAutoScrollTimer might destroy arbitrary frames etc.
+<span class="lineNum">     162 </span>            :   nsresult     StartAutoScrollTimer(nsIFrame *aFrame,
+<span class="lineNum">     163 </span>            :                                     nsPoint&amp; aPoint,
+<span class="lineNum">     164 </span>            :                                     uint32_t aDelay);
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   nsresult     StopAutoScrollTimer();
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :   JSObject* WrapObject(JSContext* aCx, JS::Handle&lt;JSObject*&gt; aGivenProto) override;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :   // WebIDL methods
+<span class="lineNum">     171 </span>            :   nsINode*     GetAnchorNode();
+<span class="lineNum">     172 </span>            :   uint32_t     AnchorOffset();
+<span class="lineNum">     173 </span>            :   nsINode*     GetFocusNode();
+<span class="lineNum">     174 </span>            :   uint32_t     FocusOffset();
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :   bool IsCollapsed() const;
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :   // *JS() methods are mapped to Selection.*().
+<span class="lineNum">     179 </span>            :   // They may move focus only when the range represents normal selection.
+<span class="lineNum">     180 </span>            :   // These methods shouldn't be used by non-JS callers.
+<span class="lineNum">     181 </span>            :   void CollapseJS(nsINode&amp; aNode, uint32_t aOffset,
+<span class="lineNum">     182 </span>            :                   mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     183 </span>            :   void CollapseToStartJS(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     184 </span>            :   void CollapseToEndJS(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :   void ExtendJS(nsINode&amp; aNode, uint32_t aOffset,
+<span class="lineNum">     187 </span>            :                 mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :   void SelectAllChildrenJS(nsINode&amp; aNode, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :   void DeleteFromDocument(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            :   uint32_t RangeCount() const
+<span class="lineNum">     194 </span>            :   {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :     return mRanges.Length();</span>
+<span class="lineNum">     196 </span>            :   }
+<span class="lineNum">     197 </span>            :   nsRange* GetRangeAt(uint32_t aIndex, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     198 </span>            :   void AddRangeJS(nsRange&amp; aRange, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     199 </span>            :   void RemoveRange(nsRange&amp; aRange, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     200 </span>            :   void RemoveAllRanges(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :   void Stringify(nsAString&amp; aResult);
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :   bool ContainsNode(nsINode&amp; aNode, bool aPartlyContained, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            :   /**
+<span class="lineNum">     207 </span>            :    * Check to see if the given point is contained within the selection area. In
+<span class="lineNum">     208 </span>            :    * particular, this iterates through all the rects that make up the selection,
+<span class="lineNum">     209 </span>            :    * not just the bounding box, and checks to see if the given point is contained
+<span class="lineNum">     210 </span>            :    * in any one of them.
+<span class="lineNum">     211 </span>            :    * @param aPoint The point to check, relative to the root frame.
+<span class="lineNum">     212 </span>            :    */
+<span class="lineNum">     213 </span>            :   bool ContainsPoint(const nsPoint&amp; aPoint);
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :   void Modify(const nsAString&amp; aAlter, const nsAString&amp; aDirection,
+<span class="lineNum">     216 </span>            :               const nsAString&amp; aGranularity, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   void SetBaseAndExtentJS(nsINode&amp; aAnchorNode, uint32_t aAnchorOffset,
+<span class="lineNum">     219 </span>            :                           nsINode&amp; aFocusNode, uint32_t aFocusOffset,
+<span class="lineNum">     220 </span>            :                           mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :   bool GetInterlinePosition(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     223 </span>            :   void SetInterlinePosition(bool aValue, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   Nullable&lt;int16_t&gt; GetCaretBidiLevel(mozilla::ErrorResult&amp; aRv) const;
+<span class="lineNum">     226 </span>            :   void SetCaretBidiLevel(const Nullable&lt;int16_t&gt;&amp; aCaretBidiLevel, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :   void ToStringWithFormat(const nsAString&amp; aFormatType,
+<span class="lineNum">     229 </span>            :                           uint32_t aFlags,
+<span class="lineNum">     230 </span>            :                           int32_t aWrapColumn,
+<span class="lineNum">     231 </span>            :                           nsAString&amp; aReturn,
+<span class="lineNum">     232 </span>            :                           mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     233 </span>            :   void AddSelectionListener(nsISelectionListener* aListener,
+<span class="lineNum">     234 </span>            :                             mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     235 </span>            :   void RemoveSelectionListener(nsISelectionListener* aListener,
+<span class="lineNum">     236 </span>            :                                mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   RawSelectionType RawType() const
+<span class="lineNum">     239 </span>            :   {
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :     return ToRawSelectionType(mSelectionType);</span>
+<span class="lineNum">     241 </span>            :   }
+<span class="lineNum">     242 </span>            :   SelectionType Type() const { return mSelectionType; }
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :   void GetRangesForInterval(nsINode&amp; aBeginNode, int32_t aBeginOffset,
+<span class="lineNum">     245 </span>            :                             nsINode&amp; aEndNode, int32_t aEndOffset,
+<span class="lineNum">     246 </span>            :                             bool aAllowAdjacent,
+<span class="lineNum">     247 </span>            :                             nsTArray&lt;RefPtr&lt;nsRange&gt;&gt;&amp; aReturn,
+<span class="lineNum">     248 </span>            :                             mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span>            :   void ScrollIntoView(int16_t aRegion, bool aIsSynchronous,
+<span class="lineNum">     251 </span>            :                       int16_t aVPercent, int16_t aHPercent,
+<span class="lineNum">     252 </span>            :                       mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :   // Non-JS callers should use the following methods.
+<span class="lineNum">     255 </span>            :   void Collapse(nsINode&amp; aNode, uint32_t aOffset, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     256 </span>            :   void CollapseToStart(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     257 </span>            :   void CollapseToEnd(mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     258 </span>            :   void Extend(nsINode&amp; aNode, uint32_t aOffset, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     259 </span>            :   void AddRange(nsRange&amp; aRange, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     260 </span>            :   void SelectAllChildren(nsINode&amp; aNode, mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     261 </span>            :   void SetBaseAndExtent(nsINode&amp; aAnchorNode, uint32_t aAnchorOffset,
+<span class="lineNum">     262 </span>            :                         nsINode&amp; aFocusNode, uint32_t aFocusOffset,
+<span class="lineNum">     263 </span>            :                         mozilla::ErrorResult&amp; aRv);
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :   void AddSelectionChangeBlocker();
+<span class="lineNum">     266 </span>            :   void RemoveSelectionChangeBlocker();
+<span class="lineNum">     267 </span>            :   bool IsBlockingSelectionChangeEvents() const;
+<span class="lineNum">     268 </span>            : private:
+<span class="lineNum">     269 </span>            :   friend class ::nsAutoScrollTimer;
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :   // Note: DoAutoScroll might destroy arbitrary frames etc.
+<span class="lineNum">     272 </span>            :   nsresult DoAutoScroll(nsIFrame *aFrame, nsPoint&amp; aPoint);
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :   // XXX Please don't add additional uses of this method, it's only for
+<span class="lineNum">     275 </span>            :   // XXX supporting broken code (bug 1245883) in the following classes:
+<span class="lineNum">     276 </span>            :   friend class ::nsCopySupport;
+<span class="lineNum">     277 </span>            :   friend class ::nsHTMLCopyEncoder;
+<span class="lineNum">     278 </span>            :   void AddRangeInternal(nsRange&amp; aRange, nsIDocument* aDocument, ErrorResult&amp;);
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : public:
+<span class="lineNum">     281 </span>            :   SelectionType GetType() const { return mSelectionType; }
+<span class="lineNum">     282 </span>            :   void SetType(SelectionType aSelectionType)
+<span class="lineNum">     283 </span>            :   {
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :     mSelectionType = aSelectionType;</span>
+<span class="lineNum">     285 </span>            :   }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :   nsresult NotifySelectionListeners(bool aCalledByJS);
+<span class="lineNum">     288 </span>            :   nsresult NotifySelectionListeners();
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   friend struct AutoUserInitiated;
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   struct MOZ_RAII AutoUserInitiated</span>
+<span class="lineNum">     292 </span>            :   {
+<span class="lineNum">     293 </span>            :     explicit AutoUserInitiated(Selection* aSelection
+<span class="lineNum">     294 </span>            :                                MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :       : mSavedValue(aSelection-&gt;mUserInitiated)</span>
+<span class="lineNum">     296 </span>            :     {
+<span class="lineNum">     297 </span>            :       MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :       aSelection-&gt;mUserInitiated = true;</span>
+<span class="lineNum">     299 </span>            :     }
+<span class="lineNum">     300 </span>            :     AutoRestore&lt;bool&gt; mSavedValue;
+<span class="lineNum">     301 </span>            :     MOZ_DECL_USE_GUARD_OBJECT_NOTIFIER
+<span class="lineNum">     302 </span>            :   };
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : private:
+<span class="lineNum">     305 </span>            :   friend struct mozilla::AutoPrepareFocusRange;
+<span class="lineNum">     306 </span>            :   class ScrollSelectionIntoViewEvent;
+<a name="307"><span class="lineNum">     307 </span>            :   friend class ScrollSelectionIntoViewEvent;</a>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   class ScrollSelectionIntoViewEvent : public Runnable {</span>
+<span class="lineNum">     310 </span>            :   public:
+<span class="lineNum">     311 </span>            :     NS_DECL_NSIRUNNABLE
+<span class="lineNum">     312 </span>            :     ScrollSelectionIntoViewEvent(Selection* aSelection,
+<span class="lineNum">     313 </span>            :                                  SelectionRegion aRegion,
+<span class="lineNum">     314 </span>            :                                  nsIPresShell::ScrollAxis aVertical,
+<span class="lineNum">     315 </span>            :                                  nsIPresShell::ScrollAxis aHorizontal,
+<span class="lineNum">     316 </span>            :                                  int32_t aFlags)
+<span class="lineNum">     317 </span>            :       : mSelection(aSelection),
+<span class="lineNum">     318 </span>            :         mRegion(aRegion),
+<span class="lineNum">     319 </span>            :         mVerticalScroll(aVertical),
+<span class="lineNum">     320 </span>            :         mHorizontalScroll(aHorizontal),
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :         mFlags(aFlags) {</span>
+<span class="lineNum">     322 </span>            :       NS_ASSERTION(aSelection, &quot;null parameter&quot;);
+<span class="lineNum">     323 </span>            :     }
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     void Revoke() { mSelection = nullptr; }</span>
+<span class="lineNum">     325 </span>            :   private:
+<span class="lineNum">     326 </span>            :     Selection *mSelection;
+<span class="lineNum">     327 </span>            :     SelectionRegion mRegion;
+<span class="lineNum">     328 </span>            :     nsIPresShell::ScrollAxis mVerticalScroll;
+<span class="lineNum">     329 </span>            :     nsIPresShell::ScrollAxis mHorizontalScroll;
+<span class="lineNum">     330 </span>            :     int32_t mFlags;
+<span class="lineNum">     331 </span>            :   };
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :   void setAnchorFocusRange(int32_t aIndex); // pass in index into mRanges;
+<span class="lineNum">     334 </span>            :                                             // negative value clears
+<span class="lineNum">     335 </span>            :                                             // mAnchorFocusRange
+<span class="lineNum">     336 </span>            :   nsresult     SelectAllFramesForContent(nsIContentIterator *aInnerIter,
+<span class="lineNum">     337 </span>            :                                nsIContent *aContent,
+<span class="lineNum">     338 </span>            :                                bool aSelected);
+<span class="lineNum">     339 </span>            :   nsresult     selectFrames(nsPresContext* aPresContext, nsRange *aRange, bool aSelect);
+<span class="lineNum">     340 </span>            :   nsresult     getTableCellLocationFromRange(nsRange *aRange, int32_t *aSelectionType, int32_t *aRow, int32_t *aCol);
+<span class="lineNum">     341 </span>            :   nsresult     addTableCellRange(nsRange *aRange, bool *aDidAddRange, int32_t *aOutIndex);
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :   nsresult FindInsertionPoint(
+<span class="lineNum">     344 </span>            :       nsTArray&lt;RangeData&gt;* aElementArray,
+<span class="lineNum">     345 </span>            :       nsINode* aPointNode, int32_t aPointOffset,
+<span class="lineNum">     346 </span>            :       nsresult (*aComparator)(nsINode*,int32_t,nsRange*,int32_t*),
+<span class="lineNum">     347 </span>            :       int32_t* aPoint);
+<span class="lineNum">     348 </span>            :   bool EqualsRangeAtPoint(nsINode* aBeginNode, int32_t aBeginOffset,
+<span class="lineNum">     349 </span>            :                             nsINode* aEndNode, int32_t aEndOffset,
+<span class="lineNum">     350 </span>            :                             int32_t aRangeIndex);
+<span class="lineNum">     351 </span>            :   nsresult GetIndicesForInterval(nsINode* aBeginNode, int32_t aBeginOffset,
+<span class="lineNum">     352 </span>            :                                  nsINode* aEndNode, int32_t aEndOffset,
+<span class="lineNum">     353 </span>            :                                  bool aAllowAdjacent,
+<span class="lineNum">     354 </span>            :                                  int32_t* aStartIndex, int32_t* aEndIndex);
+<span class="lineNum">     355 </span>            :   RangeData* FindRangeData(nsIDOMRange* aRange);
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :   void UserSelectRangesToAdd(nsRange* aItem, nsTArray&lt;RefPtr&lt;nsRange&gt; &gt;&amp; rangesToAdd);
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            :   /**
+<span class="lineNum">     360 </span>            :    * Helper method for AddItem.
+<span class="lineNum">     361 </span>            :    */
+<span class="lineNum">     362 </span>            :   nsresult AddItemInternal(nsRange* aRange, int32_t* aOutIndex);
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :   nsIDocument* GetDocument() const;
+<span class="lineNum">     365 </span>            :   nsPIDOMWindowOuter* GetWindow() const;
+<span class="lineNum">     366 </span>            :   nsIEditor* GetEditor() const;
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   /**
+<span class="lineNum">     369 </span>            :    * GetCommonEditingHostForAllRanges() returns common editing host of all
+<span class="lineNum">     370 </span>            :    * ranges if there is. If at least one of the ranges is in non-editable
+<span class="lineNum">     371 </span>            :    * element, returns nullptr.  See following examples for the detail:
+<span class="lineNum">     372 </span>            :    *
+<span class="lineNum">     373 </span>            :    *  &lt;div id=&quot;a&quot; contenteditable&gt;
+<span class="lineNum">     374 </span>            :    *    an[cestor
+<span class="lineNum">     375 </span>            :    *    &lt;div id=&quot;b&quot; contenteditable=&quot;false&quot;&gt;
+<span class="lineNum">     376 </span>            :    *      non-editable
+<span class="lineNum">     377 </span>            :    *      &lt;div id=&quot;c&quot; contenteditable&gt;
+<span class="lineNum">     378 </span>            :    *        desc]endant
+<span class="lineNum">     379 </span>            :    *  in this case, this returns div#a because div#c is also in div#a.
+<span class="lineNum">     380 </span>            :    *
+<span class="lineNum">     381 </span>            :    *  &lt;div id=&quot;a&quot; contenteditable&gt;
+<span class="lineNum">     382 </span>            :    *    an[ce]stor
+<span class="lineNum">     383 </span>            :    *    &lt;div id=&quot;b&quot; contenteditable=&quot;false&quot;&gt;
+<span class="lineNum">     384 </span>            :    *      non-editable
+<span class="lineNum">     385 </span>            :    *      &lt;div id=&quot;c&quot; contenteditable&gt;
+<span class="lineNum">     386 </span>            :    *        de[sc]endant
+<span class="lineNum">     387 </span>            :    *  in this case, this returns div#a because second range is also in div#a
+<span class="lineNum">     388 </span>            :    *  and common ancestor of the range (i.e., div#c) is editable.
+<span class="lineNum">     389 </span>            :    *
+<span class="lineNum">     390 </span>            :    *  &lt;div id=&quot;a&quot; contenteditable&gt;
+<span class="lineNum">     391 </span>            :    *    an[ce]stor
+<span class="lineNum">     392 </span>            :    *    &lt;div id=&quot;b&quot; contenteditable=&quot;false&quot;&gt;
+<span class="lineNum">     393 </span>            :    *      [non]-editable
+<span class="lineNum">     394 </span>            :    *      &lt;div id=&quot;c&quot; contenteditable&gt;
+<span class="lineNum">     395 </span>            :    *        de[sc]endant
+<span class="lineNum">     396 </span>            :    *  in this case, this returns nullptr because the second range is in
+<span class="lineNum">     397 </span>            :    *  non-editable area.
+<span class="lineNum">     398 </span>            :    */
+<span class="lineNum">     399 </span>            :   Element* GetCommonEditingHostForAllRanges();
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            :   // These are the ranges inside this selection. They are kept sorted in order
+<span class="lineNum">     402 </span>            :   // of DOM start position.
+<span class="lineNum">     403 </span>            :   //
+<span class="lineNum">     404 </span>            :   // This data structure is sorted by the range beginnings. As the ranges are
+<span class="lineNum">     405 </span>            :   // disjoint, it is also implicitly sorted by the range endings. This allows
+<span class="lineNum">     406 </span>            :   // us to perform binary searches when searching for existence of a range,
+<span class="lineNum">     407 </span>            :   // giving us O(log n) search time.
+<span class="lineNum">     408 </span>            :   //
+<span class="lineNum">     409 </span>            :   // Inserting a new range requires finding the overlapping interval, requiring
+<span class="lineNum">     410 </span>            :   // two binary searches plus up to an additional 6 DOM comparisons. If this
+<span class="lineNum">     411 </span>            :   // proves to be a performance concern, then an interval tree may be a
+<span class="lineNum">     412 </span>            :   // possible solution, allowing the calculation of the overlap interval in
+<span class="lineNum">     413 </span>            :   // O(log n) time, though this would require rebalancing and other overhead.
+<span class="lineNum">     414 </span>            :   nsTArray&lt;RangeData&gt; mRanges;
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :   RefPtr&lt;nsRange&gt; mAnchorFocusRange;
+<span class="lineNum">     417 </span>            :   RefPtr&lt;nsFrameSelection&gt; mFrameSelection;
+<span class="lineNum">     418 </span>            :   RefPtr&lt;nsAutoScrollTimer&gt; mAutoScrollTimer;
+<span class="lineNum">     419 </span>            :   nsCOMArray&lt;nsISelectionListener&gt; mSelectionListeners;
+<span class="lineNum">     420 </span>            :   nsRevocableEventPtr&lt;ScrollSelectionIntoViewEvent&gt; mScrollEvent;
+<span class="lineNum">     421 </span>            :   CachedOffsetForFrame *mCachedOffsetForFrame;
+<span class="lineNum">     422 </span>            :   nsDirection mDirection;
+<span class="lineNum">     423 </span>            :   SelectionType mSelectionType;
+<span class="lineNum">     424 </span>            :   /**
+<span class="lineNum">     425 </span>            :    * True if the current selection operation was initiated by user action.
+<span class="lineNum">     426 </span>            :    * It determines whether we exclude -moz-user-select:none nodes or not,
+<span class="lineNum">     427 </span>            :    * as well as whether selectstart events will be fired.
+<span class="lineNum">     428 </span>            :    */
+<span class="lineNum">     429 </span>            :   bool mUserInitiated;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :   /**
+<span class="lineNum">     432 </span>            :    * When the selection change is caused by a call of Selection API,
+<span class="lineNum">     433 </span>            :    * mCalledByJS is true.  Otherwise, false.
+<span class="lineNum">     434 </span>            :    */
+<span class="lineNum">     435 </span>            :   bool mCalledByJS;
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :   // Non-zero if we don't want any changes we make to the selection to be
+<span class="lineNum">     438 </span>            :   // visible to content. If non-zero, content won't be notified about changes.
+<span class="lineNum">     439 </span>            :   uint32_t mSelectionChangeBlockerCount;
+<span class="lineNum">     440 </span>            : };
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            : // Stack-class to turn on/off selection batching.
+<span class="lineNum">     443 </span>            : class MOZ_STACK_CLASS SelectionBatcher final
+<span class="lineNum">     444 </span>            : {
+<span class="lineNum">     445 </span>            : private:
+<a name="446"><span class="lineNum">     446 </span>            :   RefPtr&lt;Selection&gt; mSelection;</a>
+<span class="lineNum">     447 </span>            : public:
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :   explicit SelectionBatcher(Selection* aSelection)</span>
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :     mSelection = aSelection;</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :     if (mSelection) {</span>
+<span class="lineNum">     452 </span><span class="lineNoCov">          0 :       mSelection-&gt;StartBatchChanges();</span>
+<span class="lineNum">     453 </span>            :     }
+<a name="454"><span class="lineNum">     454 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span><span class="lineNoCov">          0 :   ~SelectionBatcher()</span>
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :     if (mSelection) {</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :       mSelection-&gt;EndBatchChangesInternal();</span>
+<span class="lineNum">     460 </span>            :     }
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     462 </span>            : };
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            : class MOZ_RAII AutoHideSelectionChanges final
+<span class="lineNum">     465 </span>            : {
+<span class="lineNum">     466 </span>            : private:
+<span class="lineNum">     467 </span>            :   RefPtr&lt;Selection&gt; mSelection;
+<span class="lineNum">     468 </span>            :   MOZ_DECL_USE_GUARD_OBJECT_NOTIFIER
+<span class="lineNum">     469 </span>            : public:
+<a name="470"><span class="lineNum">     470 </span>            :   explicit AutoHideSelectionChanges(const nsFrameSelection* aFrame);</a>
+<span class="lineNum">     471 </span>            : 
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :   explicit AutoHideSelectionChanges(Selection* aSelection</span>
+<span class="lineNum">     473 </span>            :                                     MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :     : mSelection(aSelection)</span>
+<span class="lineNum">     475 </span>            :   {
+<span class="lineNum">     476 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :     mSelection = aSelection;</span>
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :     if (mSelection) {</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :       mSelection-&gt;AddSelectionChangeBlocker();</span>
+<span class="lineNum">     480 </span>            :     }
+<a name="481"><span class="lineNum">     481 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :   ~AutoHideSelectionChanges()</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :     if (mSelection) {</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :       mSelection-&gt;RemoveSelectionChangeBlocker();</span>
+<span class="lineNum">     487 </span>            :     }
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     489 </span>            : };
+<span class="lineNum">     490 </span>            : 
+<span class="lineNum">     491 </span>            : } // namespace dom
+<span class="lineNum">     492 </span>            : } // namespace mozilla
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            : #endif // mozilla_Selection_h__
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/ServoStyleSet.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - ServoStyleSet.h<span style="font-size: 80%;"> (source / <a href="ServoStyleSet.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_ServoStyleSet_h
+<span class="lineNum">       8 </span>            : #define mozilla_ServoStyleSet_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/EnumeratedArray.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/EventStates.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/ServoBindingTypes.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/ServoElementSnapshot.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/StyleSheetInlines.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/SheetType.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;MainThreadUtils.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsCSSPseudoElements.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsCSSAnonBoxes.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsChangeHint.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsIAtom.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : namespace mozilla {
+<span class="lineNum">      25 </span>            : namespace dom {
+<span class="lineNum">      26 </span>            : class Element;
+<span class="lineNum">      27 </span>            : } // namespace dom
+<span class="lineNum">      28 </span>            : class CSSStyleSheet;
+<span class="lineNum">      29 </span>            : class ServoRestyleManager;
+<span class="lineNum">      30 </span>            : class ServoStyleSheet;
+<span class="lineNum">      31 </span>            : struct Keyframe;
+<span class="lineNum">      32 </span>            : struct ServoComputedValuesWithParent;
+<span class="lineNum">      33 </span>            : } // namespace mozilla
+<span class="lineNum">      34 </span>            : class nsIContent;
+<span class="lineNum">      35 </span>            : class nsIDocument;
+<span class="lineNum">      36 </span>            : class nsStyleContext;
+<span class="lineNum">      37 </span>            : class nsPresContext;
+<span class="lineNum">      38 </span>            : struct nsTimingFunction;
+<span class="lineNum">      39 </span>            : struct TreeMatchContext;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : namespace mozilla {
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : /**
+<span class="lineNum">      44 </span>            :  * The set of style sheets that apply to a document, backed by a Servo
+<span class="lineNum">      45 </span>            :  * Stylist.  A ServoStyleSet contains ServoStyleSheets.
+<span class="lineNum">      46 </span>            :  */
+<span class="lineNum">      47 </span>            : class ServoStyleSet
+<span class="lineNum">      48 </span>            : {
+<span class="lineNum">      49 </span>            :   friend class ServoRestyleManager;
+<span class="lineNum">      50 </span>            : public:
+<span class="lineNum">      51 </span>            :   class AutoAllowStaleStyles
+<span class="lineNum">      52 </span>            :   {
+<span class="lineNum">      53 </span>            :   public:
+<span class="lineNum">      54 </span>            :     explicit AutoAllowStaleStyles(ServoStyleSet* aStyleSet)
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       : mStyleSet(aStyleSet)</span>
+<span class="lineNum">      56 </span>            :     {
+<span class="lineNum">      57 </span>            :       if (mStyleSet) {
+<span class="lineNum">      58 </span>            :         MOZ_ASSERT(!mStyleSet-&gt;mAllowResolveStaleStyles);
+<span class="lineNum">      59 </span>            :         mStyleSet-&gt;mAllowResolveStaleStyles = true;
+<span class="lineNum">      60 </span>            :       }
+<a name="61"><span class="lineNum">      61 </span>            :     }</a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     ~AutoAllowStaleStyles()</span>
+<span class="lineNum">      64 </span>            :     {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       if (mStyleSet) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :         mStyleSet-&gt;mAllowResolveStaleStyles = false;</span>
+<span class="lineNum">      67 </span>            :       }
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :   private:
+<span class="lineNum">      71 </span>            :     ServoStyleSet* mStyleSet;
+<span class="lineNum">      72 </span>            :   };
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   static bool IsInServoTraversal()
+<span class="lineNum">      75 </span>            :   {
+<span class="lineNum">      76 </span>            :     // The callers of this function are generally main-thread-only _except_
+<span class="lineNum">      77 </span>            :     // for potentially running during the Servo traversal, in which case they may
+<span class="lineNum">      78 </span>            :     // take special paths that avoid writing to caches and the like. In order
+<span class="lineNum">      79 </span>            :     // to allow those callers to branch efficiently without checking TLS, we
+<span class="lineNum">      80 </span>            :     // maintain this static boolean. However, the danger is that those callers
+<span class="lineNum">      81 </span>            :     // are generally unprepared to deal with non-Servo-but-also-non-main-thread
+<span class="lineNum">      82 </span>            :     // callers, and are likely to take the main-thread codepath if this function
+<span class="lineNum">      83 </span>            :     // returns false. So we assert against other non-main-thread callers here.
+<span class="lineNum">      84 </span>            :     MOZ_ASSERT(sInServoTraversal || NS_IsMainThread());
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     return sInServoTraversal;</span>
+<span class="lineNum">      86 </span>            :   }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :   ServoStyleSet();
+<span class="lineNum">      89 </span>            :   ~ServoStyleSet();
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   void Init(nsPresContext* aPresContext);
+<span class="lineNum">      92 </span>            :   void BeginShutdown();
+<span class="lineNum">      93 </span>            :   void Shutdown();
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   const RawServoStyleSet&amp; RawSet() const { return *mRawSet; }</span>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :   bool GetAuthorStyleDisabled() const;
+<span class="lineNum">      99 </span>            :   nsresult SetAuthorStyleDisabled(bool aStyleDisabled);
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :   void BeginUpdate();
+<span class="lineNum">     102 </span>            :   nsresult EndUpdate();
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     105 </span>            :   ResolveStyleFor(dom::Element* aElement,
+<span class="lineNum">     106 </span>            :                   nsStyleContext* aParentContext,
+<span class="lineNum">     107 </span>            :                   LazyComputeBehavior aMayCompute);
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     110 </span>            :   ResolveStyleFor(dom::Element* aElement,
+<span class="lineNum">     111 </span>            :                   nsStyleContext* aParentContext,
+<span class="lineNum">     112 </span>            :                   LazyComputeBehavior aMayCompute,
+<span class="lineNum">     113 </span>            :                   TreeMatchContext&amp; aTreeMatchContext);
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :   // Get a style context for a text node (which no rules will match).
+<span class="lineNum">     116 </span>            :   //
+<span class="lineNum">     117 </span>            :   // The returned style context will have nsCSSAnonBoxes::mozText as its pseudo.
+<span class="lineNum">     118 </span>            :   //
+<span class="lineNum">     119 </span>            :   // (Perhaps mozText should go away and we shouldn't even create style
+<span class="lineNum">     120 </span>            :   // contexts for such content nodes, when text-combine-upright is not
+<span class="lineNum">     121 </span>            :   // present.  However, not doing any rule matching for them is a first step.)
+<span class="lineNum">     122 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     123 </span>            :   ResolveStyleForText(nsIContent* aTextNode,
+<span class="lineNum">     124 </span>            :                       nsStyleContext* aParentContext);
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :   // Get a style context for a first-letter continuation (which no rules will
+<span class="lineNum">     127 </span>            :   // match).
+<span class="lineNum">     128 </span>            :   //
+<span class="lineNum">     129 </span>            :   // The returned style context will have
+<span class="lineNum">     130 </span>            :   // nsCSSAnonBoxes::firstLetterContinuation as its pseudo.
+<span class="lineNum">     131 </span>            :   //
+<span class="lineNum">     132 </span>            :   // (Perhaps nsCSSAnonBoxes::firstLetterContinuation should go away and we
+<span class="lineNum">     133 </span>            :   // shouldn't even create style contexts for such frames.  However, not doing
+<span class="lineNum">     134 </span>            :   // any rule matching for them is a first step.  And right now we do use this
+<span class="lineNum">     135 </span>            :   // style context for some things)
+<span class="lineNum">     136 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     137 </span>            :   ResolveStyleForFirstLetterContinuation(nsStyleContext* aParentContext);
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :   // Get a style context for a placeholder frame (which no rules will match).
+<span class="lineNum">     140 </span>            :   //
+<span class="lineNum">     141 </span>            :   // The returned style context will have nsCSSAnonBoxes::oofPlaceholder as
+<span class="lineNum">     142 </span>            :   // its pseudo.
+<span class="lineNum">     143 </span>            :   //
+<span class="lineNum">     144 </span>            :   // (Perhaps nsCSSAnonBoxes::oofPaceholder should go away and we shouldn't even
+<span class="lineNum">     145 </span>            :   // create style contexts for placeholders.  However, not doing any rule
+<span class="lineNum">     146 </span>            :   // matching for them is a first step.)
+<span class="lineNum">     147 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     148 </span>            :   ResolveStyleForPlaceholder();
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :   // Get a style context for a pseudo-element.  aParentElement must be
+<span class="lineNum">     151 </span>            :   // non-null.  aPseudoID is the CSSPseudoElementType for the
+<span class="lineNum">     152 </span>            :   // pseudo-element.  aPseudoElement must be non-null if the pseudo-element
+<span class="lineNum">     153 </span>            :   // type is one that allows user action pseudo-classes after it or allows
+<span class="lineNum">     154 </span>            :   // style attributes; otherwise, it is ignored.
+<span class="lineNum">     155 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     156 </span>            :   ResolvePseudoElementStyle(dom::Element* aOriginatingElement,
+<span class="lineNum">     157 </span>            :                             mozilla::CSSPseudoElementType aType,
+<span class="lineNum">     158 </span>            :                             nsStyleContext* aParentContext,
+<span class="lineNum">     159 </span>            :                             dom::Element* aPseudoElement);
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :   // Resolves style for a (possibly-pseudo) Element without assuming that the
+<span class="lineNum">     162 </span>            :   // style has been resolved, and without worrying about setting the style
+<span class="lineNum">     163 </span>            :   // context up to live in the style context tree (a null parent is used).
+<span class="lineNum">     164 </span>            :   // |aPeudoTag| and |aPseudoType| must match.
+<span class="lineNum">     165 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     166 </span>            :   ResolveTransientStyle(dom::Element* aElement,
+<span class="lineNum">     167 </span>            :                         nsIAtom* aPseudoTag,
+<span class="lineNum">     168 </span>            :                         CSSPseudoElementType aPseudoType);
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :   // Similar to ResolveTransientStyle() but returns ServoComputedValues.
+<span class="lineNum">     171 </span>            :   // Unlike ResolveServoStyle() this function calls PreTraverseSync().
+<span class="lineNum">     172 </span>            :   already_AddRefed&lt;ServoComputedValues&gt;
+<span class="lineNum">     173 </span>            :   ResolveTransientServoStyle(dom::Element* aElement, nsIAtom* aPseudoTag);
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :   // Get a style context for an anonymous box.  aPseudoTag is the pseudo-tag to
+<span class="lineNum">     176 </span>            :   // use and must be non-null.  It must be an anon box, and must be one that
+<span class="lineNum">     177 </span>            :   // inherits style from the given aParentContext.  aFlags is an nsStyleSet
+<span class="lineNum">     178 </span>            :   // flags bitfield.
+<span class="lineNum">     179 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     180 </span>            :   ResolveInheritingAnonymousBoxStyle(nsIAtom* aPseudoTag,
+<span class="lineNum">     181 </span>            :                                      nsStyleContext* aParentContext,
+<span class="lineNum">     182 </span>            :                                      uint32_t aFlags = 0);
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   // Get a style context for an anonymous box that does not inherit style from
+<span class="lineNum">     185 </span>            :   // anything.  aPseudoTag is the pseudo-tag to use and must be non-null.  It
+<span class="lineNum">     186 </span>            :   // must be an anon box, and must be a non-inheriting one.
+<span class="lineNum">     187 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     188 </span>            :   ResolveNonInheritingAnonymousBoxStyle(nsIAtom* aPseudoTag);
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            :   // manage the set of style sheets in the style set
+<span class="lineNum">     191 </span>            :   nsresult AppendStyleSheet(SheetType aType, ServoStyleSheet* aSheet);
+<span class="lineNum">     192 </span>            :   nsresult PrependStyleSheet(SheetType aType, ServoStyleSheet* aSheet);
+<span class="lineNum">     193 </span>            :   nsresult RemoveStyleSheet(SheetType aType, ServoStyleSheet* aSheet);
+<span class="lineNum">     194 </span>            :   nsresult ReplaceSheets(SheetType aType,
+<span class="lineNum">     195 </span>            :                          const nsTArray&lt;RefPtr&lt;ServoStyleSheet&gt;&gt;&amp; aNewSheets);
+<span class="lineNum">     196 </span>            :   nsresult InsertStyleSheetBefore(SheetType aType,
+<span class="lineNum">     197 </span>            :                                   ServoStyleSheet* aNewSheet,
+<span class="lineNum">     198 </span>            :                                   ServoStyleSheet* aReferenceSheet);
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :   int32_t SheetCount(SheetType aType) const;
+<span class="lineNum">     201 </span>            :   ServoStyleSheet* StyleSheetAt(SheetType aType, int32_t aIndex) const;
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            :   nsresult RemoveDocStyleSheet(ServoStyleSheet* aSheet);
+<span class="lineNum">     204 </span>            :   nsresult AddDocStyleSheet(ServoStyleSheet* aSheet, nsIDocument* aDocument);
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span>            :   // check whether there is ::before/::after style for an element
+<span class="lineNum">     207 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     208 </span>            :   ProbePseudoElementStyle(dom::Element* aOriginatingElement,
+<span class="lineNum">     209 </span>            :                           mozilla::CSSPseudoElementType aType,
+<span class="lineNum">     210 </span>            :                           nsStyleContext* aParentContext);
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :   already_AddRefed&lt;nsStyleContext&gt;
+<span class="lineNum">     213 </span>            :   ProbePseudoElementStyle(dom::Element* aOriginatingElement,
+<span class="lineNum">     214 </span>            :                           mozilla::CSSPseudoElementType aType,
+<span class="lineNum">     215 </span>            :                           nsStyleContext* aParentContext,
+<span class="lineNum">     216 </span>            :                           TreeMatchContext&amp; aTreeMatchContext,
+<span class="lineNum">     217 </span>            :                           dom::Element* aPseudoElement = nullptr);
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   // Test if style is dependent on content state
+<span class="lineNum">     220 </span>            :   nsRestyleHint HasStateDependentStyle(dom::Element* aElement,
+<span class="lineNum">     221 </span>            :                                        EventStates aStateMask);
+<span class="lineNum">     222 </span>            :   nsRestyleHint HasStateDependentStyle(
+<span class="lineNum">     223 </span>            :     dom::Element* aElement, mozilla::CSSPseudoElementType aPseudoType,
+<span class="lineNum">     224 </span>            :     dom::Element* aPseudoElement, EventStates aStateMask);
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   /**
+<span class="lineNum">     227 </span>            :    * Performs a Servo traversal to compute style for all dirty nodes in the
+<span class="lineNum">     228 </span>            :    * document.  This will traverse all of the document's style roots (that
+<span class="lineNum">     229 </span>            :    * is, its document element, and the roots of the document-level native
+<span class="lineNum">     230 </span>            :    * anonymous content).  Returns true if a post-traversal is required.
+<span class="lineNum">     231 </span>            :    */
+<span class="lineNum">     232 </span>            :   bool StyleDocument();
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :   /**
+<span class="lineNum">     235 </span>            :    * Eagerly styles a subtree of unstyled nodes that was just appended to the
+<span class="lineNum">     236 </span>            :    * tree. This is used in situations where we need the style immediately and
+<span class="lineNum">     237 </span>            :    * cannot wait for a future batch restyle.
+<span class="lineNum">     238 </span>            :    */
+<span class="lineNum">     239 </span>            :   void StyleNewSubtree(dom::Element* aRoot);
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :   /**
+<span class="lineNum">     242 </span>            :    * Like the above, but skips the root node, and only styles unstyled children.
+<span class="lineNum">     243 </span>            :    * When potentially appending multiple children, it's preferable to call
+<span class="lineNum">     244 </span>            :    * StyleNewChildren on the node rather than making multiple calls to
+<span class="lineNum">     245 </span>            :    * StyleNewSubtree on each child, since it allows for more parallelism.
+<span class="lineNum">     246 </span>            :    */
+<span class="lineNum">     247 </span>            :   void StyleNewChildren(dom::Element* aParent);
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   /**
+<span class="lineNum">     250 </span>            :    * Like StyleNewSubtree, but in response to a request to reconstruct frames
+<span class="lineNum">     251 </span>            :    * for the given subtree, and so works on elements that already have
+<span class="lineNum">     252 </span>            :    * styles.  This will leave the subtree in a state just like after an initial
+<span class="lineNum">     253 </span>            :    * styling, i.e. with new styles, no change hints, and with the dirty
+<span class="lineNum">     254 </span>            :    * descendants bits cleared.  No comparison of old and new styles is done,
+<span class="lineNum">     255 </span>            :    * so no change hints will be processed.
+<span class="lineNum">     256 </span>            :    */
+<span class="lineNum">     257 </span>            :   void StyleSubtreeForReconstruct(dom::Element* aRoot);
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   /**
+<span class="lineNum">     260 </span>            :    * Records that the contents of style sheets have changed since the last
+<span class="lineNum">     261 </span>            :    * restyle.  Calling this will ensure that the Stylist rebuilds its
+<span class="lineNum">     262 </span>            :    * selector maps.
+<span class="lineNum">     263 </span>            :    */
+<span class="lineNum">     264 </span>            :   void NoteStyleSheetsChanged();
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            : #ifdef DEBUG
+<span class="lineNum">     267 </span>            :   void AssertTreeIsClean();
+<span class="lineNum">     268 </span>            : #else
+<span class="lineNum">     269 </span>            :   void AssertTreeIsClean() {}
+<span class="lineNum">     270 </span>            : #endif
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :   /**
+<span class="lineNum">     273 </span>            :    * Rebuild the style data. This will force a stylesheet flush, and also
+<span class="lineNum">     274 </span>            :    * recompute the default computed styles.
+<span class="lineNum">     275 </span>            :    */
+<span class="lineNum">     276 </span>            :   void RebuildData();
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :   /**
+<span class="lineNum">     279 </span>            :    * Resolve style for the given element, and return it as a
+<span class="lineNum">     280 </span>            :    * ServoComputedValues, not an nsStyleContext.
+<span class="lineNum">     281 </span>            :    */
+<span class="lineNum">     282 </span>            :   already_AddRefed&lt;ServoComputedValues&gt; ResolveServoStyle(dom::Element* aElement);
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :   bool FillKeyframesForName(const nsString&amp; aName,
+<span class="lineNum">     285 </span>            :                             const nsTimingFunction&amp; aTimingFunction,
+<span class="lineNum">     286 </span>            :                             const ServoComputedValues* aComputedValues,
+<span class="lineNum">     287 </span>            :                             nsTArray&lt;Keyframe&gt;&amp; aKeyframes);
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :   nsTArray&lt;ComputedKeyframeValues&gt;
+<span class="lineNum">     290 </span>            :   GetComputedKeyframeValuesFor(const nsTArray&lt;Keyframe&gt;&amp; aKeyframes,
+<span class="lineNum">     291 </span>            :                                dom::Element* aElement,
+<span class="lineNum">     292 </span>            :                                const ServoComputedValuesWithParent&amp;
+<span class="lineNum">     293 </span>            :                                  aServoValues);
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :   bool AppendFontFaceRules(nsTArray&lt;nsFontFaceRuleContainer&gt;&amp; aArray);
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :   already_AddRefed&lt;ServoComputedValues&gt;
+<span class="lineNum">     298 </span>            :   GetBaseComputedValuesForElement(dom::Element* aElement, nsIAtom* aPseudoTag);
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   /**
+<span class="lineNum">     301 </span>            :    * Resolve style for a given declaration block with/without the parent style.
+<span class="lineNum">     302 </span>            :    * If the parent style is not specified, the document default computed values
+<span class="lineNum">     303 </span>            :    * is used.
+<span class="lineNum">     304 </span>            :    */
+<span class="lineNum">     305 </span>            :   already_AddRefed&lt;ServoComputedValues&gt;
+<span class="lineNum">     306 </span>            :   ResolveForDeclarations(ServoComputedValuesBorrowedOrNull aParentOrNull,
+<span class="lineNum">     307 </span>            :                          RawServoDeclarationBlockBorrowed aDeclarations);
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : private:
+<span class="lineNum">     310 </span>            :   already_AddRefed&lt;nsStyleContext&gt; GetContext(already_AddRefed&lt;ServoComputedValues&gt;,
+<span class="lineNum">     311 </span>            :                                               nsStyleContext* aParentContext,
+<span class="lineNum">     312 </span>            :                                               nsIAtom* aPseudoTag,
+<span class="lineNum">     313 </span>            :                                               CSSPseudoElementType aPseudoType,
+<span class="lineNum">     314 </span>            :                                               dom::Element* aElementForAnimation);
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   already_AddRefed&lt;nsStyleContext&gt; GetContext(nsIContent* aContent,
+<span class="lineNum">     317 </span>            :                                               nsStyleContext* aParentContext,
+<span class="lineNum">     318 </span>            :                                               nsIAtom* aPseudoTag,
+<span class="lineNum">     319 </span>            :                                               CSSPseudoElementType aPseudoType,
+<span class="lineNum">     320 </span>            :                                               LazyComputeBehavior aMayCompute);
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :   /**
+<span class="lineNum">     323 </span>            :    * Resolve all ServoDeclarationBlocks attached to mapped
+<span class="lineNum">     324 </span>            :    * presentation attributes cached on the document.
+<span class="lineNum">     325 </span>            :    * Call this before jumping into Servo's style system.
+<span class="lineNum">     326 </span>            :    */
+<span class="lineNum">     327 </span>            :   void ResolveMappedAttrDeclarationBlocks();
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :   /**
+<span class="lineNum">     330 </span>            :    * Perform all lazy operations required before traversing
+<span class="lineNum">     331 </span>            :    * a subtree.  Returns whether a post-traversal is required.
+<span class="lineNum">     332 </span>            :    */
+<span class="lineNum">     333 </span>            :   bool PrepareAndTraverseSubtree(RawGeckoElementBorrowed aRoot,
+<span class="lineNum">     334 </span>            :                                  TraversalRootBehavior aRootBehavior,
+<span class="lineNum">     335 </span>            :                                  TraversalRestyleBehavior aRestyleBehavior);
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            :   /**
+<span class="lineNum">     338 </span>            :    * Clear our cached mNonInheritingStyleContexts.  We do this when we want to
+<span class="lineNum">     339 </span>            :    * make sure those style contexts won't live too long (e.g. when rebuilding
+<span class="lineNum">     340 </span>            :    * all style data or when shutting down the style set).
+<span class="lineNum">     341 </span>            :    */
+<span class="lineNum">     342 </span>            :   void ClearNonInheritingStyleContexts();
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   /**
+<span class="lineNum">     345 </span>            :    * Perform processes that we should do before traversing.
+<span class="lineNum">     346 </span>            :    *
+<span class="lineNum">     347 </span>            :    * When aRoot is null, the entire document is pre-traversed.  Otherwise,
+<span class="lineNum">     348 </span>            :    * only the subtree rooted at aRoot is pre-traversed.
+<span class="lineNum">     349 </span>            :    */
+<span class="lineNum">     350 </span>            :   void PreTraverse(dom::Element* aRoot = nullptr);
+<span class="lineNum">     351 </span>            :   // Subset of the pre-traverse steps that involve syncing up data
+<span class="lineNum">     352 </span>            :   void PreTraverseSync();
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            :   already_AddRefed&lt;ServoComputedValues&gt; ResolveStyleLazily(dom::Element* aElement,
+<span class="lineNum">     355 </span>            :                                                            nsIAtom* aPseudoTag);
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :   nsPresContext* mPresContext;
+<span class="lineNum">     358 </span>            :   UniquePtr&lt;RawServoStyleSet&gt; mRawSet;
+<span class="lineNum">     359 </span>            :   EnumeratedArray&lt;SheetType, SheetType::Count,
+<span class="lineNum">     360 </span>            :                   nsTArray&lt;RefPtr&lt;ServoStyleSheet&gt;&gt;&gt; mSheets;
+<span class="lineNum">     361 </span>            :   int32_t mBatching;
+<span class="lineNum">     362 </span>            :   bool mAllowResolveStaleStyles;
+<span class="lineNum">     363 </span>            :   bool mAuthorStyleDisabled;
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :   // Stores pointers to our cached style contexts for non-inheriting anonymous
+<span class="lineNum">     366 </span>            :   // boxes.
+<span class="lineNum">     367 </span>            :   EnumeratedArray&lt;nsCSSAnonBoxes::NonInheriting,
+<span class="lineNum">     368 </span>            :                   nsCSSAnonBoxes::NonInheriting::_Count,
+<span class="lineNum">     369 </span>            :                   RefPtr&lt;nsStyleContext&gt;&gt; mNonInheritingStyleContexts;
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :   static bool sInServoTraversal;
+<span class="lineNum">     372 </span>            : };
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            : } // namespace mozilla
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            : #endif // mozilla_ServoStyleSet_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

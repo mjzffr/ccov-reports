@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - security/sandbox/chromium/base/at_exit.cc</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium/base</a> - at_exit.cc<span style="font-size: 80%;"> (source / <a href="at_exit.cc.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright (c) 2011 The Chromium Authors. All rights reserved.</a>
+<span class="lineNum">       2 </span>            : // Use of this source code is governed by a BSD-style license that can be
+<span class="lineNum">       3 </span>            : // found in the LICENSE file.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #include &quot;base/at_exit.h&quot;
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       8 </span>            : #include &lt;ostream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;utility&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;base/bind.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;base/callback.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;base/logging.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace base {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : // Keep a stack of registered AtExitManagers.  We always operate on the most
+<span class="lineNum">      18 </span>            : // recent, and we should never have more than one outside of testing (for a
+<span class="lineNum">      19 </span>            : // statically linked version of this library).  Testing may use the shadow
+<span class="lineNum">      20 </span>            : // version of the constructor, and if we are building a dynamic library we may
+<span class="lineNum">      21 </span>            : // end up with multiple AtExitManagers on the same process.  We don't protect
+<span class="lineNum">      22 </span>            : // this for thread-safe access, since it will only be modified in testing.
+<span class="lineNum">      23 </span>            : static AtExitManager* g_top_manager = NULL;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 : AtExitManager::AtExitManager()</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     : processing_callbacks_(false), next_manager_(g_top_manager) {</span>
+<span class="lineNum">      27 </span>            : // If multiple modules instantiate AtExitManagers they'll end up living in this
+<span class="lineNum">      28 </span>            : // module... they have to coexist.
+<span class="lineNum">      29 </span>            : #if !defined(COMPONENT_BUILD)
+<span class="lineNum">      30 </span>            :   DCHECK(!g_top_manager);
+<span class="lineNum">      31 </span>            : #endif
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   g_top_manager = this;</span>
+<a name="33"><span class="lineNum">      33 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 : AtExitManager::~AtExitManager() {</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   if (!g_top_manager) {</span>
+<span class="lineNum">      37 </span>            :     NOTREACHED() &lt;&lt; &quot;Tried to ~AtExitManager without an AtExitManager&quot;;
+<span class="lineNum">      38 </span>            :     return;
+<span class="lineNum">      39 </span>            :   }
+<span class="lineNum">      40 </span>            :   DCHECK_EQ(this, g_top_manager);
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :   ProcessCallbacksNow();</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :   g_top_manager = next_manager_;</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : }</span>
+<a name="45"><span class="lineNum">      45 </span>            : </a>
+<span class="lineNum">      46 </span>            : // static
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 : void AtExitManager::RegisterCallback(AtExitCallbackType func, void* param) {</span>
+<span class="lineNum">      48 </span>            :   DCHECK(func);
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   RegisterTask(base::Bind(func, param));</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : // static
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 : void AtExitManager::RegisterTask(base::Closure task) {</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   if (!g_top_manager) {</span>
+<span class="lineNum">      55 </span>            :     NOTREACHED() &lt;&lt; &quot;Tried to RegisterCallback without an AtExitManager&quot;;
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      57 </span>            :   }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :   AutoLock lock(g_top_manager-&gt;lock_);</span>
+<span class="lineNum">      60 </span>            :   DCHECK(!g_top_manager-&gt;processing_callbacks_);
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   g_top_manager-&gt;stack_.push(std::move(task));</span>
+<span class="lineNum">      62 </span>            : }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : // static
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 : void AtExitManager::ProcessCallbacksNow() {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   if (!g_top_manager) {</span>
+<span class="lineNum">      67 </span>            :     NOTREACHED() &lt;&lt; &quot;Tried to ProcessCallbacksNow without an AtExitManager&quot;;
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      69 </span>            :   }
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   // Callbacks may try to add new callbacks, so run them without holding
+<span class="lineNum">      72 </span>            :   // |lock_|. This is an error and caught by the DCHECK in RegisterTask(), but
+<span class="lineNum">      73 </span>            :   // handle it gracefully in release builds so we don't deadlock.
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :   std::stack&lt;base::Closure&gt; tasks;</span>
+<span class="lineNum">      75 </span>            :   {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     AutoLock lock(g_top_manager-&gt;lock_);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     tasks.swap(g_top_manager-&gt;stack_);</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     g_top_manager-&gt;processing_callbacks_ = true;</span>
+<span class="lineNum">      79 </span>            :   }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   while (!tasks.empty()) {</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     base::Closure task = tasks.top();</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     task.Run();</span>
+<span class="lineNum">      84 </span>            :     tasks.pop();
+<span class="lineNum">      85 </span>            :   }
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :   // Expect that all callbacks have been run.
+<span class="lineNum">      88 </span>            :   DCHECK(g_top_manager-&gt;stack_.empty());
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 : AtExitManager::AtExitManager(bool shadow)</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     : processing_callbacks_(false), next_manager_(g_top_manager) {</span>
+<span class="lineNum">      93 </span>            :   DCHECK(shadow || !g_top_manager);
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   g_top_manager = this;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : }  // namespace base
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

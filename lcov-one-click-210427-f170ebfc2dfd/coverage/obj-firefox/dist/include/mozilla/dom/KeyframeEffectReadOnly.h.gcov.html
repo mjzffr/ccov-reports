@@ -1,0 +1,555 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/dom/KeyframeEffectReadOnly.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/dom</a> - KeyframeEffectReadOnly.h<span style="font-size: 80%;"> (source / <a href="KeyframeEffectReadOnly.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+<span class="lineNum">       5 </span>            :  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_dom_KeyframeEffectReadOnly_h
+<span class="lineNum">       8 </span>            : #define mozilla_dom_KeyframeEffectReadOnly_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;nsChangeHint.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;nsCSSPropertyID.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsCSSPropertyIDSet.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsCSSValue.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;nsCycleCollectionParticipant.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;nsRefPtrHashtable.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsWrapperCache.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/AnimationPerformanceWarning.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/AnimationPropertySegment.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/AnimationTarget.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;mozilla/ComputedTimingFunction.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;mozilla/EffectCompositor.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;mozilla/Keyframe.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;mozilla/KeyframeEffectParams.h&quot;
+<span class="lineNum">      26 </span>            : // RawServoDeclarationBlock and associated RefPtrTraits
+<span class="lineNum">      27 </span>            : #include &quot;mozilla/ServoBindingTypes.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;mozilla/StyleAnimationValue.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;mozilla/dom/AnimationEffectReadOnly.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;mozilla/dom/BindingDeclarations.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;mozilla/dom/Element.h&quot;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : struct JSContext;
+<span class="lineNum">      34 </span>            : class JSObject;
+<span class="lineNum">      35 </span>            : class nsIContent;
+<span class="lineNum">      36 </span>            : class nsIDocument;
+<span class="lineNum">      37 </span>            : class nsIFrame;
+<span class="lineNum">      38 </span>            : class nsIPresShell;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : namespace mozilla {
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : class AnimValuesStyleRule;
+<span class="lineNum">      43 </span>            : enum class CSSPseudoElementType : uint8_t;
+<span class="lineNum">      44 </span>            : class ErrorResult;
+<span class="lineNum">      45 </span>            : struct AnimationRule;
+<span class="lineNum">      46 </span>            : struct TimingParams;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : namespace dom {
+<span class="lineNum">      49 </span>            : class ElementOrCSSPseudoElement;
+<span class="lineNum">      50 </span>            : class GlobalObject;
+<span class="lineNum">      51 </span>            : class OwningElementOrCSSPseudoElement;
+<span class="lineNum">      52 </span>            : class UnrestrictedDoubleOrKeyframeAnimationOptions;
+<span class="lineNum">      53 </span>            : class UnrestrictedDoubleOrKeyframeEffectOptions;
+<span class="lineNum">      54 </span>            : enum class IterationCompositeOperation : uint8_t;
+<span class="lineNum">      55 </span>            : enum class CompositeOperation : uint8_t;
+<span class="lineNum">      56 </span>            : struct AnimationPropertyDetails;
+<span class="lineNum">      57 </span>            : }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 : struct AnimationProperty</span>
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span>            :   nsCSSPropertyID mProperty = eCSSProperty_UNKNOWN;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :   // If true, the propery is currently being animated on the compositor.
+<span class="lineNum">      64 </span>            :   //
+<span class="lineNum">      65 </span>            :   // Note that when the owning Animation requests a non-throttled restyle, in
+<span class="lineNum">      66 </span>            :   // between calling RequestRestyle on its EffectCompositor and when the
+<span class="lineNum">      67 </span>            :   // restyle is performed, this member may temporarily become false even if
+<span class="lineNum">      68 </span>            :   // the animation remains on the layer after the restyle.
+<span class="lineNum">      69 </span>            :   //
+<span class="lineNum">      70 </span>            :   // **NOTE**: This member is not included when comparing AnimationProperty
+<span class="lineNum">      71 </span>            :   // objects for equality.
+<span class="lineNum">      72 </span>            :   bool mIsRunningOnCompositor = false;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   Maybe&lt;AnimationPerformanceWarning&gt; mPerformanceWarning;
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   InfallibleTArray&lt;AnimationPropertySegment&gt; mSegments;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :   // The copy constructor/assignment doesn't copy mIsRunningOnCompositor and
+<span class="lineNum">      79 </span>            :   // mPerformanceWarning.
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   AnimationProperty() = default;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   AnimationProperty(const AnimationProperty&amp; aOther)</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     : mProperty(aOther.mProperty), mSegments(aOther.mSegments) { }</span>
+<span class="lineNum">      83 </span>            :   AnimationProperty&amp; operator=(const AnimationProperty&amp; aOther)
+<span class="lineNum">      84 </span>            :   {
+<span class="lineNum">      85 </span>            :     mProperty = aOther.mProperty;
+<span class="lineNum">      86 </span>            :     mSegments = aOther.mSegments;
+<span class="lineNum">      87 </span>            :     return *this;
+<span class="lineNum">      88 </span>            :   }
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :   // NOTE: This operator does *not* compare the mIsRunningOnCompositor member.
+<span class="lineNum">      91 </span>            :   // This is because AnimationProperty objects are compared when recreating
+<span class="lineNum">      92 </span>            :   // CSS animations to determine if mutation observer change records need to
+<span class="lineNum">      93 </span>            :   // be created or not. However, at the point when these objects are compared
+<a name="94"><span class="lineNum">      94 </span>            :   // the mIsRunningOnCompositor will not have been set on the new objects so</a>
+<span class="lineNum">      95 </span>            :   // we ignore this member to avoid generating spurious change records.
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   bool operator==(const AnimationProperty&amp; aOther) const</span>
+<span class="lineNum">      97 </span>            :   {
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :     return mProperty == aOther.mProperty &amp;&amp;</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :            mSegments == aOther.mSegments;</span>
+<span class="lineNum">     100 </span>            :   }
+<span class="lineNum">     101 </span>            :   bool operator!=(const AnimationProperty&amp; aOther) const
+<span class="lineNum">     102 </span>            :   {
+<span class="lineNum">     103 </span>            :     return !(*this == aOther);
+<span class="lineNum">     104 </span>            :   }
+<span class="lineNum">     105 </span>            : };
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : struct ServoComputedValuesWithParent
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span>            :   const ServoComputedValues* mCurrentStyle;
+<span class="lineNum">     110 </span>            :   const ServoComputedValues* mParentStyle;
+<span class="lineNum">     111 </span>            :   explicit operator bool() const { return true; }
+<span class="lineNum">     112 </span>            : };
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            : struct ElementPropertyTransition;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : namespace dom {
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            : class Animation;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : class KeyframeEffectReadOnly : public AnimationEffectReadOnly
+<span class="lineNum">     121 </span>            : {
+<span class="lineNum">     122 </span>            : public:
+<span class="lineNum">     123 </span>            :   KeyframeEffectReadOnly(nsIDocument* aDocument,
+<span class="lineNum">     124 </span>            :                          const Maybe&lt;OwningAnimationTarget&gt;&amp; aTarget,
+<span class="lineNum">     125 </span>            :                          const TimingParams&amp; aTiming,
+<span class="lineNum">     126 </span>            :                          const KeyframeEffectParams&amp; aOptions);
+<a name="127"><span class="lineNum">     127 </span>            : </a>
+<span class="lineNum">     128 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_INHERITED(KeyframeEffectReadOnly,</span>
+<span class="lineNum">     130 </span>            :                                                         AnimationEffectReadOnly)
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :   virtual JSObject* WrapObject(JSContext* aCx,
+<a name="133"><span class="lineNum">     133 </span>            :                                JS::Handle&lt;JSObject*&gt; aGivenProto) override;</a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   KeyframeEffectReadOnly* AsKeyframeEffect() override { return this; }</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :   // KeyframeEffectReadOnly interface
+<span class="lineNum">     138 </span>            :   static already_AddRefed&lt;KeyframeEffectReadOnly&gt;
+<span class="lineNum">     139 </span>            :   Constructor(const GlobalObject&amp; aGlobal,
+<span class="lineNum">     140 </span>            :               const Nullable&lt;ElementOrCSSPseudoElement&gt;&amp; aTarget,
+<span class="lineNum">     141 </span>            :               JS::Handle&lt;JSObject*&gt; aKeyframes,
+<span class="lineNum">     142 </span>            :               const UnrestrictedDoubleOrKeyframeEffectOptions&amp; aOptions,
+<span class="lineNum">     143 </span>            :               ErrorResult&amp; aRv);
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :   static already_AddRefed&lt;KeyframeEffectReadOnly&gt;
+<span class="lineNum">     146 </span>            :   Constructor(const GlobalObject&amp; aGlobal,
+<span class="lineNum">     147 </span>            :               KeyframeEffectReadOnly&amp; aSource,
+<span class="lineNum">     148 </span>            :               ErrorResult&amp; aRv);
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<span class="lineNum">     150 </span>            :   void GetTarget(Nullable&lt;OwningElementOrCSSPseudoElement&gt;&amp; aRv) const;
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   Maybe&lt;NonOwningAnimationTarget&gt; GetTarget() const</span>
+<span class="lineNum">     152 </span>            :   {
+<span class="lineNum">     153 </span>            :     Maybe&lt;NonOwningAnimationTarget&gt; result;
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     if (mTarget) {</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :       result.emplace(*mTarget);</span>
+<span class="lineNum">     156 </span>            :     }
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     158 </span>            :   }
+<span class="lineNum">     159 </span>            :   void GetKeyframes(JSContext*&amp; aCx,
+<span class="lineNum">     160 </span>            :                     nsTArray&lt;JSObject*&gt;&amp; aResult,
+<span class="lineNum">     161 </span>            :                     ErrorResult&amp; aRv);
+<span class="lineNum">     162 </span>            :   void GetProperties(nsTArray&lt;AnimationPropertyDetails&gt;&amp; aProperties,
+<span class="lineNum">     163 </span>            :                      ErrorResult&amp; aRv) const;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   IterationCompositeOperation IterationComposite() const;
+<span class="lineNum">     166 </span>            :   CompositeOperation Composite() const;
+<span class="lineNum">     167 </span>            :   void GetSpacing(nsString&amp; aRetVal) const
+<span class="lineNum">     168 </span>            :   {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     mEffectOptions.GetSpacingAsString(aRetVal);</span>
+<span class="lineNum">     170 </span>            :   }
+<span class="lineNum">     171 </span>            :   void NotifyAnimationTimingUpdated();
+<span class="lineNum">     172 </span>            :   void RequestRestyle(EffectCompositor::RestyleType aRestyleType);
+<span class="lineNum">     173 </span>            :   void SetAnimation(Animation* aAnimation) override;
+<span class="lineNum">     174 </span>            :   void SetKeyframes(JSContext* aContext, JS::Handle&lt;JSObject*&gt; aKeyframes,
+<span class="lineNum">     175 </span>            :                     ErrorResult&amp; aRv);
+<span class="lineNum">     176 </span>            :   void SetKeyframes(nsTArray&lt;Keyframe&gt;&amp;&amp; aKeyframes,
+<span class="lineNum">     177 </span>            :                     nsStyleContext* aStyleContext);
+<span class="lineNum">     178 </span>            :   void SetKeyframes(nsTArray&lt;Keyframe&gt;&amp;&amp; aKeyframes,
+<span class="lineNum">     179 </span>            :                     const ServoComputedValuesWithParent&amp; aServoValues);
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   // Returns true if the effect includes |aProperty| regardless of whether the
+<span class="lineNum">     182 </span>            :   // property is overridden by !important rule.
+<span class="lineNum">     183 </span>            :   bool HasAnimationOfProperty(nsCSSPropertyID aProperty) const;
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :   // GetEffectiveAnimationOfProperty returns AnimationProperty corresponding
+<span class="lineNum">     186 </span>            :   // to a given CSS property if the effect includes the property and the
+<span class="lineNum">     187 </span>            :   // property is not overridden by !important rules.
+<span class="lineNum">     188 </span>            :   // Also EffectiveAnimationOfProperty returns true under the same condition.
+<span class="lineNum">     189 </span>            :   //
+<a name="190"><span class="lineNum">     190 </span>            :   // NOTE: We don't currently check for !important rules for properties that</a>
+<span class="lineNum">     191 </span>            :   // can't run on the compositor.
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   bool HasEffectiveAnimationOfProperty(nsCSSPropertyID aProperty) const</span>
+<span class="lineNum">     193 </span>            :   {
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :     return GetEffectiveAnimationOfProperty(aProperty) != nullptr;</span>
+<span class="lineNum">     195 </span>            :   }
+<span class="lineNum">     196 </span>            :   const AnimationProperty* GetEffectiveAnimationOfProperty(
+<span class="lineNum">     197 </span>            :     nsCSSPropertyID aProperty) const;
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            :   const InfallibleTArray&lt;AnimationProperty&gt;&amp; Properties() const
+<span class="lineNum">     200 </span>            :   {
+<span class="lineNum">     201 </span>            :     return mProperties;
+<span class="lineNum">     202 </span>            :   }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :   // Update |mProperties| by recalculating from |mKeyframes| using
+<span class="lineNum">     205 </span>            :   // |aStyleContext| to resolve specified values.
+<span class="lineNum">     206 </span>            :   void UpdateProperties(nsStyleContext* aStyleContext);
+<span class="lineNum">     207 </span>            :   // Servo version of the above function.
+<span class="lineNum">     208 </span>            :   void UpdateProperties(const ServoComputedValuesWithParent&amp; aServoValues);
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   // Update various bits of state related to running ComposeStyle().
+<span class="lineNum">     211 </span>            :   // We need to update this outside ComposeStyle() because we should avoid
+<span class="lineNum">     212 </span>            :   // mutating any state in ComposeStyle() since it might be called during
+<span class="lineNum">     213 </span>            :   // parallel traversal.
+<span class="lineNum">     214 </span>            :   void WillComposeStyle();
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :   // Updates |aComposeResult| with the animation values produced by this
+<span class="lineNum">     217 </span>            :   // AnimationEffect for the current time except any properties contained
+<span class="lineNum">     218 </span>            :   // in |aPropertiesToSkip|.
+<span class="lineNum">     219 </span>            :   template&lt;typename ComposeAnimationResult&gt;
+<span class="lineNum">     220 </span>            :   void ComposeStyle(ComposeAnimationResult&amp;&amp; aRestultContainer,
+<span class="lineNum">     221 </span>            :                     const nsCSSPropertyIDSet&amp; aPropertiesToSkip);
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :   // Composite |aValueToComposite| on |aUnderlyingValue| with
+<span class="lineNum">     224 </span>            :   // |aCompositeOperation|.
+<span class="lineNum">     225 </span>            :   // Returns |aValueToComposite| if |aCompositeOperation| is Replace.
+<span class="lineNum">     226 </span>            :   static StyleAnimationValue CompositeValue(
+<span class="lineNum">     227 </span>            :     nsCSSPropertyID aProperty,
+<span class="lineNum">     228 </span>            :     const StyleAnimationValue&amp; aValueToComposite,
+<span class="lineNum">     229 </span>            :     const StyleAnimationValue&amp; aUnderlyingValue,
+<span class="lineNum">     230 </span>            :     CompositeOperation aCompositeOperation);
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :   // Returns true if at least one property is being animated on compositor.
+<span class="lineNum">     233 </span>            :   bool IsRunningOnCompositor() const;
+<span class="lineNum">     234 </span>            :   void SetIsRunningOnCompositor(nsCSSPropertyID aProperty, bool aIsRunning);
+<span class="lineNum">     235 </span>            :   void ResetIsRunningOnCompositor();
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   // Returns true if this effect, applied to |aFrame|, contains properties
+<span class="lineNum">     238 </span>            :   // that mean we shouldn't run transform compositor animations on this element.
+<span class="lineNum">     239 </span>            :   //
+<span class="lineNum">     240 </span>            :   // For example, if we have an animation of geometric properties like 'left'
+<span class="lineNum">     241 </span>            :   // and 'top' on an element, we force all 'transform' animations running at
+<span class="lineNum">     242 </span>            :   // the same time on the same element to run on the main thread.
+<span class="lineNum">     243 </span>            :   //
+<span class="lineNum">     244 </span>            :   // When returning true, |aPerformanceWarning| stores the reason why
+<span class="lineNum">     245 </span>            :   // we shouldn't run the transform animations.
+<span class="lineNum">     246 </span>            :   bool ShouldBlockAsyncTransformAnimations(
+<span class="lineNum">     247 </span>            :     const nsIFrame* aFrame,
+<a name="248"><span class="lineNum">     248 </span>            :     AnimationPerformanceWarning::Type&amp; aPerformanceWarning) const;</a>
+<span class="lineNum">     249 </span>            :   bool HasGeometricProperties() const;
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :   bool AffectsGeometry() const override</span>
+<span class="lineNum">     251 </span>            :   {
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :     return GetTarget() &amp;&amp; HasGeometricProperties();</span>
+<span class="lineNum">     253 </span>            :   }
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :   nsIDocument* GetRenderedDocument() const;
+<span class="lineNum">     256 </span>            :   nsIPresShell* GetPresShell() const;
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :   // Associates a warning with the animated property on the specified frame
+<span class="lineNum">     259 </span>            :   // indicating why, for example, the property could not be animated on the
+<span class="lineNum">     260 </span>            :   // compositor. |aParams| and |aParamsLength| are optional parameters which
+<span class="lineNum">     261 </span>            :   // will be used to generate a localized message for devtools.
+<span class="lineNum">     262 </span>            :   void SetPerformanceWarning(
+<span class="lineNum">     263 </span>            :     nsCSSPropertyID aProperty,
+<span class="lineNum">     264 </span>            :     const AnimationPerformanceWarning&amp; aWarning);
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :   // Cumulative change hint on each segment for each property.
+<span class="lineNum">     267 </span>            :   // This is used for deciding the animation is paint-only.
+<span class="lineNum">     268 </span>            :   void CalculateCumulativeChangeHint(nsStyleContext* aStyleContext);
+<span class="lineNum">     269 </span>            :   void CalculateCumulativeChangeHint(
+<span class="lineNum">     270 </span>            :     const ServoComputedValuesWithParent&amp; aServoValues)
+<span class="lineNum">     271 </span>            :   {
+<span class="lineNum">     272 </span>            :   }
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :   // Returns true if all of animation properties' change hints
+<span class="lineNum">     275 </span>            :   // can ignore painting if the animation is not visible.
+<span class="lineNum">     276 </span>            :   // See nsChangeHint_Hints_CanIgnoreIfNotVisible in nsChangeHint.h
+<span class="lineNum">     277 </span>            :   // in detail which change hint can be ignored.
+<span class="lineNum">     278 </span>            :   bool CanIgnoreIfNotVisible() const;
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            :   // Returns true if the effect is current state and has scale animation.
+<span class="lineNum">     281 </span>            :   // |aFrame| is used for calculation of scale values.
+<a name="282"><span class="lineNum">     282 </span>            :   bool ContainsAnimatedScale(const nsIFrame* aFrame) const;</a>
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   StyleAnimationValue BaseStyle(nsCSSPropertyID aProperty) const</span>
+<span class="lineNum">     285 </span>            :   {
+<span class="lineNum">     286 </span>            :     StyleAnimationValue result;
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     DebugOnly&lt;bool&gt; hasProperty = mBaseStyleValues.Get(aProperty, &amp;result);</span>
+<span class="lineNum">     288 </span>            :     MOZ_ASSERT(hasProperty || result.IsNull());
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     290 </span>            :   }
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            : protected:
+<span class="lineNum">     293 </span>            :   KeyframeEffectReadOnly(nsIDocument* aDocument,
+<span class="lineNum">     294 </span>            :                          const Maybe&lt;OwningAnimationTarget&gt;&amp; aTarget,
+<span class="lineNum">     295 </span>            :                          AnimationEffectTimingReadOnly* aTiming,
+<a name="296"><span class="lineNum">     296 </span>            :                          const KeyframeEffectParams&amp; aOptions);</a>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   ~KeyframeEffectReadOnly() override = default;</span>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   static Maybe&lt;OwningAnimationTarget&gt;
+<span class="lineNum">     301 </span>            :   ConvertTarget(const Nullable&lt;ElementOrCSSPseudoElement&gt;&amp; aTarget);
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            :   template&lt;class KeyframeEffectType, class OptionsType&gt;
+<span class="lineNum">     304 </span>            :   static already_AddRefed&lt;KeyframeEffectType&gt;
+<span class="lineNum">     305 </span>            :   ConstructKeyframeEffect(const GlobalObject&amp; aGlobal,
+<span class="lineNum">     306 </span>            :                           const Nullable&lt;ElementOrCSSPseudoElement&gt;&amp; aTarget,
+<span class="lineNum">     307 </span>            :                           JS::Handle&lt;JSObject*&gt; aKeyframes,
+<span class="lineNum">     308 </span>            :                           const OptionsType&amp; aOptions,
+<span class="lineNum">     309 </span>            :                           ErrorResult&amp; aRv);
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :   template&lt;class KeyframeEffectType&gt;
+<span class="lineNum">     312 </span>            :   static already_AddRefed&lt;KeyframeEffectType&gt;
+<span class="lineNum">     313 </span>            :   ConstructKeyframeEffect(const GlobalObject&amp; aGlobal,
+<span class="lineNum">     314 </span>            :                           KeyframeEffectReadOnly&amp; aSource,
+<span class="lineNum">     315 </span>            :                           ErrorResult&amp; aRv);
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span>            :   // Build properties by recalculating from |mKeyframes| using |aStyleContext|
+<span class="lineNum">     318 </span>            :   // to resolve specified values. This function also applies paced spacing if
+<span class="lineNum">     319 </span>            :   // needed.
+<span class="lineNum">     320 </span>            :   template&lt;typename StyleType&gt;
+<span class="lineNum">     321 </span>            :   nsTArray&lt;AnimationProperty&gt; BuildProperties(StyleType&amp;&amp; aStyle);
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            :   // This effect is registered with its target element so long as:
+<span class="lineNum">     324 </span>            :   //
+<span class="lineNum">     325 </span>            :   // (a) It has a target element, and
+<span class="lineNum">     326 </span>            :   // (b) It is &quot;relevant&quot; (i.e. yet to finish but not idle, or finished but
+<span class="lineNum">     327 </span>            :   //     filling forwards)
+<span class="lineNum">     328 </span>            :   //
+<span class="lineNum">     329 </span>            :   // As a result, we need to make sure this gets called whenever anything
+<span class="lineNum">     330 </span>            :   // changes with regards to this effects's timing including changes to the
+<span class="lineNum">     331 </span>            :   // owning Animation's timing.
+<span class="lineNum">     332 </span>            :   void UpdateTargetRegistration();
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            :   // Remove the current effect target from its EffectSet.
+<span class="lineNum">     335 </span>            :   void UnregisterTarget();
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            :   // Update the associated frame state bits so that, if necessary, a stacking
+<span class="lineNum">     338 </span>            :   // context will be created and the effect sent to the compositor.  We
+<span class="lineNum">     339 </span>            :   // typically need to do this when the properties referenced by the keyframe
+<span class="lineNum">     340 </span>            :   // have changed, or when the target frame might have changed.
+<span class="lineNum">     341 </span>            :   void MaybeUpdateFrameForCompositor();
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :   // Looks up the style context associated with the target element, if any.
+<span class="lineNum">     344 </span>            :   // We need to be careful to *not* call this when we are updating the style
+<span class="lineNum">     345 </span>            :   // context. That's because calling GetStyleContext when we are in the process
+<span class="lineNum">     346 </span>            :   // of building a style context may trigger various forms of infinite
+<span class="lineNum">     347 </span>            :   // recursion.
+<span class="lineNum">     348 </span>            :   already_AddRefed&lt;nsStyleContext&gt; GetTargetStyleContext();
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :   // A wrapper for marking cascade update according to the current
+<span class="lineNum">     351 </span>            :   // target and its effectSet.
+<span class="lineNum">     352 </span>            :   void MarkCascadeNeedsUpdate();
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span>            :   // Composites |aValueToComposite| using |aCompositeOperation| onto the value
+<span class="lineNum">     355 </span>            :   // for |aProperty| in |aAnimationRule|, or, if there is no suitable value in
+<span class="lineNum">     356 </span>            :   // |aAnimationRule|, uses the base value for the property recorded on the
+<span class="lineNum">     357 </span>            :   // target element's EffectSet.
+<span class="lineNum">     358 </span>            :   StyleAnimationValue CompositeValue(
+<span class="lineNum">     359 </span>            :     nsCSSPropertyID aProperty,
+<span class="lineNum">     360 </span>            :     const RefPtr&lt;AnimValuesStyleRule&gt;&amp; aAnimationRule,
+<span class="lineNum">     361 </span>            :     const StyleAnimationValue&amp; aValueToComposite,
+<span class="lineNum">     362 </span>            :     CompositeOperation aCompositeOperation);
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :   // Returns underlying style animation value for |aProperty|.
+<span class="lineNum">     365 </span>            :   StyleAnimationValue GetUnderlyingStyle(
+<span class="lineNum">     366 </span>            :     nsCSSPropertyID aProperty,
+<span class="lineNum">     367 </span>            :     const RefPtr&lt;AnimValuesStyleRule&gt;&amp; aAnimationRule);
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span>            :   // Ensure the base styles is available for any properties in |aProperties|.
+<span class="lineNum">     370 </span>            :   void EnsureBaseStyles(nsStyleContext* aStyleContext,
+<span class="lineNum">     371 </span>            :                         const nsTArray&lt;AnimationProperty&gt;&amp; aProperties);
+<span class="lineNum">     372 </span>            :   void EnsureBaseStyles(const ServoComputedValuesWithParent&amp; aServoValues,
+<span class="lineNum">     373 </span>            :                         const nsTArray&lt;AnimationProperty&gt;&amp; aProperties);
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            :   // If no base style is already stored for |aProperty|, resolves the base style
+<span class="lineNum">     376 </span>            :   // for |aProperty| using |aStyleContext| and stores it in mBaseStyleValues.
+<span class="lineNum">     377 </span>            :   // If |aCachedBaseStyleContext| is non-null, it will be used, otherwise the
+<span class="lineNum">     378 </span>            :   // base style context will be resolved and stored in
+<span class="lineNum">     379 </span>            :   // |aCachedBaseStyleContext|.
+<span class="lineNum">     380 </span>            :   void EnsureBaseStyle(nsCSSPropertyID aProperty,
+<span class="lineNum">     381 </span>            :                        nsStyleContext* aStyleContext,
+<span class="lineNum">     382 </span>            :                        RefPtr&lt;nsStyleContext&gt;&amp; aCachedBaseStyleContext);
+<span class="lineNum">     383 </span>            :   // Stylo version of the above function that also first checks for an additive
+<span class="lineNum">     384 </span>            :   // value in |aProperty|'s list of segments.
+<span class="lineNum">     385 </span>            :   void EnsureBaseStyle(const AnimationProperty&amp; aProperty,
+<span class="lineNum">     386 </span>            :                        nsIAtom* aPseudoAtom,
+<span class="lineNum">     387 </span>            :                        nsPresContext* aPresContext,
+<span class="lineNum">     388 </span>            :                        RefPtr&lt;ServoComputedValues&gt;&amp; aBaseComputedValues);
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :   Maybe&lt;OwningAnimationTarget&gt; mTarget;
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            :   KeyframeEffectParams mEffectOptions;
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            :   // The specified keyframes.
+<span class="lineNum">     395 </span>            :   nsTArray&lt;Keyframe&gt;          mKeyframes;
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            :   // A set of per-property value arrays, derived from |mKeyframes|.
+<span class="lineNum">     398 </span>            :   nsTArray&lt;AnimationProperty&gt; mProperties;
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            :   // The computed progress last time we composed the style rule. This is
+<span class="lineNum">     401 </span>            :   // used to detect when the progress is not changing (e.g. due to a step
+<span class="lineNum">     402 </span>            :   // timing function) so we can avoid unnecessary style updates.
+<span class="lineNum">     403 </span>            :   Nullable&lt;double&gt; mProgressOnLastCompose;
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            :   // The purpose of this value is the same as mProgressOnLastCompose but
+<span class="lineNum">     406 </span>            :   // this is used to detect when the current iteration is not changing
+<span class="lineNum">     407 </span>            :   // in the case when iterationComposite is accumulate.
+<span class="lineNum">     408 </span>            :   uint64_t mCurrentIterationOnLastCompose = 0;
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            :   // We need to track when we go to or from being &quot;in effect&quot; since
+<span class="lineNum">     411 </span>            :   // we need to re-evaluate the cascade of animations when that changes.
+<span class="lineNum">     412 </span>            :   bool mInEffectOnLastAnimationTimingUpdate;
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :   // The non-animated values for properties in this effect that contain at
+<span class="lineNum">     415 </span>            :   // least one animation value that is composited with the underlying value
+<span class="lineNum">     416 </span>            :   // (i.e. it uses the additive or accumulate composite mode).
+<span class="lineNum">     417 </span>            :   nsDataHashtable&lt;nsUint32HashKey, StyleAnimationValue&gt; mBaseStyleValues;
+<span class="lineNum">     418 </span>            :   nsRefPtrHashtable&lt;nsUint32HashKey, RawServoAnimationValue&gt;
+<span class="lineNum">     419 </span>            :     mBaseStyleValuesForServo;
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            :   // We only want to record telemetry data for &quot;ContentTooLarge&quot; warnings once
+<span class="lineNum">     422 </span>            :   // per effect:target pair so we use this member to record if we have already
+<span class="lineNum">     423 </span>            :   // reported a &quot;ContentTooLarge&quot; warning for the current target.
+<span class="lineNum">     424 </span>            :   bool mRecordedContentTooLarge = false;
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            : private:
+<span class="lineNum">     427 </span>            :   nsChangeHint mCumulativeChangeHint;
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            :   template&lt;typename StyleType&gt;
+<span class="lineNum">     430 </span>            :   void DoSetKeyframes(nsTArray&lt;Keyframe&gt;&amp;&amp; aKeyframes, StyleType&amp;&amp; aStyle);
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            :   template&lt;typename StyleType&gt;
+<span class="lineNum">     433 </span>            :   void DoUpdateProperties(StyleType&amp;&amp; aStyle);
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            :   void ComposeStyleRule(RefPtr&lt;AnimValuesStyleRule&gt;&amp; aStyleRule,
+<span class="lineNum">     436 </span>            :                         const AnimationProperty&amp; aProperty,
+<span class="lineNum">     437 </span>            :                         const AnimationPropertySegment&amp; aSegment,
+<span class="lineNum">     438 </span>            :                         const ComputedTiming&amp; aComputedTiming);
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            :   void ComposeStyleRule(const RawServoAnimationValueMap&amp; aAnimationValues,
+<span class="lineNum">     441 </span>            :                         const AnimationProperty&amp; aProperty,
+<span class="lineNum">     442 </span>            :                         const AnimationPropertySegment&amp; aSegment,
+<span class="lineNum">     443 </span>            :                         const ComputedTiming&amp; aComputedTiming);
+<span class="lineNum">     444 </span>            : 
+<span class="lineNum">     445 </span>            :   nsIFrame* GetAnimationFrame() const;
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            :   bool CanThrottle() const;
+<span class="lineNum">     448 </span>            :   bool CanThrottleTransformChanges(nsIFrame&amp; aFrame) const;
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :   // Returns true if the computedTiming has changed since the last
+<span class="lineNum">     451 </span>            :   // composition.
+<span class="lineNum">     452 </span>            :   bool HasComputedTimingChanged() const;
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            :   // Returns true unless Gecko limitations prevent performing transform
+<span class="lineNum">     455 </span>            :   // animations for |aFrame|. When returning true, the reason for the
+<span class="lineNum">     456 </span>            :   // limitation is stored in |aOutPerformanceWarning|.
+<span class="lineNum">     457 </span>            :   static bool CanAnimateTransformOnCompositor(
+<span class="lineNum">     458 </span>            :     const nsIFrame* aFrame,
+<span class="lineNum">     459 </span>            :     AnimationPerformanceWarning::Type&amp; aPerformanceWarning);
+<span class="lineNum">     460 </span>            :   static bool IsGeometricProperty(const nsCSSPropertyID aProperty);
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :   static const TimeDuration OverflowRegionRefreshInterval();
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span>            :   // FIXME: This flag will be removed in bug 1324966.
+<span class="lineNum">     465 </span>            :   bool mIsComposingStyle = false;
+<span class="lineNum">     466 </span>            : };
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span>            : } // namespace dom
+<span class="lineNum">     469 </span>            : } // namespace mozilla
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : #endif // mozilla_dom_KeyframeEffectReadOnly_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

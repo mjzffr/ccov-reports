@@ -1,0 +1,935 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/webrender/webrender_ffi_generated.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/webrender</a> - webrender_ffi_generated.h<span style="font-size: 80%;"> (source / <a href="webrender_ffi_generated.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public</a>
+<span class="lineNum">       2 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       3 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : /* DO NOT MODIFY THIS MANUALLY! This file was generated using cbindgen.
+<span class="lineNum">       6 </span>            :  * To generate this file, clone `https://github.com/rlhunt/cbindgen` or run `cargo install cbindgen`,
+<span class="lineNum">       7 </span>            :  * then run `cbindgen -c wr gfx/webrender_bindings/ gfx/webrender_bindings/webrender_ffi_generated.h` */
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : enum class WrBorderStyle : uint32_t {
+<span class="lineNum">      10 </span>            :   None = 0,
+<span class="lineNum">      11 </span>            :   Solid = 1,
+<span class="lineNum">      12 </span>            :   Double = 2,
+<span class="lineNum">      13 </span>            :   Dotted = 3,
+<span class="lineNum">      14 </span>            :   Dashed = 4,
+<span class="lineNum">      15 </span>            :   Hidden = 5,
+<span class="lineNum">      16 </span>            :   Groove = 6,
+<span class="lineNum">      17 </span>            :   Ridge = 7,
+<span class="lineNum">      18 </span>            :   Inset = 8,
+<span class="lineNum">      19 </span>            :   Outset = 9,
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      22 </span>            : };
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : enum class WrBoxShadowClipMode : uint32_t {
+<span class="lineNum">      25 </span>            :   None = 0,
+<span class="lineNum">      26 </span>            :   Outset = 1,
+<span class="lineNum">      27 </span>            :   Inset = 2,
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      30 </span>            : };
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : enum class WrExternalImageType : uint32_t {
+<span class="lineNum">      33 </span>            :   NativeTexture = 0,
+<span class="lineNum">      34 </span>            :   RawData = 1,
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      37 </span>            : };
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : enum class WrGradientExtendMode : uint32_t {
+<span class="lineNum">      40 </span>            :   Clamp = 0,
+<span class="lineNum">      41 </span>            :   Repeat = 1,
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      44 </span>            : };
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : enum class WrImageFormat : uint32_t {
+<span class="lineNum">      47 </span>            :   Invalid = 0,
+<span class="lineNum">      48 </span>            :   A8 = 1,
+<span class="lineNum">      49 </span>            :   RGB8 = 2,
+<span class="lineNum">      50 </span>            :   RGBA8 = 3,
+<span class="lineNum">      51 </span>            :   RGBAF32 = 4,
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      54 </span>            : };
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : enum class WrImageRendering : uint32_t {
+<span class="lineNum">      57 </span>            :   Auto = 0,
+<span class="lineNum">      58 </span>            :   CrispEdges = 1,
+<span class="lineNum">      59 </span>            :   Pixelated = 2,
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      62 </span>            : };
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : enum class WrMixBlendMode : uint32_t {
+<span class="lineNum">      65 </span>            :   Normal = 0,
+<span class="lineNum">      66 </span>            :   Multiply = 1,
+<span class="lineNum">      67 </span>            :   Screen = 2,
+<span class="lineNum">      68 </span>            :   Overlay = 3,
+<span class="lineNum">      69 </span>            :   Darken = 4,
+<span class="lineNum">      70 </span>            :   Lighten = 5,
+<span class="lineNum">      71 </span>            :   ColorDodge = 6,
+<span class="lineNum">      72 </span>            :   ColorBurn = 7,
+<span class="lineNum">      73 </span>            :   HardLight = 8,
+<span class="lineNum">      74 </span>            :   SoftLight = 9,
+<span class="lineNum">      75 </span>            :   Difference = 10,
+<span class="lineNum">      76 </span>            :   Exclusion = 11,
+<span class="lineNum">      77 </span>            :   Hue = 12,
+<span class="lineNum">      78 </span>            :   Saturation = 13,
+<span class="lineNum">      79 </span>            :   Color = 14,
+<span class="lineNum">      80 </span>            :   Luminosity = 15,
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      83 </span>            : };
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : enum class WrRepeatMode : uint32_t {
+<span class="lineNum">      86 </span>            :   Stretch = 0,
+<span class="lineNum">      87 </span>            :   Repeat = 1,
+<span class="lineNum">      88 </span>            :   Round = 2,
+<span class="lineNum">      89 </span>            :   Space = 3,
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   Sentinel /* this must be last for serialization purposes. */
+<span class="lineNum">      92 </span>            : };
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : struct WrAPI;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : struct WrImageKey {
+<span class="lineNum">      97 </span>            :   uint32_t mNamespace;
+<a name="98"><span class="lineNum">      98 </span>            :   uint32_t mHandle;</a>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   bool operator==(const WrImageKey&amp; aOther) const {</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     return mNamespace == aOther.mNamespace &amp;&amp;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :       mHandle == aOther.mHandle;</span>
+<span class="lineNum">     103 </span>            :   }
+<span class="lineNum">     104 </span>            : };
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : struct WrImageDescriptor {
+<span class="lineNum">     107 </span>            :   WrImageFormat format;
+<span class="lineNum">     108 </span>            :   uint32_t width;
+<span class="lineNum">     109 </span>            :   uint32_t height;
+<span class="lineNum">     110 </span>            :   uint32_t stride;
+<span class="lineNum">     111 </span>            :   bool is_opaque;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   bool operator==(const WrImageDescriptor&amp; aOther) const {
+<span class="lineNum">     114 </span>            :     return format == aOther.format &amp;&amp;
+<span class="lineNum">     115 </span>            :       width == aOther.width &amp;&amp;
+<span class="lineNum">     116 </span>            :       height == aOther.height &amp;&amp;
+<span class="lineNum">     117 </span>            :       stride == aOther.stride &amp;&amp;
+<span class="lineNum">     118 </span>            :       is_opaque == aOther.is_opaque;
+<span class="lineNum">     119 </span>            :   }
+<span class="lineNum">     120 </span>            : };
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : struct WrByteSlice {
+<span class="lineNum">     123 </span>            :   const uint8_t* buffer;
+<span class="lineNum">     124 </span>            :   size_t len;
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :   bool operator==(const WrByteSlice&amp; aOther) const {
+<span class="lineNum">     127 </span>            :     return buffer == aOther.buffer &amp;&amp;
+<span class="lineNum">     128 </span>            :       len == aOther.len;
+<span class="lineNum">     129 </span>            :   }
+<span class="lineNum">     130 </span>            : };
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : struct WrFontKey {
+<span class="lineNum">     133 </span>            :   uint32_t mNamespace;
+<span class="lineNum">     134 </span>            :   uint32_t mHandle;
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            :   bool operator==(const WrFontKey&amp; aOther) const {
+<span class="lineNum">     137 </span>            :     return mNamespace == aOther.mNamespace &amp;&amp;
+<span class="lineNum">     138 </span>            :       mHandle == aOther.mHandle;
+<span class="lineNum">     139 </span>            :   }
+<span class="lineNum">     140 </span>            : };
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : struct WrEpoch {
+<span class="lineNum">     143 </span>            :   uint32_t mHandle;
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :   bool operator==(const WrEpoch&amp; aOther) const {
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     return mHandle == aOther.mHandle;</span>
+<span class="lineNum">     147 </span>            :   }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :   bool operator&lt;(const WrEpoch&amp; aOther) const {
+<span class="lineNum">     150 </span>            :     return mHandle &lt; aOther.mHandle;
+<span class="lineNum">     151 </span>            :   }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   bool operator&lt;=(const WrEpoch&amp; aOther) const {
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     return mHandle &lt;= aOther.mHandle;</span>
+<span class="lineNum">     155 </span>            :   }
+<span class="lineNum">     156 </span>            : };
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : struct WrPipelineId {
+<span class="lineNum">     159 </span>            :   uint32_t mNamespace;
+<a name="160"><span class="lineNum">     160 </span>            :   uint32_t mHandle;</a>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   bool operator==(const WrPipelineId&amp; aOther) const {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     return mNamespace == aOther.mNamespace &amp;&amp;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       mHandle == aOther.mHandle;</span>
+<span class="lineNum">     165 </span>            :   }
+<span class="lineNum">     166 </span>            : };
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : struct WrState;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : struct WrBuiltDisplayListDescriptor {
+<span class="lineNum">     171 </span>            :   size_t display_list_items_size;
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :   bool operator==(const WrBuiltDisplayListDescriptor&amp; aOther) const {
+<span class="lineNum">     174 </span>            :     return display_list_items_size == aOther.display_list_items_size;
+<span class="lineNum">     175 </span>            :   }
+<span class="lineNum">     176 </span>            : };
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            : struct WrVecU8 {
+<span class="lineNum">     179 </span>            :   uint8_t* data;
+<span class="lineNum">     180 </span>            :   size_t length;
+<span class="lineNum">     181 </span>            :   size_t capacity;
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   bool operator==(const WrVecU8&amp; aOther) const {
+<span class="lineNum">     184 </span>            :     return data == aOther.data &amp;&amp;
+<span class="lineNum">     185 </span>            :       length == aOther.length &amp;&amp;
+<span class="lineNum">     186 </span>            :       capacity == aOther.capacity;
+<span class="lineNum">     187 </span>            :   }
+<span class="lineNum">     188 </span>            : };
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            : struct WrAuxiliaryListsDescriptor {
+<span class="lineNum">     191 </span>            :   size_t gradient_stops_size;
+<span class="lineNum">     192 </span>            :   size_t complex_clip_regions_size;
+<span class="lineNum">     193 </span>            :   size_t filters_size;
+<span class="lineNum">     194 </span>            :   size_t glyph_instances_size;
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   bool operator==(const WrAuxiliaryListsDescriptor&amp; aOther) const {
+<span class="lineNum">     197 </span>            :     return gradient_stops_size == aOther.gradient_stops_size &amp;&amp;
+<span class="lineNum">     198 </span>            :       complex_clip_regions_size == aOther.complex_clip_regions_size &amp;&amp;
+<span class="lineNum">     199 </span>            :       filters_size == aOther.filters_size &amp;&amp;
+<span class="lineNum">     200 </span>            :       glyph_instances_size == aOther.glyph_instances_size;
+<span class="lineNum">     201 </span>            :   }
+<span class="lineNum">     202 </span>            : };
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : struct WrIdNamespace {
+<span class="lineNum">     205 </span>            :   uint32_t mHandle;
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            :   bool operator==(const WrIdNamespace&amp; aOther) const {
+<span class="lineNum">     208 </span>            :     return mHandle == aOther.mHandle;
+<span class="lineNum">     209 </span>            :   }
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   bool operator&lt;(const WrIdNamespace&amp; aOther) const {
+<span class="lineNum">     212 </span>            :     return mHandle &lt; aOther.mHandle;
+<span class="lineNum">     213 </span>            :   }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :   bool operator&lt;=(const WrIdNamespace&amp; aOther) const {
+<span class="lineNum">     216 </span>            :     return mHandle &lt;= aOther.mHandle;
+<span class="lineNum">     217 </span>            :   }
+<span class="lineNum">     218 </span>            : };
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            : struct WrRect {
+<span class="lineNum">     221 </span>            :   float x;
+<span class="lineNum">     222 </span>            :   float y;
+<span class="lineNum">     223 </span>            :   float width;
+<span class="lineNum">     224 </span>            :   float height;
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   bool operator==(const WrRect&amp; aOther) const {
+<span class="lineNum">     227 </span>            :     return x == aOther.x &amp;&amp;
+<span class="lineNum">     228 </span>            :       y == aOther.y &amp;&amp;
+<span class="lineNum">     229 </span>            :       width == aOther.width &amp;&amp;
+<span class="lineNum">     230 </span>            :       height == aOther.height;
+<span class="lineNum">     231 </span>            :   }
+<span class="lineNum">     232 </span>            : };
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            : struct WrItemRange {
+<span class="lineNum">     235 </span>            :   size_t start;
+<span class="lineNum">     236 </span>            :   size_t length;
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   bool operator==(const WrItemRange&amp; aOther) const {
+<span class="lineNum">     239 </span>            :     return start == aOther.start &amp;&amp;
+<span class="lineNum">     240 </span>            :       length == aOther.length;
+<span class="lineNum">     241 </span>            :   }
+<span class="lineNum">     242 </span>            : };
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : struct WrImageMask {
+<span class="lineNum">     245 </span>            :   WrImageKey image;
+<span class="lineNum">     246 </span>            :   WrRect rect;
+<span class="lineNum">     247 </span>            :   bool repeat;
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   bool operator==(const WrImageMask&amp; aOther) const {
+<span class="lineNum">     250 </span>            :     return image == aOther.image &amp;&amp;
+<span class="lineNum">     251 </span>            :       rect == aOther.rect &amp;&amp;
+<span class="lineNum">     252 </span>            :       repeat == aOther.repeat;
+<span class="lineNum">     253 </span>            :   }
+<span class="lineNum">     254 </span>            : };
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            : struct WrClipRegion {
+<span class="lineNum">     257 </span>            :   WrRect main;
+<span class="lineNum">     258 </span>            :   WrItemRange complex;
+<span class="lineNum">     259 </span>            :   WrImageMask image_mask;
+<span class="lineNum">     260 </span>            :   bool has_image_mask;
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :   bool operator==(const WrClipRegion&amp; aOther) const {
+<span class="lineNum">     263 </span>            :     return main == aOther.main &amp;&amp;
+<span class="lineNum">     264 </span>            :       complex == aOther.complex &amp;&amp;
+<span class="lineNum">     265 </span>            :       image_mask == aOther.image_mask &amp;&amp;
+<span class="lineNum">     266 </span>            :       has_image_mask == aOther.has_image_mask;
+<span class="lineNum">     267 </span>            :   }
+<span class="lineNum">     268 </span>            : };
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            : struct WrSize {
+<span class="lineNum">     271 </span>            :   float width;
+<span class="lineNum">     272 </span>            :   float height;
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :   bool operator==(const WrSize&amp; aOther) const {
+<span class="lineNum">     275 </span>            :     return width == aOther.width &amp;&amp;
+<span class="lineNum">     276 </span>            :       height == aOther.height;
+<span class="lineNum">     277 </span>            :   }
+<span class="lineNum">     278 </span>            : };
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : struct WrBorderRadius {
+<span class="lineNum">     281 </span>            :   WrSize top_left;
+<span class="lineNum">     282 </span>            :   WrSize top_right;
+<span class="lineNum">     283 </span>            :   WrSize bottom_left;
+<span class="lineNum">     284 </span>            :   WrSize bottom_right;
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :   bool operator==(const WrBorderRadius&amp; aOther) const {
+<span class="lineNum">     287 </span>            :     return top_left == aOther.top_left &amp;&amp;
+<span class="lineNum">     288 </span>            :       top_right == aOther.top_right &amp;&amp;
+<span class="lineNum">     289 </span>            :       bottom_left == aOther.bottom_left &amp;&amp;
+<span class="lineNum">     290 </span>            :       bottom_right == aOther.bottom_right;
+<span class="lineNum">     291 </span>            :   }
+<span class="lineNum">     292 </span>            : };
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            : struct WrComplexClipRegion {
+<span class="lineNum">     295 </span>            :   WrRect rect;
+<span class="lineNum">     296 </span>            :   WrBorderRadius radii;
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :   bool operator==(const WrComplexClipRegion&amp; aOther) const {
+<span class="lineNum">     299 </span>            :     return rect == aOther.rect &amp;&amp;
+<span class="lineNum">     300 </span>            :       radii == aOther.radii;
+<span class="lineNum">     301 </span>            :   }
+<span class="lineNum">     302 </span>            : };
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            : struct WrBorderWidths {
+<span class="lineNum">     305 </span>            :   float left;
+<span class="lineNum">     306 </span>            :   float top;
+<span class="lineNum">     307 </span>            :   float right;
+<span class="lineNum">     308 </span>            :   float bottom;
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :   bool operator==(const WrBorderWidths&amp; aOther) const {
+<span class="lineNum">     311 </span>            :     return left == aOther.left &amp;&amp;
+<span class="lineNum">     312 </span>            :       top == aOther.top &amp;&amp;
+<span class="lineNum">     313 </span>            :       right == aOther.right &amp;&amp;
+<span class="lineNum">     314 </span>            :       bottom == aOther.bottom;
+<span class="lineNum">     315 </span>            :   }
+<span class="lineNum">     316 </span>            : };
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : struct WrColor {
+<span class="lineNum">     319 </span>            :   float r;
+<span class="lineNum">     320 </span>            :   float g;
+<span class="lineNum">     321 </span>            :   float b;
+<span class="lineNum">     322 </span>            :   float a;
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span>            :   bool operator==(const WrColor&amp; aOther) const {
+<span class="lineNum">     325 </span>            :     return r == aOther.r &amp;&amp;
+<span class="lineNum">     326 </span>            :       g == aOther.g &amp;&amp;
+<span class="lineNum">     327 </span>            :       b == aOther.b &amp;&amp;
+<span class="lineNum">     328 </span>            :       a == aOther.a;
+<span class="lineNum">     329 </span>            :   }
+<span class="lineNum">     330 </span>            : };
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : struct WrBorderSide {
+<span class="lineNum">     333 </span>            :   WrColor color;
+<span class="lineNum">     334 </span>            :   WrBorderStyle style;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :   bool operator==(const WrBorderSide&amp; aOther) const {
+<span class="lineNum">     337 </span>            :     return color == aOther.color &amp;&amp;
+<span class="lineNum">     338 </span>            :       style == aOther.style;
+<span class="lineNum">     339 </span>            :   }
+<span class="lineNum">     340 </span>            : };
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            : struct WrPoint {
+<span class="lineNum">     343 </span>            :   float x;
+<span class="lineNum">     344 </span>            :   float y;
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :   bool operator==(const WrPoint&amp; aOther) const {
+<span class="lineNum">     347 </span>            :     return x == aOther.x &amp;&amp;
+<span class="lineNum">     348 </span>            :       y == aOther.y;
+<span class="lineNum">     349 </span>            :   }
+<span class="lineNum">     350 </span>            : };
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            : struct WrGradientStop {
+<span class="lineNum">     353 </span>            :   float offset;
+<span class="lineNum">     354 </span>            :   WrColor color;
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :   bool operator==(const WrGradientStop&amp; aOther) const {
+<span class="lineNum">     357 </span>            :     return offset == aOther.offset &amp;&amp;
+<span class="lineNum">     358 </span>            :       color == aOther.color;
+<span class="lineNum">     359 </span>            :   }
+<span class="lineNum">     360 </span>            : };
+<span class="lineNum">     361 </span>            : 
+<span class="lineNum">     362 </span>            : struct WrSideOffsets2Df32 {
+<span class="lineNum">     363 </span>            :   float top;
+<span class="lineNum">     364 </span>            :   float right;
+<span class="lineNum">     365 </span>            :   float bottom;
+<span class="lineNum">     366 </span>            :   float left;
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   bool operator==(const WrSideOffsets2Df32&amp; aOther) const {
+<span class="lineNum">     369 </span>            :     return top == aOther.top &amp;&amp;
+<span class="lineNum">     370 </span>            :       right == aOther.right &amp;&amp;
+<span class="lineNum">     371 </span>            :       bottom == aOther.bottom &amp;&amp;
+<span class="lineNum">     372 </span>            :       left == aOther.left;
+<span class="lineNum">     373 </span>            :   }
+<span class="lineNum">     374 </span>            : };
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            : struct WrSideOffsets2Du32 {
+<span class="lineNum">     377 </span>            :   uint32_t top;
+<span class="lineNum">     378 </span>            :   uint32_t right;
+<span class="lineNum">     379 </span>            :   uint32_t bottom;
+<span class="lineNum">     380 </span>            :   uint32_t left;
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :   bool operator==(const WrSideOffsets2Du32&amp; aOther) const {
+<span class="lineNum">     383 </span>            :     return top == aOther.top &amp;&amp;
+<span class="lineNum">     384 </span>            :       right == aOther.right &amp;&amp;
+<span class="lineNum">     385 </span>            :       bottom == aOther.bottom &amp;&amp;
+<span class="lineNum">     386 </span>            :       left == aOther.left;
+<span class="lineNum">     387 </span>            :   }
+<span class="lineNum">     388 </span>            : };
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            : struct WrNinePatchDescriptor {
+<span class="lineNum">     391 </span>            :   uint32_t width;
+<span class="lineNum">     392 </span>            :   uint32_t height;
+<span class="lineNum">     393 </span>            :   WrSideOffsets2Du32 slice;
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            :   bool operator==(const WrNinePatchDescriptor&amp; aOther) const {
+<span class="lineNum">     396 </span>            :     return width == aOther.width &amp;&amp;
+<span class="lineNum">     397 </span>            :       height == aOther.height &amp;&amp;
+<span class="lineNum">     398 </span>            :       slice == aOther.slice;
+<span class="lineNum">     399 </span>            :   }
+<span class="lineNum">     400 </span>            : };
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            : struct WrMatrix {
+<span class="lineNum">     403 </span>            :   float values[16];
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            :   bool operator==(const WrMatrix&amp; aOther) const {
+<span class="lineNum">     406 </span>            :     return values == aOther.values;
+<span class="lineNum">     407 </span>            :   }
+<span class="lineNum">     408 </span>            : };
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            : struct WrGlyphInstance {
+<span class="lineNum">     411 </span>            :   uint32_t index;
+<span class="lineNum">     412 </span>            :   WrPoint point;
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :   bool operator==(const WrGlyphInstance&amp; aOther) const {
+<span class="lineNum">     415 </span>            :     return index == aOther.index &amp;&amp;
+<span class="lineNum">     416 </span>            :       point == aOther.point;
+<span class="lineNum">     417 </span>            :   }
+<span class="lineNum">     418 </span>            : };
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span>            : struct WrRenderedEpochs;
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            : struct WrRenderer;
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            : struct WrExternalImage {
+<span class="lineNum">     425 </span>            :   WrExternalImageType image_type;
+<span class="lineNum">     426 </span>            :   uint32_t handle;
+<span class="lineNum">     427 </span>            :   float u0;
+<span class="lineNum">     428 </span>            :   float v0;
+<span class="lineNum">     429 </span>            :   float u1;
+<span class="lineNum">     430 </span>            :   float v1;
+<span class="lineNum">     431 </span>            :   const uint8_t* buff;
+<span class="lineNum">     432 </span>            :   size_t size;
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            :   bool operator==(const WrExternalImage&amp; aOther) const {
+<span class="lineNum">     435 </span>            :     return image_type == aOther.image_type &amp;&amp;
+<span class="lineNum">     436 </span>            :       handle == aOther.handle &amp;&amp;
+<span class="lineNum">     437 </span>            :       u0 == aOther.u0 &amp;&amp;
+<span class="lineNum">     438 </span>            :       v0 == aOther.v0 &amp;&amp;
+<span class="lineNum">     439 </span>            :       u1 == aOther.u1 &amp;&amp;
+<span class="lineNum">     440 </span>            :       v1 == aOther.v1 &amp;&amp;
+<span class="lineNum">     441 </span>            :       buff == aOther.buff &amp;&amp;
+<span class="lineNum">     442 </span>            :       size == aOther.size;
+<span class="lineNum">     443 </span>            :   }
+<span class="lineNum">     444 </span>            : };
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : struct WrExternalImageId {
+<span class="lineNum">     447 </span>            :   uint64_t mHandle;
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :   bool operator==(const WrExternalImageId&amp; aOther) const {
+<span class="lineNum">     450 </span>            :     return mHandle == aOther.mHandle;
+<span class="lineNum">     451 </span>            :   }
+<span class="lineNum">     452 </span>            : };
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            : typedef WrExternalImage (*LockExternalImageCallback)(void*, WrExternalImageId);
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            : typedef void (*UnlockExternalImageCallback)(void*, WrExternalImageId);
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            : typedef void (*ReleaseExternalImageCallback)(void*, WrExternalImageId);
+<span class="lineNum">     459 </span>            : 
+<span class="lineNum">     460 </span>            : struct WrExternalImageHandler {
+<span class="lineNum">     461 </span>            :   void* external_image_obj;
+<span class="lineNum">     462 </span>            :   LockExternalImageCallback lock_func;
+<span class="lineNum">     463 </span>            :   UnlockExternalImageCallback unlock_func;
+<span class="lineNum">     464 </span>            :   ReleaseExternalImageCallback release_func;
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :   bool operator==(const WrExternalImageHandler&amp; aOther) const {
+<span class="lineNum">     467 </span>            :     return external_image_obj == aOther.external_image_obj &amp;&amp;
+<span class="lineNum">     468 </span>            :       lock_func == aOther.lock_func &amp;&amp;
+<span class="lineNum">     469 </span>            :       unlock_func == aOther.unlock_func &amp;&amp;
+<span class="lineNum">     470 </span>            :       release_func == aOther.release_func;
+<span class="lineNum">     471 </span>            :   }
+<span class="lineNum">     472 </span>            : };
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : struct WrWindowId {
+<span class="lineNum">     475 </span>            :   uint64_t mHandle;
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :   bool operator==(const WrWindowId&amp; aOther) const {
+<span class="lineNum">     478 </span>            :     return mHandle == aOther.mHandle;
+<span class="lineNum">     479 </span>            :   }
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            :   bool operator&lt;(const WrWindowId&amp; aOther) const {
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     return mHandle &lt; aOther.mHandle;</span>
+<span class="lineNum">     483 </span>            :   }
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            :   bool operator&lt;=(const WrWindowId&amp; aOther) const {
+<span class="lineNum">     486 </span>            :     return mHandle &lt;= aOther.mHandle;
+<span class="lineNum">     487 </span>            :   }
+<span class="lineNum">     488 </span>            : };
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            : /* DO NOT MODIFY THIS MANUALLY! This file was generated using cbindgen.
+<span class="lineNum">     491 </span>            :  * To generate this file, clone `https://github.com/rlhunt/cbindgen` or run `cargo install cbindgen`,
+<span class="lineNum">     492 </span>            :  * then run `cbindgen -c wr gfx/webrender_bindings/ gfx/webrender_bindings/webrender_ffi_generated.h` */
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            : WR_INLINE void
+<span class="lineNum">     495 </span>            : wr_api_add_blob_image(WrAPI* api,
+<span class="lineNum">     496 </span>            :     WrImageKey image_key,
+<span class="lineNum">     497 </span>            :     const WrImageDescriptor* descriptor,
+<span class="lineNum">     498 </span>            :     WrByteSlice bytes)
+<span class="lineNum">     499 </span>            : WR_FUNC;
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span>            : WR_INLINE void
+<span class="lineNum">     502 </span>            : wr_api_add_external_image_buffer(WrAPI* api,
+<span class="lineNum">     503 </span>            :     WrImageKey image_key,
+<span class="lineNum">     504 </span>            :     const WrImageDescriptor* descriptor,
+<span class="lineNum">     505 </span>            :     uint64_t external_image_id)
+<span class="lineNum">     506 </span>            : WR_FUNC;
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            : WR_INLINE void
+<span class="lineNum">     509 </span>            : wr_api_add_external_image_handle(WrAPI* api,
+<span class="lineNum">     510 </span>            :     WrImageKey image_key,
+<span class="lineNum">     511 </span>            :     const WrImageDescriptor* descriptor,
+<span class="lineNum">     512 </span>            :     uint64_t external_image_id)
+<span class="lineNum">     513 </span>            : WR_FUNC;
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            : WR_INLINE void
+<span class="lineNum">     516 </span>            : wr_api_add_image(WrAPI* api,
+<span class="lineNum">     517 </span>            :     WrImageKey image_key,
+<span class="lineNum">     518 </span>            :     const WrImageDescriptor* descriptor,
+<span class="lineNum">     519 </span>            :     WrByteSlice bytes)
+<span class="lineNum">     520 </span>            : WR_FUNC;
+<span class="lineNum">     521 </span>            : 
+<span class="lineNum">     522 </span>            : WR_INLINE void
+<span class="lineNum">     523 </span>            : wr_api_add_raw_font(WrAPI* api,
+<span class="lineNum">     524 </span>            :     WrFontKey key,
+<span class="lineNum">     525 </span>            :     uint8_t* font_buffer,
+<span class="lineNum">     526 </span>            :     size_t buffer_size)
+<span class="lineNum">     527 </span>            : WR_FUNC;
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            : WR_INLINE void
+<span class="lineNum">     530 </span>            : wr_api_clear_root_display_list(WrAPI* api,
+<span class="lineNum">     531 </span>            :     WrEpoch epoch,
+<span class="lineNum">     532 </span>            :     WrPipelineId pipeline_id)
+<span class="lineNum">     533 </span>            : WR_FUNC;
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            : WR_INLINE void
+<span class="lineNum">     536 </span>            : wr_api_delete(WrAPI* api)
+<span class="lineNum">     537 </span>            : WR_FUNC;
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            : WR_INLINE void
+<span class="lineNum">     540 </span>            : wr_api_delete_font(WrAPI* api,
+<span class="lineNum">     541 </span>            :     WrFontKey key)
+<span class="lineNum">     542 </span>            : WR_FUNC;
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span>            : WR_INLINE void
+<span class="lineNum">     545 </span>            : wr_api_delete_image(WrAPI* api,
+<span class="lineNum">     546 </span>            :     WrImageKey key)
+<span class="lineNum">     547 </span>            : WR_FUNC;
+<span class="lineNum">     548 </span>            : 
+<span class="lineNum">     549 </span>            : WR_INLINE void
+<span class="lineNum">     550 </span>            : wr_api_finalize_builder(WrState* state,
+<span class="lineNum">     551 </span>            :     WrBuiltDisplayListDescriptor* dl_descriptor,
+<span class="lineNum">     552 </span>            :     WrVecU8* dl_data,
+<span class="lineNum">     553 </span>            :     WrAuxiliaryListsDescriptor* aux_descriptor,
+<span class="lineNum">     554 </span>            :     WrVecU8* aux_data)
+<span class="lineNum">     555 </span>            : WR_FUNC;
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span>            : WR_INLINE void
+<span class="lineNum">     558 </span>            : wr_api_generate_frame(WrAPI* api)
+<span class="lineNum">     559 </span>            : WR_FUNC;
+<span class="lineNum">     560 </span>            : 
+<span class="lineNum">     561 </span>            : WR_INLINE WrIdNamespace
+<span class="lineNum">     562 </span>            : wr_api_get_namespace(WrAPI* api)
+<span class="lineNum">     563 </span>            : WR_FUNC;
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            : WR_INLINE void
+<span class="lineNum">     566 </span>            : wr_api_send_external_event(WrAPI* api,
+<span class="lineNum">     567 </span>            :     size_t evt)
+<span class="lineNum">     568 </span>            : WR_DESTRUCTOR_SAFE_FUNC;
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            : WR_INLINE void
+<span class="lineNum">     571 </span>            : wr_api_set_root_display_list(WrAPI* api,
+<span class="lineNum">     572 </span>            :     WrEpoch epoch,
+<span class="lineNum">     573 </span>            :     float viewport_width,
+<span class="lineNum">     574 </span>            :     float viewport_height,
+<span class="lineNum">     575 </span>            :     WrPipelineId pipeline_id,
+<span class="lineNum">     576 </span>            :     WrBuiltDisplayListDescriptor dl_descriptor,
+<span class="lineNum">     577 </span>            :     uint8_t* dl_data,
+<span class="lineNum">     578 </span>            :     size_t dl_size,
+<span class="lineNum">     579 </span>            :     WrAuxiliaryListsDescriptor aux_descriptor,
+<span class="lineNum">     580 </span>            :     uint8_t* aux_data,
+<span class="lineNum">     581 </span>            :     size_t aux_size)
+<span class="lineNum">     582 </span>            : WR_FUNC;
+<span class="lineNum">     583 </span>            : 
+<span class="lineNum">     584 </span>            : WR_INLINE void
+<span class="lineNum">     585 </span>            : wr_api_set_root_pipeline(WrAPI* api,
+<span class="lineNum">     586 </span>            :     WrPipelineId pipeline_id)
+<span class="lineNum">     587 </span>            : WR_FUNC;
+<span class="lineNum">     588 </span>            : 
+<span class="lineNum">     589 </span>            : WR_INLINE void
+<span class="lineNum">     590 </span>            : wr_api_set_window_parameters(WrAPI* api,
+<span class="lineNum">     591 </span>            :     int32_t width,
+<span class="lineNum">     592 </span>            :     int32_t height)
+<span class="lineNum">     593 </span>            : WR_FUNC;
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : WR_INLINE void
+<span class="lineNum">     596 </span>            : wr_api_update_image(WrAPI* api,
+<span class="lineNum">     597 </span>            :     WrImageKey key,
+<span class="lineNum">     598 </span>            :     const WrImageDescriptor* descriptor,
+<span class="lineNum">     599 </span>            :     WrByteSlice bytes)
+<span class="lineNum">     600 </span>            : WR_FUNC;
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            : WR_INLINE void
+<span class="lineNum">     603 </span>            : wr_dp_begin(WrState* state,
+<span class="lineNum">     604 </span>            :     uint32_t width,
+<span class="lineNum">     605 </span>            :     uint32_t height)
+<span class="lineNum">     606 </span>            : WR_FUNC;
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            : WR_INLINE void
+<span class="lineNum">     609 </span>            : wr_dp_end(WrState* state)
+<span class="lineNum">     610 </span>            : WR_FUNC;
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span>            : WR_INLINE WrClipRegion
+<span class="lineNum">     613 </span>            : wr_dp_new_clip_region(WrState* state,
+<span class="lineNum">     614 </span>            :     WrRect main,
+<span class="lineNum">     615 </span>            :     const WrComplexClipRegion* complex,
+<span class="lineNum">     616 </span>            :     size_t complex_count,
+<span class="lineNum">     617 </span>            :     const WrImageMask* image_mask)
+<span class="lineNum">     618 </span>            : WR_FUNC;
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            : WR_INLINE void
+<span class="lineNum">     621 </span>            : wr_dp_pop_scroll_layer(WrState* state)
+<span class="lineNum">     622 </span>            : WR_FUNC;
+<span class="lineNum">     623 </span>            : 
+<span class="lineNum">     624 </span>            : WR_INLINE void
+<span class="lineNum">     625 </span>            : wr_dp_pop_stacking_context(WrState* state)
+<span class="lineNum">     626 </span>            : WR_FUNC;
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span>            : WR_INLINE void
+<span class="lineNum">     629 </span>            : wr_dp_push_border(WrState* state,
+<span class="lineNum">     630 </span>            :     WrRect rect,
+<span class="lineNum">     631 </span>            :     WrClipRegion clip,
+<span class="lineNum">     632 </span>            :     WrBorderWidths widths,
+<span class="lineNum">     633 </span>            :     WrBorderSide top,
+<span class="lineNum">     634 </span>            :     WrBorderSide right,
+<span class="lineNum">     635 </span>            :     WrBorderSide bottom,
+<span class="lineNum">     636 </span>            :     WrBorderSide left,
+<span class="lineNum">     637 </span>            :     WrBorderRadius radius)
+<span class="lineNum">     638 </span>            : WR_FUNC;
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            : WR_INLINE void
+<span class="lineNum">     641 </span>            : wr_dp_push_border_gradient(WrState* state,
+<span class="lineNum">     642 </span>            :     WrRect rect,
+<span class="lineNum">     643 </span>            :     WrClipRegion clip,
+<span class="lineNum">     644 </span>            :     WrBorderWidths widths,
+<span class="lineNum">     645 </span>            :     WrPoint start_point,
+<span class="lineNum">     646 </span>            :     WrPoint end_point,
+<span class="lineNum">     647 </span>            :     const WrGradientStop* stops,
+<span class="lineNum">     648 </span>            :     size_t stops_count,
+<span class="lineNum">     649 </span>            :     WrGradientExtendMode extend_mode,
+<span class="lineNum">     650 </span>            :     WrSideOffsets2Df32 outset)
+<span class="lineNum">     651 </span>            : WR_FUNC;
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span>            : WR_INLINE void
+<span class="lineNum">     654 </span>            : wr_dp_push_border_image(WrState* state,
+<span class="lineNum">     655 </span>            :     WrRect rect,
+<span class="lineNum">     656 </span>            :     WrClipRegion clip,
+<span class="lineNum">     657 </span>            :     WrBorderWidths widths,
+<span class="lineNum">     658 </span>            :     WrImageKey image,
+<span class="lineNum">     659 </span>            :     WrNinePatchDescriptor patch,
+<span class="lineNum">     660 </span>            :     WrSideOffsets2Df32 outset,
+<span class="lineNum">     661 </span>            :     WrRepeatMode repeat_horizontal,
+<span class="lineNum">     662 </span>            :     WrRepeatMode repeat_vertical)
+<span class="lineNum">     663 </span>            : WR_FUNC;
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            : WR_INLINE void
+<span class="lineNum">     666 </span>            : wr_dp_push_border_radial_gradient(WrState* state,
+<span class="lineNum">     667 </span>            :     WrRect rect,
+<span class="lineNum">     668 </span>            :     WrClipRegion clip,
+<span class="lineNum">     669 </span>            :     WrBorderWidths widths,
+<span class="lineNum">     670 </span>            :     WrPoint center,
+<span class="lineNum">     671 </span>            :     WrSize radius,
+<span class="lineNum">     672 </span>            :     const WrGradientStop* stops,
+<span class="lineNum">     673 </span>            :     size_t stops_count,
+<span class="lineNum">     674 </span>            :     WrGradientExtendMode extend_mode,
+<span class="lineNum">     675 </span>            :     WrSideOffsets2Df32 outset)
+<span class="lineNum">     676 </span>            : WR_FUNC;
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : WR_INLINE void
+<span class="lineNum">     679 </span>            : wr_dp_push_box_shadow(WrState* state,
+<span class="lineNum">     680 </span>            :     WrRect rect,
+<span class="lineNum">     681 </span>            :     WrClipRegion clip,
+<span class="lineNum">     682 </span>            :     WrRect box_bounds,
+<span class="lineNum">     683 </span>            :     WrPoint offset,
+<span class="lineNum">     684 </span>            :     WrColor color,
+<span class="lineNum">     685 </span>            :     float blur_radius,
+<span class="lineNum">     686 </span>            :     float spread_radius,
+<span class="lineNum">     687 </span>            :     float border_radius,
+<span class="lineNum">     688 </span>            :     WrBoxShadowClipMode clip_mode)
+<span class="lineNum">     689 </span>            : WR_FUNC;
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span>            : WR_INLINE void
+<span class="lineNum">     692 </span>            : wr_dp_push_built_display_list(WrState* state,
+<span class="lineNum">     693 </span>            :     WrBuiltDisplayListDescriptor dl_descriptor,
+<span class="lineNum">     694 </span>            :     WrVecU8 dl_data,
+<span class="lineNum">     695 </span>            :     WrAuxiliaryListsDescriptor aux_descriptor,
+<span class="lineNum">     696 </span>            :     WrVecU8 aux_data)
+<span class="lineNum">     697 </span>            : WR_FUNC;
+<span class="lineNum">     698 </span>            : 
+<span class="lineNum">     699 </span>            : WR_INLINE void
+<span class="lineNum">     700 </span>            : wr_dp_push_iframe(WrState* state,
+<span class="lineNum">     701 </span>            :     WrRect rect,
+<span class="lineNum">     702 </span>            :     WrClipRegion clip,
+<span class="lineNum">     703 </span>            :     WrPipelineId pipeline_id)
+<span class="lineNum">     704 </span>            : WR_FUNC;
+<span class="lineNum">     705 </span>            : 
+<span class="lineNum">     706 </span>            : WR_INLINE void
+<span class="lineNum">     707 </span>            : wr_dp_push_image(WrState* state,
+<span class="lineNum">     708 </span>            :     WrRect bounds,
+<span class="lineNum">     709 </span>            :     WrClipRegion clip,
+<span class="lineNum">     710 </span>            :     WrSize stretch_size,
+<span class="lineNum">     711 </span>            :     WrSize tile_spacing,
+<span class="lineNum">     712 </span>            :     WrImageRendering image_rendering,
+<span class="lineNum">     713 </span>            :     WrImageKey key)
+<span class="lineNum">     714 </span>            : WR_FUNC;
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            : WR_INLINE void
+<span class="lineNum">     717 </span>            : wr_dp_push_linear_gradient(WrState* state,
+<span class="lineNum">     718 </span>            :     WrRect rect,
+<span class="lineNum">     719 </span>            :     WrClipRegion clip,
+<span class="lineNum">     720 </span>            :     WrPoint start_point,
+<span class="lineNum">     721 </span>            :     WrPoint end_point,
+<span class="lineNum">     722 </span>            :     const WrGradientStop* stops,
+<span class="lineNum">     723 </span>            :     size_t stops_count,
+<span class="lineNum">     724 </span>            :     WrGradientExtendMode extend_mode,
+<span class="lineNum">     725 </span>            :     WrSize tile_size,
+<span class="lineNum">     726 </span>            :     WrSize tile_spacing)
+<span class="lineNum">     727 </span>            : WR_FUNC;
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            : WR_INLINE void
+<span class="lineNum">     730 </span>            : wr_dp_push_radial_gradient(WrState* state,
+<span class="lineNum">     731 </span>            :     WrRect rect,
+<span class="lineNum">     732 </span>            :     WrClipRegion clip,
+<span class="lineNum">     733 </span>            :     WrPoint center,
+<span class="lineNum">     734 </span>            :     WrSize radius,
+<span class="lineNum">     735 </span>            :     const WrGradientStop* stops,
+<span class="lineNum">     736 </span>            :     size_t stops_count,
+<span class="lineNum">     737 </span>            :     WrGradientExtendMode extend_mode,
+<span class="lineNum">     738 </span>            :     WrSize tile_size,
+<span class="lineNum">     739 </span>            :     WrSize tile_spacing)
+<span class="lineNum">     740 </span>            : WR_FUNC;
+<span class="lineNum">     741 </span>            : 
+<span class="lineNum">     742 </span>            : WR_INLINE void
+<span class="lineNum">     743 </span>            : wr_dp_push_rect(WrState* state,
+<span class="lineNum">     744 </span>            :     WrRect rect,
+<span class="lineNum">     745 </span>            :     WrClipRegion clip,
+<span class="lineNum">     746 </span>            :     WrColor color)
+<span class="lineNum">     747 </span>            : WR_FUNC;
+<span class="lineNum">     748 </span>            : 
+<span class="lineNum">     749 </span>            : WR_INLINE void
+<span class="lineNum">     750 </span>            : wr_dp_push_scroll_layer(WrState* state,
+<span class="lineNum">     751 </span>            :     WrRect bounds,
+<span class="lineNum">     752 </span>            :     WrRect overflow,
+<span class="lineNum">     753 </span>            :     const WrImageMask* mask)
+<span class="lineNum">     754 </span>            : WR_FUNC;
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span>            : WR_INLINE void
+<span class="lineNum">     757 </span>            : wr_dp_push_stacking_context(WrState* state,
+<span class="lineNum">     758 </span>            :     WrRect bounds,
+<span class="lineNum">     759 </span>            :     float opacity,
+<span class="lineNum">     760 </span>            :     WrMatrix transform,
+<span class="lineNum">     761 </span>            :     WrMixBlendMode mix_blend_mode)
+<span class="lineNum">     762 </span>            : WR_FUNC;
+<span class="lineNum">     763 </span>            : 
+<span class="lineNum">     764 </span>            : WR_INLINE void
+<span class="lineNum">     765 </span>            : wr_dp_push_text(WrState* state,
+<span class="lineNum">     766 </span>            :     WrRect bounds,
+<span class="lineNum">     767 </span>            :     WrClipRegion clip,
+<span class="lineNum">     768 </span>            :     WrColor color,
+<span class="lineNum">     769 </span>            :     WrFontKey font_key,
+<span class="lineNum">     770 </span>            :     const WrGlyphInstance* glyphs,
+<span class="lineNum">     771 </span>            :     uint32_t glyph_count,
+<span class="lineNum">     772 </span>            :     float glyph_size)
+<span class="lineNum">     773 </span>            : WR_FUNC;
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span>            : WR_INLINE void
+<span class="lineNum">     776 </span>            : wr_rendered_epochs_delete(WrRenderedEpochs* pipeline_epochs)
+<span class="lineNum">     777 </span>            : WR_DESTRUCTOR_SAFE_FUNC;
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span>            : WR_INLINE bool
+<span class="lineNum">     780 </span>            : wr_rendered_epochs_next(WrRenderedEpochs* pipeline_epochs,
+<span class="lineNum">     781 </span>            :     WrPipelineId* out_pipeline,
+<span class="lineNum">     782 </span>            :     WrEpoch* out_epoch)
+<span class="lineNum">     783 </span>            : WR_FUNC;
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            : WR_INLINE bool
+<span class="lineNum">     786 </span>            : wr_renderer_current_epoch(WrRenderer* renderer,
+<span class="lineNum">     787 </span>            :     WrPipelineId pipeline_id,
+<span class="lineNum">     788 </span>            :     WrEpoch* out_epoch)
+<span class="lineNum">     789 </span>            : WR_FUNC;
+<span class="lineNum">     790 </span>            : 
+<span class="lineNum">     791 </span>            : WR_INLINE void
+<span class="lineNum">     792 </span>            : wr_renderer_delete(WrRenderer* renderer)
+<span class="lineNum">     793 </span>            : WR_DESTRUCTOR_SAFE_FUNC;
+<span class="lineNum">     794 </span>            : 
+<span class="lineNum">     795 </span>            : WR_INLINE WrRenderedEpochs*
+<span class="lineNum">     796 </span>            : wr_renderer_flush_rendered_epochs(WrRenderer* renderer)
+<span class="lineNum">     797 </span>            : WR_FUNC;
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span>            : WR_INLINE void
+<span class="lineNum">     800 </span>            : wr_renderer_readback(WrRenderer* renderer,
+<span class="lineNum">     801 </span>            :     uint32_t width,
+<span class="lineNum">     802 </span>            :     uint32_t height,
+<span class="lineNum">     803 </span>            :     uint8_t* dst_buffer,
+<span class="lineNum">     804 </span>            :     size_t buffer_size)
+<span class="lineNum">     805 </span>            : WR_FUNC;
+<span class="lineNum">     806 </span>            : 
+<span class="lineNum">     807 </span>            : WR_INLINE void
+<span class="lineNum">     808 </span>            : wr_renderer_render(WrRenderer* renderer,
+<span class="lineNum">     809 </span>            :     uint32_t width,
+<span class="lineNum">     810 </span>            :     uint32_t height)
+<span class="lineNum">     811 </span>            : WR_FUNC;
+<span class="lineNum">     812 </span>            : 
+<span class="lineNum">     813 </span>            : WR_INLINE void
+<span class="lineNum">     814 </span>            : wr_renderer_set_external_image_handler(WrRenderer* renderer,
+<span class="lineNum">     815 </span>            :     WrExternalImageHandler* external_image_handler)
+<span class="lineNum">     816 </span>            : WR_FUNC;
+<span class="lineNum">     817 </span>            : 
+<span class="lineNum">     818 </span>            : WR_INLINE void
+<span class="lineNum">     819 </span>            : wr_renderer_set_profiler_enabled(WrRenderer* renderer,
+<span class="lineNum">     820 </span>            :     bool enabled)
+<span class="lineNum">     821 </span>            : WR_FUNC;
+<span class="lineNum">     822 </span>            : 
+<span class="lineNum">     823 </span>            : WR_INLINE void
+<span class="lineNum">     824 </span>            : wr_renderer_update(WrRenderer* renderer)
+<span class="lineNum">     825 </span>            : WR_FUNC;
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            : WR_INLINE void
+<span class="lineNum">     828 </span>            : wr_state_delete(WrState* state)
+<span class="lineNum">     829 </span>            : WR_FUNC;
+<span class="lineNum">     830 </span>            : 
+<span class="lineNum">     831 </span>            : WR_INLINE WrState*
+<span class="lineNum">     832 </span>            : wr_state_new(WrPipelineId pipeline_id)
+<span class="lineNum">     833 </span>            : WR_FUNC;
+<span class="lineNum">     834 </span>            : 
+<span class="lineNum">     835 </span>            : WR_INLINE void
+<span class="lineNum">     836 </span>            : wr_vec_u8_free(WrVecU8 v)
+<span class="lineNum">     837 </span>            : WR_FUNC;
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span>            : WR_INLINE bool
+<span class="lineNum">     840 </span>            : wr_window_new(WrWindowId window_id,
+<span class="lineNum">     841 </span>            :     uint32_t window_width,
+<span class="lineNum">     842 </span>            :     uint32_t window_height,
+<span class="lineNum">     843 </span>            :     void* gl_context,
+<span class="lineNum">     844 </span>            :     bool enable_profiler,
+<span class="lineNum">     845 </span>            :     WrAPI** out_api,
+<span class="lineNum">     846 </span>            :     WrRenderer** out_renderer)
+<span class="lineNum">     847 </span>            : WR_FUNC;
+<span class="lineNum">     848 </span>            : 
+<span class="lineNum">     849 </span>            : /* DO NOT MODIFY THIS MANUALLY! This file was generated using cbindgen.
+<span class="lineNum">     850 </span>            :  * To generate this file, clone `https://github.com/rlhunt/cbindgen` or run `cargo install cbindgen`,
+<span class="lineNum">     851 </span>            :  * then run `cbindgen -c wr gfx/webrender_bindings/ gfx/webrender_bindings/webrender_ffi_generated.h` */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

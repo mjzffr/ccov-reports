@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/css/StyleRule.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/css</a> - StyleRule.h<span style="font-size: 80%;"> (source / <a href="StyleRule.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryLo">16.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">12.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /*
+<span class="lineNum">       7 </span>            :  * representation of CSS style rules (selectors+declaration) and CSS
+<span class="lineNum">       8 </span>            :  * selectors
+<span class="lineNum">       9 </span>            :  */
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #ifndef mozilla_css_StyleRule_h__
+<span class="lineNum">      12 </span>            : #define mozilla_css_StyleRule_h__
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/MemoryReporting.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/BindingStyleRule.h&quot;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;nsString.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsCOMPtr.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsCSSPseudoElements.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsIStyleRule.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsICSSStyleRuleDOMWrapper.h&quot;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : class nsIAtom;
+<span class="lineNum">      26 </span>            : struct nsCSSSelectorList;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : namespace mozilla {
+<span class="lineNum">      29 </span>            : enum class CSSPseudoClassType : uint8_t;
+<span class="lineNum">      30 </span>            : class CSSStyleSheet;
+<span class="lineNum">      31 </span>            : } // namespace mozilla
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : struct nsAtomList {
+<span class="lineNum">      34 </span>            : public:
+<span class="lineNum">      35 </span>            :   explicit nsAtomList(nsIAtom* aAtom);
+<span class="lineNum">      36 </span>            :   explicit nsAtomList(const nsString&amp; aAtomValue);
+<span class="lineNum">      37 </span>            :   ~nsAtomList(void);
+<a name="38"><span class="lineNum">      38 </span>            : </a>
+<span class="lineNum">      39 </span>            :   /** Do a deep clone.  Should be used only on the first in the linked list. */
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :   nsAtomList* Clone() const { return Clone(true); }</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   nsCOMPtr&lt;nsIAtom&gt; mAtom;
+<span class="lineNum">      45 </span>            :   nsAtomList*       mNext;
+<span class="lineNum">      46 </span>            : private:
+<span class="lineNum">      47 </span>            :   nsAtomList* Clone(bool aDeep) const;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   nsAtomList(const nsAtomList&amp; aCopy) = delete;
+<span class="lineNum">      50 </span>            :   nsAtomList&amp; operator=(const nsAtomList&amp; aCopy) = delete;
+<span class="lineNum">      51 </span>            : };
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : struct nsPseudoClassList {
+<span class="lineNum">      54 </span>            : public:
+<span class="lineNum">      55 </span>            :   typedef mozilla::CSSPseudoClassType CSSPseudoClassType;
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   explicit nsPseudoClassList(CSSPseudoClassType aType);
+<span class="lineNum">      58 </span>            :   nsPseudoClassList(CSSPseudoClassType aType, const char16_t *aString);
+<span class="lineNum">      59 </span>            :   nsPseudoClassList(CSSPseudoClassType aType, const int32_t *aIntPair);
+<span class="lineNum">      60 </span>            :   nsPseudoClassList(CSSPseudoClassType aType,
+<span class="lineNum">      61 </span>            :                     nsCSSSelectorList *aSelectorList /* takes ownership */);
+<span class="lineNum">      62 </span>            :   ~nsPseudoClassList(void);
+<a name="63"><span class="lineNum">      63 </span>            : </a>
+<span class="lineNum">      64 </span>            :   /** Do a deep clone.  Should be used only on the first in the linked list. */
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   nsPseudoClassList* Clone() const { return Clone(true); }</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   union {
+<span class="lineNum">      70 </span>            :     // For a given value of mType, we have either:
+<span class="lineNum">      71 </span>            :     //   a. no value, which means mMemory is always null
+<span class="lineNum">      72 </span>            :     //      (if none of the conditions for (b), (c), or (d) is true)
+<span class="lineNum">      73 </span>            :     //   b. a string value, which means mString/mMemory is non-null
+<span class="lineNum">      74 </span>            :     //      (if nsCSSPseudoClasses::HasStringArg(mType))
+<span class="lineNum">      75 </span>            :     //   c. an integer pair value, which means mNumbers/mMemory is non-null
+<span class="lineNum">      76 </span>            :     //      (if nsCSSPseudoClasses::HasNthPairArg(mType))
+<span class="lineNum">      77 </span>            :     //   d. a selector list, which means mSelectors is non-null
+<span class="lineNum">      78 </span>            :     //      (if nsCSSPseudoClasses::HasSelectorListArg(mType))
+<span class="lineNum">      79 </span>            :     void*           mMemory; // mString and mNumbers use moz_xmalloc/free
+<span class="lineNum">      80 </span>            :     char16_t*       mString;
+<span class="lineNum">      81 </span>            :     int32_t*        mNumbers;
+<span class="lineNum">      82 </span>            :     nsCSSSelectorList* mSelectors;
+<span class="lineNum">      83 </span>            :   } u;
+<span class="lineNum">      84 </span>            :   CSSPseudoClassType mType;
+<span class="lineNum">      85 </span>            :   nsPseudoClassList* mNext;
+<span class="lineNum">      86 </span>            : private:
+<span class="lineNum">      87 </span>            :   nsPseudoClassList* Clone(bool aDeep) const;
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   nsPseudoClassList(const nsPseudoClassList&amp; aCopy) = delete;
+<span class="lineNum">      90 </span>            :   nsPseudoClassList&amp; operator=(const nsPseudoClassList&amp; aCopy) = delete;
+<span class="lineNum">      91 </span>            : };
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : #define NS_ATTR_FUNC_SET        0     // [attr]
+<span class="lineNum">      94 </span>            : #define NS_ATTR_FUNC_EQUALS     1     // [attr=value]
+<span class="lineNum">      95 </span>            : #define NS_ATTR_FUNC_INCLUDES   2     // [attr~=value] (space separated)
+<span class="lineNum">      96 </span>            : #define NS_ATTR_FUNC_DASHMATCH  3     // [attr|=value] ('-' truncated)
+<span class="lineNum">      97 </span>            : #define NS_ATTR_FUNC_BEGINSMATCH  4   // [attr^=value] (begins with)
+<span class="lineNum">      98 </span>            : #define NS_ATTR_FUNC_ENDSMATCH  5     // [attr$=value] (ends with)
+<span class="lineNum">      99 </span>            : #define NS_ATTR_FUNC_CONTAINSMATCH 6  // [attr*=value] (contains substring)
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : struct nsAttrSelector {
+<span class="lineNum">     102 </span>            : public:
+<span class="lineNum">     103 </span>            :   enum class ValueCaseSensitivity : uint8_t {
+<span class="lineNum">     104 </span>            :     CaseSensitive,
+<span class="lineNum">     105 </span>            :     CaseInsensitive,
+<span class="lineNum">     106 </span>            :     CaseInsensitiveInHTML
+<span class="lineNum">     107 </span>            :   };
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :   nsAttrSelector(int32_t aNameSpace, const nsString&amp; aAttr);
+<span class="lineNum">     110 </span>            :   nsAttrSelector(int32_t aNameSpace, const nsString&amp; aAttr, uint8_t aFunction, 
+<span class="lineNum">     111 </span>            :                  const nsString&amp; aValue,
+<span class="lineNum">     112 </span>            :                  ValueCaseSensitivity aValueCaseSensitivity);
+<span class="lineNum">     113 </span>            :   nsAttrSelector(int32_t aNameSpace, nsIAtom* aLowercaseAttr, 
+<span class="lineNum">     114 </span>            :                  nsIAtom* aCasedAttr, uint8_t aFunction, 
+<span class="lineNum">     115 </span>            :                  const nsString&amp; aValue,
+<span class="lineNum">     116 </span>            :                  ValueCaseSensitivity aValueCaseSensitivity);
+<span class="lineNum">     117 </span>            :   ~nsAttrSelector(void);
+<a name="118"><span class="lineNum">     118 </span>            : </a>
+<span class="lineNum">     119 </span>            :   /** Do a deep clone.  Should be used only on the first in the linked list. */
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   nsAttrSelector* Clone() const { return Clone(true); }</span>
+<span class="lineNum">     121 </span>            : 
+<a name="122"><span class="lineNum">     122 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;</a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :   bool IsValueCaseSensitive(bool aInHTML) const {</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :     return mValueCaseSensitivity == ValueCaseSensitivity::CaseSensitive ||</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :       (!aInHTML &amp;&amp;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :        mValueCaseSensitivity == ValueCaseSensitivity::CaseInsensitiveInHTML);</span>
+<span class="lineNum">     128 </span>            :   }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :   nsString        mValue;
+<span class="lineNum">     131 </span>            :   nsAttrSelector* mNext;
+<span class="lineNum">     132 </span>            :   nsCOMPtr&lt;nsIAtom&gt; mLowercaseAttr;
+<span class="lineNum">     133 </span>            :   nsCOMPtr&lt;nsIAtom&gt; mCasedAttr;
+<span class="lineNum">     134 </span>            :   int32_t         mNameSpace;
+<span class="lineNum">     135 </span>            :   uint8_t         mFunction;
+<span class="lineNum">     136 </span>            :   ValueCaseSensitivity mValueCaseSensitivity;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : private:
+<span class="lineNum">     139 </span>            :   nsAttrSelector* Clone(bool aDeep) const;
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :   nsAttrSelector(const nsAttrSelector&amp; aCopy) = delete;
+<span class="lineNum">     142 </span>            :   nsAttrSelector&amp; operator=(const nsAttrSelector&amp; aCopy) = delete;
+<span class="lineNum">     143 </span>            : };
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : struct nsCSSSelector {
+<span class="lineNum">     146 </span>            : public:
+<span class="lineNum">     147 </span>            :   typedef mozilla::CSSPseudoClassType CSSPseudoClassType;
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :   nsCSSSelector(void);
+<span class="lineNum">     150 </span>            :   ~nsCSSSelector(void);
+<a name="151"><span class="lineNum">     151 </span>            : </a>
+<span class="lineNum">     152 </span>            :   /** Do a deep clone.  Should be used only on the first in the linked list. */
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   nsCSSSelector* Clone() const { return Clone(true, true); }</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :   void Reset(void);
+<span class="lineNum">     156 </span>            :   void SetNameSpace(int32_t aNameSpace);
+<span class="lineNum">     157 </span>            :   void SetTag(const nsString&amp; aTag);
+<span class="lineNum">     158 </span>            :   void AddID(const nsString&amp; aID);
+<span class="lineNum">     159 </span>            :   void AddClass(const nsString&amp; aClass);
+<span class="lineNum">     160 </span>            :   void AddPseudoClass(CSSPseudoClassType aType);
+<span class="lineNum">     161 </span>            :   void AddPseudoClass(CSSPseudoClassType aType, const char16_t* aString);
+<span class="lineNum">     162 </span>            :   void AddPseudoClass(CSSPseudoClassType aType, const int32_t* aIntPair);
+<span class="lineNum">     163 </span>            :   // takes ownership of aSelectorList
+<span class="lineNum">     164 </span>            :   void AddPseudoClass(CSSPseudoClassType aType,
+<span class="lineNum">     165 </span>            :                       nsCSSSelectorList* aSelectorList);
+<span class="lineNum">     166 </span>            :   void AddAttribute(int32_t aNameSpace, const nsString&amp; aAttr);
+<span class="lineNum">     167 </span>            :   void AddAttribute(int32_t aNameSpace, const nsString&amp; aAttr, uint8_t aFunc,
+<span class="lineNum">     168 </span>            :                     const nsString&amp; aValue,
+<span class="lineNum">     169 </span>            :                     nsAttrSelector::ValueCaseSensitivity aValueCaseSensitivity);
+<span class="lineNum">     170 </span>            :   void SetOperator(char16_t aOperator);
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :   inline bool HasTagSelector() const {
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     return !!mCasedTag;</span>
+<a name="174"><span class="lineNum">     174 </span>            :   }</a>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">      10590 :   inline bool IsPseudoElement() const {</span>
+<span class="lineNum">     177 </span><span class="lineCov">      30435 :     return mLowercaseTag &amp;&amp; !mCasedTag;</span>
+<span class="lineNum">     178 </span>            :   }
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   // Calculate the specificity of this selector (not including its mNext!).
+<span class="lineNum">     181 </span>            :   int32_t CalcWeight() const;
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   void ToString(nsAString&amp; aString, mozilla::CSSStyleSheet* aSheet,
+<span class="lineNum">     184 </span>            :                 bool aAppend = false) const;
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :   bool IsRestrictedSelector() const {
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :     return PseudoType() == mozilla::CSSPseudoElementType::NotPseudo;</span>
+<span class="lineNum">     188 </span>            :   }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            : #ifdef DEBUG
+<span class="lineNum">     191 </span>            :   nsCString RestrictedSelectorToString() const;
+<span class="lineNum">     192 </span>            : #endif
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            : private:
+<span class="lineNum">     195 </span>            :   void AddPseudoClassInternal(nsPseudoClassList *aPseudoClass);
+<span class="lineNum">     196 </span>            :   nsCSSSelector* Clone(bool aDeepNext, bool aDeepNegations) const;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   void AppendToStringWithoutCombinators(
+<span class="lineNum">     199 </span>            :       nsAString&amp; aString,
+<span class="lineNum">     200 </span>            :       mozilla::CSSStyleSheet* aSheet,
+<span class="lineNum">     201 </span>            :       bool aUseStandardNamespacePrefixes) const;
+<span class="lineNum">     202 </span>            :   void AppendToStringWithoutCombinatorsOrNegations(
+<span class="lineNum">     203 </span>            :       nsAString&amp; aString,
+<span class="lineNum">     204 </span>            :       mozilla::CSSStyleSheet* aSheet,
+<span class="lineNum">     205 </span>            :       bool aIsNegated,
+<span class="lineNum">     206 </span>            :       bool aUseStandardNamespacePrefixes) const;
+<span class="lineNum">     207 </span>            :   // Returns true if this selector can have a namespace specified (which
+<span class="lineNum">     208 </span>            :   // happens if and only if the default namespace would apply to this
+<span class="lineNum">     209 </span>            :   // selector).
+<span class="lineNum">     210 </span>            :   bool CanBeNamespaced(bool aIsNegated) const;
+<span class="lineNum">     211 </span>            :   // Calculate the specificity of this selector (not including its mNext
+<span class="lineNum">     212 </span>            :   // or its mNegations).
+<span class="lineNum">     213 </span>            :   int32_t CalcWeightWithoutNegations() const;
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : public:
+<span class="lineNum">     216 </span>            :   // Get and set the selector's pseudo type
+<span class="lineNum">     217 </span>            :   mozilla::CSSPseudoElementType PseudoType() const { return mPseudoType; }
+<span class="lineNum">     218 </span>            :   void SetPseudoType(mozilla::CSSPseudoElementType aType) {
+<span class="lineNum">     219 </span><span class="lineCov">        110 :     mPseudoType = aType;</span>
+<span class="lineNum">     220 </span>            :   }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :   // For case-sensitive documents, mLowercaseTag is the same as mCasedTag,
+<span class="lineNum">     225 </span>            :   // but in case-insensitive documents (HTML) mLowercaseTag is lowercase.
+<span class="lineNum">     226 </span>            :   // Also, for pseudo-elements mCasedTag will be null but mLowercaseTag
+<span class="lineNum">     227 </span>            :   // contains their name.
+<span class="lineNum">     228 </span>            :   nsCOMPtr&lt;nsIAtom&gt; mLowercaseTag;
+<span class="lineNum">     229 </span>            :   nsCOMPtr&lt;nsIAtom&gt; mCasedTag;
+<span class="lineNum">     230 </span>            :   nsAtomList*     mIDList;
+<span class="lineNum">     231 </span>            :   nsAtomList*     mClassList;
+<span class="lineNum">     232 </span>            :   nsPseudoClassList* mPseudoClassList; // atom for the pseudo, string for
+<span class="lineNum">     233 </span>            :                                        // the argument to functional pseudos
+<span class="lineNum">     234 </span>            :   nsAttrSelector* mAttrList;
+<span class="lineNum">     235 </span>            :   nsCSSSelector*  mNegations;
+<span class="lineNum">     236 </span>            :   nsCSSSelector*  mNext;
+<span class="lineNum">     237 </span>            :   int32_t         mNameSpace;
+<span class="lineNum">     238 </span>            :   char16_t       mOperator;
+<span class="lineNum">     239 </span>            : private:
+<span class="lineNum">     240 </span>            :   // The underlying type of CSSPseudoElementType is uint8_t and
+<span class="lineNum">     241 </span>            :   // it packs well with mOperator. (char16_t + uint8_t is less than 32bits.)
+<span class="lineNum">     242 </span>            :   mozilla::CSSPseudoElementType mPseudoType;
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :   nsCSSSelector(const nsCSSSelector&amp; aCopy) = delete;
+<span class="lineNum">     245 </span>            :   nsCSSSelector&amp; operator=(const nsCSSSelector&amp; aCopy) = delete;
+<span class="lineNum">     246 </span>            : };
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            : /**
+<span class="lineNum">     249 </span>            :  * A selector list is the unit of selectors that each style rule has.
+<span class="lineNum">     250 </span>            :  * For example, &quot;P B, H1 B { ... }&quot; would be a selector list with two
+<span class="lineNum">     251 </span>            :  * items (where each |nsCSSSelectorList| object's |mSelectors| has
+<span class="lineNum">     252 </span>            :  * an |mNext| for the P or H1).  We represent them as linked lists.
+<span class="lineNum">     253 </span>            :  */
+<span class="lineNum">     254 </span>            : class inDOMUtils;
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            : struct nsCSSSelectorList {
+<span class="lineNum">     257 </span>            :   nsCSSSelectorList(void);
+<span class="lineNum">     258 </span>            :   ~nsCSSSelectorList(void);
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :   /**
+<span class="lineNum">     261 </span>            :    * Create a new selector and push it onto the beginning of |mSelectors|,
+<span class="lineNum">     262 </span>            :    * setting its |mNext| to the current value of |mSelectors|.  If there is an
+<span class="lineNum">     263 </span>            :    * earlier selector, set its |mOperator| to |aOperator|; else |aOperator|
+<span class="lineNum">     264 </span>            :    * must be char16_t(0).
+<span class="lineNum">     265 </span>            :    * Returns the new selector.
+<span class="lineNum">     266 </span>            :    * The list owns the new selector.
+<span class="lineNum">     267 </span>            :    * The caller is responsible for updating |mWeight|.
+<span class="lineNum">     268 </span>            :    */
+<span class="lineNum">     269 </span>            :   nsCSSSelector* AddSelector(char16_t aOperator);
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :   /**
+<span class="lineNum">     272 </span>            :    * Point |mSelectors| to its |mNext|, and delete the first node in the old
+<span class="lineNum">     273 </span>            :    * |mSelectors|.
+<span class="lineNum">     274 </span>            :    * Should only be used on a list with more than one selector in it.
+<span class="lineNum">     275 </span>            :    */
+<span class="lineNum">     276 </span>            :   void RemoveRightmostSelector();
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :   /**
+<span class="lineNum">     279 </span>            :    * Should be used only on the first in the list
+<span class="lineNum">     280 </span>            :    */
+<span class="lineNum">     281 </span>            :   void ToString(nsAString&amp; aResult, mozilla::CSSStyleSheet* aSheet);
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :   /**
+<a name="284"><span class="lineNum">     284 </span>            :    * Do a deep clone.  Should be used only on the first in the list.</a>
+<span class="lineNum">     285 </span>            :    */
+<span class="lineNum">     286 </span><span class="lineNoCov">          0 :   nsCSSSelectorList* Clone() const { return Clone(true); }</span>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :   size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const;
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   nsCSSSelector*     mSelectors;
+<span class="lineNum">     291 </span>            :   int32_t            mWeight;
+<span class="lineNum">     292 </span>            :   nsCSSSelectorList* mNext;
+<span class="lineNum">     293 </span>            : protected:
+<span class="lineNum">     294 </span>            :   friend class inDOMUtils;
+<span class="lineNum">     295 </span>            :   nsCSSSelectorList* Clone(bool aDeep) const;
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            : private:
+<span class="lineNum">     298 </span>            :   nsCSSSelectorList(const nsCSSSelectorList&amp; aCopy) = delete;
+<span class="lineNum">     299 </span>            :   nsCSSSelectorList&amp; operator=(const nsCSSSelectorList&amp; aCopy) = delete;
+<span class="lineNum">     300 </span>            : };
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : // 464bab7a-2fce-4f30-ab44-b7a5f3aae57d
+<span class="lineNum">     303 </span>            : #define NS_CSS_STYLE_RULE_IMPL_CID \
+<span class="lineNum">     304 </span>            : { 0x464bab7a, 0x2fce, 0x4f30, \
+<span class="lineNum">     305 </span>            :   { 0xab, 0x44, 0xb7, 0xa5, 0xf3, 0xaa, 0xe5, 0x7d } }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            : class DOMCSSDeclarationImpl;
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : namespace mozilla {
+<span class="lineNum">     310 </span>            : namespace css {
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            : class Declaration;
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            : class StyleRule final : public BindingStyleRule
+<span class="lineNum">     315 </span>            :                       , public nsICSSStyleRuleDOMWrapper
+<span class="lineNum">     316 </span>            : {
+<span class="lineNum">     317 </span>            :  public:
+<span class="lineNum">     318 </span>            :   StyleRule(nsCSSSelectorList* aSelector,
+<span class="lineNum">     319 </span>            :             Declaration *aDeclaration,
+<span class="lineNum">     320 </span>            :             uint32_t aLineNumber, uint32_t aColumnNumber);
+<span class="lineNum">     321 </span>            : private:
+<span class="lineNum">     322 </span>            :   // for |Clone|
+<span class="lineNum">     323 </span>            :   StyleRule(const StyleRule&amp; aCopy);
+<span class="lineNum">     324 </span>            : public:
+<span class="lineNum">     325 </span>            :   NS_DECLARE_STATIC_IID_ACCESSOR(NS_CSS_STYLE_RULE_IMPL_CID)
+<a name="326"><span class="lineNum">     326 </span>            : </a>
+<span class="lineNum">     327 </span>            :   NS_DECL_ISUPPORTS_INHERITED
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :   NS_DECL_CYCLE_COLLECTION_SCRIPT_HOLDER_CLASS_INHERITED(StyleRule, Rule)</span>
+<span class="lineNum">     329 </span>            :   virtual bool IsCCLeaf() const override;
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            :   NS_DECL_NSIDOMCSSSTYLERULE
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :   // nsICSSStyleRuleDOMWrapper
+<span class="lineNum">     334 </span>            :   NS_IMETHOD GetCSSStyleRule(StyleRule **aResult) override;
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            :   // WebIDL interface
+<span class="lineNum">     337 </span>            :   uint16_t Type() const override;
+<span class="lineNum">     338 </span>            :   void GetCssTextImpl(nsAString&amp; aCssText) const override;
+<span class="lineNum">     339 </span>            :   virtual nsICSSDeclaration* Style() override;
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span>            :   // null for style attribute
+<span class="lineNum">     342 </span>            :   nsCSSSelectorList* Selector() { return mSelector; }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :   Declaration* GetDeclaration() const { return mDeclaration; }</span>
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span>            :   void SetDeclaration(Declaration* aDecl);
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   virtual int32_t GetType() const override;
+<span class="lineNum">     349 </span>            :   using Rule::GetType;
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :   CSSStyleSheet* GetStyleSheet() const
+<span class="lineNum">     352 </span>            :   {
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :     StyleSheet* sheet = Rule::GetStyleSheet();</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :     return sheet ? sheet-&gt;AsGecko() : nullptr;</span>
+<span class="lineNum">     355 </span>            :   }
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            :   virtual already_AddRefed&lt;Rule&gt; Clone() const override;
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            : #ifdef DEBUG
+<span class="lineNum">     360 </span>            :   virtual void List(FILE* out = stdout, int32_t aIndent = 0) const override;
+<span class="lineNum">     361 </span>            : #endif
+<span class="lineNum">     362 </span>            : 
+<span class="lineNum">     363 </span>            :   virtual size_t SizeOfIncludingThis(mozilla::MallocSizeOf aMallocSizeOf) const override;
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            : private:
+<span class="lineNum">     366 </span>            :   ~StyleRule();
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   // Drop our references to mDeclaration and mRule, and let them know we're
+<span class="lineNum">     369 </span>            :   // doing that.
+<span class="lineNum">     370 </span>            :   void DropReferences();
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            : private:
+<span class="lineNum">     373 </span>            :   nsCSSSelectorList*      mSelector; // null for style attribute
+<span class="lineNum">     374 </span>            :   RefPtr&lt;Declaration&gt;     mDeclaration;
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :   // We own it, and it aggregates its refcount with us.
+<span class="lineNum">     377 </span>            :   UniquePtr&lt;DOMCSSDeclarationImpl&gt; mDOMDeclaration;
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            : private:
+<span class="lineNum">     380 </span>            :   StyleRule&amp; operator=(const StyleRule&amp; aCopy) = delete;
+<span class="lineNum">     381 </span>            : };
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : NS_DEFINE_STATIC_IID_ACCESSOR(StyleRule, NS_CSS_STYLE_RULE_IMPL_CID)
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : } // namespace css
+<span class="lineNum">     386 </span>            : } // namespace mozilla
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span>            : #endif /* mozilla_css_StyleRule_h__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

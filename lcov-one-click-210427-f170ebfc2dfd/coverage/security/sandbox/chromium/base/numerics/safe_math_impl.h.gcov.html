@@ -1,0 +1,843 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - security/sandbox/chromium/base/numerics/safe_math_impl.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium/base/numerics</a> - safe_math_impl.h<span style="font-size: 80%;"> (source / <a href="safe_math_impl.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Copyright 2014 The Chromium Authors. All rights reserved.</a>
+<span class="lineNum">       2 </span>            : // Use of this source code is governed by a BSD-style license that can be
+<span class="lineNum">       3 </span>            : // found in the LICENSE file.
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef BASE_NUMERICS_SAFE_MATH_IMPL_H_
+<span class="lineNum">       6 </span>            : #define BASE_NUMERICS_SAFE_MATH_IMPL_H_
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;stddef.h&gt;
+<span class="lineNum">       9 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;climits&gt;
+<span class="lineNum">      12 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      13 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">      14 </span>            : #include &lt;limits&gt;
+<span class="lineNum">      15 </span>            : #include &lt;type_traits&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : #include &quot;base/numerics/safe_conversions.h&quot;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : namespace base {
+<span class="lineNum">      20 </span>            : namespace internal {
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : // Everything from here up to the floating point operations is portable C++,
+<span class="lineNum">      23 </span>            : // but it may not be fast. This code could be split based on
+<span class="lineNum">      24 </span>            : // platform/architecture and replaced with potentially faster implementations.
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : // Integer promotion templates used by the portable checked integer arithmetic.
+<span class="lineNum">      27 </span>            : template &lt;size_t Size, bool IsSigned&gt;
+<span class="lineNum">      28 </span>            : struct IntegerForSizeAndSign;
+<span class="lineNum">      29 </span>            : template &lt;&gt;
+<span class="lineNum">      30 </span>            : struct IntegerForSizeAndSign&lt;1, true&gt; {
+<span class="lineNum">      31 </span>            :   typedef int8_t type;
+<span class="lineNum">      32 </span>            : };
+<span class="lineNum">      33 </span>            : template &lt;&gt;
+<span class="lineNum">      34 </span>            : struct IntegerForSizeAndSign&lt;1, false&gt; {
+<span class="lineNum">      35 </span>            :   typedef uint8_t type;
+<span class="lineNum">      36 </span>            : };
+<span class="lineNum">      37 </span>            : template &lt;&gt;
+<span class="lineNum">      38 </span>            : struct IntegerForSizeAndSign&lt;2, true&gt; {
+<span class="lineNum">      39 </span>            :   typedef int16_t type;
+<span class="lineNum">      40 </span>            : };
+<span class="lineNum">      41 </span>            : template &lt;&gt;
+<span class="lineNum">      42 </span>            : struct IntegerForSizeAndSign&lt;2, false&gt; {
+<span class="lineNum">      43 </span>            :   typedef uint16_t type;
+<span class="lineNum">      44 </span>            : };
+<span class="lineNum">      45 </span>            : template &lt;&gt;
+<span class="lineNum">      46 </span>            : struct IntegerForSizeAndSign&lt;4, true&gt; {
+<span class="lineNum">      47 </span>            :   typedef int32_t type;
+<span class="lineNum">      48 </span>            : };
+<span class="lineNum">      49 </span>            : template &lt;&gt;
+<span class="lineNum">      50 </span>            : struct IntegerForSizeAndSign&lt;4, false&gt; {
+<span class="lineNum">      51 </span>            :   typedef uint32_t type;
+<span class="lineNum">      52 </span>            : };
+<span class="lineNum">      53 </span>            : template &lt;&gt;
+<span class="lineNum">      54 </span>            : struct IntegerForSizeAndSign&lt;8, true&gt; {
+<span class="lineNum">      55 </span>            :   typedef int64_t type;
+<span class="lineNum">      56 </span>            : };
+<span class="lineNum">      57 </span>            : template &lt;&gt;
+<span class="lineNum">      58 </span>            : struct IntegerForSizeAndSign&lt;8, false&gt; {
+<span class="lineNum">      59 </span>            :   typedef uint64_t type;
+<span class="lineNum">      60 </span>            : };
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : // WARNING: We have no IntegerForSizeAndSign&lt;16, *&gt;. If we ever add one to
+<span class="lineNum">      63 </span>            : // support 128-bit math, then the ArithmeticPromotion template below will need
+<span class="lineNum">      64 </span>            : // to be updated (or more likely replaced with a decltype expression).
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            : template &lt;typename Integer&gt;
+<span class="lineNum">      67 </span>            : struct UnsignedIntegerForSize {
+<span class="lineNum">      68 </span>            :   typedef typename std::enable_if&lt;
+<span class="lineNum">      69 </span>            :       std::numeric_limits&lt;Integer&gt;::is_integer,
+<span class="lineNum">      70 </span>            :       typename IntegerForSizeAndSign&lt;sizeof(Integer), false&gt;::type&gt;::type type;
+<span class="lineNum">      71 </span>            : };
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : template &lt;typename Integer&gt;
+<span class="lineNum">      74 </span>            : struct SignedIntegerForSize {
+<span class="lineNum">      75 </span>            :   typedef typename std::enable_if&lt;
+<span class="lineNum">      76 </span>            :       std::numeric_limits&lt;Integer&gt;::is_integer,
+<span class="lineNum">      77 </span>            :       typename IntegerForSizeAndSign&lt;sizeof(Integer), true&gt;::type&gt;::type type;
+<span class="lineNum">      78 </span>            : };
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : template &lt;typename Integer&gt;
+<span class="lineNum">      81 </span>            : struct TwiceWiderInteger {
+<span class="lineNum">      82 </span>            :   typedef typename std::enable_if&lt;
+<span class="lineNum">      83 </span>            :       std::numeric_limits&lt;Integer&gt;::is_integer,
+<span class="lineNum">      84 </span>            :       typename IntegerForSizeAndSign&lt;
+<span class="lineNum">      85 </span>            :           sizeof(Integer) * 2,
+<span class="lineNum">      86 </span>            :           std::numeric_limits&lt;Integer&gt;::is_signed&gt;::type&gt;::type type;
+<span class="lineNum">      87 </span>            : };
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : template &lt;typename Integer&gt;
+<span class="lineNum">      90 </span>            : struct PositionOfSignBit {
+<span class="lineNum">      91 </span>            :   static const typename std::enable_if&lt;std::numeric_limits&lt;Integer&gt;::is_integer,
+<span class="lineNum">      92 </span>            :                                        size_t&gt;::type value =
+<span class="lineNum">      93 </span>            :       CHAR_BIT * sizeof(Integer) - 1;
+<span class="lineNum">      94 </span>            : };
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : // This is used for UnsignedAbs, where we need to support floating-point
+<span class="lineNum">      97 </span>            : // template instantiations even though we don't actually support the operations.
+<span class="lineNum">      98 </span>            : // However, there is no corresponding implementation of e.g. SafeUnsignedAbs,
+<span class="lineNum">      99 </span>            : // so the float versions will not compile.
+<span class="lineNum">     100 </span>            : template &lt;typename Numeric,
+<span class="lineNum">     101 </span>            :           bool IsInteger = std::numeric_limits&lt;Numeric&gt;::is_integer,
+<span class="lineNum">     102 </span>            :           bool IsFloat = std::numeric_limits&lt;Numeric&gt;::is_iec559&gt;
+<span class="lineNum">     103 </span>            : struct UnsignedOrFloatForSize;
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : template &lt;typename Numeric&gt;
+<span class="lineNum">     106 </span>            : struct UnsignedOrFloatForSize&lt;Numeric, true, false&gt; {
+<span class="lineNum">     107 </span>            :   typedef typename UnsignedIntegerForSize&lt;Numeric&gt;::type type;
+<span class="lineNum">     108 </span>            : };
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : template &lt;typename Numeric&gt;
+<span class="lineNum">     111 </span>            : struct UnsignedOrFloatForSize&lt;Numeric, false, true&gt; {
+<span class="lineNum">     112 </span>            :   typedef Numeric type;
+<span class="lineNum">     113 </span>            : };
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            : // Helper templates for integer manipulations.
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : template &lt;typename T&gt;
+<a name="118"><span class="lineNum">     118 </span>            : constexpr bool HasSignBit(T x) {</a>
+<span class="lineNum">     119 </span>            :   // Cast to unsigned since right shift on signed is undefined.
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :   return !!(static_cast&lt;typename UnsignedIntegerForSize&lt;T&gt;::type&gt;(x) &gt;&gt;</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :             PositionOfSignBit&lt;T&gt;::value);</span>
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : // This wrapper undoes the standard integer promotions.
+<span class="lineNum">     125 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     126 </span>            : constexpr T BinaryComplement(T x) {
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :   return static_cast&lt;T&gt;(~x);</span>
+<span class="lineNum">     128 </span>            : }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            : // Return if a numeric value is negative regardless of type.
+<span class="lineNum">     131 </span>            : template &lt;typename T,
+<span class="lineNum">     132 </span>            :           typename std::enable_if&lt;std::is_arithmetic&lt;T&gt;::value &amp;&amp;
+<span class="lineNum">     133 </span>            :                                   std::is_signed&lt;T&gt;::value&gt;::type* = nullptr&gt;
+<span class="lineNum">     134 </span>            : constexpr bool IsNegative(T x) {
+<span class="lineNum">     135 </span>            :   return x &lt; 0;
+<span class="lineNum">     136 </span>            : }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : template &lt;typename T,
+<span class="lineNum">     139 </span>            :           typename std::enable_if&lt;std::is_arithmetic&lt;T&gt;::value &amp;&amp;
+<span class="lineNum">     140 </span>            :                                   !std::is_signed&lt;T&gt;::value&gt;::type* = nullptr&gt;
+<span class="lineNum">     141 </span>            : constexpr bool IsNegative(T x) {
+<span class="lineNum">     142 </span>            :   return false;
+<span class="lineNum">     143 </span>            : }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : enum ArithmeticPromotionCategory {
+<span class="lineNum">     146 </span>            :   LEFT_PROMOTION,          // Use the type of the left-hand argument.
+<span class="lineNum">     147 </span>            :   RIGHT_PROMOTION,         // Use the type of the right-hand argument.
+<span class="lineNum">     148 </span>            :   MAX_EXPONENT_PROMOTION,  // Use the type supporting the largest exponent.
+<span class="lineNum">     149 </span>            :   BIG_ENOUGH_PROMOTION     // Attempt to find a big enough type.
+<span class="lineNum">     150 </span>            : };
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : template &lt;ArithmeticPromotionCategory Promotion,
+<span class="lineNum">     153 </span>            :           typename Lhs,
+<span class="lineNum">     154 </span>            :           typename Rhs = Lhs&gt;
+<span class="lineNum">     155 </span>            : struct ArithmeticPromotion;
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            : template &lt;typename Lhs,
+<span class="lineNum">     158 </span>            :           typename Rhs,
+<span class="lineNum">     159 </span>            :           ArithmeticPromotionCategory Promotion =
+<span class="lineNum">     160 </span>            :               (MaxExponent&lt;Lhs&gt;::value &gt; MaxExponent&lt;Rhs&gt;::value)
+<span class="lineNum">     161 </span>            :                   ? LEFT_PROMOTION
+<span class="lineNum">     162 </span>            :                   : RIGHT_PROMOTION&gt;
+<span class="lineNum">     163 </span>            : struct MaxExponentPromotion;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     166 </span>            : struct MaxExponentPromotion&lt;Lhs, Rhs, LEFT_PROMOTION&gt; {
+<span class="lineNum">     167 </span>            :   using type = Lhs;
+<span class="lineNum">     168 </span>            : };
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     171 </span>            : struct MaxExponentPromotion&lt;Lhs, Rhs, RIGHT_PROMOTION&gt; {
+<span class="lineNum">     172 </span>            :   using type = Rhs;
+<span class="lineNum">     173 </span>            : };
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : template &lt;typename Lhs,
+<span class="lineNum">     176 </span>            :           typename Rhs = Lhs,
+<span class="lineNum">     177 </span>            :           bool is_intmax_type =
+<span class="lineNum">     178 </span>            :               std::is_integral&lt;
+<span class="lineNum">     179 </span>            :                   typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type&gt;::value &amp;&amp;
+<span class="lineNum">     180 </span>            :               sizeof(typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type) ==
+<span class="lineNum">     181 </span>            :                   sizeof(intmax_t),
+<span class="lineNum">     182 </span>            :           bool is_max_exponent =
+<span class="lineNum">     183 </span>            :               StaticDstRangeRelationToSrcRange&lt;
+<span class="lineNum">     184 </span>            :                   typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type,
+<span class="lineNum">     185 </span>            :                   Lhs&gt;::value ==
+<span class="lineNum">     186 </span>            :               NUMERIC_RANGE_CONTAINED&amp;&amp; StaticDstRangeRelationToSrcRange&lt;
+<span class="lineNum">     187 </span>            :                   typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type,
+<span class="lineNum">     188 </span>            :                   Rhs&gt;::value == NUMERIC_RANGE_CONTAINED&gt;
+<span class="lineNum">     189 </span>            : struct BigEnoughPromotion;
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : // The side with the max exponent is big enough.
+<span class="lineNum">     192 </span>            : template &lt;typename Lhs, typename Rhs, bool is_intmax_type&gt;
+<span class="lineNum">     193 </span>            : struct BigEnoughPromotion&lt;Lhs, Rhs, is_intmax_type, true&gt; {
+<span class="lineNum">     194 </span>            :   using type = typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type;
+<span class="lineNum">     195 </span>            :   static const bool is_contained = true;
+<span class="lineNum">     196 </span>            : };
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : // We can use a twice wider type to fit.
+<span class="lineNum">     199 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     200 </span>            : struct BigEnoughPromotion&lt;Lhs, Rhs, false, false&gt; {
+<span class="lineNum">     201 </span>            :   using type = typename IntegerForSizeAndSign&lt;
+<span class="lineNum">     202 </span>            :       sizeof(typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type) * 2,
+<span class="lineNum">     203 </span>            :       std::is_signed&lt;Lhs&gt;::value || std::is_signed&lt;Rhs&gt;::value&gt;::type;
+<span class="lineNum">     204 </span>            :   static const bool is_contained = true;
+<span class="lineNum">     205 </span>            : };
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            : // No type is large enough.
+<span class="lineNum">     208 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     209 </span>            : struct BigEnoughPromotion&lt;Lhs, Rhs, true, false&gt; {
+<span class="lineNum">     210 </span>            :   using type = typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type;
+<span class="lineNum">     211 </span>            :   static const bool is_contained = false;
+<span class="lineNum">     212 </span>            : };
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : // These are the four supported promotion types.
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : // Use the type of the left-hand argument.
+<span class="lineNum">     217 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     218 </span>            : struct ArithmeticPromotion&lt;LEFT_PROMOTION, Lhs, Rhs&gt; {
+<span class="lineNum">     219 </span>            :   using type = Lhs;
+<span class="lineNum">     220 </span>            :   static const bool is_contained = true;
+<span class="lineNum">     221 </span>            : };
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : // Use the type of the right-hand argument.
+<span class="lineNum">     224 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     225 </span>            : struct ArithmeticPromotion&lt;RIGHT_PROMOTION, Lhs, Rhs&gt; {
+<span class="lineNum">     226 </span>            :   using type = Rhs;
+<span class="lineNum">     227 </span>            :   static const bool is_contained = true;
+<span class="lineNum">     228 </span>            : };
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : // Use the type supporting the largest exponent.
+<span class="lineNum">     231 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     232 </span>            : struct ArithmeticPromotion&lt;MAX_EXPONENT_PROMOTION, Lhs, Rhs&gt; {
+<span class="lineNum">     233 </span>            :   using type = typename MaxExponentPromotion&lt;Lhs, Rhs&gt;::type;
+<span class="lineNum">     234 </span>            :   static const bool is_contained = true;
+<span class="lineNum">     235 </span>            : };
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : // Attempt to find a big enough type.
+<span class="lineNum">     238 </span>            : template &lt;typename Lhs, typename Rhs&gt;
+<span class="lineNum">     239 </span>            : struct ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, Lhs, Rhs&gt; {
+<span class="lineNum">     240 </span>            :   using type = typename BigEnoughPromotion&lt;Lhs, Rhs&gt;::type;
+<span class="lineNum">     241 </span>            :   static const bool is_contained = BigEnoughPromotion&lt;Lhs, Rhs&gt;::is_contained;
+<span class="lineNum">     242 </span>            : };
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            : // We can statically check if operations on the provided types can wrap, so we
+<span class="lineNum">     245 </span>            : // can skip the checked operations if they're not needed. So, for an integer we
+<span class="lineNum">     246 </span>            : // care if the destination type preserves the sign and is twice the width of
+<span class="lineNum">     247 </span>            : // the source.
+<span class="lineNum">     248 </span>            : template &lt;typename T, typename Lhs, typename Rhs&gt;
+<span class="lineNum">     249 </span>            : struct IsIntegerArithmeticSafe {
+<span class="lineNum">     250 </span>            :   static const bool value = !std::numeric_limits&lt;T&gt;::is_iec559 &amp;&amp;
+<span class="lineNum">     251 </span>            :                             StaticDstRangeRelationToSrcRange&lt;T, Lhs&gt;::value ==
+<span class="lineNum">     252 </span>            :                                 NUMERIC_RANGE_CONTAINED &amp;&amp;
+<span class="lineNum">     253 </span>            :                             sizeof(T) &gt;= (2 * sizeof(Lhs)) &amp;&amp;
+<span class="lineNum">     254 </span>            :                             StaticDstRangeRelationToSrcRange&lt;T, Rhs&gt;::value !=
+<span class="lineNum">     255 </span>            :                                 NUMERIC_RANGE_CONTAINED &amp;&amp;
+<span class="lineNum">     256 </span>            :                             sizeof(T) &gt;= (2 * sizeof(Rhs));
+<span class="lineNum">     257 </span>            : };
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : // Here are the actual portable checked integer math implementations.
+<span class="lineNum">     260 </span>            : // TODO(jschuh): Break this code out from the enable_if pattern and find a clean
+<span class="lineNum">     261 </span>            : // way to coalesce things into the CheckedNumericState specializations below.
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     264 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer, bool&gt;::type
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 : CheckedAddImpl(T x, T y, T* result) {</span>
+<span class="lineNum">     266 </span>            :   // Since the value of x+y is undefined if we have a signed type, we compute
+<span class="lineNum">     267 </span>            :   // it using the unsigned type of the same size.
+<span class="lineNum">     268 </span>            :   typedef typename UnsignedIntegerForSize&lt;T&gt;::type UnsignedDst;
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :   UnsignedDst ux = static_cast&lt;UnsignedDst&gt;(x);</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :   UnsignedDst uy = static_cast&lt;UnsignedDst&gt;(y);</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :   UnsignedDst uresult = static_cast&lt;UnsignedDst&gt;(ux + uy);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :   *result = static_cast&lt;T&gt;(uresult);</span>
+<span class="lineNum">     273 </span>            :   // Addition is valid if the sign of (x + y) is equal to either that of x or
+<span class="lineNum">     274 </span>            :   // that of y.
+<span class="lineNum">     275 </span>            :   return (std::numeric_limits&lt;T&gt;::is_signed)
+<span class="lineNum">     276 </span>            :              ? HasSignBit(BinaryComplement(
+<span class="lineNum">     277 </span>            :                    static_cast&lt;UnsignedDst&gt;((uresult ^ ux) &amp; (uresult ^ uy))))
+<span class="lineNum">     278 </span>            :              : (BinaryComplement(x) &gt;=
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                 y);  // Unsigned is either valid or underflow.</span>
+<span class="lineNum">     280 </span>            : }
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     283 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     284 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<a name="285"><span class="lineNum">     285 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,</a>
+<span class="lineNum">     286 </span>            :                         bool&gt;::type
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 : CheckedAdd(T x, U y, V* result) {</span>
+<span class="lineNum">     288 </span>            :   using Promotion =
+<span class="lineNum">     289 </span>            :       typename ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, T, U&gt;::type;
+<span class="lineNum">     290 </span>            :   Promotion presult;
+<span class="lineNum">     291 </span>            :   // Fail if either operand is out of range for the promoted type.
+<span class="lineNum">     292 </span>            :   // TODO(jschuh): This could be made to work for a broader range of values.
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   bool is_valid = IsValueInRangeForNumericType&lt;Promotion&gt;(x) &amp;&amp;</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                   IsValueInRangeForNumericType&lt;Promotion&gt;(y);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :   if (IsIntegerArithmeticSafe&lt;Promotion, U, V&gt;::value) {
+<span class="lineNum">     297 </span>            :     presult = static_cast&lt;Promotion&gt;(x) + static_cast&lt;Promotion&gt;(y);
+<span class="lineNum">     298 </span>            :   } else {
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :     is_valid &amp;= CheckedAddImpl(static_cast&lt;Promotion&gt;(x),</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :                                static_cast&lt;Promotion&gt;(y), &amp;presult);</span>
+<span class="lineNum">     301 </span>            :   }
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :   *result = static_cast&lt;V&gt;(presult);</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   return is_valid &amp;&amp; IsValueInRangeForNumericType&lt;V&gt;(presult);</span>
+<span class="lineNum">     304 </span>            : }
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     307 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer, bool&gt;::type
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 : CheckedSubImpl(T x, T y, T* result) {</span>
+<span class="lineNum">     309 </span>            :   // Since the value of x+y is undefined if we have a signed type, we compute
+<span class="lineNum">     310 </span>            :   // it using the unsigned type of the same size.
+<span class="lineNum">     311 </span>            :   typedef typename UnsignedIntegerForSize&lt;T&gt;::type UnsignedDst;
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :   UnsignedDst ux = static_cast&lt;UnsignedDst&gt;(x);</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   UnsignedDst uy = static_cast&lt;UnsignedDst&gt;(y);</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :   UnsignedDst uresult = static_cast&lt;UnsignedDst&gt;(ux - uy);</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :   *result = static_cast&lt;T&gt;(uresult);</span>
+<span class="lineNum">     316 </span>            :   // Subtraction is valid if either x and y have same sign, or (x-y) and x have
+<span class="lineNum">     317 </span>            :   // the same sign.
+<span class="lineNum">     318 </span>            :   return (std::numeric_limits&lt;T&gt;::is_signed)
+<span class="lineNum">     319 </span>            :              ? HasSignBit(BinaryComplement(
+<span class="lineNum">     320 </span>            :                    static_cast&lt;UnsignedDst&gt;((uresult ^ ux) &amp; (ux ^ uy))))
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :              : (x &gt;= y);</span>
+<span class="lineNum">     322 </span>            : }
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     325 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     326 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<a name="327"><span class="lineNum">     327 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,</a>
+<span class="lineNum">     328 </span>            :                         bool&gt;::type
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 : CheckedSub(T x, U y, V* result) {</span>
+<span class="lineNum">     330 </span>            :   using Promotion =
+<span class="lineNum">     331 </span>            :       typename ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, T, U&gt;::type;
+<span class="lineNum">     332 </span>            :   Promotion presult;
+<span class="lineNum">     333 </span>            :   // Fail if either operand is out of range for the promoted type.
+<span class="lineNum">     334 </span>            :   // TODO(jschuh): This could be made to work for a broader range of values.
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :   bool is_valid = IsValueInRangeForNumericType&lt;Promotion&gt;(x) &amp;&amp;</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                   IsValueInRangeForNumericType&lt;Promotion&gt;(y);</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span>            :   if (IsIntegerArithmeticSafe&lt;Promotion, U, V&gt;::value) {
+<span class="lineNum">     339 </span>            :     presult = static_cast&lt;Promotion&gt;(x) - static_cast&lt;Promotion&gt;(y);
+<span class="lineNum">     340 </span>            :   } else {
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :     is_valid &amp;= CheckedSubImpl(static_cast&lt;Promotion&gt;(x),</span>
+<span class="lineNum">     342 </span>            :                                static_cast&lt;Promotion&gt;(y), &amp;presult);
+<span class="lineNum">     343 </span>            :   }
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :   *result = static_cast&lt;V&gt;(presult);</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :   return is_valid &amp;&amp; IsValueInRangeForNumericType&lt;V&gt;(presult);</span>
+<span class="lineNum">     346 </span>            : }
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : // Integer multiplication is a bit complicated. In the fast case we just
+<span class="lineNum">     349 </span>            : // we just promote to a twice wider type, and range check the result. In the
+<span class="lineNum">     350 </span>            : // slow case we need to manually check that the result won't be truncated by
+<span class="lineNum">     351 </span>            : // checking with division against the appropriate bound.
+<span class="lineNum">     352 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     353 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     354 </span>            :                             sizeof(T) * 2 &lt;= sizeof(uintmax_t),
+<span class="lineNum">     355 </span>            :                         bool&gt;::type
+<span class="lineNum">     356 </span>            : CheckedMulImpl(T x, T y, T* result) {
+<span class="lineNum">     357 </span>            :   typedef typename TwiceWiderInteger&lt;T&gt;::type IntermediateType;
+<span class="lineNum">     358 </span>            :   IntermediateType tmp =
+<span class="lineNum">     359 </span>            :       static_cast&lt;IntermediateType&gt;(x) * static_cast&lt;IntermediateType&gt;(y);
+<span class="lineNum">     360 </span>            :   *result = static_cast&lt;T&gt;(tmp);
+<span class="lineNum">     361 </span>            :   return DstRangeRelationToSrcRange&lt;T&gt;(tmp) == RANGE_VALID;
+<span class="lineNum">     362 </span>            : }
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     365 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     366 </span>            :                             std::numeric_limits&lt;T&gt;::is_signed &amp;&amp;
+<a name="367"><span class="lineNum">     367 </span>            :                             (sizeof(T) * 2 &gt; sizeof(uintmax_t)),</a>
+<span class="lineNum">     368 </span>            :                         bool&gt;::type
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 : CheckedMulImpl(T x, T y, T* result) {</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :   if (x &amp;&amp; y) {</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :     if (x &gt; 0) {</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :       if (y &gt; 0) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :         if (x &gt; std::numeric_limits&lt;T&gt;::max() / y)</span>
+<span class="lineNum">     374 </span>            :           return false;
+<span class="lineNum">     375 </span>            :       } else {
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :         if (y &lt; std::numeric_limits&lt;T&gt;::min() / x)</span>
+<span class="lineNum">     377 </span>            :           return false;
+<span class="lineNum">     378 </span>            :       }
+<span class="lineNum">     379 </span>            :     } else {
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :       if (y &gt; 0) {</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :         if (x &lt; std::numeric_limits&lt;T&gt;::min() / y)</span>
+<span class="lineNum">     382 </span>            :           return false;
+<span class="lineNum">     383 </span>            :       } else {
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :         if (y &lt; std::numeric_limits&lt;T&gt;::max() / x)</span>
+<span class="lineNum">     385 </span>            :           return false;
+<span class="lineNum">     386 </span>            :       }
+<span class="lineNum">     387 </span>            :     }
+<span class="lineNum">     388 </span>            :   }
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :   *result = x * y;</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :   return true;</span>
+<span class="lineNum">     391 </span>            : }
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     394 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     395 </span>            :                             !std::numeric_limits&lt;T&gt;::is_signed &amp;&amp;
+<span class="lineNum">     396 </span>            :                             (sizeof(T) * 2 &gt; sizeof(uintmax_t)),
+<span class="lineNum">     397 </span>            :                         bool&gt;::type
+<span class="lineNum">     398 </span>            : CheckedMulImpl(T x, T y, T* result) {
+<span class="lineNum">     399 </span>            :   *result = x * y;
+<span class="lineNum">     400 </span>            :   return (y == 0 || x &lt;= std::numeric_limits&lt;T&gt;::max() / y);
+<span class="lineNum">     401 </span>            : }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     404 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     405 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<a name="406"><span class="lineNum">     406 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,</a>
+<span class="lineNum">     407 </span>            :                         bool&gt;::type
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 : CheckedMul(T x, U y, V* result) {</span>
+<span class="lineNum">     409 </span>            :   using Promotion =
+<span class="lineNum">     410 </span>            :       typename ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, T, U&gt;::type;
+<span class="lineNum">     411 </span>            :   Promotion presult;
+<span class="lineNum">     412 </span>            :   // Fail if either operand is out of range for the promoted type.
+<span class="lineNum">     413 </span>            :   // TODO(jschuh): This could be made to work for a broader range of values.
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :   bool is_valid = IsValueInRangeForNumericType&lt;Promotion&gt;(x) &amp;&amp;</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :                   IsValueInRangeForNumericType&lt;Promotion&gt;(y);</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            :   if (IsIntegerArithmeticSafe&lt;Promotion, U, V&gt;::value) {
+<span class="lineNum">     418 </span>            :     presult = static_cast&lt;Promotion&gt;(x) * static_cast&lt;Promotion&gt;(y);
+<span class="lineNum">     419 </span>            :   } else {
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :     is_valid &amp;= CheckedMulImpl(static_cast&lt;Promotion&gt;(x),</span>
+<span class="lineNum">     421 </span>            :                                static_cast&lt;Promotion&gt;(y), &amp;presult);
+<span class="lineNum">     422 </span>            :   }
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :   *result = static_cast&lt;V&gt;(presult);</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :   return is_valid &amp;&amp; IsValueInRangeForNumericType&lt;V&gt;(presult);</span>
+<span class="lineNum">     425 </span>            : }
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span>            : // Division just requires a check for a zero denominator or an invalid negation
+<span class="lineNum">     428 </span>            : // on signed min/-1.
+<span class="lineNum">     429 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     430 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer, bool&gt;::type
+<span class="lineNum">     431 </span>            : CheckedDivImpl(T x, T y, T* result) {
+<span class="lineNum">     432 </span>            :   if (y &amp;&amp; (!std::numeric_limits&lt;T&gt;::is_signed ||
+<span class="lineNum">     433 </span>            :             x != std::numeric_limits&lt;T&gt;::min() || y != static_cast&lt;T&gt;(-1))) {
+<span class="lineNum">     434 </span>            :     *result = x / y;
+<span class="lineNum">     435 </span>            :     return true;
+<span class="lineNum">     436 </span>            :   }
+<span class="lineNum">     437 </span>            :   return false;
+<span class="lineNum">     438 </span>            : }
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     441 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     442 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<span class="lineNum">     443 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,
+<span class="lineNum">     444 </span>            :                         bool&gt;::type
+<span class="lineNum">     445 </span>            : CheckedDiv(T x, U y, V* result) {
+<span class="lineNum">     446 </span>            :   using Promotion =
+<span class="lineNum">     447 </span>            :       typename ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, T, U&gt;::type;
+<span class="lineNum">     448 </span>            :   Promotion presult;
+<span class="lineNum">     449 </span>            :   // Fail if either operand is out of range for the promoted type.
+<span class="lineNum">     450 </span>            :   // TODO(jschuh): This could be made to work for a broader range of values.
+<span class="lineNum">     451 </span>            :   bool is_valid = IsValueInRangeForNumericType&lt;Promotion&gt;(x) &amp;&amp;
+<span class="lineNum">     452 </span>            :                   IsValueInRangeForNumericType&lt;Promotion&gt;(y);
+<span class="lineNum">     453 </span>            :   is_valid &amp;= CheckedDivImpl(static_cast&lt;Promotion&gt;(x),
+<span class="lineNum">     454 </span>            :                              static_cast&lt;Promotion&gt;(y), &amp;presult);
+<span class="lineNum">     455 </span>            :   *result = static_cast&lt;V&gt;(presult);
+<span class="lineNum">     456 </span>            :   return is_valid &amp;&amp; IsValueInRangeForNumericType&lt;V&gt;(presult);
+<span class="lineNum">     457 </span>            : }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     460 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     461 </span>            :                             std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     462 </span>            :                         bool&gt;::type
+<span class="lineNum">     463 </span>            : CheckedModImpl(T x, T y, T* result) {
+<span class="lineNum">     464 </span>            :   if (y &gt; 0) {
+<span class="lineNum">     465 </span>            :     *result = static_cast&lt;T&gt;(x % y);
+<span class="lineNum">     466 </span>            :     return true;
+<span class="lineNum">     467 </span>            :   }
+<span class="lineNum">     468 </span>            :   return false;
+<span class="lineNum">     469 </span>            : }
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     472 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     473 </span>            :                             !std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     474 </span>            :                         bool&gt;::type
+<span class="lineNum">     475 </span>            : CheckedModImpl(T x, T y, T* result) {
+<span class="lineNum">     476 </span>            :   if (y != 0) {
+<span class="lineNum">     477 </span>            :     *result = static_cast&lt;T&gt;(x % y);
+<span class="lineNum">     478 </span>            :     return true;
+<span class="lineNum">     479 </span>            :   }
+<span class="lineNum">     480 </span>            :   return false;
+<span class="lineNum">     481 </span>            : }
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     484 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     485 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<span class="lineNum">     486 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,
+<span class="lineNum">     487 </span>            :                         bool&gt;::type
+<span class="lineNum">     488 </span>            : CheckedMod(T x, U y, V* result) {
+<span class="lineNum">     489 </span>            :   using Promotion =
+<span class="lineNum">     490 </span>            :       typename ArithmeticPromotion&lt;BIG_ENOUGH_PROMOTION, T, U&gt;::type;
+<span class="lineNum">     491 </span>            :   Promotion presult;
+<span class="lineNum">     492 </span>            :   bool is_valid = CheckedModImpl(static_cast&lt;Promotion&gt;(x),
+<span class="lineNum">     493 </span>            :                                  static_cast&lt;Promotion&gt;(y), &amp;presult);
+<span class="lineNum">     494 </span>            :   *result = static_cast&lt;V&gt;(presult);
+<span class="lineNum">     495 </span>            :   return is_valid &amp;&amp; IsValueInRangeForNumericType&lt;V&gt;(presult);
+<span class="lineNum">     496 </span>            : }
+<span class="lineNum">     497 </span>            : 
+<span class="lineNum">     498 </span>            : // Left shift. Shifts less than 0 or greater than or equal to the number
+<span class="lineNum">     499 </span>            : // of bits in the promoted type are undefined. Shifts of negative values
+<span class="lineNum">     500 </span>            : // are undefined. Otherwise it is defined when the result fits.
+<span class="lineNum">     501 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     502 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     503 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<span class="lineNum">     504 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,
+<span class="lineNum">     505 </span>            :                         bool&gt;::type
+<span class="lineNum">     506 </span>            : CheckedLeftShift(T x, U shift, V* result) {
+<span class="lineNum">     507 </span>            :   using ShiftType = typename UnsignedIntegerForSize&lt;T&gt;::type;
+<span class="lineNum">     508 </span>            :   static const ShiftType kBitWidth = CHAR_BIT * sizeof(T);
+<span class="lineNum">     509 </span>            :   const ShiftType real_shift = static_cast&lt;ShiftType&gt;(shift);
+<span class="lineNum">     510 </span>            :   // Signed shift is not legal on negative values.
+<span class="lineNum">     511 </span>            :   if (!IsNegative(x) &amp;&amp; real_shift &lt; kBitWidth) {
+<span class="lineNum">     512 </span>            :     // Just use a multiplication because it's easy.
+<span class="lineNum">     513 </span>            :     // TODO(jschuh): This could probably be made more efficient.
+<span class="lineNum">     514 </span>            :     if (!std::is_signed&lt;T&gt;::value || real_shift != kBitWidth - 1)
+<span class="lineNum">     515 </span>            :       return CheckedMul(x, static_cast&lt;T&gt;(1) &lt;&lt; shift, result);
+<span class="lineNum">     516 </span>            :     return !x;  // Special case zero for a full width signed shift.
+<span class="lineNum">     517 </span>            :   }
+<span class="lineNum">     518 </span>            :   return false;
+<span class="lineNum">     519 </span>            : }
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            : // Right shift. Shifts less than 0 or greater than or equal to the number
+<span class="lineNum">     522 </span>            : // of bits in the promoted type are undefined. Otherwise, it is always defined,
+<span class="lineNum">     523 </span>            : // but a right shift of a negative value is implementation-dependent.
+<span class="lineNum">     524 </span>            : template &lt;typename T, typename U, typename V&gt;
+<span class="lineNum">     525 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     526 </span>            :                             std::numeric_limits&lt;U&gt;::is_integer &amp;&amp;
+<span class="lineNum">     527 </span>            :                             std::numeric_limits&lt;V&gt;::is_integer,
+<span class="lineNum">     528 </span>            :                         bool&gt;::type
+<span class="lineNum">     529 </span>            : CheckedRightShift(T x, U shift, V* result) {
+<span class="lineNum">     530 </span>            :   // Use the type conversion push negative values out of range.
+<span class="lineNum">     531 </span>            :   using ShiftType = typename UnsignedIntegerForSize&lt;T&gt;::type;
+<span class="lineNum">     532 </span>            :   if (static_cast&lt;ShiftType&gt;(shift) &lt; (CHAR_BIT * sizeof(T))) {
+<span class="lineNum">     533 </span>            :     T tmp = x &gt;&gt; shift;
+<span class="lineNum">     534 </span>            :     *result = static_cast&lt;V&gt;(tmp);
+<span class="lineNum">     535 </span>            :     return IsValueInRangeForNumericType&lt;unsigned&gt;(tmp);
+<span class="lineNum">     536 </span>            :   }
+<span class="lineNum">     537 </span>            :   return false;
+<span class="lineNum">     538 </span>            : }
+<span class="lineNum">     539 </span>            : 
+<span class="lineNum">     540 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     541 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     542 </span>            :                             std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     543 </span>            :                         bool&gt;::type
+<span class="lineNum">     544 </span>            : CheckedNeg(T value, T* result) {
+<span class="lineNum">     545 </span>            :   // The negation of signed min is min, so catch that one.
+<span class="lineNum">     546 </span>            :   if (value != std::numeric_limits&lt;T&gt;::min()) {
+<span class="lineNum">     547 </span>            :     *result = static_cast&lt;T&gt;(-value);
+<span class="lineNum">     548 </span>            :     return true;
+<span class="lineNum">     549 </span>            :   }
+<span class="lineNum">     550 </span>            :   return false;
+<span class="lineNum">     551 </span>            : }
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     554 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     555 </span>            :                             !std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     556 </span>            :                         bool&gt;::type
+<span class="lineNum">     557 </span>            : CheckedNeg(T value, T* result) {
+<span class="lineNum">     558 </span>            :   if (!value) {  // The only legal unsigned negation is zero.
+<span class="lineNum">     559 </span>            :     *result = static_cast&lt;T&gt;(0);
+<span class="lineNum">     560 </span>            :     return true;
+<span class="lineNum">     561 </span>            :   }
+<span class="lineNum">     562 </span>            :   return false;
+<span class="lineNum">     563 </span>            : }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     566 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     567 </span>            :                             std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     568 </span>            :                         bool&gt;::type
+<span class="lineNum">     569 </span>            : CheckedAbs(T value, T* result) {
+<span class="lineNum">     570 </span>            :   if (value != std::numeric_limits&lt;T&gt;::min()) {
+<span class="lineNum">     571 </span>            :     *result = std::abs(value);
+<span class="lineNum">     572 </span>            :     return true;
+<span class="lineNum">     573 </span>            :   }
+<span class="lineNum">     574 </span>            :   return false;
+<span class="lineNum">     575 </span>            : }
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     578 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     579 </span>            :                             !std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     580 </span>            :                         bool&gt;::type
+<span class="lineNum">     581 </span>            : CheckedAbs(T value, T* result) {
+<span class="lineNum">     582 </span>            :   // T is unsigned, so |value| must already be positive.
+<span class="lineNum">     583 </span>            :   *result = value;
+<span class="lineNum">     584 </span>            :   return true;
+<span class="lineNum">     585 </span>            : }
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     588 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     589 </span>            :                             std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     590 </span>            :                         typename UnsignedIntegerForSize&lt;T&gt;::type&gt;::type
+<span class="lineNum">     591 </span>            : SafeUnsignedAbs(T value) {
+<span class="lineNum">     592 </span>            :   typedef typename UnsignedIntegerForSize&lt;T&gt;::type UnsignedT;
+<span class="lineNum">     593 </span>            :   return value == std::numeric_limits&lt;T&gt;::min()
+<span class="lineNum">     594 </span>            :              ? static_cast&lt;UnsignedT&gt;(std::numeric_limits&lt;T&gt;::max()) + 1
+<span class="lineNum">     595 </span>            :              : static_cast&lt;UnsignedT&gt;(std::abs(value));
+<span class="lineNum">     596 </span>            : }
+<span class="lineNum">     597 </span>            : 
+<span class="lineNum">     598 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     599 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_integer &amp;&amp;
+<span class="lineNum">     600 </span>            :                             !std::numeric_limits&lt;T&gt;::is_signed,
+<span class="lineNum">     601 </span>            :                         T&gt;::type
+<span class="lineNum">     602 </span>            : SafeUnsignedAbs(T value) {
+<span class="lineNum">     603 </span>            :   // T is unsigned, so |value| must already be positive.
+<span class="lineNum">     604 </span>            :   return static_cast&lt;T&gt;(value);
+<span class="lineNum">     605 </span>            : }
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     608 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_iec559, T&gt;::type CheckedNeg(
+<span class="lineNum">     609 </span>            :     T value,
+<span class="lineNum">     610 </span>            :     bool*) {
+<span class="lineNum">     611 </span>            :   NOTREACHED();
+<span class="lineNum">     612 </span>            :   return static_cast&lt;T&gt;(-value);
+<span class="lineNum">     613 </span>            : }
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     616 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_iec559, T&gt;::type CheckedAbs(
+<span class="lineNum">     617 </span>            :     T value,
+<span class="lineNum">     618 </span>            :     bool*) {
+<span class="lineNum">     619 </span>            :   NOTREACHED();
+<span class="lineNum">     620 </span>            :   return static_cast&lt;T&gt;(std::abs(value));
+<span class="lineNum">     621 </span>            : }
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span>            : // These are the floating point stubs that the compiler needs to see.
+<span class="lineNum">     624 </span>            : #define BASE_FLOAT_ARITHMETIC_STUBS(NAME)                          \
+<span class="lineNum">     625 </span>            :   template &lt;typename T, typename U, typename V&gt;                    \
+<span class="lineNum">     626 </span>            :   typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_iec559 ||     \
+<span class="lineNum">     627 </span>            :                               std::numeric_limits&lt;U&gt;::is_iec559 || \
+<span class="lineNum">     628 </span>            :                               std::numeric_limits&lt;V&gt;::is_iec559,   \
+<span class="lineNum">     629 </span>            :                           bool&gt;::type Checked##NAME(T, U, V*) {    \
+<span class="lineNum">     630 </span>            :     NOTREACHED();                                                  \
+<span class="lineNum">     631 </span>            :     return static_cast&lt;T&gt;(false);                                  \
+<span class="lineNum">     632 </span>            :   }
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            : BASE_FLOAT_ARITHMETIC_STUBS(Add)
+<span class="lineNum">     635 </span>            : BASE_FLOAT_ARITHMETIC_STUBS(Sub)
+<span class="lineNum">     636 </span>            : BASE_FLOAT_ARITHMETIC_STUBS(Mul)
+<span class="lineNum">     637 </span>            : BASE_FLOAT_ARITHMETIC_STUBS(Div)
+<span class="lineNum">     638 </span>            : BASE_FLOAT_ARITHMETIC_STUBS(Mod)
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            : #undef BASE_FLOAT_ARITHMETIC_STUBS
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     643 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_iec559, bool&gt;::type
+<span class="lineNum">     644 </span>            : CheckedNeg(T value, T* result) {
+<span class="lineNum">     645 </span>            :   *result = static_cast&lt;T&gt;(-value);
+<span class="lineNum">     646 </span>            :   return true;
+<span class="lineNum">     647 </span>            : }
+<span class="lineNum">     648 </span>            : 
+<span class="lineNum">     649 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     650 </span>            : typename std::enable_if&lt;std::numeric_limits&lt;T&gt;::is_iec559, bool&gt;::type
+<span class="lineNum">     651 </span>            : CheckedAbs(T value, T* result) {
+<span class="lineNum">     652 </span>            :   *result = static_cast&lt;T&gt;(std::abs(value));
+<span class="lineNum">     653 </span>            :   return true;
+<span class="lineNum">     654 </span>            : }
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span>            : // Floats carry around their validity state with them, but integers do not. So,
+<span class="lineNum">     657 </span>            : // we wrap the underlying value in a specialization in order to hide that detail
+<span class="lineNum">     658 </span>            : // and expose an interface via accessors.
+<span class="lineNum">     659 </span>            : enum NumericRepresentation {
+<span class="lineNum">     660 </span>            :   NUMERIC_INTEGER,
+<span class="lineNum">     661 </span>            :   NUMERIC_FLOATING,
+<span class="lineNum">     662 </span>            :   NUMERIC_UNKNOWN
+<span class="lineNum">     663 </span>            : };
+<span class="lineNum">     664 </span>            : 
+<span class="lineNum">     665 </span>            : template &lt;typename NumericType&gt;
+<span class="lineNum">     666 </span>            : struct GetNumericRepresentation {
+<span class="lineNum">     667 </span>            :   static const NumericRepresentation value =
+<span class="lineNum">     668 </span>            :       std::numeric_limits&lt;NumericType&gt;::is_integer
+<span class="lineNum">     669 </span>            :           ? NUMERIC_INTEGER
+<span class="lineNum">     670 </span>            :           : (std::numeric_limits&lt;NumericType&gt;::is_iec559 ? NUMERIC_FLOATING
+<span class="lineNum">     671 </span>            :                                                          : NUMERIC_UNKNOWN);
+<span class="lineNum">     672 </span>            : };
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span>            : template &lt;typename T, NumericRepresentation type =
+<span class="lineNum">     675 </span>            :                           GetNumericRepresentation&lt;T&gt;::value&gt;
+<span class="lineNum">     676 </span>            : class CheckedNumericState {};
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : // Integrals require quite a bit of additional housekeeping to manage state.
+<span class="lineNum">     679 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     680 </span>            : class CheckedNumericState&lt;T, NUMERIC_INTEGER&gt; {
+<span class="lineNum">     681 </span>            :  private:
+<span class="lineNum">     682 </span>            :   T value_;
+<span class="lineNum">     683 </span>            :   bool is_valid_;
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            :  public:
+<span class="lineNum">     686 </span>            :   template &lt;typename Src, NumericRepresentation type&gt;
+<span class="lineNum">     687 </span>            :   friend class CheckedNumericState;
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            :   CheckedNumericState() : value_(0), is_valid_(true) {}
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     692 </span>            :   CheckedNumericState(Src value, bool is_valid)
+<span class="lineNum">     693 </span>            :       : value_(static_cast&lt;T&gt;(value)),
+<span class="lineNum">     694 </span>            :         is_valid_(is_valid &amp;&amp;
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :                   (DstRangeRelationToSrcRange&lt;T&gt;(value) == RANGE_VALID)) {</span>
+<span class="lineNum">     696 </span>            :     static_assert(std::numeric_limits&lt;Src&gt;::is_specialized,
+<span class="lineNum">     697 </span>            :                   &quot;Argument must be numeric.&quot;);
+<span class="lineNum">     698 </span>            :   }
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span>            :   // Copy constructor.
+<span class="lineNum">     701 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     702 </span>            :   CheckedNumericState(const CheckedNumericState&lt;Src&gt;&amp; rhs)
+<span class="lineNum">     703 </span>            :       : value_(static_cast&lt;T&gt;(rhs.value())), is_valid_(rhs.IsValid()) {}
+<span class="lineNum">     704 </span>            : 
+<span class="lineNum">     705 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     706 </span>            :   explicit CheckedNumericState(
+<span class="lineNum">     707 </span>            :       Src value,
+<span class="lineNum">     708 </span>            :       typename std::enable_if&lt;std::numeric_limits&lt;Src&gt;::is_specialized,
+<span class="lineNum">     709 </span>            :                               int&gt;::type = 0)
+<span class="lineNum">     710 </span>            :       : value_(static_cast&lt;T&gt;(value)),
+<span class="lineNum">     711 </span><span class="lineNoCov">          0 :         is_valid_(DstRangeRelationToSrcRange&lt;T&gt;(value) == RANGE_VALID) {}</span>
+<span class="lineNum">     712 </span>            : 
+<span class="lineNum">     713 </span>            :   bool is_valid() const { return is_valid_; }
+<span class="lineNum">     714 </span>            :   T value() const { return value_; }
+<span class="lineNum">     715 </span>            : };
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            : // Floating points maintain their own validity, but need translation wrappers.
+<span class="lineNum">     718 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     719 </span>            : class CheckedNumericState&lt;T, NUMERIC_FLOATING&gt; {
+<span class="lineNum">     720 </span>            :  private:
+<span class="lineNum">     721 </span>            :   T value_;
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            :  public:
+<span class="lineNum">     724 </span>            :   template &lt;typename Src, NumericRepresentation type&gt;
+<span class="lineNum">     725 </span>            :   friend class CheckedNumericState;
+<span class="lineNum">     726 </span>            : 
+<span class="lineNum">     727 </span>            :   CheckedNumericState() : value_(0.0) {}
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     730 </span>            :   CheckedNumericState(
+<span class="lineNum">     731 </span>            :       Src value,
+<span class="lineNum">     732 </span>            :       bool is_valid,
+<span class="lineNum">     733 </span>            :       typename std::enable_if&lt;std::numeric_limits&lt;Src&gt;::is_integer, int&gt;::type =
+<span class="lineNum">     734 </span>            :           0) {
+<span class="lineNum">     735 </span>            :     value_ = (is_valid &amp;&amp; (DstRangeRelationToSrcRange&lt;T&gt;(value) == RANGE_VALID))
+<span class="lineNum">     736 </span>            :                  ? static_cast&lt;T&gt;(value)
+<span class="lineNum">     737 </span>            :                  : std::numeric_limits&lt;T&gt;::quiet_NaN();
+<span class="lineNum">     738 </span>            :   }
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     741 </span>            :   explicit CheckedNumericState(
+<span class="lineNum">     742 </span>            :       Src value,
+<span class="lineNum">     743 </span>            :       typename std::enable_if&lt;std::numeric_limits&lt;Src&gt;::is_specialized,
+<span class="lineNum">     744 </span>            :                               int&gt;::type = 0)
+<span class="lineNum">     745 </span>            :       : value_(static_cast&lt;T&gt;(value)) {}
+<span class="lineNum">     746 </span>            : 
+<span class="lineNum">     747 </span>            :   // Copy constructor.
+<span class="lineNum">     748 </span>            :   template &lt;typename Src&gt;
+<span class="lineNum">     749 </span>            :   CheckedNumericState(const CheckedNumericState&lt;Src&gt;&amp; rhs)
+<span class="lineNum">     750 </span>            :       : value_(static_cast&lt;T&gt;(rhs.value())) {}
+<span class="lineNum">     751 </span>            : 
+<span class="lineNum">     752 </span>            :   bool is_valid() const { return std::isfinite(value_); }
+<span class="lineNum">     753 </span>            :   T value() const { return value_; }
+<span class="lineNum">     754 </span>            : };
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span>            : }  // namespace internal
+<span class="lineNum">     757 </span>            : }  // namespace base
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span>            : #endif  // BASE_NUMERICS_SAFE_MATH_IMPL_H_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - gcc/include/c++/4.9.4/bits/streambuf_iterator.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">gcc/include/c++/4.9.4/bits</a> - streambuf_iterator.h<span style="font-size: 80%;"> (source / <a href="streambuf_iterator.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // Streambuf iterators</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 1997-2014 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /** @file bits/streambuf_iterator.h
+<span class="lineNum">      26 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      27 </span>            :  *  Do not attempt to use it directly. @headername{iterator}
+<span class="lineNum">      28 </span>            :  */
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #ifndef _STREAMBUF_ITERATOR_H
+<span class="lineNum">      31 </span>            : #define _STREAMBUF_ITERATOR_H 1
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : #pragma GCC system_header
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #include &lt;streambuf&gt;
+<span class="lineNum">      36 </span>            : #include &lt;debug/debug.h&gt;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">      41 </span>            :      
+<span class="lineNum">      42 </span>            :   /**
+<span class="lineNum">      43 </span>            :    * @addtogroup iterators
+<span class="lineNum">      44 </span>            :    * @{
+<span class="lineNum">      45 </span>            :    */
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :   // 24.5.3 Template class istreambuf_iterator
+<span class="lineNum">      48 </span>            :   /// Provides input iterator semantics for streambufs.
+<span class="lineNum">      49 </span>            :   template&lt;typename _CharT, typename _Traits&gt;
+<span class="lineNum">      50 </span>            :     class istreambuf_iterator
+<span class="lineNum">      51 </span>            :     : public iterator&lt;input_iterator_tag, _CharT, typename _Traits::off_type,
+<span class="lineNum">      52 </span>            :                       _CharT*,
+<span class="lineNum">      53 </span>            : #if __cplusplus &gt;= 201103L
+<span class="lineNum">      54 </span>            :     // LWG 445.
+<span class="lineNum">      55 </span>            :                       _CharT&gt;
+<span class="lineNum">      56 </span>            : #else
+<span class="lineNum">      57 </span>            :                       _CharT&amp;&gt;
+<span class="lineNum">      58 </span>            : #endif
+<span class="lineNum">      59 </span>            :     {
+<span class="lineNum">      60 </span>            :     public:
+<span class="lineNum">      61 </span>            :       // Types:
+<span class="lineNum">      62 </span>            :       //@{
+<span class="lineNum">      63 </span>            :       /// Public typedefs
+<span class="lineNum">      64 </span>            :       typedef _CharT                                    char_type;
+<span class="lineNum">      65 </span>            :       typedef _Traits                                   traits_type;
+<span class="lineNum">      66 </span>            :       typedef typename _Traits::int_type                int_type;
+<span class="lineNum">      67 </span>            :       typedef basic_streambuf&lt;_CharT, _Traits&gt;            streambuf_type;
+<span class="lineNum">      68 </span>            :       typedef basic_istream&lt;_CharT, _Traits&gt;              istream_type;
+<span class="lineNum">      69 </span>            :       //@}
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :       template&lt;typename _CharT2&gt;
+<span class="lineNum">      72 </span>            :         friend typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT2&gt;::__value,
+<span class="lineNum">      73 </span>            :                                     ostreambuf_iterator&lt;_CharT2&gt; &gt;::__type
+<span class="lineNum">      74 </span>            :         copy(istreambuf_iterator&lt;_CharT2&gt;, istreambuf_iterator&lt;_CharT2&gt;,
+<span class="lineNum">      75 </span>            :              ostreambuf_iterator&lt;_CharT2&gt;);
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :       template&lt;bool _IsMove, typename _CharT2&gt;
+<span class="lineNum">      78 </span>            :         friend typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT2&gt;::__value, 
+<span class="lineNum">      79 </span>            :                                                _CharT2*&gt;::__type
+<span class="lineNum">      80 </span>            :         __copy_move_a2(istreambuf_iterator&lt;_CharT2&gt;,
+<span class="lineNum">      81 </span>            :                        istreambuf_iterator&lt;_CharT2&gt;, _CharT2*);
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :       template&lt;typename _CharT2&gt;
+<span class="lineNum">      84 </span>            :         friend typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT2&gt;::__value,
+<span class="lineNum">      85 </span>            :                                     istreambuf_iterator&lt;_CharT2&gt; &gt;::__type
+<span class="lineNum">      86 </span>            :         find(istreambuf_iterator&lt;_CharT2&gt;, istreambuf_iterator&lt;_CharT2&gt;,
+<span class="lineNum">      87 </span>            :              const _CharT2&amp;);
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :     private:
+<span class="lineNum">      90 </span>            :       // 24.5.3 istreambuf_iterator
+<span class="lineNum">      91 </span>            :       // p 1
+<span class="lineNum">      92 </span>            :       // If the end of stream is reached (streambuf_type::sgetc()
+<span class="lineNum">      93 </span>            :       // returns traits_type::eof()), the iterator becomes equal to
+<span class="lineNum">      94 </span>            :       // the &quot;end of stream&quot; iterator value.
+<span class="lineNum">      95 </span>            :       // NB: This implementation assumes the &quot;end of stream&quot; value
+<span class="lineNum">      96 </span>            :       // is EOF, or -1.
+<span class="lineNum">      97 </span>            :       mutable streambuf_type*   _M_sbuf;
+<span class="lineNum">      98 </span>            :       mutable int_type          _M_c;
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     public:
+<span class="lineNum">     101 </span>            :       ///  Construct end of input stream iterator.
+<span class="lineNum">     102 </span>            :       _GLIBCXX_CONSTEXPR istreambuf_iterator() _GLIBCXX_USE_NOEXCEPT
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       : _M_sbuf(0), _M_c(traits_type::eof()) { }</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : #if __cplusplus &gt;= 201103L
+<span class="lineNum">     106 </span>            :       istreambuf_iterator(const istreambuf_iterator&amp;) noexcept = default;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :       ~istreambuf_iterator() = default;
+<span class="lineNum">     109 </span>            : #endif
+<a name="110"><span class="lineNum">     110 </span>            : </a>
+<span class="lineNum">     111 </span>            :       ///  Construct start of input stream iterator.
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :       istreambuf_iterator(istream_type&amp; __s) _GLIBCXX_USE_NOEXCEPT</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :       : _M_sbuf(__s.rdbuf()), _M_c(traits_type::eof()) { }</span>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :       ///  Construct start of streambuf iterator.
+<span class="lineNum">     116 </span>            :       istreambuf_iterator(streambuf_type* __s) _GLIBCXX_USE_NOEXCEPT
+<span class="lineNum">     117 </span>            :       : _M_sbuf(__s), _M_c(traits_type::eof()) { }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :       ///  Return the current character pointed to by iterator.  This returns
+<span class="lineNum">     120 </span>            :       ///  streambuf.sgetc().  It cannot be assigned.  NB: The result of
+<span class="lineNum">     121 </span>            :       ///  operator*() on an end of stream is undefined.
+<span class="lineNum">     122 </span>            :       char_type
+<span class="lineNum">     123 </span>            :       operator*() const
+<span class="lineNum">     124 </span>            :       {
+<span class="lineNum">     125 </span>            : #ifdef _GLIBCXX_DEBUG_PEDANTIC
+<span class="lineNum">     126 </span>            :         // Dereferencing a past-the-end istreambuf_iterator is a
+<span class="lineNum">     127 </span>            :         // libstdc++ extension
+<span class="lineNum">     128 </span>            :         __glibcxx_requires_cond(!_M_at_eof(),
+<span class="lineNum">     129 </span>            :                                 _M_message(__gnu_debug::__msg_deref_istreambuf)
+<span class="lineNum">     130 </span>            :                                 ._M_iterator(*this));
+<span class="lineNum">     131 </span>            : #endif
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :         return traits_type::to_char_type(_M_get());</span>
+<span class="lineNum">     133 </span>            :       }
+<span class="lineNum">     134 </span>            : 
+<a name="135"><span class="lineNum">     135 </span>            :       /// Advance the iterator.  Calls streambuf.sbumpc().</a>
+<span class="lineNum">     136 </span>            :       istreambuf_iterator&amp;
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :       operator++()</span>
+<span class="lineNum">     138 </span>            :       {
+<span class="lineNum">     139 </span>            :         __glibcxx_requires_cond(!_M_at_eof(),
+<span class="lineNum">     140 </span>            :                                 _M_message(__gnu_debug::__msg_inc_istreambuf)
+<span class="lineNum">     141 </span>            :                                 ._M_iterator(*this));
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         if (_M_sbuf)</span>
+<span class="lineNum">     143 </span>            :           {
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :             _M_sbuf-&gt;sbumpc();</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :             _M_c = traits_type::eof();</span>
+<span class="lineNum">     146 </span>            :           }
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :         return *this;</span>
+<span class="lineNum">     148 </span>            :       }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :       /// Advance the iterator.  Calls streambuf.sbumpc().
+<span class="lineNum">     151 </span>            :       istreambuf_iterator
+<span class="lineNum">     152 </span>            :       operator++(int)
+<span class="lineNum">     153 </span>            :       {
+<span class="lineNum">     154 </span>            :         __glibcxx_requires_cond(!_M_at_eof(),
+<span class="lineNum">     155 </span>            :                                 _M_message(__gnu_debug::__msg_inc_istreambuf)
+<span class="lineNum">     156 </span>            :                                 ._M_iterator(*this));
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :         istreambuf_iterator __old = *this;
+<span class="lineNum">     159 </span>            :         if (_M_sbuf)
+<span class="lineNum">     160 </span>            :           {
+<span class="lineNum">     161 </span>            :             __old._M_c = _M_sbuf-&gt;sbumpc();
+<span class="lineNum">     162 </span>            :             _M_c = traits_type::eof();
+<span class="lineNum">     163 </span>            :           }
+<span class="lineNum">     164 </span>            :         return __old;
+<span class="lineNum">     165 </span>            :       }
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :       // _GLIBCXX_RESOLVE_LIB_DEFECTS
+<span class="lineNum">     168 </span>            :       // 110 istreambuf_iterator::equal not const
+<span class="lineNum">     169 </span>            :       // NB: there is also number 111 (NAD, Future) pending on this function.
+<a name="170"><span class="lineNum">     170 </span>            :       /// Return true both iterators are end or both are not end.</a>
+<span class="lineNum">     171 </span>            :       bool
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       equal(const istreambuf_iterator&amp; __b) const</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       { return _M_at_eof() == __b._M_at_eof(); }</span>
+<span class="lineNum">     174 </span>            : 
+<a name="175"><span class="lineNum">     175 </span>            :     private:</a>
+<span class="lineNum">     176 </span>            :       int_type
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       _M_get() const</span>
+<span class="lineNum">     178 </span>            :       {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :         const int_type __eof = traits_type::eof();</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :         int_type __ret = __eof;</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :         if (_M_sbuf)</span>
+<span class="lineNum">     182 </span>            :           {
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :             if (!traits_type::eq_int_type(_M_c, __eof))</span>
+<span class="lineNum">     184 </span>            :               __ret = _M_c;
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :             else if (!traits_type::eq_int_type((__ret = _M_sbuf-&gt;sgetc()),</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                                                __eof))</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :               _M_c = __ret;</span>
+<span class="lineNum">     188 </span>            :             else
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :               _M_sbuf = 0;</span>
+<span class="lineNum">     190 </span>            :           }
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         return __ret;</span>
+<span class="lineNum">     192 </span>            :       }
+<a name="193"><span class="lineNum">     193 </span>            : </a>
+<span class="lineNum">     194 </span>            :       bool
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       _M_at_eof() const</span>
+<span class="lineNum">     196 </span>            :       {
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :         const int_type __eof = traits_type::eof();</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         return traits_type::eq_int_type(_M_get(), __eof);</span>
+<span class="lineNum">     199 </span>            :       }
+<span class="lineNum">     200 </span>            :     };
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :   template&lt;typename _CharT, typename _Traits&gt;
+<span class="lineNum">     203 </span>            :     inline bool
+<span class="lineNum">     204 </span>            :     operator==(const istreambuf_iterator&lt;_CharT, _Traits&gt;&amp; __a,
+<span class="lineNum">     205 </span>            :                const istreambuf_iterator&lt;_CharT, _Traits&gt;&amp; __b)
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :     { return __a.equal(__b); }</span>
+<span class="lineNum">     207 </span>            : 
+<a name="208"><span class="lineNum">     208 </span>            :   template&lt;typename _CharT, typename _Traits&gt;</a>
+<span class="lineNum">     209 </span>            :     inline bool
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :     operator!=(const istreambuf_iterator&lt;_CharT, _Traits&gt;&amp; __a,</span>
+<span class="lineNum">     211 </span>            :                const istreambuf_iterator&lt;_CharT, _Traits&gt;&amp; __b)
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :     { return !__a.equal(__b); }</span>
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   /// Provides output iterator semantics for streambufs.
+<span class="lineNum">     215 </span>            :   template&lt;typename _CharT, typename _Traits&gt;
+<span class="lineNum">     216 </span>            :     class ostreambuf_iterator
+<span class="lineNum">     217 </span>            :     : public iterator&lt;output_iterator_tag, void, void, void, void&gt;
+<span class="lineNum">     218 </span>            :     {
+<span class="lineNum">     219 </span>            :     public:
+<span class="lineNum">     220 </span>            :       // Types:
+<span class="lineNum">     221 </span>            :       //@{
+<span class="lineNum">     222 </span>            :       /// Public typedefs
+<span class="lineNum">     223 </span>            :       typedef _CharT                           char_type;
+<span class="lineNum">     224 </span>            :       typedef _Traits                          traits_type;
+<span class="lineNum">     225 </span>            :       typedef basic_streambuf&lt;_CharT, _Traits&gt; streambuf_type;
+<span class="lineNum">     226 </span>            :       typedef basic_ostream&lt;_CharT, _Traits&gt;   ostream_type;
+<span class="lineNum">     227 </span>            :       //@}
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :       template&lt;typename _CharT2&gt;
+<span class="lineNum">     230 </span>            :         friend typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT2&gt;::__value,
+<span class="lineNum">     231 </span>            :                                     ostreambuf_iterator&lt;_CharT2&gt; &gt;::__type
+<span class="lineNum">     232 </span>            :         copy(istreambuf_iterator&lt;_CharT2&gt;, istreambuf_iterator&lt;_CharT2&gt;,
+<span class="lineNum">     233 </span>            :              ostreambuf_iterator&lt;_CharT2&gt;);
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :     private:
+<span class="lineNum">     236 </span>            :       streambuf_type*   _M_sbuf;
+<span class="lineNum">     237 </span>            :       bool              _M_failed;
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :     public:
+<span class="lineNum">     240 </span>            :       ///  Construct output iterator from ostream.
+<span class="lineNum">     241 </span>            :       ostreambuf_iterator(ostream_type&amp; __s) _GLIBCXX_USE_NOEXCEPT
+<span class="lineNum">     242 </span>            :       : _M_sbuf(__s.rdbuf()), _M_failed(!_M_sbuf) { }
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :       ///  Construct output iterator from streambuf.
+<span class="lineNum">     245 </span>            :       ostreambuf_iterator(streambuf_type* __s) _GLIBCXX_USE_NOEXCEPT
+<span class="lineNum">     246 </span>            :       : _M_sbuf(__s), _M_failed(!_M_sbuf) { }
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :       ///  Write character to streambuf.  Calls streambuf.sputc().
+<span class="lineNum">     249 </span>            :       ostreambuf_iterator&amp;
+<span class="lineNum">     250 </span>            :       operator=(_CharT __c)
+<span class="lineNum">     251 </span>            :       {
+<span class="lineNum">     252 </span>            :         if (!_M_failed &amp;&amp;
+<span class="lineNum">     253 </span>            :             _Traits::eq_int_type(_M_sbuf-&gt;sputc(__c), _Traits::eof()))
+<span class="lineNum">     254 </span>            :           _M_failed = true;
+<span class="lineNum">     255 </span>            :         return *this;
+<span class="lineNum">     256 </span>            :       }
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :       /// Return *this.
+<span class="lineNum">     259 </span>            :       ostreambuf_iterator&amp;
+<span class="lineNum">     260 </span>            :       operator*()
+<span class="lineNum">     261 </span>            :       { return *this; }
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :       /// Return *this.
+<span class="lineNum">     264 </span>            :       ostreambuf_iterator&amp;
+<span class="lineNum">     265 </span>            :       operator++(int)
+<span class="lineNum">     266 </span>            :       { return *this; }
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :       /// Return *this.
+<span class="lineNum">     269 </span>            :       ostreambuf_iterator&amp;
+<span class="lineNum">     270 </span>            :       operator++()
+<span class="lineNum">     271 </span>            :       { return *this; }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :       /// Return true if previous operator=() failed.
+<span class="lineNum">     274 </span>            :       bool
+<span class="lineNum">     275 </span>            :       failed() const _GLIBCXX_USE_NOEXCEPT
+<span class="lineNum">     276 </span>            :       { return _M_failed; }
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :       ostreambuf_iterator&amp;
+<span class="lineNum">     279 </span>            :       _M_put(const _CharT* __ws, streamsize __len)
+<span class="lineNum">     280 </span>            :       {
+<span class="lineNum">     281 </span>            :         if (__builtin_expect(!_M_failed, true)
+<span class="lineNum">     282 </span>            :             &amp;&amp; __builtin_expect(this-&gt;_M_sbuf-&gt;sputn(__ws, __len) != __len,
+<span class="lineNum">     283 </span>            :                                 false))
+<span class="lineNum">     284 </span>            :           _M_failed = true;
+<span class="lineNum">     285 </span>            :         return *this;
+<span class="lineNum">     286 </span>            :       }
+<span class="lineNum">     287 </span>            :     };
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :   // Overloads for streambuf iterators.
+<span class="lineNum">     290 </span>            :   template&lt;typename _CharT&gt;
+<span class="lineNum">     291 </span>            :     typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT&gt;::__value,
+<span class="lineNum">     292 </span>            :                                     ostreambuf_iterator&lt;_CharT&gt; &gt;::__type
+<span class="lineNum">     293 </span>            :     copy(istreambuf_iterator&lt;_CharT&gt; __first,
+<span class="lineNum">     294 </span>            :          istreambuf_iterator&lt;_CharT&gt; __last,
+<span class="lineNum">     295 </span>            :          ostreambuf_iterator&lt;_CharT&gt; __result)
+<span class="lineNum">     296 </span>            :     {
+<span class="lineNum">     297 </span>            :       if (__first._M_sbuf &amp;&amp; !__last._M_sbuf &amp;&amp; !__result._M_failed)
+<span class="lineNum">     298 </span>            :         {
+<span class="lineNum">     299 </span>            :           bool __ineof;
+<span class="lineNum">     300 </span>            :           __copy_streambufs_eof(__first._M_sbuf, __result._M_sbuf, __ineof);
+<span class="lineNum">     301 </span>            :           if (!__ineof)
+<span class="lineNum">     302 </span>            :             __result._M_failed = true;
+<span class="lineNum">     303 </span>            :         }
+<span class="lineNum">     304 </span>            :       return __result;
+<span class="lineNum">     305 </span>            :     }
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :   template&lt;bool _IsMove, typename _CharT&gt;
+<span class="lineNum">     308 </span>            :     typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT&gt;::__value, 
+<span class="lineNum">     309 </span>            :                                     ostreambuf_iterator&lt;_CharT&gt; &gt;::__type
+<span class="lineNum">     310 </span>            :     __copy_move_a2(_CharT* __first, _CharT* __last,
+<span class="lineNum">     311 </span>            :                    ostreambuf_iterator&lt;_CharT&gt; __result)
+<span class="lineNum">     312 </span>            :     {
+<span class="lineNum">     313 </span>            :       const streamsize __num = __last - __first;
+<span class="lineNum">     314 </span>            :       if (__num &gt; 0)
+<span class="lineNum">     315 </span>            :         __result._M_put(__first, __num);
+<span class="lineNum">     316 </span>            :       return __result;
+<span class="lineNum">     317 </span>            :     }
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            :   template&lt;bool _IsMove, typename _CharT&gt;
+<span class="lineNum">     320 </span>            :     typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT&gt;::__value,
+<span class="lineNum">     321 </span>            :                                     ostreambuf_iterator&lt;_CharT&gt; &gt;::__type
+<span class="lineNum">     322 </span>            :     __copy_move_a2(const _CharT* __first, const _CharT* __last,
+<span class="lineNum">     323 </span>            :                    ostreambuf_iterator&lt;_CharT&gt; __result)
+<span class="lineNum">     324 </span>            :     {
+<span class="lineNum">     325 </span>            :       const streamsize __num = __last - __first;
+<span class="lineNum">     326 </span>            :       if (__num &gt; 0)
+<span class="lineNum">     327 </span>            :         __result._M_put(__first, __num);
+<span class="lineNum">     328 </span>            :       return __result;
+<span class="lineNum">     329 </span>            :     }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            :   template&lt;bool _IsMove, typename _CharT&gt;
+<span class="lineNum">     332 </span>            :     typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT&gt;::__value, 
+<span class="lineNum">     333 </span>            :                                     _CharT*&gt;::__type
+<span class="lineNum">     334 </span>            :     __copy_move_a2(istreambuf_iterator&lt;_CharT&gt; __first,
+<span class="lineNum">     335 </span>            :                    istreambuf_iterator&lt;_CharT&gt; __last, _CharT* __result)
+<span class="lineNum">     336 </span>            :     {
+<span class="lineNum">     337 </span>            :       typedef istreambuf_iterator&lt;_CharT&gt;                  __is_iterator_type;
+<span class="lineNum">     338 </span>            :       typedef typename __is_iterator_type::traits_type     traits_type;
+<span class="lineNum">     339 </span>            :       typedef typename __is_iterator_type::streambuf_type  streambuf_type;
+<span class="lineNum">     340 </span>            :       typedef typename traits_type::int_type               int_type;
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            :       if (__first._M_sbuf &amp;&amp; !__last._M_sbuf)
+<span class="lineNum">     343 </span>            :         {
+<span class="lineNum">     344 </span>            :           streambuf_type* __sb = __first._M_sbuf;
+<span class="lineNum">     345 </span>            :           int_type __c = __sb-&gt;sgetc();
+<span class="lineNum">     346 </span>            :           while (!traits_type::eq_int_type(__c, traits_type::eof()))
+<span class="lineNum">     347 </span>            :             {
+<span class="lineNum">     348 </span>            :               const streamsize __n = __sb-&gt;egptr() - __sb-&gt;gptr();
+<span class="lineNum">     349 </span>            :               if (__n &gt; 1)
+<span class="lineNum">     350 </span>            :                 {
+<span class="lineNum">     351 </span>            :                   traits_type::copy(__result, __sb-&gt;gptr(), __n);
+<span class="lineNum">     352 </span>            :                   __sb-&gt;__safe_gbump(__n);
+<span class="lineNum">     353 </span>            :                   __result += __n;
+<span class="lineNum">     354 </span>            :                   __c = __sb-&gt;underflow();
+<span class="lineNum">     355 </span>            :                 }
+<span class="lineNum">     356 </span>            :               else
+<span class="lineNum">     357 </span>            :                 {
+<span class="lineNum">     358 </span>            :                   *__result++ = traits_type::to_char_type(__c);
+<span class="lineNum">     359 </span>            :                   __c = __sb-&gt;snextc();
+<span class="lineNum">     360 </span>            :                 }
+<span class="lineNum">     361 </span>            :             }
+<span class="lineNum">     362 </span>            :         }
+<span class="lineNum">     363 </span>            :       return __result;
+<span class="lineNum">     364 </span>            :     }
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :   template&lt;typename _CharT&gt;
+<span class="lineNum">     367 </span>            :     typename __gnu_cxx::__enable_if&lt;__is_char&lt;_CharT&gt;::__value,
+<span class="lineNum">     368 </span>            :                                     istreambuf_iterator&lt;_CharT&gt; &gt;::__type
+<span class="lineNum">     369 </span>            :     find(istreambuf_iterator&lt;_CharT&gt; __first,
+<span class="lineNum">     370 </span>            :          istreambuf_iterator&lt;_CharT&gt; __last, const _CharT&amp; __val)
+<span class="lineNum">     371 </span>            :     {
+<span class="lineNum">     372 </span>            :       typedef istreambuf_iterator&lt;_CharT&gt;                  __is_iterator_type;
+<span class="lineNum">     373 </span>            :       typedef typename __is_iterator_type::traits_type     traits_type;
+<span class="lineNum">     374 </span>            :       typedef typename __is_iterator_type::streambuf_type  streambuf_type;
+<span class="lineNum">     375 </span>            :       typedef typename traits_type::int_type               int_type;
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :       if (__first._M_sbuf &amp;&amp; !__last._M_sbuf)
+<span class="lineNum">     378 </span>            :         {
+<span class="lineNum">     379 </span>            :           const int_type __ival = traits_type::to_int_type(__val);
+<span class="lineNum">     380 </span>            :           streambuf_type* __sb = __first._M_sbuf;
+<span class="lineNum">     381 </span>            :           int_type __c = __sb-&gt;sgetc();
+<span class="lineNum">     382 </span>            :           while (!traits_type::eq_int_type(__c, traits_type::eof())
+<span class="lineNum">     383 </span>            :                  &amp;&amp; !traits_type::eq_int_type(__c, __ival))
+<span class="lineNum">     384 </span>            :             {
+<span class="lineNum">     385 </span>            :               streamsize __n = __sb-&gt;egptr() - __sb-&gt;gptr();
+<span class="lineNum">     386 </span>            :               if (__n &gt; 1)
+<span class="lineNum">     387 </span>            :                 {
+<span class="lineNum">     388 </span>            :                   const _CharT* __p = traits_type::find(__sb-&gt;gptr(),
+<span class="lineNum">     389 </span>            :                                                         __n, __val);
+<span class="lineNum">     390 </span>            :                   if (__p)
+<span class="lineNum">     391 </span>            :                     __n = __p - __sb-&gt;gptr();
+<span class="lineNum">     392 </span>            :                   __sb-&gt;__safe_gbump(__n);
+<span class="lineNum">     393 </span>            :                   __c = __sb-&gt;sgetc();
+<span class="lineNum">     394 </span>            :                 }
+<span class="lineNum">     395 </span>            :               else
+<span class="lineNum">     396 </span>            :                 __c = __sb-&gt;snextc();
+<span class="lineNum">     397 </span>            :             }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :           if (!traits_type::eq_int_type(__c, traits_type::eof()))
+<span class="lineNum">     400 </span>            :             __first._M_c = __c;
+<span class="lineNum">     401 </span>            :           else
+<span class="lineNum">     402 </span>            :             __first._M_sbuf = 0;
+<span class="lineNum">     403 </span>            :         }
+<span class="lineNum">     404 </span>            :       return __first;
+<span class="lineNum">     405 </span>            :     }
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            : // @} group iterators
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     410 </span>            : } // namespace
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

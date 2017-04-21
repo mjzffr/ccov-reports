@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/layout/FrameChildList.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/layout</a> - FrameChildList.h<span style="font-size: 80%;"> (source / <a href="FrameChildList.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set shiftwidth=2 tabstop=8 autoindent cindent expandtab: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef FrameChildList_h_
+<span class="lineNum">       8 </span>            : #define FrameChildList_h_
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;nsFrameList.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : class nsIFrame;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace mozilla {
+<span class="lineNum">      16 </span>            : namespace layout {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : // enum FrameChildListID lives in nsFrameList.h to solve circular dependencies.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #ifdef DEBUG_FRAME_DUMP
+<span class="lineNum">      21 </span>            : extern const char* ChildListName(FrameChildListID aListID);
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : class FrameChildListIDs {
+<span class="lineNum">      25 </span>            : friend class FrameChildListIterator;
+<span class="lineNum">      26 </span>            :  public:
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :   FrameChildListIDs() : mIDs(0) {}</span>
+<span class="lineNum">      28 </span>            :   FrameChildListIDs(const FrameChildListIDs&amp; aOther) : mIDs(aOther.mIDs) {}
+<span class="lineNum">      29 </span>            :   MOZ_IMPLICIT FrameChildListIDs(FrameChildListID aListID) : mIDs(aListID) {}
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   FrameChildListIDs operator|(FrameChildListIDs aOther) const {
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     return FrameChildListIDs(mIDs | aOther.mIDs);</span>
+<span class="lineNum">      33 </span>            :   }
+<span class="lineNum">      34 </span>            :   FrameChildListIDs&amp; operator|=(FrameChildListIDs aOther) {
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :     mIDs |= aOther.mIDs;</span>
+<span class="lineNum">      36 </span>            :     return *this;
+<span class="lineNum">      37 </span>            :   }
+<span class="lineNum">      38 </span>            :   bool operator==(FrameChildListIDs aOther) const {
+<span class="lineNum">      39 </span>            :     return mIDs == aOther.mIDs;
+<span class="lineNum">      40 </span>            :   }
+<span class="lineNum">      41 </span>            :   bool operator!=(const FrameChildListIDs&amp; aOther) const {
+<span class="lineNum">      42 </span>            :     return !(*this == aOther);
+<span class="lineNum">      43 </span>            :   }
+<span class="lineNum">      44 </span>            :   bool Contains(FrameChildListIDs aOther) const {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     return (mIDs &amp; aOther.mIDs) == aOther.mIDs;</span>
+<span class="lineNum">      46 </span>            :   }
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :  protected:
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   explicit FrameChildListIDs(uint32_t aIDs) : mIDs(aIDs) {}</span>
+<span class="lineNum">      50 </span>            :   uint32_t mIDs;
+<span class="lineNum">      51 </span>            : };
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 : class FrameChildList {</span>
+<a name="54"><span class="lineNum">      54 </span>            :  public:</a>
+<span class="lineNum">      55 </span>            :   FrameChildList(const nsFrameList&amp; aList, FrameChildListID aID)
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     : mList(aList), mID(aID) {}</span>
+<span class="lineNum">      57 </span>            :   nsFrameList mList;
+<span class="lineNum">      58 </span>            :   FrameChildListID mID;
+<span class="lineNum">      59 </span>            : };
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : /**
+<span class="lineNum">      62 </span>            :  * A class to iterate frame child lists.
+<span class="lineNum">      63 </span>            :  */
+<span class="lineNum">      64 </span>            : class MOZ_STACK_CLASS FrameChildListArrayIterator {
+<span class="lineNum">      65 </span>            :  public:
+<a name="66"><span class="lineNum">      66 </span>            :   explicit FrameChildListArrayIterator(const nsTArray&lt;FrameChildList&gt;&amp; aLists)</a>
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 :     : mLists(aLists), mCurrentIndex(0) {}</span></a>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   bool IsDone() const { return mCurrentIndex &gt;= mLists.Length(); }</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   FrameChildListID CurrentID() const {</span>
+<span class="lineNum">      70 </span>            :     NS_ASSERTION(!IsDone(), &quot;CurrentID(): iterator at end&quot;);
+<a name="71"><span class="lineNum">      71 </span><span class="lineNoCov">          0 :     return mLists[mCurrentIndex].mID;</span></a>
+<span class="lineNum">      72 </span>            :   }
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :   const nsFrameList&amp; CurrentList() const {</span>
+<span class="lineNum">      74 </span>            :     NS_ASSERTION(!IsDone(), &quot;CurrentList(): iterator at end&quot;);
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :     return mLists[mCurrentIndex].mList;</span>
+<span class="lineNum">      76 </span>            :   }
+<span class="lineNum">      77 </span>            :   void Next() {
+<span class="lineNum">      78 </span>            :     NS_ASSERTION(!IsDone(), &quot;Next(): iterator at end&quot;);
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     ++mCurrentIndex;</span>
+<span class="lineNum">      80 </span>            :   }
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            : protected:
+<span class="lineNum">      83 </span>            :   const nsTArray&lt;FrameChildList&gt;&amp; mLists;
+<span class="lineNum">      84 </span>            :   uint32_t mCurrentIndex;
+<span class="lineNum">      85 </span>            : };
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : /**
+<span class="lineNum">      88 </span>            :  * A class for retrieving a frame's child lists and iterate them.
+<span class="lineNum">      89 </span>            :  */
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 : class MOZ_STACK_CLASS FrameChildListIterator</span>
+<span class="lineNum">      91 </span>            :   : public FrameChildListArrayIterator {
+<span class="lineNum">      92 </span>            :  public:
+<span class="lineNum">      93 </span>            :   explicit FrameChildListIterator(const nsIFrame* aFrame);
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : protected:
+<span class="lineNum">      96 </span>            :   AutoTArray&lt;FrameChildList,4&gt; mLists;
+<span class="lineNum">      97 </span>            : };
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : inline mozilla::layout::FrameChildListIDs
+<span class="lineNum">     100 </span>            : operator|(mozilla::layout::FrameChildListID aLeftOp,
+<span class="lineNum">     101 </span>            :           mozilla::layout::FrameChildListID aRightOp)
+<span class="lineNum">     102 </span>            : {
+<span class="lineNum">     103 </span>            :   return mozilla::layout::FrameChildListIDs(aLeftOp) |
+<span class="lineNum">     104 </span>            :          mozilla::layout::FrameChildListIDs(aRightOp);
+<span class="lineNum">     105 </span>            : }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : inline mozilla::layout::FrameChildListIDs
+<span class="lineNum">     108 </span>            : operator|(mozilla::layout::FrameChildListID aLeftOp,
+<span class="lineNum">     109 </span>            :           const mozilla::layout::FrameChildListIDs&amp; aRightOp)
+<span class="lineNum">     110 </span>            : {
+<span class="lineNum">     111 </span>            :   return mozilla::layout::FrameChildListIDs(aLeftOp) | aRightOp;
+<span class="lineNum">     112 </span>            : }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            : } // namespace layout
+<span class="lineNum">     115 </span>            : } // namespace mozilla
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 : inline void nsFrameList::AppendIfNonempty(</span>
+<span class="lineNum">     118 </span>            :          nsTArray&lt;mozilla::layout::FrameChildList&gt;* aLists,
+<span class="lineNum">     119 </span>            :          mozilla::layout::FrameChildListID aListID) const
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   if (NotEmpty()) {</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     aLists-&gt;AppendElement(mozilla::layout::FrameChildList(*this, aListID));</span>
+<span class="lineNum">     123 </span>            :   }
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : #endif /* !defined(FrameChildList_h_) */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

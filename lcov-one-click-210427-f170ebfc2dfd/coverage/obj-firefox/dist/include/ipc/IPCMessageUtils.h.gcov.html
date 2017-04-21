@@ -1,0 +1,936 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/ipc/IPCMessageUtils.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/ipc</a> - IPCMessageUtils.h<span style="font-size: 80%;"> (source / <a href="IPCMessageUtils.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntry">150</td>
+            <td class="headerCovTableEntryLo">48.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">403</td>
+            <td class="headerCovTableEntryLo">5.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef __IPC_GLUE_IPCMESSAGEUTILS_H__
+<span class="lineNum">       8 </span>            : #define __IPC_GLUE_IPCMESSAGEUTILS_H__
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;base/process_util.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;chrome/common/ipc_message_utils.h&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/ArrayUtils.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/DebugOnly.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/dom/ipc/StructuredCloneData.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/Maybe.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;mozilla/net/WebSocketFrame.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/TimeStamp.h&quot;
+<span class="lineNum">      20 </span>            : #ifdef XP_WIN
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/TimeStamp_windows.h&quot;
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : #include &quot;mozilla/TypeTraits.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;mozilla/IntegerTypeTraits.h&quot;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #ifdef MOZ_CRASHREPORTER
+<span class="lineNum">      29 </span>            : #include &quot;nsExceptionHandler.h&quot;
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : #include &quot;nsID.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsIWidget.h&quot;
+<span class="lineNum">      33 </span>            : #include &quot;nsMemory.h&quot;
+<span class="lineNum">      34 </span>            : #include &quot;nsString.h&quot;
+<span class="lineNum">      35 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      36 </span>            : #include &quot;js/StructuredClone.h&quot;
+<span class="lineNum">      37 </span>            : #include &quot;nsCSSPropertyID.h&quot;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #ifdef _MSC_VER
+<span class="lineNum">      40 </span>            : #pragma warning( disable : 4800 )
+<span class="lineNum">      41 </span>            : #endif
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : #if !defined(OS_POSIX)
+<span class="lineNum">      44 </span>            : // This condition must be kept in sync with the one in
+<span class="lineNum">      45 </span>            : // ipc_message_utils.h, but this dummy definition of
+<span class="lineNum">      46 </span>            : // base::FileDescriptor acts as a static assert that we only get one
+<span class="lineNum">      47 </span>            : // def or the other (or neither, in which case code using
+<span class="lineNum">      48 </span>            : // FileDescriptor fails to build)
+<span class="lineNum">      49 </span>            : namespace base { struct FileDescriptor { }; }
+<span class="lineNum">      50 </span>            : #endif
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : namespace mozilla {
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : // This is a cross-platform approximation to HANDLE, which we expect
+<span class="lineNum">      55 </span>            : // to be typedef'd to void* or thereabouts.
+<span class="lineNum">      56 </span>            : typedef uintptr_t WindowsHandle;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : // XXX there are out of place and might be generally useful.  Could
+<span class="lineNum">      59 </span>            : // move to nscore.h or something.
+<span class="lineNum">      60 </span>            : struct void_t {
+<span class="lineNum">      61 </span>            :   bool operator==(const void_t&amp;) const { return true; }
+<span class="lineNum">      62 </span>            : };
+<span class="lineNum">      63 </span>            : struct null_t {
+<span class="lineNum">      64 </span>            :   bool operator==(const null_t&amp;) const { return true; }
+<a name="65"><span class="lineNum">      65 </span>            : };</a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">         10 : struct SerializedStructuredCloneBuffer final</span>
+<a name="68"><span class="lineNum">      68 </span>            : {</a>
+<span class="lineNum">      69 </span>            :   SerializedStructuredCloneBuffer&amp;
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   operator=(const SerializedStructuredCloneBuffer&amp; aOther)</span>
+<span class="lineNum">      71 </span>            :   {
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :     data.Clear();</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     auto iter = aOther.data.Iter();</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     while (!iter.Done()) {</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       data.WriteBytes(iter.Data(), iter.RemainingInSegment());</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       iter.Advance(aOther.data, iter.RemainingInSegment());</span>
+<span class="lineNum">      77 </span>            :     }
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     return *this;</span>
+<span class="lineNum">      79 </span>            :   }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   bool
+<span class="lineNum">      82 </span>            :   operator==(const SerializedStructuredCloneBuffer&amp; aOther) const
+<span class="lineNum">      83 </span>            :   {
+<span class="lineNum">      84 </span>            :     // The copy assignment operator and the equality operator are
+<span class="lineNum">      85 </span>            :     // needed by the IPDL generated code. We relied on the copy
+<span class="lineNum">      86 </span>            :     // assignment operator at some places but we never use the
+<span class="lineNum">      87 </span>            :     // equality operator.
+<span class="lineNum">      88 </span>            :     return false;
+<span class="lineNum">      89 </span>            :   }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   JSStructuredCloneData data;
+<span class="lineNum">      92 </span>            : };
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            : } // namespace mozilla
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : namespace IPC {
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : /**
+<span class="lineNum">      99 </span>            :  * Maximum size, in bytes, of a single IPC message.
+<span class="lineNum">     100 </span>            :  */
+<span class="lineNum">     101 </span>            : static const uint32_t MAX_MESSAGE_SIZE = 65536;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : /**
+<span class="lineNum">     104 </span>            :  * Generic enum serializer.
+<span class="lineNum">     105 </span>            :  *
+<span class="lineNum">     106 </span>            :  * Consider using the specializations below, such as ContiguousEnumSerializer.
+<span class="lineNum">     107 </span>            :  *
+<span class="lineNum">     108 </span>            :  * This is a generic serializer for any enum type used in IPDL.
+<span class="lineNum">     109 </span>            :  * Programmers can define ParamTraits&lt;E&gt; for enum type E by deriving
+<span class="lineNum">     110 </span>            :  * EnumSerializer&lt;E, MyEnumValidator&gt; where MyEnumValidator is a struct
+<span class="lineNum">     111 </span>            :  * that has to define a static IsLegalValue function returning whether
+<span class="lineNum">     112 </span>            :  * a given value is a legal value of the enum type at hand.
+<span class="lineNum">     113 </span>            :  *
+<span class="lineNum">     114 </span>            :  * \sa https://developer.mozilla.org/en/IPDL/Type_Serialization
+<span class="lineNum">     115 </span>            :  */
+<span class="lineNum">     116 </span>            : template &lt;typename E, typename EnumValidator&gt;
+<span class="lineNum">     117 </span>            : struct EnumSerializer {
+<span class="lineNum">     118 </span>            :   typedef E paramType;
+<span class="lineNum">     119 </span>            :   typedef typename mozilla::UnsignedStdintTypeForSize&lt;sizeof(paramType)&gt;::Type
+<a name="120"><span class="lineNum">     120 </span>            :           uintParamType;</a>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineCov">         30 :   static void Write(Message* aMsg, const paramType&amp; aValue) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">         30 :     MOZ_RELEASE_ASSERT(EnumValidator::IsLegalValue(aValue));</span>
+<span class="lineNum">     124 </span><span class="lineCov">         40 :     WriteParam(aMsg, uintParamType(aValue));</span>
+<a name="125"><span class="lineNum">     125 </span><span class="lineCov">         30 :   }</span></a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult) {</span>
+<span class="lineNum">     128 </span>            :     uintParamType value;
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     if (!ReadParam(aMsg, aIter, &amp;value)) {</span>
+<span class="lineNum">     130 </span>            : #ifdef MOZ_CRASHREPORTER
+<span class="lineNum">     131 </span>            :       CrashReporter::AnnotateCrashReport(NS_LITERAL_CSTRING(&quot;IPCReadErrorReason&quot;),
+<span class="lineNum">     132 </span>            :                                          NS_LITERAL_CSTRING(&quot;Bad iter&quot;));
+<span class="lineNum">     133 </span>            : #endif
+<span class="lineNum">     134 </span>            :       return false;
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     } else if (!EnumValidator::IsLegalValue(paramType(value))) {</span>
+<span class="lineNum">     136 </span>            : #ifdef MOZ_CRASHREPORTER
+<span class="lineNum">     137 </span>            :       CrashReporter::AnnotateCrashReport(NS_LITERAL_CSTRING(&quot;IPCReadErrorReason&quot;),
+<span class="lineNum">     138 </span>            :                                          NS_LITERAL_CSTRING(&quot;Illegal value&quot;));
+<span class="lineNum">     139 </span>            : #endif
+<span class="lineNum">     140 </span>            :       return false;
+<span class="lineNum">     141 </span>            :     }
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     *aResult = paramType(value);</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     144 </span>            :   }
+<span class="lineNum">     145 </span>            : };
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            : template &lt;typename E,
+<span class="lineNum">     148 </span>            :           E MinLegal,
+<span class="lineNum">     149 </span>            :           E HighBound&gt;
+<span class="lineNum">     150 </span>            : class ContiguousEnumValidator
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :   // Silence overzealous -Wtype-limits bug in GCC fixed in GCC 4.8:
+<span class="lineNum">     153 </span>            :   // &quot;comparison of unsigned expression &gt;= 0 is always true&quot;
+<a name="154"><span class="lineNum">     154 </span>            :   // http://gcc.gnu.org/bugzilla/show_bug.cgi?id=11856</a>
+<span class="lineNum">     155 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   static bool IsLessThanOrEqual(T a, T b) { return a &lt;= b; }</span>
+<a name="157"><span class="lineNum">     157 </span>            : </a>
+<span class="lineNum">     158 </span>            : public:
+<span class="lineNum">     159 </span><span class="lineCov">         30 :   static bool IsLegalValue(E e)</span>
+<span class="lineNum">     160 </span>            :   {
+<span class="lineNum">     161 </span><span class="lineCov">         30 :     return IsLessThanOrEqual(MinLegal, e) &amp;&amp; e &lt; HighBound;</span>
+<span class="lineNum">     162 </span>            :   }
+<span class="lineNum">     163 </span>            : };
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : template &lt;typename E,
+<span class="lineNum">     166 </span>            :           E AllBits&gt;
+<span class="lineNum">     167 </span>            : struct BitFlagsEnumValidator
+<span class="lineNum">     168 </span>            : {
+<span class="lineNum">     169 </span>            :   static bool IsLegalValue(E e)
+<span class="lineNum">     170 </span>            :   {
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     return (e &amp; AllBits) == e;</span>
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span>            : };
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : /**
+<span class="lineNum">     176 </span>            :  * Specialization of EnumSerializer for enums with contiguous enum values.
+<span class="lineNum">     177 </span>            :  *
+<span class="lineNum">     178 </span>            :  * Provide two values: MinLegal, HighBound. An enum value x will be
+<span class="lineNum">     179 </span>            :  * considered legal if MinLegal &lt;= x &lt; HighBound.
+<span class="lineNum">     180 </span>            :  *
+<span class="lineNum">     181 </span>            :  * For example, following is definition of serializer for enum type FOO.
+<span class="lineNum">     182 </span>            :  * \code
+<span class="lineNum">     183 </span>            :  * enum FOO { FOO_FIRST, FOO_SECOND, FOO_LAST, NUM_FOO };
+<span class="lineNum">     184 </span>            :  *
+<span class="lineNum">     185 </span>            :  * template &lt;&gt;
+<span class="lineNum">     186 </span>            :  * struct ParamTraits&lt;FOO&gt;:
+<span class="lineNum">     187 </span>            :  *     public ContiguousEnumSerializer&lt;FOO, FOO_FIRST, NUM_FOO&gt; {};
+<span class="lineNum">     188 </span>            :  * \endcode
+<span class="lineNum">     189 </span>            :  * FOO_FIRST, FOO_SECOND, and FOO_LAST are valid value.
+<span class="lineNum">     190 </span>            :  */
+<span class="lineNum">     191 </span>            : template &lt;typename E,
+<span class="lineNum">     192 </span>            :           E MinLegal,
+<span class="lineNum">     193 </span>            :           E HighBound&gt;
+<span class="lineNum">     194 </span>            : struct ContiguousEnumSerializer
+<span class="lineNum">     195 </span>            :   : EnumSerializer&lt;E,
+<span class="lineNum">     196 </span>            :                    ContiguousEnumValidator&lt;E, MinLegal, HighBound&gt;&gt;
+<span class="lineNum">     197 </span>            : {};
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : /**
+<span class="lineNum">     200 </span>            :  * Specialization of EnumSerializer for enums representing bit flags.
+<span class="lineNum">     201 </span>            :  *
+<span class="lineNum">     202 </span>            :  * Provide one value: AllBits. An enum value x will be
+<span class="lineNum">     203 </span>            :  * considered legal if (x &amp; AllBits) == x;
+<span class="lineNum">     204 </span>            :  *
+<span class="lineNum">     205 </span>            :  * Example:
+<span class="lineNum">     206 </span>            :  * \code
+<span class="lineNum">     207 </span>            :  * enum FOO {
+<span class="lineNum">     208 </span>            :  *   FOO_FIRST =  1 &lt;&lt; 0,
+<span class="lineNum">     209 </span>            :  *   FOO_SECOND = 1 &lt;&lt; 1,
+<span class="lineNum">     210 </span>            :  *   FOO_LAST =   1 &lt;&lt; 2,
+<span class="lineNum">     211 </span>            :  *   ALL_BITS =   (1 &lt;&lt; 3) - 1
+<span class="lineNum">     212 </span>            :  * };
+<span class="lineNum">     213 </span>            :  *
+<span class="lineNum">     214 </span>            :  * template &lt;&gt;
+<span class="lineNum">     215 </span>            :  * struct ParamTraits&lt;FOO&gt;:
+<span class="lineNum">     216 </span>            :  *     public BitFlagsEnumSerializer&lt;FOO, FOO::ALL_BITS&gt; {};
+<span class="lineNum">     217 </span>            :  * \endcode
+<span class="lineNum">     218 </span>            :  */
+<span class="lineNum">     219 </span>            : template &lt;typename E,
+<span class="lineNum">     220 </span>            :           E AllBits&gt;
+<span class="lineNum">     221 </span>            : struct BitFlagsEnumSerializer
+<span class="lineNum">     222 </span>            :   : EnumSerializer&lt;E,
+<span class="lineNum">     223 </span>            :                    BitFlagsEnumValidator&lt;E, AllBits&gt;&gt;
+<span class="lineNum">     224 </span>            : {};
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            : template &lt;&gt;
+<span class="lineNum">     227 </span>            : struct ParamTraits&lt;base::ChildPrivileges&gt;
+<span class="lineNum">     228 </span>            :   : public ContiguousEnumSerializer&lt;base::ChildPrivileges,
+<span class="lineNum">     229 </span>            :                                     base::PRIVILEGES_DEFAULT,
+<span class="lineNum">     230 </span>            :                                     base::PRIVILEGES_LAST&gt;
+<span class="lineNum">     231 </span>            : { };
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            : template&lt;&gt;
+<span class="lineNum">     234 </span>            : struct ParamTraits&lt;int8_t&gt;
+<span class="lineNum">     235 </span>            : {
+<a name="236"><span class="lineNum">     236 </span>            :   typedef int8_t paramType;</a>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     239 </span>            :   {
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :     aMsg-&gt;WriteBytes(&amp;aParam, sizeof(aParam));</span>
+<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     244 </span>            :   {
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     return aMsg-&gt;ReadBytesInto(aIter, aResult, sizeof(*aResult));</span>
+<span class="lineNum">     246 </span>            :   }
+<span class="lineNum">     247 </span>            : };
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : template&lt;&gt;
+<span class="lineNum">     250 </span>            : struct ParamTraits&lt;uint8_t&gt;
+<span class="lineNum">     251 </span>            : {
+<a name="252"><span class="lineNum">     252 </span>            :   typedef uint8_t paramType;</a>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineCov">         10 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     255 </span>            :   {
+<span class="lineNum">     256 </span><span class="lineCov">         10 :     aMsg-&gt;WriteBytes(&amp;aParam, sizeof(aParam));</span>
+<a name="257"><span class="lineNum">     257 </span><span class="lineCov">         10 :   }</span></a>
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     260 </span>            :   {
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     return aMsg-&gt;ReadBytesInto(aIter, aResult, sizeof(*aResult));</span>
+<span class="lineNum">     262 </span>            :   }
+<span class="lineNum">     263 </span>            : };
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            : #if !defined(OS_POSIX)
+<span class="lineNum">     266 </span>            : // See above re: keeping definitions in sync
+<span class="lineNum">     267 </span>            : template&lt;&gt;
+<span class="lineNum">     268 </span>            : struct ParamTraits&lt;base::FileDescriptor&gt;
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span>            :   typedef base::FileDescriptor paramType;
+<span class="lineNum">     271 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam) {
+<span class="lineNum">     272 </span>            :     MOZ_CRASH(&quot;FileDescriptor isn't meaningful on this platform&quot;);
+<span class="lineNum">     273 </span>            :   }
+<span class="lineNum">     274 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult) {
+<span class="lineNum">     275 </span>            :     MOZ_CRASH(&quot;FileDescriptor isn't meaningful on this platform&quot;);
+<span class="lineNum">     276 </span>            :     return false;
+<span class="lineNum">     277 </span>            :   }
+<span class="lineNum">     278 </span>            : };
+<span class="lineNum">     279 </span>            : #endif  // !defined(OS_POSIX)
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            : template &lt;&gt;
+<span class="lineNum">     282 </span>            : struct ParamTraits&lt;nsACString&gt;
+<span class="lineNum">     283 </span>            : {
+<a name="284"><span class="lineNum">     284 </span>            :   typedef nsACString paramType;</a>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span><span class="lineCov">      14135 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     287 </span>            :   {
+<span class="lineNum">     288 </span><span class="lineCov">      28270 :     bool isVoid = aParam.IsVoid();</span>
+<span class="lineNum">     289 </span><span class="lineCov">      14135 :     aMsg-&gt;WriteBool(isVoid);</span>
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">      14135 :     if (isVoid)</span>
+<span class="lineNum">     292 </span>            :       // represents a nullptr pointer
+<span class="lineNum">     293 </span><span class="lineCov">      14135 :       return;</span>
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span><span class="lineCov">      14135 :     uint32_t length = aParam.Length();</span>
+<span class="lineNum">     296 </span><span class="lineCov">      14135 :     WriteParam(aMsg, length);</span>
+<span class="lineNum">     297 </span><span class="lineCov">      14135 :     aMsg-&gt;WriteBytes(aParam.BeginReading(), length);</span>
+<a name="298"><span class="lineNum">     298 </span>            :   }</a>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">        133 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     301 </span>            :   {
+<span class="lineNum">     302 </span>            :     bool isVoid;
+<span class="lineNum">     303 </span><span class="lineCov">        133 :     if (!aMsg-&gt;ReadBool(aIter, &amp;isVoid))</span>
+<span class="lineNum">     304 </span>            :       return false;
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineCov">        133 :     if (isVoid) {</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :       aResult-&gt;SetIsVoid(true);</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     309 </span>            :     }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :     uint32_t length;
+<span class="lineNum">     312 </span><span class="lineCov">        133 :     if (!ReadParam(aMsg, aIter, &amp;length)) {</span>
+<span class="lineNum">     313 </span>            :       return false;
+<span class="lineNum">     314 </span>            :     }
+<span class="lineNum">     315 </span><span class="lineCov">        133 :     aResult-&gt;SetLength(length);</span>
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineCov">        133 :     return aMsg-&gt;ReadBytesInto(aIter, aResult-&gt;BeginWriting(), length);</span>
+<span class="lineNum">     318 </span>            :   }
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     321 </span>            :   {
+<span class="lineNum">     322 </span>            :     if (aParam.IsVoid())
+<span class="lineNum">     323 </span>            :       aLog-&gt;append(L&quot;(NULL)&quot;);
+<span class="lineNum">     324 </span>            :     else
+<span class="lineNum">     325 </span>            :       aLog-&gt;append(UTF8ToWide(aParam.BeginReading()));
+<span class="lineNum">     326 </span>            :   }
+<span class="lineNum">     327 </span>            : };
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            : template &lt;&gt;
+<span class="lineNum">     330 </span>            : struct ParamTraits&lt;nsAString&gt;
+<span class="lineNum">     331 </span>            : {
+<a name="332"><span class="lineNum">     332 </span>            :   typedef nsAString paramType;</a>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineCov">         20 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     335 </span>            :   {
+<span class="lineNum">     336 </span><span class="lineCov">         40 :     bool isVoid = aParam.IsVoid();</span>
+<span class="lineNum">     337 </span><span class="lineCov">         20 :     aMsg-&gt;WriteBool(isVoid);</span>
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span><span class="lineCov">         20 :     if (isVoid)</span>
+<span class="lineNum">     340 </span>            :       // represents a nullptr pointer
+<span class="lineNum">     341 </span><span class="lineCov">         20 :       return;</span>
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span><span class="lineCov">         20 :     uint32_t length = aParam.Length();</span>
+<span class="lineNum">     344 </span><span class="lineCov">         20 :     WriteParam(aMsg, length);</span>
+<span class="lineNum">     345 </span><span class="lineCov">         20 :     aMsg-&gt;WriteBytes(aParam.BeginReading(), length * sizeof(char16_t));</span>
+<a name="346"><span class="lineNum">     346 </span>            :   }</a>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineCov">         13 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     349 </span>            :   {
+<span class="lineNum">     350 </span>            :     bool isVoid;
+<span class="lineNum">     351 </span><span class="lineCov">         13 :     if (!aMsg-&gt;ReadBool(aIter, &amp;isVoid))</span>
+<span class="lineNum">     352 </span>            :       return false;
+<span class="lineNum">     353 </span>            : 
+<span class="lineNum">     354 </span><span class="lineCov">         13 :     if (isVoid) {</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :       aResult-&gt;SetIsVoid(true);</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     357 </span>            :     }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            :     uint32_t length;
+<span class="lineNum">     360 </span><span class="lineCov">         13 :     if (!ReadParam(aMsg, aIter, &amp;length)) {</span>
+<span class="lineNum">     361 </span>            :       return false;
+<span class="lineNum">     362 </span>            :     }
+<span class="lineNum">     363 </span><span class="lineCov">         13 :     aResult-&gt;SetLength(length);</span>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">         13 :     return aMsg-&gt;ReadBytesInto(aIter, aResult-&gt;BeginWriting(), length * sizeof(char16_t));</span>
+<span class="lineNum">     366 </span>            :   }
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     369 </span>            :   {
+<span class="lineNum">     370 </span>            :     if (aParam.IsVoid())
+<span class="lineNum">     371 </span>            :       aLog-&gt;append(L&quot;(NULL)&quot;);
+<span class="lineNum">     372 </span>            :     else {
+<span class="lineNum">     373 </span>            : #ifdef WCHAR_T_IS_UTF16
+<span class="lineNum">     374 </span>            :       aLog-&gt;append(reinterpret_cast&lt;const wchar_t*&gt;(aParam.BeginReading()));
+<span class="lineNum">     375 </span>            : #else
+<span class="lineNum">     376 </span>            :       uint32_t length = aParam.Length();
+<span class="lineNum">     377 </span>            :       for (uint32_t index = 0; index &lt; length; index++) {
+<span class="lineNum">     378 </span>            :         aLog-&gt;push_back(std::wstring::value_type(aParam[index]));
+<span class="lineNum">     379 </span>            :       }
+<span class="lineNum">     380 </span>            : #endif
+<span class="lineNum">     381 </span>            :     }
+<span class="lineNum">     382 </span>            :   }
+<span class="lineNum">     383 </span>            : };
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : template &lt;&gt;
+<span class="lineNum">     386 </span>            : struct ParamTraits&lt;nsCString&gt; : ParamTraits&lt;nsACString&gt;
+<span class="lineNum">     387 </span>            : {
+<span class="lineNum">     388 </span>            :   typedef nsCString paramType;
+<span class="lineNum">     389 </span>            : };
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : template &lt;&gt;
+<span class="lineNum">     392 </span>            : struct ParamTraits&lt;nsLiteralCString&gt; : ParamTraits&lt;nsACString&gt;
+<span class="lineNum">     393 </span>            : {
+<span class="lineNum">     394 </span>            :   typedef nsLiteralCString paramType;
+<span class="lineNum">     395 </span>            : };
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            : #ifdef MOZILLA_INTERNAL_API
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            : template&lt;&gt;
+<span class="lineNum">     400 </span>            : struct ParamTraits&lt;nsAutoCString&gt; : ParamTraits&lt;nsCString&gt;
+<span class="lineNum">     401 </span>            : {
+<span class="lineNum">     402 </span>            :   typedef nsAutoCString paramType;
+<span class="lineNum">     403 </span>            : };
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            : #endif  // MOZILLA_INTERNAL_API
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            : template &lt;&gt;
+<span class="lineNum">     408 </span>            : struct ParamTraits&lt;nsString&gt; : ParamTraits&lt;nsAString&gt;
+<span class="lineNum">     409 </span>            : {
+<span class="lineNum">     410 </span>            :   typedef nsString paramType;
+<span class="lineNum">     411 </span>            : };
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            : template &lt;&gt;
+<span class="lineNum">     414 </span>            : struct ParamTraits&lt;nsLiteralString&gt; : ParamTraits&lt;nsAString&gt;
+<span class="lineNum">     415 </span>            : {
+<span class="lineNum">     416 </span>            :   typedef nsLiteralString paramType;
+<span class="lineNum">     417 </span>            : };
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span>            : template &lt;&gt;
+<span class="lineNum">     420 </span>            : struct ParamTraits&lt;nsDependentSubstring&gt; : ParamTraits&lt;nsAString&gt;
+<span class="lineNum">     421 </span>            : {
+<span class="lineNum">     422 </span>            :   typedef nsDependentSubstring paramType;
+<span class="lineNum">     423 </span>            : };
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : template &lt;&gt;
+<span class="lineNum">     426 </span>            : struct ParamTraits&lt;nsDependentCSubstring&gt; : ParamTraits&lt;nsACString&gt;
+<span class="lineNum">     427 </span>            : {
+<span class="lineNum">     428 </span>            :   typedef nsDependentCSubstring paramType;
+<span class="lineNum">     429 </span>            : };
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            : #ifdef MOZILLA_INTERNAL_API
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span>            : template&lt;&gt;
+<span class="lineNum">     434 </span>            : struct ParamTraits&lt;nsAutoString&gt; : ParamTraits&lt;nsString&gt;
+<span class="lineNum">     435 </span>            : {
+<span class="lineNum">     436 </span>            :   typedef nsAutoString paramType;
+<span class="lineNum">     437 </span>            : };
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            : #endif  // MOZILLA_INTERNAL_API
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            : // Pickle::ReadBytes and ::WriteBytes take the length in ints, so we must
+<span class="lineNum">     442 </span>            : // ensure there is no overflow. This returns |false| if it would overflow.
+<span class="lineNum">     443 </span>            : // Otherwise, it returns |true| and places the byte length in |aByteLength|.
+<span class="lineNum">     444 </span>            : bool ByteLengthIsValid(uint32_t aNumElements, size_t aElementSize, int* aByteLength);
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : // Note: IPDL will sometimes codegen specialized implementations of
+<span class="lineNum">     447 </span>            : // nsTArray serialization and deserialization code in
+<span class="lineNum">     448 </span>            : // implementSpecialArrayPickling(). This is needed when ParamTraits&lt;E&gt;
+<span class="lineNum">     449 </span>            : // is not defined.
+<span class="lineNum">     450 </span>            : template &lt;typename E&gt;
+<span class="lineNum">     451 </span>            : struct ParamTraits&lt;nsTArray&lt;E&gt;&gt;
+<span class="lineNum">     452 </span>            : {
+<span class="lineNum">     453 </span>            :   typedef nsTArray&lt;E&gt; paramType;
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            :   // We write arrays of integer or floating-point data using a single pickling
+<span class="lineNum">     456 </span>            :   // call, rather than writing each element individually.  We deliberately do
+<span class="lineNum">     457 </span>            :   // not use mozilla::IsPod here because it is perfectly reasonable to have
+<span class="lineNum">     458 </span>            :   // a data structure T for which IsPod&lt;T&gt;::value is true, yet also have a
+<span class="lineNum">     459 </span>            :   // ParamTraits&lt;T&gt; specialization.
+<span class="lineNum">     460 </span>            :   static const bool sUseWriteBytes = (mozilla::IsIntegral&lt;E&gt;::value ||
+<a name="461"><span class="lineNum">     461 </span>            :                                       mozilla::IsFloatingPoint&lt;E&gt;::value);</a>
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span><span class="lineCov">         35 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     464 </span>            :   {
+<span class="lineNum">     465 </span><span class="lineCov">         70 :     uint32_t length = aParam.Length();</span>
+<span class="lineNum">     466 </span><span class="lineCov">         35 :     WriteParam(aMsg, length);</span>
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span>            :     if (sUseWriteBytes) {
+<span class="lineNum">     469 </span><span class="lineCov">          5 :       int pickledLength = 0;</span>
+<span class="lineNum">     470 </span><span class="lineCov">          5 :       MOZ_RELEASE_ASSERT(ByteLengthIsValid(length, sizeof(E), &amp;pickledLength));</span>
+<span class="lineNum">     471 </span><span class="lineCov">         10 :       aMsg-&gt;WriteBytes(aParam.Elements(), pickledLength);</span>
+<span class="lineNum">     472 </span>            :     } else {
+<span class="lineNum">     473 </span><span class="lineCov">         60 :       const E* elems = aParam.Elements();</span>
+<span class="lineNum">     474 </span><span class="lineCov">        165 :       for (uint32_t index = 0; index &lt; length; index++) {</span>
+<span class="lineNum">     475 </span><span class="lineCov">        135 :         WriteParam(aMsg, elems[index]);</span>
+<span class="lineNum">     476 </span>            :       }
+<span class="lineNum">     477 </span>            :     }
+<span class="lineNum">     478 </span><span class="lineCov">         35 :   }</span>
+<span class="lineNum">     479 </span>            : 
+<a name="480"><span class="lineNum">     480 </span>            :   // This method uses infallible allocation so that an OOM failure will</a>
+<span class="lineNum">     481 </span>            :   // show up as an OOM crash rather than an IPC FatalError.
+<span class="lineNum">     482 </span><span class="lineCov">         10 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     483 </span>            :   {
+<span class="lineNum">     484 </span>            :     uint32_t length;
+<span class="lineNum">     485 </span><span class="lineCov">         10 :     if (!ReadParam(aMsg, aIter, &amp;length)) {</span>
+<span class="lineNum">     486 </span>            :       return false;
+<span class="lineNum">     487 </span>            :     }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :     if (sUseWriteBytes) {
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :       int pickledLength = 0;</span>
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :       if (!ByteLengthIsValid(length, sizeof(E), &amp;pickledLength)) {</span>
+<span class="lineNum">     492 </span>            :         return false;
+<span class="lineNum">     493 </span>            :       }
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :       E* elements = aResult-&gt;AppendElements(length);</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :       return aMsg-&gt;ReadBytesInto(aIter, elements, pickledLength);</span>
+<span class="lineNum">     497 </span>            :     } else {
+<span class="lineNum">     498 </span><span class="lineCov">         10 :       aResult-&gt;SetCapacity(length);</span>
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span><span class="lineCov">        867 :       for (uint32_t index = 0; index &lt; length; index++) {</span>
+<span class="lineNum">     501 </span><span class="lineCov">        857 :         E* element = aResult-&gt;AppendElement();</span>
+<span class="lineNum">     502 </span><span class="lineCov">        857 :         if (!ReadParam(aMsg, aIter, element)) {</span>
+<span class="lineNum">     503 </span>            :           return false;
+<span class="lineNum">     504 </span>            :         }
+<span class="lineNum">     505 </span>            :       }
+<span class="lineNum">     506 </span>            :       return true;
+<span class="lineNum">     507 </span>            :     }
+<span class="lineNum">     508 </span>            :   }
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     511 </span>            :   {
+<span class="lineNum">     512 </span>            :     for (uint32_t index = 0; index &lt; aParam.Length(); index++) {
+<span class="lineNum">     513 </span>            :       if (index) {
+<span class="lineNum">     514 </span>            :         aLog-&gt;append(L&quot; &quot;);
+<span class="lineNum">     515 </span>            :       }
+<span class="lineNum">     516 </span>            :       LogParam(aParam[index], aLog);
+<span class="lineNum">     517 </span>            :     }
+<span class="lineNum">     518 </span>            :   }
+<span class="lineNum">     519 </span>            : };
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            : template&lt;typename E&gt;
+<span class="lineNum">     522 </span>            : struct ParamTraits&lt;FallibleTArray&lt;E&gt;&gt;
+<span class="lineNum">     523 </span>            : {
+<span class="lineNum">     524 </span>            :   typedef FallibleTArray&lt;E&gt; paramType;
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam)
+<span class="lineNum">     527 </span>            :   {
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, static_cast&lt;const nsTArray&lt;E&gt;&amp;&gt;(aParam));</span>
+<span class="lineNum">     529 </span>            :   }
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            :   // Deserialize the array infallibly, but return a FallibleTArray.
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     533 </span>            :   {
+<span class="lineNum">     534 </span>            :     nsTArray&lt;E&gt; temp;
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :     if (!ReadParam(aMsg, aIter, &amp;temp))</span>
+<span class="lineNum">     536 </span>            :       return false;
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :     aResult-&gt;SwapElements(temp);</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     540 </span>            :   }
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     543 </span>            :   {
+<span class="lineNum">     544 </span>            :     LogParam(static_cast&lt;const nsTArray&lt;E&gt;&amp;&gt;(aParam), aLog);
+<span class="lineNum">     545 </span>            :   }
+<span class="lineNum">     546 </span>            : };
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            : template&lt;typename E, size_t N&gt;
+<span class="lineNum">     549 </span>            : struct ParamTraits&lt;AutoTArray&lt;E, N&gt;&gt; : ParamTraits&lt;nsTArray&lt;E&gt;&gt;
+<span class="lineNum">     550 </span>            : {
+<span class="lineNum">     551 </span>            :   typedef AutoTArray&lt;E, N&gt; paramType;
+<span class="lineNum">     552 </span>            : };
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span>            : template&lt;&gt;
+<span class="lineNum">     555 </span>            : struct ParamTraits&lt;float&gt;
+<span class="lineNum">     556 </span>            : {
+<a name="557"><span class="lineNum">     557 </span>            :   typedef float paramType;</a>
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     560 </span>            :   {
+<span class="lineNum">     561 </span><span class="lineNoCov">          0 :     aMsg-&gt;WriteBytes(&amp;aParam, sizeof(paramType));</span>
+<a name="562"><span class="lineNum">     562 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     565 </span>            :   {
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :     return aMsg-&gt;ReadBytesInto(aIter, aResult, sizeof(*aResult));</span>
+<span class="lineNum">     567 </span>            :   }
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     570 </span>            :   {
+<span class="lineNum">     571 </span>            :     aLog-&gt;append(StringPrintf(L&quot;%g&quot;, aParam));
+<span class="lineNum">     572 </span>            :   }
+<span class="lineNum">     573 </span>            : };
+<span class="lineNum">     574 </span>            : 
+<span class="lineNum">     575 </span>            : template &lt;&gt;
+<span class="lineNum">     576 </span>            : struct ParamTraits&lt;nsCSSPropertyID&gt;
+<span class="lineNum">     577 </span>            :   : public ContiguousEnumSerializer&lt;nsCSSPropertyID,
+<span class="lineNum">     578 </span>            :                                     eCSSProperty_UNKNOWN,
+<span class="lineNum">     579 </span>            :                                     eCSSProperty_COUNT&gt;
+<span class="lineNum">     580 </span>            : {};
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            : template&lt;&gt;
+<span class="lineNum">     583 </span>            : struct ParamTraits&lt;mozilla::void_t&gt;
+<span class="lineNum">     584 </span>            : {
+<span class="lineNum">     585 </span>            :   typedef mozilla::void_t paramType;
+<span class="lineNum">     586 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam) { }
+<span class="lineNum">     587 </span>            :   static bool
+<span class="lineNum">     588 </span>            :   Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     589 </span>            :   {
+<span class="lineNum">     590 </span>            :     *aResult = paramType();
+<span class="lineNum">     591 </span>            :     return true;
+<span class="lineNum">     592 </span>            :   }
+<span class="lineNum">     593 </span>            : };
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : template&lt;&gt;
+<span class="lineNum">     596 </span>            : struct ParamTraits&lt;mozilla::null_t&gt;
+<span class="lineNum">     597 </span>            : {
+<span class="lineNum">     598 </span>            :   typedef mozilla::null_t paramType;
+<span class="lineNum">     599 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam) { }
+<span class="lineNum">     600 </span>            :   static bool
+<span class="lineNum">     601 </span>            :   Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     602 </span>            :   {
+<span class="lineNum">     603 </span>            :     *aResult = paramType();
+<span class="lineNum">     604 </span>            :     return true;
+<span class="lineNum">     605 </span>            :   }
+<span class="lineNum">     606 </span>            : };
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span>            : template&lt;&gt;
+<span class="lineNum">     609 </span>            : struct ParamTraits&lt;nsID&gt;
+<span class="lineNum">     610 </span>            : {
+<a name="611"><span class="lineNum">     611 </span>            :   typedef nsID paramType;</a>
+<span class="lineNum">     612 </span>            : 
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     614 </span>            :   {
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.m0);</span>
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.m1);</span>
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.m2);</span>
+<span class="lineNum">     618 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; mozilla::ArrayLength(aParam.m3); i++) {</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :       WriteParam(aMsg, aParam.m3[i]);</span>
+<span class="lineNum">     620 </span>            :     }
+<a name="621"><span class="lineNum">     621 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     624 </span>            :   {
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :     if(!ReadParam(aMsg, aIter, &amp;(aResult-&gt;m0)) ||</span>
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :        !ReadParam(aMsg, aIter, &amp;(aResult-&gt;m1)) ||</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :        !ReadParam(aMsg, aIter, &amp;(aResult-&gt;m2)))</span>
+<span class="lineNum">     628 </span>            :       return false;
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span><span class="lineNoCov">          0 :     for (unsigned int i = 0; i &lt; mozilla::ArrayLength(aResult-&gt;m3); i++)</span>
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :       if (!ReadParam(aMsg, aIter, &amp;(aResult-&gt;m3[i])))</span>
+<span class="lineNum">     632 </span>            :         return false;
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            :     return true;
+<span class="lineNum">     635 </span>            :   }
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     638 </span>            :   {
+<span class="lineNum">     639 </span>            :     aLog-&gt;append(L&quot;{&quot;);
+<span class="lineNum">     640 </span>            :     aLog-&gt;append(StringPrintf(L&quot;%8.8X-%4.4X-%4.4X-&quot;,
+<span class="lineNum">     641 </span>            :                               aParam.m0,
+<span class="lineNum">     642 </span>            :                               aParam.m1,
+<span class="lineNum">     643 </span>            :                               aParam.m2));
+<span class="lineNum">     644 </span>            :     for (unsigned int i = 0; i &lt; mozilla::ArrayLength(aParam.m3); i++)
+<span class="lineNum">     645 </span>            :       aLog-&gt;append(StringPrintf(L&quot;%2.2X&quot;, aParam.m3[i]));
+<span class="lineNum">     646 </span>            :     aLog-&gt;append(L&quot;}&quot;);
+<span class="lineNum">     647 </span>            :   }
+<span class="lineNum">     648 </span>            : };
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span>            : template&lt;&gt;
+<span class="lineNum">     651 </span>            : struct ParamTraits&lt;mozilla::TimeDuration&gt;
+<span class="lineNum">     652 </span>            : {
+<span class="lineNum">     653 </span>            :   typedef mozilla::TimeDuration paramType;
+<span class="lineNum">     654 </span><span class="lineNoCov">          0 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     655 </span>            :   {
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.mValue);</span>
+<span class="lineNum">     657 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     658 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     659 </span>            :   {
+<span class="lineNum">     660 </span><span class="lineNoCov">          0 :     return ReadParam(aMsg, aIter, &amp;aResult-&gt;mValue);</span>
+<span class="lineNum">     661 </span>            :   };
+<span class="lineNum">     662 </span>            : };
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            : template&lt;&gt;
+<span class="lineNum">     665 </span>            : struct ParamTraits&lt;mozilla::TimeStamp&gt;
+<a name="666"><span class="lineNum">     666 </span>            : {</a>
+<span class="lineNum">     667 </span>            :   typedef mozilla::TimeStamp paramType;
+<span class="lineNum">     668 </span><span class="lineNoCov">          0 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     669 </span>            :   {
+<span class="lineNum">     670 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.mValue);</span>
+<span class="lineNum">     671 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     672 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     673 </span>            :   {
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :     return ReadParam(aMsg, aIter, &amp;aResult-&gt;mValue);</span>
+<span class="lineNum">     675 </span>            :   };
+<span class="lineNum">     676 </span>            : };
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : #ifdef XP_WIN
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span>            : template&lt;&gt;
+<span class="lineNum">     681 </span>            : struct ParamTraits&lt;mozilla::TimeStampValue&gt;
+<span class="lineNum">     682 </span>            : {
+<span class="lineNum">     683 </span>            :   typedef mozilla::TimeStampValue paramType;
+<span class="lineNum">     684 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam)
+<span class="lineNum">     685 </span>            :   {
+<span class="lineNum">     686 </span>            :     WriteParam(aMsg, aParam.mGTC);
+<span class="lineNum">     687 </span>            :     WriteParam(aMsg, aParam.mQPC);
+<span class="lineNum">     688 </span>            :     WriteParam(aMsg, aParam.mHasQPC);
+<span class="lineNum">     689 </span>            :     WriteParam(aMsg, aParam.mIsNull);
+<span class="lineNum">     690 </span>            :   }
+<span class="lineNum">     691 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     692 </span>            :   {
+<span class="lineNum">     693 </span>            :     return (ReadParam(aMsg, aIter, &amp;aResult-&gt;mGTC) &amp;&amp;
+<span class="lineNum">     694 </span>            :             ReadParam(aMsg, aIter, &amp;aResult-&gt;mQPC) &amp;&amp;
+<span class="lineNum">     695 </span>            :             ReadParam(aMsg, aIter, &amp;aResult-&gt;mHasQPC) &amp;&amp;
+<span class="lineNum">     696 </span>            :             ReadParam(aMsg, aIter, &amp;aResult-&gt;mIsNull));
+<span class="lineNum">     697 </span>            :   }
+<span class="lineNum">     698 </span>            : };
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span>            : #endif
+<span class="lineNum">     701 </span>            : 
+<span class="lineNum">     702 </span>            : template &lt;&gt;
+<span class="lineNum">     703 </span>            : struct ParamTraits&lt;mozilla::dom::ipc::StructuredCloneData&gt;
+<span class="lineNum">     704 </span>            : {
+<span class="lineNum">     705 </span>            :   typedef mozilla::dom::ipc::StructuredCloneData paramType;
+<span class="lineNum">     706 </span>            : 
+<span class="lineNum">     707 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam)
+<span class="lineNum">     708 </span>            :   {
+<span class="lineNum">     709 </span><span class="lineCov">          5 :     aParam.WriteIPCParams(aMsg);</span>
+<span class="lineNum">     710 </span>            :   }
+<span class="lineNum">     711 </span>            : 
+<span class="lineNum">     712 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     713 </span>            :   {
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :     return aResult-&gt;ReadIPCParams(aMsg, aIter);</span>
+<span class="lineNum">     715 </span>            :   }
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     718 </span>            :   {
+<span class="lineNum">     719 </span>            :     LogParam(aParam.DataLength(), aLog);
+<span class="lineNum">     720 </span>            :   }
+<span class="lineNum">     721 </span>            : };
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span>            : template &lt;&gt;
+<span class="lineNum">     724 </span>            : struct ParamTraits&lt;mozilla::net::WebSocketFrameData&gt;
+<span class="lineNum">     725 </span>            : {
+<span class="lineNum">     726 </span>            :   typedef mozilla::net::WebSocketFrameData paramType;
+<span class="lineNum">     727 </span>            : 
+<span class="lineNum">     728 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam)
+<span class="lineNum">     729 </span>            :   {
+<span class="lineNum">     730 </span><span class="lineNoCov">          0 :     aParam.WriteIPCParams(aMsg);</span>
+<span class="lineNum">     731 </span>            :   }
+<span class="lineNum">     732 </span>            : 
+<span class="lineNum">     733 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     734 </span>            :   {
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :     return aResult-&gt;ReadIPCParams(aMsg, aIter);</span>
+<span class="lineNum">     736 </span>            :   }
+<span class="lineNum">     737 </span>            : };
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span>            : template &lt;&gt;
+<span class="lineNum">     740 </span>            : struct ParamTraits&lt;JSStructuredCloneData&gt;
+<span class="lineNum">     741 </span>            : {
+<a name="742"><span class="lineNum">     742 </span>            :   typedef JSStructuredCloneData paramType;</a>
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span><span class="lineCov">          5 :   static void Write(Message* aMsg, const paramType&amp; aParam)</span>
+<span class="lineNum">     745 </span>            :   {
+<span class="lineNum">     746 </span>            :     MOZ_ASSERT(!(aParam.Size() % sizeof(uint64_t)));
+<span class="lineNum">     747 </span><span class="lineCov">          5 :     WriteParam(aMsg, aParam.Size());</span>
+<span class="lineNum">     748 </span><span class="lineCov">          5 :     auto iter = aParam.Iter();</span>
+<span class="lineNum">     749 </span><span class="lineCov">         10 :     while (!iter.Done()) {</span>
+<span class="lineNum">     750 </span><span class="lineCov">          5 :       aMsg-&gt;WriteBytes(iter.Data(), iter.RemainingInSegment(), sizeof(uint64_t));</span>
+<span class="lineNum">     751 </span><span class="lineCov">          5 :       iter.Advance(aParam, iter.RemainingInSegment());</span>
+<span class="lineNum">     752 </span>            :     }
+<a name="753"><span class="lineNum">     753 </span><span class="lineCov">          5 :   }</span></a>
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span><span class="lineCov">          5 :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)</span>
+<span class="lineNum">     756 </span>            :   {
+<span class="lineNum">     757 </span><span class="lineCov">          5 :     size_t length = 0;</span>
+<span class="lineNum">     758 </span><span class="lineCov">          5 :     if (!ReadParam(aMsg, aIter, &amp;length)) {</span>
+<span class="lineNum">     759 </span>            :       return false;
+<span class="lineNum">     760 </span>            :     }
+<span class="lineNum">     761 </span>            :     MOZ_ASSERT(!(length % sizeof(uint64_t)));
+<span class="lineNum">     762 </span>            : 
+<span class="lineNum">     763 </span><span class="lineCov">          5 :     mozilla::BufferList&lt;InfallibleAllocPolicy&gt; buffers(0, 0, 4096);</span>
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span>            :     // Borrowing is not suitable to use for IPC to hand out data
+<span class="lineNum">     766 </span>            :     // because we often want to store the data somewhere for
+<span class="lineNum">     767 </span>            :     // processing after IPC has released the underlying buffers. One
+<span class="lineNum">     768 </span>            :     // case is PContentChild::SendGetXPCOMProcessAttributes. We can't
+<span class="lineNum">     769 </span>            :     // return a borrowed buffer because the out param outlives the
+<span class="lineNum">     770 </span>            :     // IPDL callback.
+<span class="lineNum">     771 </span><span class="lineCov">          5 :     if (length &amp;&amp; !aMsg-&gt;ExtractBuffers(aIter, length, &amp;buffers, sizeof(uint64_t))) {</span>
+<span class="lineNum">     772 </span>            :       return false;
+<span class="lineNum">     773 </span>            :     }
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span>            :     bool success;
+<span class="lineNum">     776 </span>            :     mozilla::BufferList&lt;js::SystemAllocPolicy&gt; out =
+<span class="lineNum">     777 </span><span class="lineCov">         10 :       buffers.MoveFallible&lt;js::SystemAllocPolicy&gt;(&amp;success);</span>
+<span class="lineNum">     778 </span><span class="lineCov">          5 :     if (!success) {</span>
+<span class="lineNum">     779 </span>            :       return false;
+<span class="lineNum">     780 </span>            :     }
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span><span class="lineCov">          5 :     *aResult = JSStructuredCloneData(Move(out));</span>
+<span class="lineNum">     783 </span>            : 
+<span class="lineNum">     784 </span><span class="lineCov">         10 :     return true;</span>
+<span class="lineNum">     785 </span>            :   }
+<span class="lineNum">     786 </span>            : };
+<span class="lineNum">     787 </span>            : 
+<span class="lineNum">     788 </span>            : template &lt;&gt;
+<span class="lineNum">     789 </span>            : struct ParamTraits&lt;mozilla::SerializedStructuredCloneBuffer&gt;
+<span class="lineNum">     790 </span>            : {
+<span class="lineNum">     791 </span>            :   typedef mozilla::SerializedStructuredCloneBuffer paramType;
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span>            :   static void Write(Message* aMsg, const paramType&amp; aParam)
+<span class="lineNum">     794 </span>            :   {
+<span class="lineNum">     795 </span><span class="lineNoCov">          0 :     WriteParam(aMsg, aParam.data);</span>
+<span class="lineNum">     796 </span>            :   }
+<span class="lineNum">     797 </span>            : 
+<span class="lineNum">     798 </span>            :   static bool Read(const Message* aMsg, PickleIterator* aIter, paramType* aResult)
+<span class="lineNum">     799 </span>            :   {
+<span class="lineNum">     800 </span><span class="lineCov">          5 :     return ReadParam(aMsg, aIter, &amp;aResult-&gt;data);</span>
+<span class="lineNum">     801 </span>            :   }
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span>            :   static void Log(const paramType&amp; aParam, std::wstring* aLog)
+<span class="lineNum">     804 </span>            :   {
+<span class="lineNum">     805 </span>            :     LogParam(aParam.data.Size(), aLog);
+<span class="lineNum">     806 </span>            :   }
+<span class="lineNum">     807 </span>            : };
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span>            : template &lt;&gt;
+<span class="lineNum">     810 </span>            : struct ParamTraits&lt;nsIWidget::TouchPointerState&gt;
+<span class="lineNum">     811 </span>            :   : public BitFlagsEnumSerializer&lt;nsIWidget::TouchPointerState,
+<span class="lineNum">     812 </span>            :                                   nsIWidget::TouchPointerState::ALL_BITS&gt;
+<span class="lineNum">     813 </span>            : {
+<span class="lineNum">     814 </span>            : };
+<span class="lineNum">     815 </span>            : 
+<span class="lineNum">     816 </span>            : template&lt;class T&gt;
+<span class="lineNum">     817 </span>            : struct ParamTraits&lt;mozilla::Maybe&lt;T&gt;&gt;
+<span class="lineNum">     818 </span>            : {
+<a name="819"><span class="lineNum">     819 </span>            :   typedef mozilla::Maybe&lt;T&gt; paramType;</a>
+<span class="lineNum">     820 </span>            : 
+<span class="lineNum">     821 </span><span class="lineNoCov">          0 :   static void Write(Message* msg, const paramType&amp; param)</span>
+<span class="lineNum">     822 </span>            :   {
+<span class="lineNum">     823 </span><span class="lineNoCov">          0 :     if (param.isSome()) {</span>
+<span class="lineNum">     824 </span><span class="lineNoCov">          0 :       WriteParam(msg, true);</span>
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :       WriteParam(msg, param.value());</span>
+<span class="lineNum">     826 </span>            :     } else {
+<span class="lineNum">     827 </span><span class="lineNoCov">          0 :       WriteParam(msg, false);</span>
+<span class="lineNum">     828 </span>            :     }
+<a name="829"><span class="lineNum">     829 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     830 </span>            : 
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :   static bool Read(const Message* msg, PickleIterator* iter, paramType* result)</span>
+<span class="lineNum">     832 </span>            :   {
+<span class="lineNum">     833 </span>            :     bool isSome;
+<span class="lineNum">     834 </span><span class="lineNoCov">          0 :     if (!ReadParam(msg, iter, &amp;isSome)) {</span>
+<span class="lineNum">     835 </span>            :       return false;
+<span class="lineNum">     836 </span>            :     }
+<span class="lineNum">     837 </span><span class="lineNoCov">          0 :     if (isSome) {</span>
+<span class="lineNum">     838 </span><span class="lineNoCov">          0 :       T tmp;</span>
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 :       if (!ReadParam(msg, iter, &amp;tmp)) {</span>
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     841 </span>            :       }
+<span class="lineNum">     842 </span><span class="lineNoCov">          0 :       *result = mozilla::Some(mozilla::Move(tmp));</span>
+<span class="lineNum">     843 </span>            :     } else {
+<span class="lineNum">     844 </span><span class="lineNoCov">          0 :       *result = mozilla::Nothing();</span>
+<span class="lineNum">     845 </span>            :     }
+<span class="lineNum">     846 </span>            :     return true;
+<span class="lineNum">     847 </span>            :   }
+<span class="lineNum">     848 </span>            : };
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span>            : } /* namespace IPC */
+<span class="lineNum">     851 </span>            : 
+<span class="lineNum">     852 </span>            : #endif /* __IPC_GLUE_IPCMESSAGEUTILS_H__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

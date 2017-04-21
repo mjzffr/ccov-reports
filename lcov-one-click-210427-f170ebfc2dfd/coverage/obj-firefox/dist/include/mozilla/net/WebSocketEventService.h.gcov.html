@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/net/WebSocketEventService.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/net</a> - WebSocketEventService.h<span style="font-size: 80%;"> (source / <a href="WebSocketEventService.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_net_WebSocketEventService_h
+<span class="lineNum">       8 </span>            : #define mozilla_net_WebSocketEventService_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/AlreadyAddRefed.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/Atomics.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsIWebSocketEventService.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsAutoPtr.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;nsCOMPtr.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;nsClassHashtable.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsHashKeys.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsIObserver.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsISupportsImpl.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : namespace mozilla {
+<span class="lineNum">      22 </span>            : namespace net {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : class WebSocketFrame;
+<span class="lineNum">      25 </span>            : class WebSocketEventListenerChild;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : class WebSocketEventService final : public nsIWebSocketEventService
+<span class="lineNum">      28 </span>            :                                   , public nsIObserver
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            :   friend class WebSocketBaseRunnable;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : public:
+<span class="lineNum">      33 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">      34 </span>            :   NS_DECL_NSIOBSERVER
+<span class="lineNum">      35 </span>            :   NS_DECL_NSIWEBSOCKETEVENTSERVICE
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   static already_AddRefed&lt;WebSocketEventService&gt; GetOrCreate();
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :   void WebSocketCreated(uint32_t aWebSocketSerialID,
+<span class="lineNum">      40 </span>            :                         uint64_t aInnerWindowID,
+<span class="lineNum">      41 </span>            :                         const nsAString&amp; aURI,
+<span class="lineNum">      42 </span>            :                         const nsACString&amp; aProtocols);
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   void WebSocketOpened(uint32_t aWebSocketSerialID,
+<span class="lineNum">      45 </span>            :                        uint64_t aInnerWindowID,
+<span class="lineNum">      46 </span>            :                        const nsAString&amp; aEffectiveURI,
+<span class="lineNum">      47 </span>            :                        const nsACString&amp; aProtocols,
+<span class="lineNum">      48 </span>            :                        const nsACString&amp; aExtensions);
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   void WebSocketMessageAvailable(uint32_t aWebSocketSerialID,
+<span class="lineNum">      51 </span>            :                                  uint64_t aInnerWindowID,
+<span class="lineNum">      52 </span>            :                                  const nsACString&amp; aData,
+<span class="lineNum">      53 </span>            :                                  uint16_t aMessageType);
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :   void WebSocketClosed(uint32_t aWebSocketSerialID,
+<span class="lineNum">      56 </span>            :                        uint64_t aInnerWindowID,
+<span class="lineNum">      57 </span>            :                        bool aWasClean,
+<span class="lineNum">      58 </span>            :                        uint16_t aCode,
+<span class="lineNum">      59 </span>            :                        const nsAString&amp; aReason);
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :   void FrameReceived(uint32_t aWebSocketSerialID,
+<span class="lineNum">      62 </span>            :                      uint64_t aInnerWindowID,
+<span class="lineNum">      63 </span>            :                      already_AddRefed&lt;WebSocketFrame&gt; aFrame);
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :   void  FrameSent(uint32_t aWebSocketSerialID,
+<span class="lineNum">      66 </span>            :                   uint64_t aInnerWindowID,
+<span class="lineNum">      67 </span>            :                   already_AddRefed&lt;WebSocketFrame&gt; aFrame);
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   already_AddRefed&lt;WebSocketFrame&gt;
+<span class="lineNum">      70 </span>            :   CreateFrameIfNeeded(bool aFinBit, bool aRsvBit1, bool aRsvBit2, bool aRsvBit3,
+<span class="lineNum">      71 </span>            :                       uint8_t aOpCode, bool aMaskBit, uint32_t aMask,
+<span class="lineNum">      72 </span>            :                       const nsCString&amp; aPayload);
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   already_AddRefed&lt;WebSocketFrame&gt;
+<span class="lineNum">      75 </span>            :   CreateFrameIfNeeded(bool aFinBit, bool aRsvBit1, bool aRsvBit2, bool aRsvBit3,
+<span class="lineNum">      76 </span>            :                       uint8_t aOpCode, bool aMaskBit, uint32_t aMask,
+<span class="lineNum">      77 </span>            :                       uint8_t* aPayload, uint32_t aPayloadLength);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   already_AddRefed&lt;WebSocketFrame&gt;
+<span class="lineNum">      80 </span>            :   CreateFrameIfNeeded(bool aFinBit, bool aRsvBit1, bool aRsvBit2, bool aRsvBit3,
+<span class="lineNum">      81 </span>            :                       uint8_t aOpCode, bool aMaskBit, uint32_t aMask,
+<span class="lineNum">      82 </span>            :                       uint8_t* aPayloadInHdr, uint32_t aPayloadInHdrLength,
+<span class="lineNum">      83 </span>            :                       uint8_t* aPayload, uint32_t aPayloadLength);
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            : private:
+<span class="lineNum">      86 </span>            :   WebSocketEventService();
+<span class="lineNum">      87 </span>            :   ~WebSocketEventService();
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   bool HasListeners() const;
+<span class="lineNum">      90 </span>            :   void Shutdown();
+<span class="lineNum">      91 </span>            : 
+<a name="92"><span class="lineNum">      92 </span>            :   typedef nsTArray&lt;nsCOMPtr&lt;nsIWebSocketEventListener&gt;&gt; WindowListeners;</a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   struct WindowListener</span>
+<span class="lineNum">      95 </span>            :   {
+<span class="lineNum">      96 </span>            :     WindowListeners mListeners;
+<span class="lineNum">      97 </span>            :     RefPtr&lt;WebSocketEventListenerChild&gt; mActor;
+<span class="lineNum">      98 </span>            :   };
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   void GetListeners(uint64_t aInnerWindowID,
+<span class="lineNum">     101 </span>            :                     WindowListeners&amp; aListeners) const;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   void ShutdownActorListener(WindowListener* aListener);
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   // Used only on the main-thread.
+<span class="lineNum">     106 </span>            :   nsClassHashtable&lt;nsUint64HashKey, WindowListener&gt; mWindows;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :   Atomic&lt;uint64_t&gt; mCountListeners;
+<span class="lineNum">     109 </span>            : };
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : } // net namespace
+<span class="lineNum">     112 </span>            : } // mozilla namespace
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            : /**
+<span class="lineNum">     115 </span>            :  * Casting WebSocketEventService to nsISupports is ambiguous.
+<span class="lineNum">     116 </span>            :  * This method handles that.
+<span class="lineNum">     117 </span>            :  */
+<span class="lineNum">     118 </span>            : inline nsISupports*
+<span class="lineNum">     119 </span>            : ToSupports(mozilla::net::WebSocketEventService* p)
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span>            :   return NS_ISUPPORTS_CAST(nsIWebSocketEventService*, p);
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : #endif // mozilla_net_WebSocketEventService_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

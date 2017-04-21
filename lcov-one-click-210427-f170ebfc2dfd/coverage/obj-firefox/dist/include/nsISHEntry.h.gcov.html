@@ -1,0 +1,1259 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/nsISHEntry.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - nsISHEntry.h<span style="font-size: 80%;"> (source / <a href="nsISHEntry.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  * DO NOT EDIT.  THIS FILE IS GENERATED FROM ../../../dist/idl/nsISHEntry.idl
+<span class="lineNum">       3 </span>            :  */
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef __gen_nsISHEntry_h__
+<span class="lineNum">       6 </span>            : #define __gen_nsISHEntry_h__
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #ifndef __gen_nsISupports_h__
+<span class="lineNum">      10 </span>            : #include &quot;nsISupports.h&quot;
+<span class="lineNum">      11 </span>            : #endif
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : /* For IDL files that don't want to include root IDL files. */
+<span class="lineNum">      14 </span>            : #ifndef NS_NO_VTABLE
+<span class="lineNum">      15 </span>            : #define NS_NO_VTABLE
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : class nsIMutableArray; /* forward declaration */
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : class nsILayoutHistoryState; /* forward declaration */
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : class nsIContentViewer; /* forward declaration */
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : class nsIURI; /* forward declaration */
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : class nsIInputStream; /* forward declaration */
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : class nsIDocShellTreeItem; /* forward declaration */
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : class nsIStructuredCloneContainer; /* forward declaration */
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : class nsIBFCacheEntry; /* forward declaration */
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : class nsIPrincipal; /* forward declaration */
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : #include &quot;nsRect.h&quot;
+<span class="lineNum">      36 </span>            : class nsDocShellEditorData;
+<span class="lineNum">      37 </span>            : class nsSHEntryShared;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : /* starting interface:    nsISHEntry */
+<span class="lineNum">      40 </span>            : #define NS_ISHENTRY_IID_STR &quot;0dad26b8-a259-42c7-93f1-2fa7fc076e45&quot;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #define NS_ISHENTRY_IID \
+<span class="lineNum">      43 </span>            :   {0x0dad26b8, 0xa259, 0x42c7, \
+<span class="lineNum">      44 </span>            :     { 0x93, 0xf1, 0x2f, 0xa7, 0xfc, 0x07, 0x6e, 0x45 }}
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : class NS_NO_VTABLE nsISHEntry : public nsISupports {</span>
+<span class="lineNum">      47 </span>            :  public:
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   NS_DECLARE_STATIC_IID_ACCESSOR(NS_ISHENTRY_IID)
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :   /* readonly attribute nsIURI URI; */
+<span class="lineNum">      52 </span>            :   NS_IMETHOD GetURI(nsIURI * *aURI) = 0;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   /* attribute nsIURI originalURI; */
+<span class="lineNum">      55 </span>            :   NS_IMETHOD GetOriginalURI(nsIURI * *aOriginalURI) = 0;
+<span class="lineNum">      56 </span>            :   NS_IMETHOD SetOriginalURI(nsIURI *aOriginalURI) = 0;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :   /* attribute boolean loadReplace; */
+<span class="lineNum">      59 </span>            :   NS_IMETHOD GetLoadReplace(bool *aLoadReplace) = 0;
+<span class="lineNum">      60 </span>            :   NS_IMETHOD SetLoadReplace(bool aLoadReplace) = 0;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :   /* readonly attribute wstring title; */
+<span class="lineNum">      63 </span>            :   NS_IMETHOD GetTitle(char16_t * *aTitle) = 0;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :   /* readonly attribute boolean isSubFrame; */
+<span class="lineNum">      66 </span>            :   NS_IMETHOD GetIsSubFrame(bool *aIsSubFrame) = 0;
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :   /* void setURI (in nsIURI aURI); */
+<span class="lineNum">      69 </span>            :   NS_IMETHOD SetURI(nsIURI *aURI) = 0;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   /* attribute nsIURI referrerURI; */
+<span class="lineNum">      72 </span>            :   NS_IMETHOD GetReferrerURI(nsIURI * *aReferrerURI) = 0;
+<span class="lineNum">      73 </span>            :   NS_IMETHOD SetReferrerURI(nsIURI *aReferrerURI) = 0;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :   /* attribute unsigned long referrerPolicy; */
+<span class="lineNum">      76 </span>            :   NS_IMETHOD GetReferrerPolicy(uint32_t *aReferrerPolicy) = 0;
+<span class="lineNum">      77 </span>            :   NS_IMETHOD SetReferrerPolicy(uint32_t aReferrerPolicy) = 0;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   /* attribute nsIContentViewer contentViewer; */
+<span class="lineNum">      80 </span>            :   NS_IMETHOD GetContentViewer(nsIContentViewer * *aContentViewer) = 0;
+<span class="lineNum">      81 </span>            :   NS_IMETHOD SetContentViewer(nsIContentViewer *aContentViewer) = 0;
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :   /* attribute boolean sticky; */
+<span class="lineNum">      84 </span>            :   NS_IMETHOD GetSticky(bool *aSticky) = 0;
+<span class="lineNum">      85 </span>            :   NS_IMETHOD SetSticky(bool aSticky) = 0;
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :   /* attribute nsISupports windowState; */
+<span class="lineNum">      88 </span>            :   NS_IMETHOD GetWindowState(nsISupports * *aWindowState) = 0;
+<span class="lineNum">      89 </span>            :   NS_IMETHOD SetWindowState(nsISupports *aWindowState) = 0;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   /* [noscript] void getViewerBounds (in nsIntRect bounds); */
+<span class="lineNum">      92 </span>            :   NS_IMETHOD GetViewerBounds(nsIntRect &amp; bounds) = 0;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   /* [noscript] void setViewerBounds ([const] in nsIntRect bounds); */
+<span class="lineNum">      95 </span>            :   NS_IMETHOD SetViewerBounds(const nsIntRect &amp; bounds) = 0;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :   /* void addChildShell (in nsIDocShellTreeItem shell); */
+<span class="lineNum">      98 </span>            :   NS_IMETHOD AddChildShell(nsIDocShellTreeItem *shell) = 0;
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   /* nsIDocShellTreeItem childShellAt (in long index); */
+<span class="lineNum">     101 </span>            :   NS_IMETHOD ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval) = 0;
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   /* void clearChildShells (); */
+<span class="lineNum">     104 </span>            :   NS_IMETHOD ClearChildShells(void) = 0;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :   /* attribute nsIMutableArray refreshURIList; */
+<span class="lineNum">     107 </span>            :   NS_IMETHOD GetRefreshURIList(nsIMutableArray * *aRefreshURIList) = 0;
+<span class="lineNum">     108 </span>            :   NS_IMETHOD SetRefreshURIList(nsIMutableArray *aRefreshURIList) = 0;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :   /* void syncPresentationState (); */
+<span class="lineNum">     111 </span>            :   NS_IMETHOD SyncPresentationState(void) = 0;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   /* void setTitle (in AString aTitle); */
+<span class="lineNum">     114 </span>            :   NS_IMETHOD SetTitle(const nsAString &amp; aTitle) = 0;
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   /* attribute nsIInputStream postData; */
+<span class="lineNum">     117 </span>            :   NS_IMETHOD GetPostData(nsIInputStream * *aPostData) = 0;
+<span class="lineNum">     118 </span>            :   NS_IMETHOD SetPostData(nsIInputStream *aPostData) = 0;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :   /* attribute nsILayoutHistoryState layoutHistoryState; */
+<span class="lineNum">     121 </span>            :   NS_IMETHOD GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState) = 0;
+<span class="lineNum">     122 </span>            :   NS_IMETHOD SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState) = 0;
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :   /* nsILayoutHistoryState initLayoutHistoryState (); */
+<span class="lineNum">     125 </span>            :   NS_IMETHOD InitLayoutHistoryState(nsILayoutHistoryState * *_retval) = 0;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :   /* attribute nsISHEntry parent; */
+<span class="lineNum">     128 </span>            :   NS_IMETHOD GetParent(nsISHEntry * *aParent) = 0;
+<span class="lineNum">     129 </span>            :   NS_IMETHOD SetParent(nsISHEntry *aParent) = 0;
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :   /* attribute unsigned long loadType; */
+<span class="lineNum">     132 </span>            :   NS_IMETHOD GetLoadType(uint32_t *aLoadType) = 0;
+<span class="lineNum">     133 </span>            :   NS_IMETHOD SetLoadType(uint32_t aLoadType) = 0;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :   /* attribute unsigned long ID; */
+<span class="lineNum">     136 </span>            :   NS_IMETHOD GetID(uint32_t *aID) = 0;
+<span class="lineNum">     137 </span>            :   NS_IMETHOD SetID(uint32_t aID) = 0;
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :   /* attribute nsISupports cacheKey; */
+<span class="lineNum">     140 </span>            :   NS_IMETHOD GetCacheKey(nsISupports * *aCacheKey) = 0;
+<span class="lineNum">     141 </span>            :   NS_IMETHOD SetCacheKey(nsISupports *aCacheKey) = 0;
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :   /* attribute boolean saveLayoutStateFlag; */
+<span class="lineNum">     144 </span>            :   NS_IMETHOD GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag) = 0;
+<span class="lineNum">     145 </span>            :   NS_IMETHOD SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag) = 0;
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   /* attribute boolean expirationStatus; */
+<span class="lineNum">     148 </span>            :   NS_IMETHOD GetExpirationStatus(bool *aExpirationStatus) = 0;
+<span class="lineNum">     149 </span>            :   NS_IMETHOD SetExpirationStatus(bool aExpirationStatus) = 0;
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :   /* attribute ACString contentType; */
+<span class="lineNum">     152 </span>            :   NS_IMETHOD GetContentType(nsACString &amp; aContentType) = 0;
+<span class="lineNum">     153 </span>            :   NS_IMETHOD SetContentType(const nsACString &amp; aContentType) = 0;
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :   /* attribute boolean URIWasModified; */
+<span class="lineNum">     156 </span>            :   NS_IMETHOD GetURIWasModified(bool *aURIWasModified) = 0;
+<span class="lineNum">     157 </span>            :   NS_IMETHOD SetURIWasModified(bool aURIWasModified) = 0;
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   /* void setScrollPosition (in long x, in long y); */
+<span class="lineNum">     160 </span>            :   NS_IMETHOD SetScrollPosition(int32_t x, int32_t y) = 0;
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :   /* void getScrollPosition (out long x, out long y); */
+<span class="lineNum">     163 </span>            :   NS_IMETHOD GetScrollPosition(int32_t *x, int32_t *y) = 0;
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   /* [noscript] void create (in nsIURI URI, in AString title, in nsIInputStream inputStream, in nsILayoutHistoryState layoutHistoryState, in nsISupports cacheKey, in ACString contentType, in nsIPrincipal triggeringPrincipal, in nsIPrincipal principalToInherit, in nsIDRef docshellID, in boolean dynamicCreation); */
+<span class="lineNum">     166 </span>            :   NS_IMETHOD Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation) = 0;
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :   /* nsISHEntry clone (); */
+<span class="lineNum">     169 </span>            :   NS_IMETHOD Clone(nsISHEntry * *_retval) = 0;
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   /* void setIsSubFrame (in boolean aFlag); */
+<span class="lineNum">     172 </span>            :   NS_IMETHOD SetIsSubFrame(bool aFlag) = 0;
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :   /* nsIContentViewer getAnyContentViewer (out nsISHEntry ownerEntry); */
+<span class="lineNum">     175 </span>            :   NS_IMETHOD GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval) = 0;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :   /* attribute nsIPrincipal triggeringPrincipal; */
+<span class="lineNum">     178 </span>            :   NS_IMETHOD GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal) = 0;
+<span class="lineNum">     179 </span>            :   NS_IMETHOD SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal) = 0;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   /* attribute nsIPrincipal principalToInherit; */
+<span class="lineNum">     182 </span>            :   NS_IMETHOD GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit) = 0;
+<span class="lineNum">     183 </span>            :   NS_IMETHOD SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit) = 0;
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :   /* attribute nsIStructuredCloneContainer stateData; */
+<span class="lineNum">     186 </span>            :   NS_IMETHOD GetStateData(nsIStructuredCloneContainer * *aStateData) = 0;
+<span class="lineNum">     187 </span>            :   NS_IMETHOD SetStateData(nsIStructuredCloneContainer *aStateData) = 0;
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :   /* [noscript,notxpcom] nsDocShellEditorDataPtr forgetEditorData (); */
+<span class="lineNum">     190 </span>            :   NS_IMETHOD_(nsDocShellEditorData *) ForgetEditorData(void) = 0;
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :   /* [noscript,notxpcom] void setEditorData (in nsDocShellEditorDataPtr aData); */
+<span class="lineNum">     193 </span>            :   NS_IMETHOD_(void) SetEditorData(nsDocShellEditorData *aData) = 0;
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :   /* [noscript,notxpcom] boolean hasDetachedEditor (); */
+<span class="lineNum">     196 </span>            :   NS_IMETHOD_(bool) HasDetachedEditor(void) = 0;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   /* boolean isDynamicallyAdded (); */
+<span class="lineNum">     199 </span>            :   NS_IMETHOD IsDynamicallyAdded(bool *_retval) = 0;
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            :   /* boolean hasDynamicallyAddedChild (); */
+<span class="lineNum">     202 </span>            :   NS_IMETHOD HasDynamicallyAddedChild(bool *_retval) = 0;
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :   /* attribute nsIDPtr docshellID; */
+<span class="lineNum">     205 </span>            :   NS_IMETHOD GetDocshellID(nsID **aDocshellID) = 0;
+<span class="lineNum">     206 </span>            :   NS_IMETHOD SetDocshellID(const nsID *aDocshellID) = 0;
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   /* [noscript,notxpcom] nsID DocshellID (); */
+<span class="lineNum">     209 </span>            :   NS_IMETHOD_(const nsID) DocshellID(void) = 0;
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   /* readonly attribute nsIBFCacheEntry BFCacheEntry; */
+<span class="lineNum">     212 </span>            :   NS_IMETHOD GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry) = 0;
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   /* [noscript,notxpcom] boolean hasBFCacheEntry (in nsIBFCacheEntry aEntry); */
+<span class="lineNum">     215 </span>            :   NS_IMETHOD_(bool) HasBFCacheEntry(nsIBFCacheEntry *aEntry) = 0;
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :   /* void adoptBFCacheEntry (in nsISHEntry aEntry); */
+<span class="lineNum">     218 </span>            :   NS_IMETHOD AdoptBFCacheEntry(nsISHEntry *aEntry) = 0;
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            :   /* void abandonBFCacheEntry (); */
+<span class="lineNum">     221 </span>            :   NS_IMETHOD AbandonBFCacheEntry(void) = 0;
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            :   /* boolean sharesDocumentWith (in nsISHEntry aEntry); */
+<span class="lineNum">     224 </span>            :   NS_IMETHOD SharesDocumentWith(nsISHEntry *aEntry, bool *_retval) = 0;
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            :   /* readonly attribute boolean isSrcdocEntry; */
+<span class="lineNum">     227 </span>            :   NS_IMETHOD GetIsSrcdocEntry(bool *aIsSrcdocEntry) = 0;
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :   /* attribute AString srcdocData; */
+<span class="lineNum">     230 </span>            :   NS_IMETHOD GetSrcdocData(nsAString &amp; aSrcdocData) = 0;
+<span class="lineNum">     231 </span>            :   NS_IMETHOD SetSrcdocData(const nsAString &amp; aSrcdocData) = 0;
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :   /* attribute nsIURI baseURI; */
+<span class="lineNum">     234 </span>            :   NS_IMETHOD GetBaseURI(nsIURI * *aBaseURI) = 0;
+<span class="lineNum">     235 </span>            :   NS_IMETHOD SetBaseURI(nsIURI *aBaseURI) = 0;
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   /* attribute boolean scrollRestorationIsManual; */
+<span class="lineNum">     238 </span>            :   NS_IMETHOD GetScrollRestorationIsManual(bool *aScrollRestorationIsManual) = 0;
+<span class="lineNum">     239 </span>            :   NS_IMETHOD SetScrollRestorationIsManual(bool aScrollRestorationIsManual) = 0;
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : };
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :   NS_DEFINE_STATIC_IID_ACCESSOR(nsISHEntry, NS_ISHENTRY_IID)
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            : /* Use this macro when declaring classes that implement this interface. */
+<span class="lineNum">     246 </span>            : #define NS_DECL_NSISHENTRY \
+<span class="lineNum">     247 </span>            :   NS_IMETHOD GetURI(nsIURI * *aURI) override; \
+<span class="lineNum">     248 </span>            :   NS_IMETHOD GetOriginalURI(nsIURI * *aOriginalURI) override; \
+<span class="lineNum">     249 </span>            :   NS_IMETHOD SetOriginalURI(nsIURI *aOriginalURI) override; \
+<span class="lineNum">     250 </span>            :   NS_IMETHOD GetLoadReplace(bool *aLoadReplace) override; \
+<span class="lineNum">     251 </span>            :   NS_IMETHOD SetLoadReplace(bool aLoadReplace) override; \
+<span class="lineNum">     252 </span>            :   NS_IMETHOD GetTitle(char16_t * *aTitle) override; \
+<span class="lineNum">     253 </span>            :   NS_IMETHOD GetIsSubFrame(bool *aIsSubFrame) override; \
+<span class="lineNum">     254 </span>            :   NS_IMETHOD SetURI(nsIURI *aURI) override; \
+<span class="lineNum">     255 </span>            :   NS_IMETHOD GetReferrerURI(nsIURI * *aReferrerURI) override; \
+<span class="lineNum">     256 </span>            :   NS_IMETHOD SetReferrerURI(nsIURI *aReferrerURI) override; \
+<span class="lineNum">     257 </span>            :   NS_IMETHOD GetReferrerPolicy(uint32_t *aReferrerPolicy) override; \
+<span class="lineNum">     258 </span>            :   NS_IMETHOD SetReferrerPolicy(uint32_t aReferrerPolicy) override; \
+<span class="lineNum">     259 </span>            :   NS_IMETHOD GetContentViewer(nsIContentViewer * *aContentViewer) override; \
+<span class="lineNum">     260 </span>            :   NS_IMETHOD SetContentViewer(nsIContentViewer *aContentViewer) override; \
+<span class="lineNum">     261 </span>            :   NS_IMETHOD GetSticky(bool *aSticky) override; \
+<span class="lineNum">     262 </span>            :   NS_IMETHOD SetSticky(bool aSticky) override; \
+<span class="lineNum">     263 </span>            :   NS_IMETHOD GetWindowState(nsISupports * *aWindowState) override; \
+<span class="lineNum">     264 </span>            :   NS_IMETHOD SetWindowState(nsISupports *aWindowState) override; \
+<span class="lineNum">     265 </span>            :   NS_IMETHOD GetViewerBounds(nsIntRect &amp; bounds) override; \
+<span class="lineNum">     266 </span>            :   NS_IMETHOD SetViewerBounds(const nsIntRect &amp; bounds) override; \
+<span class="lineNum">     267 </span>            :   NS_IMETHOD AddChildShell(nsIDocShellTreeItem *shell) override; \
+<span class="lineNum">     268 </span>            :   NS_IMETHOD ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval) override; \
+<span class="lineNum">     269 </span>            :   NS_IMETHOD ClearChildShells(void) override; \
+<span class="lineNum">     270 </span>            :   NS_IMETHOD GetRefreshURIList(nsIMutableArray * *aRefreshURIList) override; \
+<span class="lineNum">     271 </span>            :   NS_IMETHOD SetRefreshURIList(nsIMutableArray *aRefreshURIList) override; \
+<span class="lineNum">     272 </span>            :   NS_IMETHOD SyncPresentationState(void) override; \
+<span class="lineNum">     273 </span>            :   NS_IMETHOD SetTitle(const nsAString &amp; aTitle) override; \
+<span class="lineNum">     274 </span>            :   NS_IMETHOD GetPostData(nsIInputStream * *aPostData) override; \
+<span class="lineNum">     275 </span>            :   NS_IMETHOD SetPostData(nsIInputStream *aPostData) override; \
+<span class="lineNum">     276 </span>            :   NS_IMETHOD GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState) override; \
+<span class="lineNum">     277 </span>            :   NS_IMETHOD SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState) override; \
+<span class="lineNum">     278 </span>            :   NS_IMETHOD InitLayoutHistoryState(nsILayoutHistoryState * *_retval) override; \
+<span class="lineNum">     279 </span>            :   NS_IMETHOD GetParent(nsISHEntry * *aParent) override; \
+<span class="lineNum">     280 </span>            :   NS_IMETHOD SetParent(nsISHEntry *aParent) override; \
+<span class="lineNum">     281 </span>            :   NS_IMETHOD GetLoadType(uint32_t *aLoadType) override; \
+<span class="lineNum">     282 </span>            :   NS_IMETHOD SetLoadType(uint32_t aLoadType) override; \
+<span class="lineNum">     283 </span>            :   NS_IMETHOD GetID(uint32_t *aID) override; \
+<span class="lineNum">     284 </span>            :   NS_IMETHOD SetID(uint32_t aID) override; \
+<span class="lineNum">     285 </span>            :   NS_IMETHOD GetCacheKey(nsISupports * *aCacheKey) override; \
+<span class="lineNum">     286 </span>            :   NS_IMETHOD SetCacheKey(nsISupports *aCacheKey) override; \
+<span class="lineNum">     287 </span>            :   NS_IMETHOD GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag) override; \
+<span class="lineNum">     288 </span>            :   NS_IMETHOD SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag) override; \
+<span class="lineNum">     289 </span>            :   NS_IMETHOD GetExpirationStatus(bool *aExpirationStatus) override; \
+<span class="lineNum">     290 </span>            :   NS_IMETHOD SetExpirationStatus(bool aExpirationStatus) override; \
+<span class="lineNum">     291 </span>            :   NS_IMETHOD GetContentType(nsACString &amp; aContentType) override; \
+<span class="lineNum">     292 </span>            :   NS_IMETHOD SetContentType(const nsACString &amp; aContentType) override; \
+<span class="lineNum">     293 </span>            :   NS_IMETHOD GetURIWasModified(bool *aURIWasModified) override; \
+<span class="lineNum">     294 </span>            :   NS_IMETHOD SetURIWasModified(bool aURIWasModified) override; \
+<span class="lineNum">     295 </span>            :   NS_IMETHOD SetScrollPosition(int32_t x, int32_t y) override; \
+<span class="lineNum">     296 </span>            :   NS_IMETHOD GetScrollPosition(int32_t *x, int32_t *y) override; \
+<span class="lineNum">     297 </span>            :   NS_IMETHOD Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation) override; \
+<span class="lineNum">     298 </span>            :   NS_IMETHOD Clone(nsISHEntry * *_retval) override; \
+<span class="lineNum">     299 </span>            :   NS_IMETHOD SetIsSubFrame(bool aFlag) override; \
+<span class="lineNum">     300 </span>            :   NS_IMETHOD GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval) override; \
+<span class="lineNum">     301 </span>            :   NS_IMETHOD GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal) override; \
+<span class="lineNum">     302 </span>            :   NS_IMETHOD SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal) override; \
+<span class="lineNum">     303 </span>            :   NS_IMETHOD GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit) override; \
+<span class="lineNum">     304 </span>            :   NS_IMETHOD SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit) override; \
+<span class="lineNum">     305 </span>            :   NS_IMETHOD GetStateData(nsIStructuredCloneContainer * *aStateData) override; \
+<span class="lineNum">     306 </span>            :   NS_IMETHOD SetStateData(nsIStructuredCloneContainer *aStateData) override; \
+<span class="lineNum">     307 </span>            :   NS_IMETHOD_(nsDocShellEditorData *) ForgetEditorData(void) override; \
+<span class="lineNum">     308 </span>            :   NS_IMETHOD_(void) SetEditorData(nsDocShellEditorData *aData) override; \
+<span class="lineNum">     309 </span>            :   NS_IMETHOD_(bool) HasDetachedEditor(void) override; \
+<span class="lineNum">     310 </span>            :   NS_IMETHOD IsDynamicallyAdded(bool *_retval) override; \
+<span class="lineNum">     311 </span>            :   NS_IMETHOD HasDynamicallyAddedChild(bool *_retval) override; \
+<span class="lineNum">     312 </span>            :   NS_IMETHOD GetDocshellID(nsID **aDocshellID) override; \
+<span class="lineNum">     313 </span>            :   NS_IMETHOD SetDocshellID(const nsID *aDocshellID) override; \
+<span class="lineNum">     314 </span>            :   NS_IMETHOD_(const nsID) DocshellID(void) override; \
+<span class="lineNum">     315 </span>            :   NS_IMETHOD GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry) override; \
+<span class="lineNum">     316 </span>            :   NS_IMETHOD_(bool) HasBFCacheEntry(nsIBFCacheEntry *aEntry) override; \
+<span class="lineNum">     317 </span>            :   NS_IMETHOD AdoptBFCacheEntry(nsISHEntry *aEntry) override; \
+<span class="lineNum">     318 </span>            :   NS_IMETHOD AbandonBFCacheEntry(void) override; \
+<span class="lineNum">     319 </span>            :   NS_IMETHOD SharesDocumentWith(nsISHEntry *aEntry, bool *_retval) override; \
+<span class="lineNum">     320 </span>            :   NS_IMETHOD GetIsSrcdocEntry(bool *aIsSrcdocEntry) override; \
+<span class="lineNum">     321 </span>            :   NS_IMETHOD GetSrcdocData(nsAString &amp; aSrcdocData) override; \
+<span class="lineNum">     322 </span>            :   NS_IMETHOD SetSrcdocData(const nsAString &amp; aSrcdocData) override; \
+<span class="lineNum">     323 </span>            :   NS_IMETHOD GetBaseURI(nsIURI * *aBaseURI) override; \
+<span class="lineNum">     324 </span>            :   NS_IMETHOD SetBaseURI(nsIURI *aBaseURI) override; \
+<span class="lineNum">     325 </span>            :   NS_IMETHOD GetScrollRestorationIsManual(bool *aScrollRestorationIsManual) override; \
+<span class="lineNum">     326 </span>            :   NS_IMETHOD SetScrollRestorationIsManual(bool aScrollRestorationIsManual) override; 
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            : /* Use this macro when declaring the members of this interface when the
+<span class="lineNum">     329 </span>            :    class doesn't implement the interface. This is useful for forwarding. */
+<span class="lineNum">     330 </span>            : #define NS_DECL_NON_VIRTUAL_NSISHENTRY \
+<span class="lineNum">     331 </span>            :   nsresult GetURI(nsIURI * *aURI); \
+<span class="lineNum">     332 </span>            :   nsresult GetOriginalURI(nsIURI * *aOriginalURI); \
+<span class="lineNum">     333 </span>            :   nsresult SetOriginalURI(nsIURI *aOriginalURI); \
+<span class="lineNum">     334 </span>            :   nsresult GetLoadReplace(bool *aLoadReplace); \
+<span class="lineNum">     335 </span>            :   nsresult SetLoadReplace(bool aLoadReplace); \
+<span class="lineNum">     336 </span>            :   nsresult GetTitle(char16_t * *aTitle); \
+<span class="lineNum">     337 </span>            :   nsresult GetIsSubFrame(bool *aIsSubFrame); \
+<span class="lineNum">     338 </span>            :   nsresult SetURI(nsIURI *aURI); \
+<span class="lineNum">     339 </span>            :   nsresult GetReferrerURI(nsIURI * *aReferrerURI); \
+<span class="lineNum">     340 </span>            :   nsresult SetReferrerURI(nsIURI *aReferrerURI); \
+<span class="lineNum">     341 </span>            :   nsresult GetReferrerPolicy(uint32_t *aReferrerPolicy); \
+<span class="lineNum">     342 </span>            :   nsresult SetReferrerPolicy(uint32_t aReferrerPolicy); \
+<span class="lineNum">     343 </span>            :   nsresult GetContentViewer(nsIContentViewer * *aContentViewer); \
+<span class="lineNum">     344 </span>            :   nsresult SetContentViewer(nsIContentViewer *aContentViewer); \
+<span class="lineNum">     345 </span>            :   nsresult GetSticky(bool *aSticky); \
+<span class="lineNum">     346 </span>            :   nsresult SetSticky(bool aSticky); \
+<span class="lineNum">     347 </span>            :   nsresult GetWindowState(nsISupports * *aWindowState); \
+<span class="lineNum">     348 </span>            :   nsresult SetWindowState(nsISupports *aWindowState); \
+<span class="lineNum">     349 </span>            :   nsresult GetViewerBounds(nsIntRect &amp; bounds); \
+<span class="lineNum">     350 </span>            :   nsresult SetViewerBounds(const nsIntRect &amp; bounds); \
+<span class="lineNum">     351 </span>            :   nsresult AddChildShell(nsIDocShellTreeItem *shell); \
+<span class="lineNum">     352 </span>            :   nsresult ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval); \
+<span class="lineNum">     353 </span>            :   nsresult ClearChildShells(void); \
+<span class="lineNum">     354 </span>            :   nsresult GetRefreshURIList(nsIMutableArray * *aRefreshURIList); \
+<span class="lineNum">     355 </span>            :   nsresult SetRefreshURIList(nsIMutableArray *aRefreshURIList); \
+<span class="lineNum">     356 </span>            :   nsresult SyncPresentationState(void); \
+<span class="lineNum">     357 </span>            :   nsresult SetTitle(const nsAString &amp; aTitle); \
+<span class="lineNum">     358 </span>            :   nsresult GetPostData(nsIInputStream * *aPostData); \
+<span class="lineNum">     359 </span>            :   nsresult SetPostData(nsIInputStream *aPostData); \
+<span class="lineNum">     360 </span>            :   nsresult GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState); \
+<span class="lineNum">     361 </span>            :   nsresult SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState); \
+<span class="lineNum">     362 </span>            :   nsresult InitLayoutHistoryState(nsILayoutHistoryState * *_retval); \
+<span class="lineNum">     363 </span>            :   nsresult GetParent(nsISHEntry * *aParent); \
+<span class="lineNum">     364 </span>            :   nsresult SetParent(nsISHEntry *aParent); \
+<span class="lineNum">     365 </span>            :   nsresult GetLoadType(uint32_t *aLoadType); \
+<span class="lineNum">     366 </span>            :   nsresult SetLoadType(uint32_t aLoadType); \
+<span class="lineNum">     367 </span>            :   nsresult GetID(uint32_t *aID); \
+<span class="lineNum">     368 </span>            :   nsresult SetID(uint32_t aID); \
+<span class="lineNum">     369 </span>            :   nsresult GetCacheKey(nsISupports * *aCacheKey); \
+<span class="lineNum">     370 </span>            :   nsresult SetCacheKey(nsISupports *aCacheKey); \
+<span class="lineNum">     371 </span>            :   nsresult GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag); \
+<span class="lineNum">     372 </span>            :   nsresult SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag); \
+<span class="lineNum">     373 </span>            :   nsresult GetExpirationStatus(bool *aExpirationStatus); \
+<span class="lineNum">     374 </span>            :   nsresult SetExpirationStatus(bool aExpirationStatus); \
+<span class="lineNum">     375 </span>            :   nsresult GetContentType(nsACString &amp; aContentType); \
+<span class="lineNum">     376 </span>            :   nsresult SetContentType(const nsACString &amp; aContentType); \
+<span class="lineNum">     377 </span>            :   nsresult GetURIWasModified(bool *aURIWasModified); \
+<span class="lineNum">     378 </span>            :   nsresult SetURIWasModified(bool aURIWasModified); \
+<span class="lineNum">     379 </span>            :   nsresult SetScrollPosition(int32_t x, int32_t y); \
+<span class="lineNum">     380 </span>            :   nsresult GetScrollPosition(int32_t *x, int32_t *y); \
+<span class="lineNum">     381 </span>            :   nsresult Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation); \
+<span class="lineNum">     382 </span>            :   nsresult Clone(nsISHEntry * *_retval); \
+<span class="lineNum">     383 </span>            :   nsresult SetIsSubFrame(bool aFlag); \
+<span class="lineNum">     384 </span>            :   nsresult GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval); \
+<span class="lineNum">     385 </span>            :   nsresult GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal); \
+<span class="lineNum">     386 </span>            :   nsresult SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal); \
+<span class="lineNum">     387 </span>            :   nsresult GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit); \
+<span class="lineNum">     388 </span>            :   nsresult SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit); \
+<span class="lineNum">     389 </span>            :   nsresult GetStateData(nsIStructuredCloneContainer * *aStateData); \
+<span class="lineNum">     390 </span>            :   nsresult SetStateData(nsIStructuredCloneContainer *aStateData); \
+<span class="lineNum">     391 </span>            :   nsresult_(nsDocShellEditorData *) ForgetEditorData(void); \
+<span class="lineNum">     392 </span>            :   nsresult_(void) SetEditorData(nsDocShellEditorData *aData); \
+<span class="lineNum">     393 </span>            :   nsresult_(bool) HasDetachedEditor(void); \
+<span class="lineNum">     394 </span>            :   nsresult IsDynamicallyAdded(bool *_retval); \
+<span class="lineNum">     395 </span>            :   nsresult HasDynamicallyAddedChild(bool *_retval); \
+<span class="lineNum">     396 </span>            :   nsresult GetDocshellID(nsID **aDocshellID); \
+<span class="lineNum">     397 </span>            :   nsresult SetDocshellID(const nsID *aDocshellID); \
+<span class="lineNum">     398 </span>            :   nsresult_(const nsID) DocshellID(void); \
+<span class="lineNum">     399 </span>            :   nsresult GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry); \
+<span class="lineNum">     400 </span>            :   nsresult_(bool) HasBFCacheEntry(nsIBFCacheEntry *aEntry); \
+<span class="lineNum">     401 </span>            :   nsresult AdoptBFCacheEntry(nsISHEntry *aEntry); \
+<span class="lineNum">     402 </span>            :   nsresult AbandonBFCacheEntry(void); \
+<span class="lineNum">     403 </span>            :   nsresult SharesDocumentWith(nsISHEntry *aEntry, bool *_retval); \
+<span class="lineNum">     404 </span>            :   nsresult GetIsSrcdocEntry(bool *aIsSrcdocEntry); \
+<span class="lineNum">     405 </span>            :   nsresult GetSrcdocData(nsAString &amp; aSrcdocData); \
+<span class="lineNum">     406 </span>            :   nsresult SetSrcdocData(const nsAString &amp; aSrcdocData); \
+<span class="lineNum">     407 </span>            :   nsresult GetBaseURI(nsIURI * *aBaseURI); \
+<span class="lineNum">     408 </span>            :   nsresult SetBaseURI(nsIURI *aBaseURI); \
+<span class="lineNum">     409 </span>            :   nsresult GetScrollRestorationIsManual(bool *aScrollRestorationIsManual); \
+<span class="lineNum">     410 </span>            :   nsresult SetScrollRestorationIsManual(bool aScrollRestorationIsManual); 
+<span class="lineNum">     411 </span>            : 
+<span class="lineNum">     412 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object. */
+<span class="lineNum">     413 </span>            : #define NS_FORWARD_NSISHENTRY(_to) \
+<span class="lineNum">     414 </span>            :   NS_IMETHOD GetURI(nsIURI * *aURI) override { return _to GetURI(aURI); } \
+<span class="lineNum">     415 </span>            :   NS_IMETHOD GetOriginalURI(nsIURI * *aOriginalURI) override { return _to GetOriginalURI(aOriginalURI); } \
+<span class="lineNum">     416 </span>            :   NS_IMETHOD SetOriginalURI(nsIURI *aOriginalURI) override { return _to SetOriginalURI(aOriginalURI); } \
+<span class="lineNum">     417 </span>            :   NS_IMETHOD GetLoadReplace(bool *aLoadReplace) override { return _to GetLoadReplace(aLoadReplace); } \
+<span class="lineNum">     418 </span>            :   NS_IMETHOD SetLoadReplace(bool aLoadReplace) override { return _to SetLoadReplace(aLoadReplace); } \
+<span class="lineNum">     419 </span>            :   NS_IMETHOD GetTitle(char16_t * *aTitle) override { return _to GetTitle(aTitle); } \
+<span class="lineNum">     420 </span>            :   NS_IMETHOD GetIsSubFrame(bool *aIsSubFrame) override { return _to GetIsSubFrame(aIsSubFrame); } \
+<span class="lineNum">     421 </span>            :   NS_IMETHOD SetURI(nsIURI *aURI) override { return _to SetURI(aURI); } \
+<span class="lineNum">     422 </span>            :   NS_IMETHOD GetReferrerURI(nsIURI * *aReferrerURI) override { return _to GetReferrerURI(aReferrerURI); } \
+<span class="lineNum">     423 </span>            :   NS_IMETHOD SetReferrerURI(nsIURI *aReferrerURI) override { return _to SetReferrerURI(aReferrerURI); } \
+<span class="lineNum">     424 </span>            :   NS_IMETHOD GetReferrerPolicy(uint32_t *aReferrerPolicy) override { return _to GetReferrerPolicy(aReferrerPolicy); } \
+<span class="lineNum">     425 </span>            :   NS_IMETHOD SetReferrerPolicy(uint32_t aReferrerPolicy) override { return _to SetReferrerPolicy(aReferrerPolicy); } \
+<span class="lineNum">     426 </span>            :   NS_IMETHOD GetContentViewer(nsIContentViewer * *aContentViewer) override { return _to GetContentViewer(aContentViewer); } \
+<span class="lineNum">     427 </span>            :   NS_IMETHOD SetContentViewer(nsIContentViewer *aContentViewer) override { return _to SetContentViewer(aContentViewer); } \
+<span class="lineNum">     428 </span>            :   NS_IMETHOD GetSticky(bool *aSticky) override { return _to GetSticky(aSticky); } \
+<span class="lineNum">     429 </span>            :   NS_IMETHOD SetSticky(bool aSticky) override { return _to SetSticky(aSticky); } \
+<span class="lineNum">     430 </span>            :   NS_IMETHOD GetWindowState(nsISupports * *aWindowState) override { return _to GetWindowState(aWindowState); } \
+<span class="lineNum">     431 </span>            :   NS_IMETHOD SetWindowState(nsISupports *aWindowState) override { return _to SetWindowState(aWindowState); } \
+<span class="lineNum">     432 </span>            :   NS_IMETHOD GetViewerBounds(nsIntRect &amp; bounds) override { return _to GetViewerBounds(bounds); } \
+<span class="lineNum">     433 </span>            :   NS_IMETHOD SetViewerBounds(const nsIntRect &amp; bounds) override { return _to SetViewerBounds(bounds); } \
+<span class="lineNum">     434 </span>            :   NS_IMETHOD AddChildShell(nsIDocShellTreeItem *shell) override { return _to AddChildShell(shell); } \
+<span class="lineNum">     435 </span>            :   NS_IMETHOD ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval) override { return _to ChildShellAt(index, _retval); } \
+<span class="lineNum">     436 </span>            :   NS_IMETHOD ClearChildShells(void) override { return _to ClearChildShells(); } \
+<span class="lineNum">     437 </span>            :   NS_IMETHOD GetRefreshURIList(nsIMutableArray * *aRefreshURIList) override { return _to GetRefreshURIList(aRefreshURIList); } \
+<span class="lineNum">     438 </span>            :   NS_IMETHOD SetRefreshURIList(nsIMutableArray *aRefreshURIList) override { return _to SetRefreshURIList(aRefreshURIList); } \
+<span class="lineNum">     439 </span>            :   NS_IMETHOD SyncPresentationState(void) override { return _to SyncPresentationState(); } \
+<span class="lineNum">     440 </span>            :   NS_IMETHOD SetTitle(const nsAString &amp; aTitle) override { return _to SetTitle(aTitle); } \
+<span class="lineNum">     441 </span>            :   NS_IMETHOD GetPostData(nsIInputStream * *aPostData) override { return _to GetPostData(aPostData); } \
+<span class="lineNum">     442 </span>            :   NS_IMETHOD SetPostData(nsIInputStream *aPostData) override { return _to SetPostData(aPostData); } \
+<span class="lineNum">     443 </span>            :   NS_IMETHOD GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState) override { return _to GetLayoutHistoryState(aLayoutHistoryState); } \
+<span class="lineNum">     444 </span>            :   NS_IMETHOD SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState) override { return _to SetLayoutHistoryState(aLayoutHistoryState); } \
+<span class="lineNum">     445 </span>            :   NS_IMETHOD InitLayoutHistoryState(nsILayoutHistoryState * *_retval) override { return _to InitLayoutHistoryState(_retval); } \
+<span class="lineNum">     446 </span>            :   NS_IMETHOD GetParent(nsISHEntry * *aParent) override { return _to GetParent(aParent); } \
+<span class="lineNum">     447 </span>            :   NS_IMETHOD SetParent(nsISHEntry *aParent) override { return _to SetParent(aParent); } \
+<span class="lineNum">     448 </span>            :   NS_IMETHOD GetLoadType(uint32_t *aLoadType) override { return _to GetLoadType(aLoadType); } \
+<span class="lineNum">     449 </span>            :   NS_IMETHOD SetLoadType(uint32_t aLoadType) override { return _to SetLoadType(aLoadType); } \
+<span class="lineNum">     450 </span>            :   NS_IMETHOD GetID(uint32_t *aID) override { return _to GetID(aID); } \
+<span class="lineNum">     451 </span>            :   NS_IMETHOD SetID(uint32_t aID) override { return _to SetID(aID); } \
+<span class="lineNum">     452 </span>            :   NS_IMETHOD GetCacheKey(nsISupports * *aCacheKey) override { return _to GetCacheKey(aCacheKey); } \
+<span class="lineNum">     453 </span>            :   NS_IMETHOD SetCacheKey(nsISupports *aCacheKey) override { return _to SetCacheKey(aCacheKey); } \
+<span class="lineNum">     454 </span>            :   NS_IMETHOD GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag) override { return _to GetSaveLayoutStateFlag(aSaveLayoutStateFlag); } \
+<span class="lineNum">     455 </span>            :   NS_IMETHOD SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag) override { return _to SetSaveLayoutStateFlag(aSaveLayoutStateFlag); } \
+<span class="lineNum">     456 </span>            :   NS_IMETHOD GetExpirationStatus(bool *aExpirationStatus) override { return _to GetExpirationStatus(aExpirationStatus); } \
+<span class="lineNum">     457 </span>            :   NS_IMETHOD SetExpirationStatus(bool aExpirationStatus) override { return _to SetExpirationStatus(aExpirationStatus); } \
+<span class="lineNum">     458 </span>            :   NS_IMETHOD GetContentType(nsACString &amp; aContentType) override { return _to GetContentType(aContentType); } \
+<span class="lineNum">     459 </span>            :   NS_IMETHOD SetContentType(const nsACString &amp; aContentType) override { return _to SetContentType(aContentType); } \
+<span class="lineNum">     460 </span>            :   NS_IMETHOD GetURIWasModified(bool *aURIWasModified) override { return _to GetURIWasModified(aURIWasModified); } \
+<span class="lineNum">     461 </span>            :   NS_IMETHOD SetURIWasModified(bool aURIWasModified) override { return _to SetURIWasModified(aURIWasModified); } \
+<span class="lineNum">     462 </span>            :   NS_IMETHOD SetScrollPosition(int32_t x, int32_t y) override { return _to SetScrollPosition(x, y); } \
+<span class="lineNum">     463 </span>            :   NS_IMETHOD GetScrollPosition(int32_t *x, int32_t *y) override { return _to GetScrollPosition(x, y); } \
+<span class="lineNum">     464 </span>            :   NS_IMETHOD Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation) override { return _to Create(URI, title, inputStream, layoutHistoryState, cacheKey, contentType, triggeringPrincipal, principalToInherit, docshellID, dynamicCreation); } \
+<span class="lineNum">     465 </span>            :   NS_IMETHOD Clone(nsISHEntry * *_retval) override { return _to Clone(_retval); } \
+<span class="lineNum">     466 </span>            :   NS_IMETHOD SetIsSubFrame(bool aFlag) override { return _to SetIsSubFrame(aFlag); } \
+<span class="lineNum">     467 </span>            :   NS_IMETHOD GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval) override { return _to GetAnyContentViewer(ownerEntry, _retval); } \
+<span class="lineNum">     468 </span>            :   NS_IMETHOD GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal) override { return _to GetTriggeringPrincipal(aTriggeringPrincipal); } \
+<span class="lineNum">     469 </span>            :   NS_IMETHOD SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal) override { return _to SetTriggeringPrincipal(aTriggeringPrincipal); } \
+<span class="lineNum">     470 </span>            :   NS_IMETHOD GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit) override { return _to GetPrincipalToInherit(aPrincipalToInherit); } \
+<span class="lineNum">     471 </span>            :   NS_IMETHOD SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit) override { return _to SetPrincipalToInherit(aPrincipalToInherit); } \
+<span class="lineNum">     472 </span>            :   NS_IMETHOD GetStateData(nsIStructuredCloneContainer * *aStateData) override { return _to GetStateData(aStateData); } \
+<span class="lineNum">     473 </span>            :   NS_IMETHOD SetStateData(nsIStructuredCloneContainer *aStateData) override { return _to SetStateData(aStateData); } \
+<span class="lineNum">     474 </span>            :   NS_IMETHOD_(nsDocShellEditorData *) ForgetEditorData(void) override { return _to ForgetEditorData(); } \
+<span class="lineNum">     475 </span>            :   NS_IMETHOD_(void) SetEditorData(nsDocShellEditorData *aData) override { return _to SetEditorData(aData); } \
+<span class="lineNum">     476 </span>            :   NS_IMETHOD_(bool) HasDetachedEditor(void) override { return _to HasDetachedEditor(); } \
+<span class="lineNum">     477 </span>            :   NS_IMETHOD IsDynamicallyAdded(bool *_retval) override { return _to IsDynamicallyAdded(_retval); } \
+<span class="lineNum">     478 </span>            :   NS_IMETHOD HasDynamicallyAddedChild(bool *_retval) override { return _to HasDynamicallyAddedChild(_retval); } \
+<span class="lineNum">     479 </span>            :   NS_IMETHOD GetDocshellID(nsID **aDocshellID) override { return _to GetDocshellID(aDocshellID); } \
+<span class="lineNum">     480 </span>            :   NS_IMETHOD SetDocshellID(const nsID *aDocshellID) override { return _to SetDocshellID(aDocshellID); } \
+<span class="lineNum">     481 </span>            :   NS_IMETHOD_(const nsID) DocshellID(void) override { return _to DocshellID(); } \
+<span class="lineNum">     482 </span>            :   NS_IMETHOD GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry) override { return _to GetBFCacheEntry(aBFCacheEntry); } \
+<span class="lineNum">     483 </span>            :   NS_IMETHOD_(bool) HasBFCacheEntry(nsIBFCacheEntry *aEntry) override { return _to HasBFCacheEntry(aEntry); } \
+<span class="lineNum">     484 </span>            :   NS_IMETHOD AdoptBFCacheEntry(nsISHEntry *aEntry) override { return _to AdoptBFCacheEntry(aEntry); } \
+<span class="lineNum">     485 </span>            :   NS_IMETHOD AbandonBFCacheEntry(void) override { return _to AbandonBFCacheEntry(); } \
+<span class="lineNum">     486 </span>            :   NS_IMETHOD SharesDocumentWith(nsISHEntry *aEntry, bool *_retval) override { return _to SharesDocumentWith(aEntry, _retval); } \
+<span class="lineNum">     487 </span>            :   NS_IMETHOD GetIsSrcdocEntry(bool *aIsSrcdocEntry) override { return _to GetIsSrcdocEntry(aIsSrcdocEntry); } \
+<span class="lineNum">     488 </span>            :   NS_IMETHOD GetSrcdocData(nsAString &amp; aSrcdocData) override { return _to GetSrcdocData(aSrcdocData); } \
+<span class="lineNum">     489 </span>            :   NS_IMETHOD SetSrcdocData(const nsAString &amp; aSrcdocData) override { return _to SetSrcdocData(aSrcdocData); } \
+<span class="lineNum">     490 </span>            :   NS_IMETHOD GetBaseURI(nsIURI * *aBaseURI) override { return _to GetBaseURI(aBaseURI); } \
+<span class="lineNum">     491 </span>            :   NS_IMETHOD SetBaseURI(nsIURI *aBaseURI) override { return _to SetBaseURI(aBaseURI); } \
+<span class="lineNum">     492 </span>            :   NS_IMETHOD GetScrollRestorationIsManual(bool *aScrollRestorationIsManual) override { return _to GetScrollRestorationIsManual(aScrollRestorationIsManual); } \
+<span class="lineNum">     493 </span>            :   NS_IMETHOD SetScrollRestorationIsManual(bool aScrollRestorationIsManual) override { return _to SetScrollRestorationIsManual(aScrollRestorationIsManual); } 
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
+<span class="lineNum">     496 </span>            : #define NS_FORWARD_SAFE_NSISHENTRY(_to) \
+<span class="lineNum">     497 </span>            :   NS_IMETHOD GetURI(nsIURI * *aURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetURI(aURI); } \
+<span class="lineNum">     498 </span>            :   NS_IMETHOD GetOriginalURI(nsIURI * *aOriginalURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetOriginalURI(aOriginalURI); } \
+<span class="lineNum">     499 </span>            :   NS_IMETHOD SetOriginalURI(nsIURI *aOriginalURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetOriginalURI(aOriginalURI); } \
+<span class="lineNum">     500 </span>            :   NS_IMETHOD GetLoadReplace(bool *aLoadReplace) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetLoadReplace(aLoadReplace); } \
+<span class="lineNum">     501 </span>            :   NS_IMETHOD SetLoadReplace(bool aLoadReplace) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetLoadReplace(aLoadReplace); } \
+<span class="lineNum">     502 </span>            :   NS_IMETHOD GetTitle(char16_t * *aTitle) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetTitle(aTitle); } \
+<span class="lineNum">     503 </span>            :   NS_IMETHOD GetIsSubFrame(bool *aIsSubFrame) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetIsSubFrame(aIsSubFrame); } \
+<span class="lineNum">     504 </span>            :   NS_IMETHOD SetURI(nsIURI *aURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetURI(aURI); } \
+<span class="lineNum">     505 </span>            :   NS_IMETHOD GetReferrerURI(nsIURI * *aReferrerURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetReferrerURI(aReferrerURI); } \
+<span class="lineNum">     506 </span>            :   NS_IMETHOD SetReferrerURI(nsIURI *aReferrerURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetReferrerURI(aReferrerURI); } \
+<span class="lineNum">     507 </span>            :   NS_IMETHOD GetReferrerPolicy(uint32_t *aReferrerPolicy) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetReferrerPolicy(aReferrerPolicy); } \
+<span class="lineNum">     508 </span>            :   NS_IMETHOD SetReferrerPolicy(uint32_t aReferrerPolicy) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetReferrerPolicy(aReferrerPolicy); } \
+<span class="lineNum">     509 </span>            :   NS_IMETHOD GetContentViewer(nsIContentViewer * *aContentViewer) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetContentViewer(aContentViewer); } \
+<span class="lineNum">     510 </span>            :   NS_IMETHOD SetContentViewer(nsIContentViewer *aContentViewer) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetContentViewer(aContentViewer); } \
+<span class="lineNum">     511 </span>            :   NS_IMETHOD GetSticky(bool *aSticky) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetSticky(aSticky); } \
+<span class="lineNum">     512 </span>            :   NS_IMETHOD SetSticky(bool aSticky) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetSticky(aSticky); } \
+<span class="lineNum">     513 </span>            :   NS_IMETHOD GetWindowState(nsISupports * *aWindowState) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetWindowState(aWindowState); } \
+<span class="lineNum">     514 </span>            :   NS_IMETHOD SetWindowState(nsISupports *aWindowState) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetWindowState(aWindowState); } \
+<span class="lineNum">     515 </span>            :   NS_IMETHOD GetViewerBounds(nsIntRect &amp; bounds) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetViewerBounds(bounds); } \
+<span class="lineNum">     516 </span>            :   NS_IMETHOD SetViewerBounds(const nsIntRect &amp; bounds) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetViewerBounds(bounds); } \
+<span class="lineNum">     517 </span>            :   NS_IMETHOD AddChildShell(nsIDocShellTreeItem *shell) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;AddChildShell(shell); } \
+<span class="lineNum">     518 </span>            :   NS_IMETHOD ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;ChildShellAt(index, _retval); } \
+<span class="lineNum">     519 </span>            :   NS_IMETHOD ClearChildShells(void) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;ClearChildShells(); } \
+<span class="lineNum">     520 </span>            :   NS_IMETHOD GetRefreshURIList(nsIMutableArray * *aRefreshURIList) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetRefreshURIList(aRefreshURIList); } \
+<span class="lineNum">     521 </span>            :   NS_IMETHOD SetRefreshURIList(nsIMutableArray *aRefreshURIList) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetRefreshURIList(aRefreshURIList); } \
+<span class="lineNum">     522 </span>            :   NS_IMETHOD SyncPresentationState(void) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SyncPresentationState(); } \
+<span class="lineNum">     523 </span>            :   NS_IMETHOD SetTitle(const nsAString &amp; aTitle) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetTitle(aTitle); } \
+<span class="lineNum">     524 </span>            :   NS_IMETHOD GetPostData(nsIInputStream * *aPostData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetPostData(aPostData); } \
+<span class="lineNum">     525 </span>            :   NS_IMETHOD SetPostData(nsIInputStream *aPostData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetPostData(aPostData); } \
+<span class="lineNum">     526 </span>            :   NS_IMETHOD GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetLayoutHistoryState(aLayoutHistoryState); } \
+<span class="lineNum">     527 </span>            :   NS_IMETHOD SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetLayoutHistoryState(aLayoutHistoryState); } \
+<span class="lineNum">     528 </span>            :   NS_IMETHOD InitLayoutHistoryState(nsILayoutHistoryState * *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;InitLayoutHistoryState(_retval); } \
+<span class="lineNum">     529 </span>            :   NS_IMETHOD GetParent(nsISHEntry * *aParent) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetParent(aParent); } \
+<span class="lineNum">     530 </span>            :   NS_IMETHOD SetParent(nsISHEntry *aParent) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetParent(aParent); } \
+<span class="lineNum">     531 </span>            :   NS_IMETHOD GetLoadType(uint32_t *aLoadType) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetLoadType(aLoadType); } \
+<span class="lineNum">     532 </span>            :   NS_IMETHOD SetLoadType(uint32_t aLoadType) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetLoadType(aLoadType); } \
+<span class="lineNum">     533 </span>            :   NS_IMETHOD GetID(uint32_t *aID) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetID(aID); } \
+<span class="lineNum">     534 </span>            :   NS_IMETHOD SetID(uint32_t aID) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetID(aID); } \
+<span class="lineNum">     535 </span>            :   NS_IMETHOD GetCacheKey(nsISupports * *aCacheKey) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetCacheKey(aCacheKey); } \
+<span class="lineNum">     536 </span>            :   NS_IMETHOD SetCacheKey(nsISupports *aCacheKey) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetCacheKey(aCacheKey); } \
+<span class="lineNum">     537 </span>            :   NS_IMETHOD GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetSaveLayoutStateFlag(aSaveLayoutStateFlag); } \
+<span class="lineNum">     538 </span>            :   NS_IMETHOD SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetSaveLayoutStateFlag(aSaveLayoutStateFlag); } \
+<span class="lineNum">     539 </span>            :   NS_IMETHOD GetExpirationStatus(bool *aExpirationStatus) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetExpirationStatus(aExpirationStatus); } \
+<span class="lineNum">     540 </span>            :   NS_IMETHOD SetExpirationStatus(bool aExpirationStatus) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetExpirationStatus(aExpirationStatus); } \
+<span class="lineNum">     541 </span>            :   NS_IMETHOD GetContentType(nsACString &amp; aContentType) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetContentType(aContentType); } \
+<span class="lineNum">     542 </span>            :   NS_IMETHOD SetContentType(const nsACString &amp; aContentType) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetContentType(aContentType); } \
+<span class="lineNum">     543 </span>            :   NS_IMETHOD GetURIWasModified(bool *aURIWasModified) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetURIWasModified(aURIWasModified); } \
+<span class="lineNum">     544 </span>            :   NS_IMETHOD SetURIWasModified(bool aURIWasModified) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetURIWasModified(aURIWasModified); } \
+<span class="lineNum">     545 </span>            :   NS_IMETHOD SetScrollPosition(int32_t x, int32_t y) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetScrollPosition(x, y); } \
+<span class="lineNum">     546 </span>            :   NS_IMETHOD GetScrollPosition(int32_t *x, int32_t *y) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetScrollPosition(x, y); } \
+<span class="lineNum">     547 </span>            :   NS_IMETHOD Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;Create(URI, title, inputStream, layoutHistoryState, cacheKey, contentType, triggeringPrincipal, principalToInherit, docshellID, dynamicCreation); } \
+<span class="lineNum">     548 </span>            :   NS_IMETHOD Clone(nsISHEntry * *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;Clone(_retval); } \
+<span class="lineNum">     549 </span>            :   NS_IMETHOD SetIsSubFrame(bool aFlag) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetIsSubFrame(aFlag); } \
+<span class="lineNum">     550 </span>            :   NS_IMETHOD GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetAnyContentViewer(ownerEntry, _retval); } \
+<span class="lineNum">     551 </span>            :   NS_IMETHOD GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetTriggeringPrincipal(aTriggeringPrincipal); } \
+<span class="lineNum">     552 </span>            :   NS_IMETHOD SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetTriggeringPrincipal(aTriggeringPrincipal); } \
+<span class="lineNum">     553 </span>            :   NS_IMETHOD GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetPrincipalToInherit(aPrincipalToInherit); } \
+<span class="lineNum">     554 </span>            :   NS_IMETHOD SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetPrincipalToInherit(aPrincipalToInherit); } \
+<span class="lineNum">     555 </span>            :   NS_IMETHOD GetStateData(nsIStructuredCloneContainer * *aStateData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetStateData(aStateData); } \
+<span class="lineNum">     556 </span>            :   NS_IMETHOD SetStateData(nsIStructuredCloneContainer *aStateData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetStateData(aStateData); } \
+<span class="lineNum">     557 </span>            :   NS_IMETHOD_(nsDocShellEditorData *) ForgetEditorData(void) override; \
+<span class="lineNum">     558 </span>            :   NS_IMETHOD_(void) SetEditorData(nsDocShellEditorData *aData) override; \
+<span class="lineNum">     559 </span>            :   NS_IMETHOD_(bool) HasDetachedEditor(void) override; \
+<span class="lineNum">     560 </span>            :   NS_IMETHOD IsDynamicallyAdded(bool *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;IsDynamicallyAdded(_retval); } \
+<span class="lineNum">     561 </span>            :   NS_IMETHOD HasDynamicallyAddedChild(bool *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;HasDynamicallyAddedChild(_retval); } \
+<span class="lineNum">     562 </span>            :   NS_IMETHOD GetDocshellID(nsID **aDocshellID) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetDocshellID(aDocshellID); } \
+<span class="lineNum">     563 </span>            :   NS_IMETHOD SetDocshellID(const nsID *aDocshellID) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetDocshellID(aDocshellID); } \
+<span class="lineNum">     564 </span>            :   NS_IMETHOD_(const nsID) DocshellID(void) override; \
+<span class="lineNum">     565 </span>            :   NS_IMETHOD GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetBFCacheEntry(aBFCacheEntry); } \
+<span class="lineNum">     566 </span>            :   NS_IMETHOD_(bool) HasBFCacheEntry(nsIBFCacheEntry *aEntry) override; \
+<span class="lineNum">     567 </span>            :   NS_IMETHOD AdoptBFCacheEntry(nsISHEntry *aEntry) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;AdoptBFCacheEntry(aEntry); } \
+<span class="lineNum">     568 </span>            :   NS_IMETHOD AbandonBFCacheEntry(void) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;AbandonBFCacheEntry(); } \
+<span class="lineNum">     569 </span>            :   NS_IMETHOD SharesDocumentWith(nsISHEntry *aEntry, bool *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SharesDocumentWith(aEntry, _retval); } \
+<span class="lineNum">     570 </span>            :   NS_IMETHOD GetIsSrcdocEntry(bool *aIsSrcdocEntry) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetIsSrcdocEntry(aIsSrcdocEntry); } \
+<span class="lineNum">     571 </span>            :   NS_IMETHOD GetSrcdocData(nsAString &amp; aSrcdocData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetSrcdocData(aSrcdocData); } \
+<span class="lineNum">     572 </span>            :   NS_IMETHOD SetSrcdocData(const nsAString &amp; aSrcdocData) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetSrcdocData(aSrcdocData); } \
+<span class="lineNum">     573 </span>            :   NS_IMETHOD GetBaseURI(nsIURI * *aBaseURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetBaseURI(aBaseURI); } \
+<span class="lineNum">     574 </span>            :   NS_IMETHOD SetBaseURI(nsIURI *aBaseURI) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetBaseURI(aBaseURI); } \
+<span class="lineNum">     575 </span>            :   NS_IMETHOD GetScrollRestorationIsManual(bool *aScrollRestorationIsManual) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetScrollRestorationIsManual(aScrollRestorationIsManual); } \
+<span class="lineNum">     576 </span>            :   NS_IMETHOD SetScrollRestorationIsManual(bool aScrollRestorationIsManual) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetScrollRestorationIsManual(aScrollRestorationIsManual); } 
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span>            : #if 0
+<span class="lineNum">     579 </span>            : /* Use the code below as a template for the implementation class for this interface. */
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span>            : /* Header file */
+<span class="lineNum">     582 </span>            : class nsSHEntry : public nsISHEntry
+<span class="lineNum">     583 </span>            : {
+<span class="lineNum">     584 </span>            : public:
+<span class="lineNum">     585 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">     586 </span>            :   NS_DECL_NSISHENTRY
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            :   nsSHEntry();
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            : private:
+<span class="lineNum">     591 </span>            :   ~nsSHEntry();
+<span class="lineNum">     592 </span>            : 
+<span class="lineNum">     593 </span>            : protected:
+<span class="lineNum">     594 </span>            :   /* additional members */
+<span class="lineNum">     595 </span>            : };
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            : /* Implementation file */
+<span class="lineNum">     598 </span>            : NS_IMPL_ISUPPORTS(nsSHEntry, nsISHEntry)
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span>            : nsSHEntry::nsSHEntry()
+<span class="lineNum">     601 </span>            : {
+<span class="lineNum">     602 </span>            :   /* member initializers and constructor code */
+<span class="lineNum">     603 </span>            : }
+<span class="lineNum">     604 </span>            : 
+<span class="lineNum">     605 </span>            : nsSHEntry::~nsSHEntry()
+<span class="lineNum">     606 </span>            : {
+<span class="lineNum">     607 </span>            :   /* destructor code */
+<span class="lineNum">     608 </span>            : }
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            : /* readonly attribute nsIURI URI; */
+<span class="lineNum">     611 </span>            : NS_IMETHODIMP nsSHEntry::GetURI(nsIURI * *aURI)
+<span class="lineNum">     612 </span>            : {
+<span class="lineNum">     613 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     614 </span>            : }
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span>            : /* attribute nsIURI originalURI; */
+<span class="lineNum">     617 </span>            : NS_IMETHODIMP nsSHEntry::GetOriginalURI(nsIURI * *aOriginalURI)
+<span class="lineNum">     618 </span>            : {
+<span class="lineNum">     619 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     620 </span>            : }
+<span class="lineNum">     621 </span>            : NS_IMETHODIMP nsSHEntry::SetOriginalURI(nsIURI *aOriginalURI)
+<span class="lineNum">     622 </span>            : {
+<span class="lineNum">     623 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     624 </span>            : }
+<span class="lineNum">     625 </span>            : 
+<span class="lineNum">     626 </span>            : /* attribute boolean loadReplace; */
+<span class="lineNum">     627 </span>            : NS_IMETHODIMP nsSHEntry::GetLoadReplace(bool *aLoadReplace)
+<span class="lineNum">     628 </span>            : {
+<span class="lineNum">     629 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     630 </span>            : }
+<span class="lineNum">     631 </span>            : NS_IMETHODIMP nsSHEntry::SetLoadReplace(bool aLoadReplace)
+<span class="lineNum">     632 </span>            : {
+<span class="lineNum">     633 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     634 </span>            : }
+<span class="lineNum">     635 </span>            : 
+<span class="lineNum">     636 </span>            : /* readonly attribute wstring title; */
+<span class="lineNum">     637 </span>            : NS_IMETHODIMP nsSHEntry::GetTitle(char16_t * *aTitle)
+<span class="lineNum">     638 </span>            : {
+<span class="lineNum">     639 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     640 </span>            : }
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            : /* readonly attribute boolean isSubFrame; */
+<span class="lineNum">     643 </span>            : NS_IMETHODIMP nsSHEntry::GetIsSubFrame(bool *aIsSubFrame)
+<span class="lineNum">     644 </span>            : {
+<span class="lineNum">     645 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     646 </span>            : }
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : /* void setURI (in nsIURI aURI); */
+<span class="lineNum">     649 </span>            : NS_IMETHODIMP nsSHEntry::SetURI(nsIURI *aURI)
+<span class="lineNum">     650 </span>            : {
+<span class="lineNum">     651 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     652 </span>            : }
+<span class="lineNum">     653 </span>            : 
+<span class="lineNum">     654 </span>            : /* attribute nsIURI referrerURI; */
+<span class="lineNum">     655 </span>            : NS_IMETHODIMP nsSHEntry::GetReferrerURI(nsIURI * *aReferrerURI)
+<span class="lineNum">     656 </span>            : {
+<span class="lineNum">     657 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     658 </span>            : }
+<span class="lineNum">     659 </span>            : NS_IMETHODIMP nsSHEntry::SetReferrerURI(nsIURI *aReferrerURI)
+<span class="lineNum">     660 </span>            : {
+<span class="lineNum">     661 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     662 </span>            : }
+<span class="lineNum">     663 </span>            : 
+<span class="lineNum">     664 </span>            : /* attribute unsigned long referrerPolicy; */
+<span class="lineNum">     665 </span>            : NS_IMETHODIMP nsSHEntry::GetReferrerPolicy(uint32_t *aReferrerPolicy)
+<span class="lineNum">     666 </span>            : {
+<span class="lineNum">     667 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     668 </span>            : }
+<span class="lineNum">     669 </span>            : NS_IMETHODIMP nsSHEntry::SetReferrerPolicy(uint32_t aReferrerPolicy)
+<span class="lineNum">     670 </span>            : {
+<span class="lineNum">     671 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     672 </span>            : }
+<span class="lineNum">     673 </span>            : 
+<span class="lineNum">     674 </span>            : /* attribute nsIContentViewer contentViewer; */
+<span class="lineNum">     675 </span>            : NS_IMETHODIMP nsSHEntry::GetContentViewer(nsIContentViewer * *aContentViewer)
+<span class="lineNum">     676 </span>            : {
+<span class="lineNum">     677 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     678 </span>            : }
+<span class="lineNum">     679 </span>            : NS_IMETHODIMP nsSHEntry::SetContentViewer(nsIContentViewer *aContentViewer)
+<span class="lineNum">     680 </span>            : {
+<span class="lineNum">     681 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     682 </span>            : }
+<span class="lineNum">     683 </span>            : 
+<span class="lineNum">     684 </span>            : /* attribute boolean sticky; */
+<span class="lineNum">     685 </span>            : NS_IMETHODIMP nsSHEntry::GetSticky(bool *aSticky)
+<span class="lineNum">     686 </span>            : {
+<span class="lineNum">     687 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     688 </span>            : }
+<span class="lineNum">     689 </span>            : NS_IMETHODIMP nsSHEntry::SetSticky(bool aSticky)
+<span class="lineNum">     690 </span>            : {
+<span class="lineNum">     691 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     692 </span>            : }
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span>            : /* attribute nsISupports windowState; */
+<span class="lineNum">     695 </span>            : NS_IMETHODIMP nsSHEntry::GetWindowState(nsISupports * *aWindowState)
+<span class="lineNum">     696 </span>            : {
+<span class="lineNum">     697 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     698 </span>            : }
+<span class="lineNum">     699 </span>            : NS_IMETHODIMP nsSHEntry::SetWindowState(nsISupports *aWindowState)
+<span class="lineNum">     700 </span>            : {
+<span class="lineNum">     701 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     702 </span>            : }
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span>            : /* [noscript] void getViewerBounds (in nsIntRect bounds); */
+<span class="lineNum">     705 </span>            : NS_IMETHODIMP nsSHEntry::GetViewerBounds(nsIntRect &amp; bounds)
+<span class="lineNum">     706 </span>            : {
+<span class="lineNum">     707 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     708 </span>            : }
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            : /* [noscript] void setViewerBounds ([const] in nsIntRect bounds); */
+<span class="lineNum">     711 </span>            : NS_IMETHODIMP nsSHEntry::SetViewerBounds(const nsIntRect &amp; bounds)
+<span class="lineNum">     712 </span>            : {
+<span class="lineNum">     713 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     714 </span>            : }
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span>            : /* void addChildShell (in nsIDocShellTreeItem shell); */
+<span class="lineNum">     717 </span>            : NS_IMETHODIMP nsSHEntry::AddChildShell(nsIDocShellTreeItem *shell)
+<span class="lineNum">     718 </span>            : {
+<span class="lineNum">     719 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     720 </span>            : }
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            : /* nsIDocShellTreeItem childShellAt (in long index); */
+<span class="lineNum">     723 </span>            : NS_IMETHODIMP nsSHEntry::ChildShellAt(int32_t index, nsIDocShellTreeItem * *_retval)
+<span class="lineNum">     724 </span>            : {
+<span class="lineNum">     725 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     726 </span>            : }
+<span class="lineNum">     727 </span>            : 
+<span class="lineNum">     728 </span>            : /* void clearChildShells (); */
+<span class="lineNum">     729 </span>            : NS_IMETHODIMP nsSHEntry::ClearChildShells()
+<span class="lineNum">     730 </span>            : {
+<span class="lineNum">     731 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     732 </span>            : }
+<span class="lineNum">     733 </span>            : 
+<span class="lineNum">     734 </span>            : /* attribute nsIMutableArray refreshURIList; */
+<span class="lineNum">     735 </span>            : NS_IMETHODIMP nsSHEntry::GetRefreshURIList(nsIMutableArray * *aRefreshURIList)
+<span class="lineNum">     736 </span>            : {
+<span class="lineNum">     737 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     738 </span>            : }
+<span class="lineNum">     739 </span>            : NS_IMETHODIMP nsSHEntry::SetRefreshURIList(nsIMutableArray *aRefreshURIList)
+<span class="lineNum">     740 </span>            : {
+<span class="lineNum">     741 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     742 </span>            : }
+<span class="lineNum">     743 </span>            : 
+<span class="lineNum">     744 </span>            : /* void syncPresentationState (); */
+<span class="lineNum">     745 </span>            : NS_IMETHODIMP nsSHEntry::SyncPresentationState()
+<span class="lineNum">     746 </span>            : {
+<span class="lineNum">     747 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     748 </span>            : }
+<span class="lineNum">     749 </span>            : 
+<span class="lineNum">     750 </span>            : /* void setTitle (in AString aTitle); */
+<span class="lineNum">     751 </span>            : NS_IMETHODIMP nsSHEntry::SetTitle(const nsAString &amp; aTitle)
+<span class="lineNum">     752 </span>            : {
+<span class="lineNum">     753 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     754 </span>            : }
+<span class="lineNum">     755 </span>            : 
+<span class="lineNum">     756 </span>            : /* attribute nsIInputStream postData; */
+<span class="lineNum">     757 </span>            : NS_IMETHODIMP nsSHEntry::GetPostData(nsIInputStream * *aPostData)
+<span class="lineNum">     758 </span>            : {
+<span class="lineNum">     759 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     760 </span>            : }
+<span class="lineNum">     761 </span>            : NS_IMETHODIMP nsSHEntry::SetPostData(nsIInputStream *aPostData)
+<span class="lineNum">     762 </span>            : {
+<span class="lineNum">     763 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     764 </span>            : }
+<span class="lineNum">     765 </span>            : 
+<span class="lineNum">     766 </span>            : /* attribute nsILayoutHistoryState layoutHistoryState; */
+<span class="lineNum">     767 </span>            : NS_IMETHODIMP nsSHEntry::GetLayoutHistoryState(nsILayoutHistoryState * *aLayoutHistoryState)
+<span class="lineNum">     768 </span>            : {
+<span class="lineNum">     769 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     770 </span>            : }
+<span class="lineNum">     771 </span>            : NS_IMETHODIMP nsSHEntry::SetLayoutHistoryState(nsILayoutHistoryState *aLayoutHistoryState)
+<span class="lineNum">     772 </span>            : {
+<span class="lineNum">     773 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     774 </span>            : }
+<span class="lineNum">     775 </span>            : 
+<span class="lineNum">     776 </span>            : /* nsILayoutHistoryState initLayoutHistoryState (); */
+<span class="lineNum">     777 </span>            : NS_IMETHODIMP nsSHEntry::InitLayoutHistoryState(nsILayoutHistoryState * *_retval)
+<span class="lineNum">     778 </span>            : {
+<span class="lineNum">     779 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     780 </span>            : }
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span>            : /* attribute nsISHEntry parent; */
+<span class="lineNum">     783 </span>            : NS_IMETHODIMP nsSHEntry::GetParent(nsISHEntry * *aParent)
+<span class="lineNum">     784 </span>            : {
+<span class="lineNum">     785 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     786 </span>            : }
+<span class="lineNum">     787 </span>            : NS_IMETHODIMP nsSHEntry::SetParent(nsISHEntry *aParent)
+<span class="lineNum">     788 </span>            : {
+<span class="lineNum">     789 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     790 </span>            : }
+<span class="lineNum">     791 </span>            : 
+<span class="lineNum">     792 </span>            : /* attribute unsigned long loadType; */
+<span class="lineNum">     793 </span>            : NS_IMETHODIMP nsSHEntry::GetLoadType(uint32_t *aLoadType)
+<span class="lineNum">     794 </span>            : {
+<span class="lineNum">     795 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     796 </span>            : }
+<span class="lineNum">     797 </span>            : NS_IMETHODIMP nsSHEntry::SetLoadType(uint32_t aLoadType)
+<span class="lineNum">     798 </span>            : {
+<span class="lineNum">     799 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     800 </span>            : }
+<span class="lineNum">     801 </span>            : 
+<span class="lineNum">     802 </span>            : /* attribute unsigned long ID; */
+<span class="lineNum">     803 </span>            : NS_IMETHODIMP nsSHEntry::GetID(uint32_t *aID)
+<span class="lineNum">     804 </span>            : {
+<span class="lineNum">     805 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     806 </span>            : }
+<span class="lineNum">     807 </span>            : NS_IMETHODIMP nsSHEntry::SetID(uint32_t aID)
+<span class="lineNum">     808 </span>            : {
+<span class="lineNum">     809 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     810 </span>            : }
+<span class="lineNum">     811 </span>            : 
+<span class="lineNum">     812 </span>            : /* attribute nsISupports cacheKey; */
+<span class="lineNum">     813 </span>            : NS_IMETHODIMP nsSHEntry::GetCacheKey(nsISupports * *aCacheKey)
+<span class="lineNum">     814 </span>            : {
+<span class="lineNum">     815 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     816 </span>            : }
+<span class="lineNum">     817 </span>            : NS_IMETHODIMP nsSHEntry::SetCacheKey(nsISupports *aCacheKey)
+<span class="lineNum">     818 </span>            : {
+<span class="lineNum">     819 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     820 </span>            : }
+<span class="lineNum">     821 </span>            : 
+<span class="lineNum">     822 </span>            : /* attribute boolean saveLayoutStateFlag; */
+<span class="lineNum">     823 </span>            : NS_IMETHODIMP nsSHEntry::GetSaveLayoutStateFlag(bool *aSaveLayoutStateFlag)
+<span class="lineNum">     824 </span>            : {
+<span class="lineNum">     825 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     826 </span>            : }
+<span class="lineNum">     827 </span>            : NS_IMETHODIMP nsSHEntry::SetSaveLayoutStateFlag(bool aSaveLayoutStateFlag)
+<span class="lineNum">     828 </span>            : {
+<span class="lineNum">     829 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     830 </span>            : }
+<span class="lineNum">     831 </span>            : 
+<span class="lineNum">     832 </span>            : /* attribute boolean expirationStatus; */
+<span class="lineNum">     833 </span>            : NS_IMETHODIMP nsSHEntry::GetExpirationStatus(bool *aExpirationStatus)
+<span class="lineNum">     834 </span>            : {
+<span class="lineNum">     835 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     836 </span>            : }
+<span class="lineNum">     837 </span>            : NS_IMETHODIMP nsSHEntry::SetExpirationStatus(bool aExpirationStatus)
+<span class="lineNum">     838 </span>            : {
+<span class="lineNum">     839 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     840 </span>            : }
+<span class="lineNum">     841 </span>            : 
+<span class="lineNum">     842 </span>            : /* attribute ACString contentType; */
+<span class="lineNum">     843 </span>            : NS_IMETHODIMP nsSHEntry::GetContentType(nsACString &amp; aContentType)
+<span class="lineNum">     844 </span>            : {
+<span class="lineNum">     845 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     846 </span>            : }
+<span class="lineNum">     847 </span>            : NS_IMETHODIMP nsSHEntry::SetContentType(const nsACString &amp; aContentType)
+<span class="lineNum">     848 </span>            : {
+<span class="lineNum">     849 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     850 </span>            : }
+<span class="lineNum">     851 </span>            : 
+<span class="lineNum">     852 </span>            : /* attribute boolean URIWasModified; */
+<span class="lineNum">     853 </span>            : NS_IMETHODIMP nsSHEntry::GetURIWasModified(bool *aURIWasModified)
+<span class="lineNum">     854 </span>            : {
+<span class="lineNum">     855 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     856 </span>            : }
+<span class="lineNum">     857 </span>            : NS_IMETHODIMP nsSHEntry::SetURIWasModified(bool aURIWasModified)
+<span class="lineNum">     858 </span>            : {
+<span class="lineNum">     859 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     860 </span>            : }
+<span class="lineNum">     861 </span>            : 
+<span class="lineNum">     862 </span>            : /* void setScrollPosition (in long x, in long y); */
+<span class="lineNum">     863 </span>            : NS_IMETHODIMP nsSHEntry::SetScrollPosition(int32_t x, int32_t y)
+<span class="lineNum">     864 </span>            : {
+<span class="lineNum">     865 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     866 </span>            : }
+<span class="lineNum">     867 </span>            : 
+<span class="lineNum">     868 </span>            : /* void getScrollPosition (out long x, out long y); */
+<span class="lineNum">     869 </span>            : NS_IMETHODIMP nsSHEntry::GetScrollPosition(int32_t *x, int32_t *y)
+<span class="lineNum">     870 </span>            : {
+<span class="lineNum">     871 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     872 </span>            : }
+<span class="lineNum">     873 </span>            : 
+<span class="lineNum">     874 </span>            : /* [noscript] void create (in nsIURI URI, in AString title, in nsIInputStream inputStream, in nsILayoutHistoryState layoutHistoryState, in nsISupports cacheKey, in ACString contentType, in nsIPrincipal triggeringPrincipal, in nsIPrincipal principalToInherit, in nsIDRef docshellID, in boolean dynamicCreation); */
+<span class="lineNum">     875 </span>            : NS_IMETHODIMP nsSHEntry::Create(nsIURI *URI, const nsAString &amp; title, nsIInputStream *inputStream, nsILayoutHistoryState *layoutHistoryState, nsISupports *cacheKey, const nsACString &amp; contentType, nsIPrincipal *triggeringPrincipal, nsIPrincipal *principalToInherit, const nsID &amp; docshellID, bool dynamicCreation)
+<span class="lineNum">     876 </span>            : {
+<span class="lineNum">     877 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     878 </span>            : }
+<span class="lineNum">     879 </span>            : 
+<span class="lineNum">     880 </span>            : /* nsISHEntry clone (); */
+<span class="lineNum">     881 </span>            : NS_IMETHODIMP nsSHEntry::Clone(nsISHEntry * *_retval)
+<span class="lineNum">     882 </span>            : {
+<span class="lineNum">     883 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     884 </span>            : }
+<span class="lineNum">     885 </span>            : 
+<span class="lineNum">     886 </span>            : /* void setIsSubFrame (in boolean aFlag); */
+<span class="lineNum">     887 </span>            : NS_IMETHODIMP nsSHEntry::SetIsSubFrame(bool aFlag)
+<span class="lineNum">     888 </span>            : {
+<span class="lineNum">     889 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     890 </span>            : }
+<span class="lineNum">     891 </span>            : 
+<span class="lineNum">     892 </span>            : /* nsIContentViewer getAnyContentViewer (out nsISHEntry ownerEntry); */
+<span class="lineNum">     893 </span>            : NS_IMETHODIMP nsSHEntry::GetAnyContentViewer(nsISHEntry * *ownerEntry, nsIContentViewer * *_retval)
+<span class="lineNum">     894 </span>            : {
+<span class="lineNum">     895 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     896 </span>            : }
+<span class="lineNum">     897 </span>            : 
+<span class="lineNum">     898 </span>            : /* attribute nsIPrincipal triggeringPrincipal; */
+<span class="lineNum">     899 </span>            : NS_IMETHODIMP nsSHEntry::GetTriggeringPrincipal(nsIPrincipal * *aTriggeringPrincipal)
+<span class="lineNum">     900 </span>            : {
+<span class="lineNum">     901 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     902 </span>            : }
+<span class="lineNum">     903 </span>            : NS_IMETHODIMP nsSHEntry::SetTriggeringPrincipal(nsIPrincipal *aTriggeringPrincipal)
+<span class="lineNum">     904 </span>            : {
+<span class="lineNum">     905 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     906 </span>            : }
+<span class="lineNum">     907 </span>            : 
+<span class="lineNum">     908 </span>            : /* attribute nsIPrincipal principalToInherit; */
+<span class="lineNum">     909 </span>            : NS_IMETHODIMP nsSHEntry::GetPrincipalToInherit(nsIPrincipal * *aPrincipalToInherit)
+<span class="lineNum">     910 </span>            : {
+<span class="lineNum">     911 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     912 </span>            : }
+<span class="lineNum">     913 </span>            : NS_IMETHODIMP nsSHEntry::SetPrincipalToInherit(nsIPrincipal *aPrincipalToInherit)
+<span class="lineNum">     914 </span>            : {
+<span class="lineNum">     915 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     916 </span>            : }
+<span class="lineNum">     917 </span>            : 
+<span class="lineNum">     918 </span>            : /* attribute nsIStructuredCloneContainer stateData; */
+<span class="lineNum">     919 </span>            : NS_IMETHODIMP nsSHEntry::GetStateData(nsIStructuredCloneContainer * *aStateData)
+<span class="lineNum">     920 </span>            : {
+<span class="lineNum">     921 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     922 </span>            : }
+<span class="lineNum">     923 </span>            : NS_IMETHODIMP nsSHEntry::SetStateData(nsIStructuredCloneContainer *aStateData)
+<span class="lineNum">     924 </span>            : {
+<span class="lineNum">     925 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     926 </span>            : }
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            : /* [noscript,notxpcom] nsDocShellEditorDataPtr forgetEditorData (); */
+<span class="lineNum">     929 </span>            : NS_IMETHODIMP_(nsDocShellEditorData *) nsSHEntry::ForgetEditorData()
+<span class="lineNum">     930 </span>            : {
+<span class="lineNum">     931 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     932 </span>            : }
+<span class="lineNum">     933 </span>            : 
+<span class="lineNum">     934 </span>            : /* [noscript,notxpcom] void setEditorData (in nsDocShellEditorDataPtr aData); */
+<span class="lineNum">     935 </span>            : NS_IMETHODIMP_(void) nsSHEntry::SetEditorData(nsDocShellEditorData *aData)
+<span class="lineNum">     936 </span>            : {
+<span class="lineNum">     937 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     938 </span>            : }
+<span class="lineNum">     939 </span>            : 
+<span class="lineNum">     940 </span>            : /* [noscript,notxpcom] boolean hasDetachedEditor (); */
+<span class="lineNum">     941 </span>            : NS_IMETHODIMP_(bool) nsSHEntry::HasDetachedEditor()
+<span class="lineNum">     942 </span>            : {
+<span class="lineNum">     943 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     944 </span>            : }
+<span class="lineNum">     945 </span>            : 
+<span class="lineNum">     946 </span>            : /* boolean isDynamicallyAdded (); */
+<span class="lineNum">     947 </span>            : NS_IMETHODIMP nsSHEntry::IsDynamicallyAdded(bool *_retval)
+<span class="lineNum">     948 </span>            : {
+<span class="lineNum">     949 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     950 </span>            : }
+<span class="lineNum">     951 </span>            : 
+<span class="lineNum">     952 </span>            : /* boolean hasDynamicallyAddedChild (); */
+<span class="lineNum">     953 </span>            : NS_IMETHODIMP nsSHEntry::HasDynamicallyAddedChild(bool *_retval)
+<span class="lineNum">     954 </span>            : {
+<span class="lineNum">     955 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     956 </span>            : }
+<span class="lineNum">     957 </span>            : 
+<span class="lineNum">     958 </span>            : /* attribute nsIDPtr docshellID; */
+<span class="lineNum">     959 </span>            : NS_IMETHODIMP nsSHEntry::GetDocshellID(nsID **aDocshellID)
+<span class="lineNum">     960 </span>            : {
+<span class="lineNum">     961 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     962 </span>            : }
+<span class="lineNum">     963 </span>            : NS_IMETHODIMP nsSHEntry::SetDocshellID(const nsID *aDocshellID)
+<span class="lineNum">     964 </span>            : {
+<span class="lineNum">     965 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     966 </span>            : }
+<span class="lineNum">     967 </span>            : 
+<span class="lineNum">     968 </span>            : /* [noscript,notxpcom] nsID DocshellID (); */
+<span class="lineNum">     969 </span>            : NS_IMETHODIMP_(const nsID) nsSHEntry::DocshellID()
+<span class="lineNum">     970 </span>            : {
+<span class="lineNum">     971 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     972 </span>            : }
+<span class="lineNum">     973 </span>            : 
+<span class="lineNum">     974 </span>            : /* readonly attribute nsIBFCacheEntry BFCacheEntry; */
+<span class="lineNum">     975 </span>            : NS_IMETHODIMP nsSHEntry::GetBFCacheEntry(nsIBFCacheEntry * *aBFCacheEntry)
+<span class="lineNum">     976 </span>            : {
+<span class="lineNum">     977 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     978 </span>            : }
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span>            : /* [noscript,notxpcom] boolean hasBFCacheEntry (in nsIBFCacheEntry aEntry); */
+<span class="lineNum">     981 </span>            : NS_IMETHODIMP_(bool) nsSHEntry::HasBFCacheEntry(nsIBFCacheEntry *aEntry)
+<span class="lineNum">     982 </span>            : {
+<span class="lineNum">     983 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     984 </span>            : }
+<span class="lineNum">     985 </span>            : 
+<span class="lineNum">     986 </span>            : /* void adoptBFCacheEntry (in nsISHEntry aEntry); */
+<span class="lineNum">     987 </span>            : NS_IMETHODIMP nsSHEntry::AdoptBFCacheEntry(nsISHEntry *aEntry)
+<span class="lineNum">     988 </span>            : {
+<span class="lineNum">     989 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     990 </span>            : }
+<span class="lineNum">     991 </span>            : 
+<span class="lineNum">     992 </span>            : /* void abandonBFCacheEntry (); */
+<span class="lineNum">     993 </span>            : NS_IMETHODIMP nsSHEntry::AbandonBFCacheEntry()
+<span class="lineNum">     994 </span>            : {
+<span class="lineNum">     995 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     996 </span>            : }
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span>            : /* boolean sharesDocumentWith (in nsISHEntry aEntry); */
+<span class="lineNum">     999 </span>            : NS_IMETHODIMP nsSHEntry::SharesDocumentWith(nsISHEntry *aEntry, bool *_retval)
+<span class="lineNum">    1000 </span>            : {
+<span class="lineNum">    1001 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1002 </span>            : }
+<span class="lineNum">    1003 </span>            : 
+<span class="lineNum">    1004 </span>            : /* readonly attribute boolean isSrcdocEntry; */
+<span class="lineNum">    1005 </span>            : NS_IMETHODIMP nsSHEntry::GetIsSrcdocEntry(bool *aIsSrcdocEntry)
+<span class="lineNum">    1006 </span>            : {
+<span class="lineNum">    1007 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1008 </span>            : }
+<span class="lineNum">    1009 </span>            : 
+<span class="lineNum">    1010 </span>            : /* attribute AString srcdocData; */
+<span class="lineNum">    1011 </span>            : NS_IMETHODIMP nsSHEntry::GetSrcdocData(nsAString &amp; aSrcdocData)
+<span class="lineNum">    1012 </span>            : {
+<span class="lineNum">    1013 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1014 </span>            : }
+<span class="lineNum">    1015 </span>            : NS_IMETHODIMP nsSHEntry::SetSrcdocData(const nsAString &amp; aSrcdocData)
+<span class="lineNum">    1016 </span>            : {
+<span class="lineNum">    1017 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1018 </span>            : }
+<span class="lineNum">    1019 </span>            : 
+<span class="lineNum">    1020 </span>            : /* attribute nsIURI baseURI; */
+<span class="lineNum">    1021 </span>            : NS_IMETHODIMP nsSHEntry::GetBaseURI(nsIURI * *aBaseURI)
+<span class="lineNum">    1022 </span>            : {
+<span class="lineNum">    1023 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1024 </span>            : }
+<span class="lineNum">    1025 </span>            : NS_IMETHODIMP nsSHEntry::SetBaseURI(nsIURI *aBaseURI)
+<span class="lineNum">    1026 </span>            : {
+<span class="lineNum">    1027 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1028 </span>            : }
+<span class="lineNum">    1029 </span>            : 
+<span class="lineNum">    1030 </span>            : /* attribute boolean scrollRestorationIsManual; */
+<span class="lineNum">    1031 </span>            : NS_IMETHODIMP nsSHEntry::GetScrollRestorationIsManual(bool *aScrollRestorationIsManual)
+<span class="lineNum">    1032 </span>            : {
+<span class="lineNum">    1033 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1034 </span>            : }
+<span class="lineNum">    1035 </span>            : NS_IMETHODIMP nsSHEntry::SetScrollRestorationIsManual(bool aScrollRestorationIsManual)
+<span class="lineNum">    1036 </span>            : {
+<span class="lineNum">    1037 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1038 </span>            : }
+<span class="lineNum">    1039 </span>            : 
+<span class="lineNum">    1040 </span>            : /* End of implementation class template. */
+<span class="lineNum">    1041 </span>            : #endif
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span>            : 
+<span class="lineNum">    1044 </span>            : /* starting interface:    nsISHEntryInternal */
+<span class="lineNum">    1045 </span>            : #define NS_ISHENTRYINTERNAL_IID_STR &quot;bb66ac35-253b-471f-a317-3ece940f04c5&quot;
+<span class="lineNum">    1046 </span>            : 
+<span class="lineNum">    1047 </span>            : #define NS_ISHENTRYINTERNAL_IID \
+<span class="lineNum">    1048 </span>            :   {0xbb66ac35, 0x253b, 0x471f, \
+<span class="lineNum">    1049 </span>            :     { 0xa3, 0x17, 0x3e, 0xce, 0x94, 0x0f, 0x04, 0xc5 }}
+<span class="lineNum">    1050 </span>            : 
+<span class="lineNum">    1051 </span><span class="lineNoCov">          0 : class NS_NO_VTABLE nsISHEntryInternal : public nsISupports {</span>
+<span class="lineNum">    1052 </span>            :  public:
+<span class="lineNum">    1053 </span>            : 
+<span class="lineNum">    1054 </span>            :   NS_DECLARE_STATIC_IID_ACCESSOR(NS_ISHENTRYINTERNAL_IID)
+<span class="lineNum">    1055 </span>            : 
+<span class="lineNum">    1056 </span>            :   /* [notxpcom] void RemoveFromBFCacheAsync (); */
+<span class="lineNum">    1057 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheAsync(void) = 0;
+<span class="lineNum">    1058 </span>            : 
+<span class="lineNum">    1059 </span>            :   /* [notxpcom] void RemoveFromBFCacheSync (); */
+<span class="lineNum">    1060 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheSync(void) = 0;
+<span class="lineNum">    1061 </span>            : 
+<span class="lineNum">    1062 </span>            :   /* attribute unsigned long lastTouched; */
+<span class="lineNum">    1063 </span>            :   NS_IMETHOD GetLastTouched(uint32_t *aLastTouched) = 0;
+<span class="lineNum">    1064 </span>            :   NS_IMETHOD SetLastTouched(uint32_t aLastTouched) = 0;
+<span class="lineNum">    1065 </span>            : 
+<span class="lineNum">    1066 </span>            :   /* [noscript,notxpcom] nsSHEntryShared getSharedState (); */
+<span class="lineNum">    1067 </span>            :   NS_IMETHOD_(nsSHEntryShared *) GetSharedState(void) = 0;
+<span class="lineNum">    1068 </span>            : 
+<span class="lineNum">    1069 </span>            : };
+<span class="lineNum">    1070 </span>            : 
+<span class="lineNum">    1071 </span>            :   NS_DEFINE_STATIC_IID_ACCESSOR(nsISHEntryInternal, NS_ISHENTRYINTERNAL_IID)
+<span class="lineNum">    1072 </span>            : 
+<span class="lineNum">    1073 </span>            : /* Use this macro when declaring classes that implement this interface. */
+<span class="lineNum">    1074 </span>            : #define NS_DECL_NSISHENTRYINTERNAL \
+<span class="lineNum">    1075 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheAsync(void) override; \
+<span class="lineNum">    1076 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheSync(void) override; \
+<span class="lineNum">    1077 </span>            :   NS_IMETHOD GetLastTouched(uint32_t *aLastTouched) override; \
+<span class="lineNum">    1078 </span>            :   NS_IMETHOD SetLastTouched(uint32_t aLastTouched) override; \
+<span class="lineNum">    1079 </span>            :   NS_IMETHOD_(nsSHEntryShared *) GetSharedState(void) override; 
+<span class="lineNum">    1080 </span>            : 
+<span class="lineNum">    1081 </span>            : /* Use this macro when declaring the members of this interface when the
+<span class="lineNum">    1082 </span>            :    class doesn't implement the interface. This is useful for forwarding. */
+<span class="lineNum">    1083 </span>            : #define NS_DECL_NON_VIRTUAL_NSISHENTRYINTERNAL \
+<span class="lineNum">    1084 </span>            :   nsresult_(void) RemoveFromBFCacheAsync(void); \
+<span class="lineNum">    1085 </span>            :   nsresult_(void) RemoveFromBFCacheSync(void); \
+<span class="lineNum">    1086 </span>            :   nsresult GetLastTouched(uint32_t *aLastTouched); \
+<span class="lineNum">    1087 </span>            :   nsresult SetLastTouched(uint32_t aLastTouched); \
+<span class="lineNum">    1088 </span>            :   nsresult_(nsSHEntryShared *) GetSharedState(void); 
+<span class="lineNum">    1089 </span>            : 
+<span class="lineNum">    1090 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object. */
+<span class="lineNum">    1091 </span>            : #define NS_FORWARD_NSISHENTRYINTERNAL(_to) \
+<span class="lineNum">    1092 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheAsync(void) override { return _to RemoveFromBFCacheAsync(); } \
+<span class="lineNum">    1093 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheSync(void) override { return _to RemoveFromBFCacheSync(); } \
+<span class="lineNum">    1094 </span>            :   NS_IMETHOD GetLastTouched(uint32_t *aLastTouched) override { return _to GetLastTouched(aLastTouched); } \
+<span class="lineNum">    1095 </span>            :   NS_IMETHOD SetLastTouched(uint32_t aLastTouched) override { return _to SetLastTouched(aLastTouched); } \
+<span class="lineNum">    1096 </span>            :   NS_IMETHOD_(nsSHEntryShared *) GetSharedState(void) override { return _to GetSharedState(); } 
+<span class="lineNum">    1097 </span>            : 
+<span class="lineNum">    1098 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
+<span class="lineNum">    1099 </span>            : #define NS_FORWARD_SAFE_NSISHENTRYINTERNAL(_to) \
+<span class="lineNum">    1100 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheAsync(void) override; \
+<span class="lineNum">    1101 </span>            :   NS_IMETHOD_(void) RemoveFromBFCacheSync(void) override; \
+<span class="lineNum">    1102 </span>            :   NS_IMETHOD GetLastTouched(uint32_t *aLastTouched) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetLastTouched(aLastTouched); } \
+<span class="lineNum">    1103 </span>            :   NS_IMETHOD SetLastTouched(uint32_t aLastTouched) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetLastTouched(aLastTouched); } \
+<span class="lineNum">    1104 </span>            :   NS_IMETHOD_(nsSHEntryShared *) GetSharedState(void) override; 
+<span class="lineNum">    1105 </span>            : 
+<span class="lineNum">    1106 </span>            : #if 0
+<span class="lineNum">    1107 </span>            : /* Use the code below as a template for the implementation class for this interface. */
+<span class="lineNum">    1108 </span>            : 
+<span class="lineNum">    1109 </span>            : /* Header file */
+<span class="lineNum">    1110 </span>            : class nsSHEntryInternal : public nsISHEntryInternal
+<span class="lineNum">    1111 </span>            : {
+<span class="lineNum">    1112 </span>            : public:
+<span class="lineNum">    1113 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">    1114 </span>            :   NS_DECL_NSISHENTRYINTERNAL
+<span class="lineNum">    1115 </span>            : 
+<span class="lineNum">    1116 </span>            :   nsSHEntryInternal();
+<span class="lineNum">    1117 </span>            : 
+<span class="lineNum">    1118 </span>            : private:
+<span class="lineNum">    1119 </span>            :   ~nsSHEntryInternal();
+<span class="lineNum">    1120 </span>            : 
+<span class="lineNum">    1121 </span>            : protected:
+<span class="lineNum">    1122 </span>            :   /* additional members */
+<span class="lineNum">    1123 </span>            : };
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span>            : /* Implementation file */
+<span class="lineNum">    1126 </span>            : NS_IMPL_ISUPPORTS(nsSHEntryInternal, nsISHEntryInternal)
+<span class="lineNum">    1127 </span>            : 
+<span class="lineNum">    1128 </span>            : nsSHEntryInternal::nsSHEntryInternal()
+<span class="lineNum">    1129 </span>            : {
+<span class="lineNum">    1130 </span>            :   /* member initializers and constructor code */
+<span class="lineNum">    1131 </span>            : }
+<span class="lineNum">    1132 </span>            : 
+<span class="lineNum">    1133 </span>            : nsSHEntryInternal::~nsSHEntryInternal()
+<span class="lineNum">    1134 </span>            : {
+<span class="lineNum">    1135 </span>            :   /* destructor code */
+<span class="lineNum">    1136 </span>            : }
+<span class="lineNum">    1137 </span>            : 
+<span class="lineNum">    1138 </span>            : /* [notxpcom] void RemoveFromBFCacheAsync (); */
+<span class="lineNum">    1139 </span>            : NS_IMETHODIMP_(void) nsSHEntryInternal::RemoveFromBFCacheAsync()
+<span class="lineNum">    1140 </span>            : {
+<span class="lineNum">    1141 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1142 </span>            : }
+<span class="lineNum">    1143 </span>            : 
+<span class="lineNum">    1144 </span>            : /* [notxpcom] void RemoveFromBFCacheSync (); */
+<span class="lineNum">    1145 </span>            : NS_IMETHODIMP_(void) nsSHEntryInternal::RemoveFromBFCacheSync()
+<span class="lineNum">    1146 </span>            : {
+<span class="lineNum">    1147 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1148 </span>            : }
+<span class="lineNum">    1149 </span>            : 
+<span class="lineNum">    1150 </span>            : /* attribute unsigned long lastTouched; */
+<span class="lineNum">    1151 </span>            : NS_IMETHODIMP nsSHEntryInternal::GetLastTouched(uint32_t *aLastTouched)
+<span class="lineNum">    1152 </span>            : {
+<span class="lineNum">    1153 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1154 </span>            : }
+<span class="lineNum">    1155 </span>            : NS_IMETHODIMP nsSHEntryInternal::SetLastTouched(uint32_t aLastTouched)
+<span class="lineNum">    1156 </span>            : {
+<span class="lineNum">    1157 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1158 </span>            : }
+<span class="lineNum">    1159 </span>            : 
+<span class="lineNum">    1160 </span>            : /* [noscript,notxpcom] nsSHEntryShared getSharedState (); */
+<span class="lineNum">    1161 </span>            : NS_IMETHODIMP_(nsSHEntryShared *) nsSHEntryInternal::GetSharedState()
+<span class="lineNum">    1162 </span>            : {
+<span class="lineNum">    1163 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">    1164 </span>            : }
+<span class="lineNum">    1165 </span>            : 
+<span class="lineNum">    1166 </span>            : /* End of implementation class template. */
+<span class="lineNum">    1167 </span>            : #endif
+<span class="lineNum">    1168 </span>            : 
+<span class="lineNum">    1169 </span>            : // {BFD1A791-AD9F-11d3-BDC7-0050040A9B44}
+<span class="lineNum">    1170 </span>            : #define NS_SHENTRY_CID \
+<span class="lineNum">    1171 </span>            : {0xbfd1a791, 0xad9f, 0x11d3, {0xbd, 0xc7, 0x0, 0x50, 0x4, 0xa, 0x9b, 0x44}}
+<span class="lineNum">    1172 </span>            : #define NS_SHENTRY_CONTRACTID \
+<span class="lineNum">    1173 </span>            :     &quot;@mozilla.org/browser/session-history-entry;1&quot;
+<span class="lineNum">    1174 </span>            : 
+<span class="lineNum">    1175 </span>            : #endif /* __gen_nsISHEntry_h__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

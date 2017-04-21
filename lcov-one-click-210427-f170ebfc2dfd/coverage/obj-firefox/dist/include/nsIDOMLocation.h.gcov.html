@@ -1,0 +1,421 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/nsIDOMLocation.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - nsIDOMLocation.h<span style="font-size: 80%;"> (source / <a href="nsIDOMLocation.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*</a>
+<span class="lineNum">       2 </span>            :  * DO NOT EDIT.  THIS FILE IS GENERATED FROM ../../../dist/idl/nsIDOMLocation.idl
+<span class="lineNum">       3 </span>            :  */
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span>            : #ifndef __gen_nsIDOMLocation_h__
+<span class="lineNum">       6 </span>            : #define __gen_nsIDOMLocation_h__
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #ifndef __gen_domstubs_h__
+<span class="lineNum">      10 </span>            : #include &quot;domstubs.h&quot;
+<span class="lineNum">      11 </span>            : #endif
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : /* For IDL files that don't want to include root IDL files. */
+<span class="lineNum">      14 </span>            : #ifndef NS_NO_VTABLE
+<span class="lineNum">      15 </span>            : #define NS_NO_VTABLE
+<span class="lineNum">      16 </span>            : #endif
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /* starting interface:    nsIDOMLocation */
+<span class="lineNum">      19 </span>            : #define NS_IDOMLOCATION_IID_STR &quot;79de76e5-994e-4f6b-81aa-42d9adb6e67e&quot;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #define NS_IDOMLOCATION_IID \
+<span class="lineNum">      22 </span>            :   {0x79de76e5, 0x994e, 0x4f6b, \
+<span class="lineNum">      23 </span>            :     { 0x81, 0xaa, 0x42, 0xd9, 0xad, 0xb6, 0xe6, 0x7e }}
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 : class NS_NO_VTABLE nsIDOMLocation : public nsISupports {</span>
+<span class="lineNum">      26 </span>            :  public:
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   NS_DECLARE_STATIC_IID_ACCESSOR(NS_IDOMLOCATION_IID)
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :   /* attribute DOMString hash; */
+<span class="lineNum">      31 </span>            :   NS_IMETHOD GetHash(nsAString &amp; aHash) = 0;
+<span class="lineNum">      32 </span>            :   NS_IMETHOD SetHash(const nsAString &amp; aHash) = 0;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :   /* attribute DOMString host; */
+<span class="lineNum">      35 </span>            :   NS_IMETHOD GetHost(nsAString &amp; aHost) = 0;
+<span class="lineNum">      36 </span>            :   NS_IMETHOD SetHost(const nsAString &amp; aHost) = 0;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   /* attribute DOMString hostname; */
+<span class="lineNum">      39 </span>            :   NS_IMETHOD GetHostname(nsAString &amp; aHostname) = 0;
+<span class="lineNum">      40 </span>            :   NS_IMETHOD SetHostname(const nsAString &amp; aHostname) = 0;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   /* attribute DOMString href; */
+<span class="lineNum">      43 </span>            :   NS_IMETHOD GetHref(nsAString &amp; aHref) = 0;
+<span class="lineNum">      44 </span>            :   NS_IMETHOD SetHref(const nsAString &amp; aHref) = 0;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :   /* attribute DOMString pathname; */
+<span class="lineNum">      47 </span>            :   NS_IMETHOD GetPathname(nsAString &amp; aPathname) = 0;
+<span class="lineNum">      48 </span>            :   NS_IMETHOD SetPathname(const nsAString &amp; aPathname) = 0;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   /* attribute DOMString port; */
+<span class="lineNum">      51 </span>            :   NS_IMETHOD GetPort(nsAString &amp; aPort) = 0;
+<span class="lineNum">      52 </span>            :   NS_IMETHOD SetPort(const nsAString &amp; aPort) = 0;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   /* attribute DOMString protocol; */
+<span class="lineNum">      55 </span>            :   NS_IMETHOD GetProtocol(nsAString &amp; aProtocol) = 0;
+<span class="lineNum">      56 </span>            :   NS_IMETHOD SetProtocol(const nsAString &amp; aProtocol) = 0;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :   /* attribute DOMString search; */
+<span class="lineNum">      59 </span>            :   NS_IMETHOD GetSearch(nsAString &amp; aSearch) = 0;
+<span class="lineNum">      60 </span>            :   NS_IMETHOD SetSearch(const nsAString &amp; aSearch) = 0;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :   /* readonly attribute DOMString origin; */
+<span class="lineNum">      63 </span>            :   NS_IMETHOD GetOrigin(nsAString &amp; aOrigin) = 0;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :   /* void reload ([optional] in boolean forceget); */
+<span class="lineNum">      66 </span>            :   NS_IMETHOD Reload(bool forceget) = 0;
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :   /* void replace (in DOMString url); */
+<span class="lineNum">      69 </span>            :   NS_IMETHOD Replace(const nsAString &amp; url) = 0;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   /* void assign (in DOMString url); */
+<span class="lineNum">      72 </span>            :   NS_IMETHOD Assign(const nsAString &amp; url) = 0;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :   /* DOMString toString (); */
+<span class="lineNum">      75 </span>            :   NS_IMETHOD ToString(nsAString &amp; _retval) = 0;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   /* nsIDOMLocation valueOf (); */
+<span class="lineNum">      78 </span>            :   NS_IMETHOD ValueOf(nsIDOMLocation * *_retval) = 0;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : };
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :   NS_DEFINE_STATIC_IID_ACCESSOR(nsIDOMLocation, NS_IDOMLOCATION_IID)
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : /* Use this macro when declaring classes that implement this interface. */
+<span class="lineNum">      85 </span>            : #define NS_DECL_NSIDOMLOCATION \
+<span class="lineNum">      86 </span>            :   NS_IMETHOD GetHash(nsAString &amp; aHash) override; \
+<span class="lineNum">      87 </span>            :   NS_IMETHOD SetHash(const nsAString &amp; aHash) override; \
+<span class="lineNum">      88 </span>            :   NS_IMETHOD GetHost(nsAString &amp; aHost) override; \
+<span class="lineNum">      89 </span>            :   NS_IMETHOD SetHost(const nsAString &amp; aHost) override; \
+<span class="lineNum">      90 </span>            :   NS_IMETHOD GetHostname(nsAString &amp; aHostname) override; \
+<span class="lineNum">      91 </span>            :   NS_IMETHOD SetHostname(const nsAString &amp; aHostname) override; \
+<span class="lineNum">      92 </span>            :   NS_IMETHOD GetHref(nsAString &amp; aHref) override; \
+<span class="lineNum">      93 </span>            :   NS_IMETHOD SetHref(const nsAString &amp; aHref) override; \
+<span class="lineNum">      94 </span>            :   NS_IMETHOD GetPathname(nsAString &amp; aPathname) override; \
+<span class="lineNum">      95 </span>            :   NS_IMETHOD SetPathname(const nsAString &amp; aPathname) override; \
+<span class="lineNum">      96 </span>            :   NS_IMETHOD GetPort(nsAString &amp; aPort) override; \
+<span class="lineNum">      97 </span>            :   NS_IMETHOD SetPort(const nsAString &amp; aPort) override; \
+<span class="lineNum">      98 </span>            :   NS_IMETHOD GetProtocol(nsAString &amp; aProtocol) override; \
+<span class="lineNum">      99 </span>            :   NS_IMETHOD SetProtocol(const nsAString &amp; aProtocol) override; \
+<span class="lineNum">     100 </span>            :   NS_IMETHOD GetSearch(nsAString &amp; aSearch) override; \
+<span class="lineNum">     101 </span>            :   NS_IMETHOD SetSearch(const nsAString &amp; aSearch) override; \
+<span class="lineNum">     102 </span>            :   NS_IMETHOD GetOrigin(nsAString &amp; aOrigin) override; \
+<span class="lineNum">     103 </span>            :   NS_IMETHOD Reload(bool forceget) override; \
+<span class="lineNum">     104 </span>            :   NS_IMETHOD Replace(const nsAString &amp; url) override; \
+<span class="lineNum">     105 </span>            :   NS_IMETHOD Assign(const nsAString &amp; url) override; \
+<span class="lineNum">     106 </span>            :   NS_IMETHOD ToString(nsAString &amp; _retval) override; \
+<span class="lineNum">     107 </span>            :   NS_IMETHOD ValueOf(nsIDOMLocation * *_retval) override; 
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : /* Use this macro when declaring the members of this interface when the
+<span class="lineNum">     110 </span>            :    class doesn't implement the interface. This is useful for forwarding. */
+<span class="lineNum">     111 </span>            : #define NS_DECL_NON_VIRTUAL_NSIDOMLOCATION \
+<span class="lineNum">     112 </span>            :   nsresult GetHash(nsAString &amp; aHash); \
+<span class="lineNum">     113 </span>            :   nsresult SetHash(const nsAString &amp; aHash); \
+<span class="lineNum">     114 </span>            :   nsresult GetHost(nsAString &amp; aHost); \
+<span class="lineNum">     115 </span>            :   nsresult SetHost(const nsAString &amp; aHost); \
+<span class="lineNum">     116 </span>            :   nsresult GetHostname(nsAString &amp; aHostname); \
+<span class="lineNum">     117 </span>            :   nsresult SetHostname(const nsAString &amp; aHostname); \
+<span class="lineNum">     118 </span>            :   nsresult GetHref(nsAString &amp; aHref); \
+<span class="lineNum">     119 </span>            :   nsresult SetHref(const nsAString &amp; aHref); \
+<span class="lineNum">     120 </span>            :   nsresult GetPathname(nsAString &amp; aPathname); \
+<span class="lineNum">     121 </span>            :   nsresult SetPathname(const nsAString &amp; aPathname); \
+<span class="lineNum">     122 </span>            :   nsresult GetPort(nsAString &amp; aPort); \
+<span class="lineNum">     123 </span>            :   nsresult SetPort(const nsAString &amp; aPort); \
+<span class="lineNum">     124 </span>            :   nsresult GetProtocol(nsAString &amp; aProtocol); \
+<span class="lineNum">     125 </span>            :   nsresult SetProtocol(const nsAString &amp; aProtocol); \
+<span class="lineNum">     126 </span>            :   nsresult GetSearch(nsAString &amp; aSearch); \
+<span class="lineNum">     127 </span>            :   nsresult SetSearch(const nsAString &amp; aSearch); \
+<span class="lineNum">     128 </span>            :   nsresult GetOrigin(nsAString &amp; aOrigin); \
+<span class="lineNum">     129 </span>            :   nsresult Reload(bool forceget); \
+<span class="lineNum">     130 </span>            :   nsresult Replace(const nsAString &amp; url); \
+<span class="lineNum">     131 </span>            :   nsresult Assign(const nsAString &amp; url); \
+<span class="lineNum">     132 </span>            :   nsresult ToString(nsAString &amp; _retval); \
+<span class="lineNum">     133 </span>            :   nsresult ValueOf(nsIDOMLocation * *_retval); 
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object. */
+<span class="lineNum">     136 </span>            : #define NS_FORWARD_NSIDOMLOCATION(_to) \
+<span class="lineNum">     137 </span>            :   NS_IMETHOD GetHash(nsAString &amp; aHash) override { return _to GetHash(aHash); } \
+<span class="lineNum">     138 </span>            :   NS_IMETHOD SetHash(const nsAString &amp; aHash) override { return _to SetHash(aHash); } \
+<span class="lineNum">     139 </span>            :   NS_IMETHOD GetHost(nsAString &amp; aHost) override { return _to GetHost(aHost); } \
+<span class="lineNum">     140 </span>            :   NS_IMETHOD SetHost(const nsAString &amp; aHost) override { return _to SetHost(aHost); } \
+<span class="lineNum">     141 </span>            :   NS_IMETHOD GetHostname(nsAString &amp; aHostname) override { return _to GetHostname(aHostname); } \
+<span class="lineNum">     142 </span>            :   NS_IMETHOD SetHostname(const nsAString &amp; aHostname) override { return _to SetHostname(aHostname); } \
+<span class="lineNum">     143 </span>            :   NS_IMETHOD GetHref(nsAString &amp; aHref) override { return _to GetHref(aHref); } \
+<span class="lineNum">     144 </span>            :   NS_IMETHOD SetHref(const nsAString &amp; aHref) override { return _to SetHref(aHref); } \
+<span class="lineNum">     145 </span>            :   NS_IMETHOD GetPathname(nsAString &amp; aPathname) override { return _to GetPathname(aPathname); } \
+<span class="lineNum">     146 </span>            :   NS_IMETHOD SetPathname(const nsAString &amp; aPathname) override { return _to SetPathname(aPathname); } \
+<span class="lineNum">     147 </span>            :   NS_IMETHOD GetPort(nsAString &amp; aPort) override { return _to GetPort(aPort); } \
+<span class="lineNum">     148 </span>            :   NS_IMETHOD SetPort(const nsAString &amp; aPort) override { return _to SetPort(aPort); } \
+<span class="lineNum">     149 </span>            :   NS_IMETHOD GetProtocol(nsAString &amp; aProtocol) override { return _to GetProtocol(aProtocol); } \
+<span class="lineNum">     150 </span>            :   NS_IMETHOD SetProtocol(const nsAString &amp; aProtocol) override { return _to SetProtocol(aProtocol); } \
+<span class="lineNum">     151 </span>            :   NS_IMETHOD GetSearch(nsAString &amp; aSearch) override { return _to GetSearch(aSearch); } \
+<span class="lineNum">     152 </span>            :   NS_IMETHOD SetSearch(const nsAString &amp; aSearch) override { return _to SetSearch(aSearch); } \
+<span class="lineNum">     153 </span>            :   NS_IMETHOD GetOrigin(nsAString &amp; aOrigin) override { return _to GetOrigin(aOrigin); } \
+<span class="lineNum">     154 </span>            :   NS_IMETHOD Reload(bool forceget) override { return _to Reload(forceget); } \
+<span class="lineNum">     155 </span>            :   NS_IMETHOD Replace(const nsAString &amp; url) override { return _to Replace(url); } \
+<span class="lineNum">     156 </span>            :   NS_IMETHOD Assign(const nsAString &amp; url) override { return _to Assign(url); } \
+<span class="lineNum">     157 </span>            :   NS_IMETHOD ToString(nsAString &amp; _retval) override { return _to ToString(_retval); } \
+<span class="lineNum">     158 </span>            :   NS_IMETHOD ValueOf(nsIDOMLocation * *_retval) override { return _to ValueOf(_retval); } 
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : /* Use this macro to declare functions that forward the behavior of this interface to another object in a safe way. */
+<span class="lineNum">     161 </span>            : #define NS_FORWARD_SAFE_NSIDOMLOCATION(_to) \
+<span class="lineNum">     162 </span>            :   NS_IMETHOD GetHash(nsAString &amp; aHash) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetHash(aHash); } \
+<span class="lineNum">     163 </span>            :   NS_IMETHOD SetHash(const nsAString &amp; aHash) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetHash(aHash); } \
+<span class="lineNum">     164 </span>            :   NS_IMETHOD GetHost(nsAString &amp; aHost) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetHost(aHost); } \
+<span class="lineNum">     165 </span>            :   NS_IMETHOD SetHost(const nsAString &amp; aHost) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetHost(aHost); } \
+<span class="lineNum">     166 </span>            :   NS_IMETHOD GetHostname(nsAString &amp; aHostname) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetHostname(aHostname); } \
+<span class="lineNum">     167 </span>            :   NS_IMETHOD SetHostname(const nsAString &amp; aHostname) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetHostname(aHostname); } \
+<span class="lineNum">     168 </span>            :   NS_IMETHOD GetHref(nsAString &amp; aHref) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetHref(aHref); } \
+<span class="lineNum">     169 </span>            :   NS_IMETHOD SetHref(const nsAString &amp; aHref) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetHref(aHref); } \
+<span class="lineNum">     170 </span>            :   NS_IMETHOD GetPathname(nsAString &amp; aPathname) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetPathname(aPathname); } \
+<span class="lineNum">     171 </span>            :   NS_IMETHOD SetPathname(const nsAString &amp; aPathname) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetPathname(aPathname); } \
+<span class="lineNum">     172 </span>            :   NS_IMETHOD GetPort(nsAString &amp; aPort) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetPort(aPort); } \
+<span class="lineNum">     173 </span>            :   NS_IMETHOD SetPort(const nsAString &amp; aPort) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetPort(aPort); } \
+<span class="lineNum">     174 </span>            :   NS_IMETHOD GetProtocol(nsAString &amp; aProtocol) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetProtocol(aProtocol); } \
+<span class="lineNum">     175 </span>            :   NS_IMETHOD SetProtocol(const nsAString &amp; aProtocol) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetProtocol(aProtocol); } \
+<span class="lineNum">     176 </span>            :   NS_IMETHOD GetSearch(nsAString &amp; aSearch) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetSearch(aSearch); } \
+<span class="lineNum">     177 </span>            :   NS_IMETHOD SetSearch(const nsAString &amp; aSearch) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;SetSearch(aSearch); } \
+<span class="lineNum">     178 </span>            :   NS_IMETHOD GetOrigin(nsAString &amp; aOrigin) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;GetOrigin(aOrigin); } \
+<span class="lineNum">     179 </span>            :   NS_IMETHOD Reload(bool forceget) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;Reload(forceget); } \
+<span class="lineNum">     180 </span>            :   NS_IMETHOD Replace(const nsAString &amp; url) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;Replace(url); } \
+<span class="lineNum">     181 </span>            :   NS_IMETHOD Assign(const nsAString &amp; url) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;Assign(url); } \
+<span class="lineNum">     182 </span>            :   NS_IMETHOD ToString(nsAString &amp; _retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;ToString(_retval); } \
+<span class="lineNum">     183 </span>            :   NS_IMETHOD ValueOf(nsIDOMLocation * *_retval) override { return !_to ? NS_ERROR_NULL_POINTER : _to-&gt;ValueOf(_retval); } 
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            : #if 0
+<span class="lineNum">     186 </span>            : /* Use the code below as a template for the implementation class for this interface. */
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : /* Header file */
+<span class="lineNum">     189 </span>            : class nsDOMLocation : public nsIDOMLocation
+<span class="lineNum">     190 </span>            : {
+<span class="lineNum">     191 </span>            : public:
+<span class="lineNum">     192 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">     193 </span>            :   NS_DECL_NSIDOMLOCATION
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            :   nsDOMLocation();
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span>            : private:
+<span class="lineNum">     198 </span>            :   ~nsDOMLocation();
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : protected:
+<span class="lineNum">     201 </span>            :   /* additional members */
+<span class="lineNum">     202 </span>            : };
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : /* Implementation file */
+<span class="lineNum">     205 </span>            : NS_IMPL_ISUPPORTS(nsDOMLocation, nsIDOMLocation)
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            : nsDOMLocation::nsDOMLocation()
+<span class="lineNum">     208 </span>            : {
+<span class="lineNum">     209 </span>            :   /* member initializers and constructor code */
+<span class="lineNum">     210 </span>            : }
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : nsDOMLocation::~nsDOMLocation()
+<span class="lineNum">     213 </span>            : {
+<span class="lineNum">     214 </span>            :   /* destructor code */
+<span class="lineNum">     215 </span>            : }
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            : /* attribute DOMString hash; */
+<span class="lineNum">     218 </span>            : NS_IMETHODIMP nsDOMLocation::GetHash(nsAString &amp; aHash)
+<span class="lineNum">     219 </span>            : {
+<span class="lineNum">     220 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     221 </span>            : }
+<span class="lineNum">     222 </span>            : NS_IMETHODIMP nsDOMLocation::SetHash(const nsAString &amp; aHash)
+<span class="lineNum">     223 </span>            : {
+<span class="lineNum">     224 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     225 </span>            : }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            : /* attribute DOMString host; */
+<span class="lineNum">     228 </span>            : NS_IMETHODIMP nsDOMLocation::GetHost(nsAString &amp; aHost)
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     231 </span>            : }
+<span class="lineNum">     232 </span>            : NS_IMETHODIMP nsDOMLocation::SetHost(const nsAString &amp; aHost)
+<span class="lineNum">     233 </span>            : {
+<span class="lineNum">     234 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     235 </span>            : }
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            : /* attribute DOMString hostname; */
+<span class="lineNum">     238 </span>            : NS_IMETHODIMP nsDOMLocation::GetHostname(nsAString &amp; aHostname)
+<span class="lineNum">     239 </span>            : {
+<span class="lineNum">     240 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     241 </span>            : }
+<span class="lineNum">     242 </span>            : NS_IMETHODIMP nsDOMLocation::SetHostname(const nsAString &amp; aHostname)
+<span class="lineNum">     243 </span>            : {
+<span class="lineNum">     244 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     245 </span>            : }
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            : /* attribute DOMString href; */
+<span class="lineNum">     248 </span>            : NS_IMETHODIMP nsDOMLocation::GetHref(nsAString &amp; aHref)
+<span class="lineNum">     249 </span>            : {
+<span class="lineNum">     250 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     251 </span>            : }
+<span class="lineNum">     252 </span>            : NS_IMETHODIMP nsDOMLocation::SetHref(const nsAString &amp; aHref)
+<span class="lineNum">     253 </span>            : {
+<span class="lineNum">     254 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     255 </span>            : }
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : /* attribute DOMString pathname; */
+<span class="lineNum">     258 </span>            : NS_IMETHODIMP nsDOMLocation::GetPathname(nsAString &amp; aPathname)
+<span class="lineNum">     259 </span>            : {
+<span class="lineNum">     260 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     261 </span>            : }
+<span class="lineNum">     262 </span>            : NS_IMETHODIMP nsDOMLocation::SetPathname(const nsAString &amp; aPathname)
+<span class="lineNum">     263 </span>            : {
+<span class="lineNum">     264 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     265 </span>            : }
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            : /* attribute DOMString port; */
+<span class="lineNum">     268 </span>            : NS_IMETHODIMP nsDOMLocation::GetPort(nsAString &amp; aPort)
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     271 </span>            : }
+<span class="lineNum">     272 </span>            : NS_IMETHODIMP nsDOMLocation::SetPort(const nsAString &amp; aPort)
+<span class="lineNum">     273 </span>            : {
+<span class="lineNum">     274 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     275 </span>            : }
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            : /* attribute DOMString protocol; */
+<span class="lineNum">     278 </span>            : NS_IMETHODIMP nsDOMLocation::GetProtocol(nsAString &amp; aProtocol)
+<span class="lineNum">     279 </span>            : {
+<span class="lineNum">     280 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     281 </span>            : }
+<span class="lineNum">     282 </span>            : NS_IMETHODIMP nsDOMLocation::SetProtocol(const nsAString &amp; aProtocol)
+<span class="lineNum">     283 </span>            : {
+<span class="lineNum">     284 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     285 </span>            : }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            : /* attribute DOMString search; */
+<span class="lineNum">     288 </span>            : NS_IMETHODIMP nsDOMLocation::GetSearch(nsAString &amp; aSearch)
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     291 </span>            : }
+<span class="lineNum">     292 </span>            : NS_IMETHODIMP nsDOMLocation::SetSearch(const nsAString &amp; aSearch)
+<span class="lineNum">     293 </span>            : {
+<span class="lineNum">     294 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     295 </span>            : }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            : /* readonly attribute DOMString origin; */
+<span class="lineNum">     298 </span>            : NS_IMETHODIMP nsDOMLocation::GetOrigin(nsAString &amp; aOrigin)
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     301 </span>            : }
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            : /* void reload ([optional] in boolean forceget); */
+<span class="lineNum">     304 </span>            : NS_IMETHODIMP nsDOMLocation::Reload(bool forceget)
+<span class="lineNum">     305 </span>            : {
+<span class="lineNum">     306 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     307 </span>            : }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : /* void replace (in DOMString url); */
+<span class="lineNum">     310 </span>            : NS_IMETHODIMP nsDOMLocation::Replace(const nsAString &amp; url)
+<span class="lineNum">     311 </span>            : {
+<span class="lineNum">     312 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     313 </span>            : }
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span>            : /* void assign (in DOMString url); */
+<span class="lineNum">     316 </span>            : NS_IMETHODIMP nsDOMLocation::Assign(const nsAString &amp; url)
+<span class="lineNum">     317 </span>            : {
+<span class="lineNum">     318 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     319 </span>            : }
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            : /* DOMString toString (); */
+<span class="lineNum">     322 </span>            : NS_IMETHODIMP nsDOMLocation::ToString(nsAString &amp; _retval)
+<span class="lineNum">     323 </span>            : {
+<span class="lineNum">     324 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     325 </span>            : }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            : /* nsIDOMLocation valueOf (); */
+<span class="lineNum">     328 </span>            : NS_IMETHODIMP nsDOMLocation::ValueOf(nsIDOMLocation * *_retval)
+<span class="lineNum">     329 </span>            : {
+<span class="lineNum">     330 </span>            :     return NS_ERROR_NOT_IMPLEMENTED;
+<span class="lineNum">     331 </span>            : }
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            : /* End of implementation class template. */
+<span class="lineNum">     334 </span>            : #endif
+<span class="lineNum">     335 </span>            : 
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            : #endif /* __gen_nsIDOMLocation_h__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/layers/LayerAttributes.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/layers</a> - LayerAttributes.h<span style="font-size: 80%;"> (source / <a href="LayerAttributes.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">105</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*-</a>
+<span class="lineNum">       2 </span>            :  * vim: sw=2 ts=8 et :
+<span class="lineNum">       3 </span>            :  */
+<span class="lineNum">       4 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       5 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       6 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       7 </span>            : #ifndef mozilla_gfx_layers_LayerAttributes_h
+<span class="lineNum">       8 </span>            : #define mozilla_gfx_layers_LayerAttributes_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/gfx/Types.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/layers/LayersTypes.h&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace IPC {
+<span class="lineNum">      14 </span>            : template &lt;typename T&gt; struct ParamTraits;
+<span class="lineNum">      15 </span>            : } // namespace IPC
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace mozilla {
+<span class="lineNum">      18 </span>            : namespace layers {
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span>            : // Infrequently changing layer attributes that require no special</a>
+<span class="lineNum">      21 </span>            : // serialization work.
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 : class SimpleLayerAttributes final</span>
+<span class="lineNum">      23 </span>            : {
+<a name="24"><span class="lineNum">      24 </span>            :   friend struct IPC::ParamTraits&lt;mozilla::layers::SimpleLayerAttributes&gt;;</a>
+<span class="lineNum">      25 </span>            : public:
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :   SimpleLayerAttributes()</span>
+<span class="lineNum">      27 </span>            :    : mTransformIsPerspective(false),
+<span class="lineNum">      28 </span>            :      mPostXScale(1.0f),
+<span class="lineNum">      29 </span>            :      mPostYScale(1.0f),
+<span class="lineNum">      30 </span>            :      mContentFlags(0),
+<span class="lineNum">      31 </span>            :      mOpacity(1.0f),
+<span class="lineNum">      32 </span>            :      mIsFixedPosition(false),
+<span class="lineNum">      33 </span>            :      mScrollbarTargetContainerId(FrameMetrics::NULL_SCROLL_ID),
+<span class="lineNum">      34 </span>            :      mScrollbarDirection(ScrollDirection::NONE),
+<span class="lineNum">      35 </span>            :      mScrollbarThumbRatio(0.0f),
+<span class="lineNum">      36 </span>            :      mIsScrollbarContainer(false),
+<span class="lineNum">      37 </span>            :      mMixBlendMode(gfx::CompositionOp::OP_OVER),
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :      mForceIsolatedGroup(false)</span>
+<span class="lineNum">      39 </span>            :   {
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   //
+<span class="lineNum">      43 </span>            :   // Setters.
+<span class="lineNum">      44 </span>            :   // All set methods return true if values changed, false otherwise.
+<a name="45"><span class="lineNum">      45 </span>            :   //</a>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   bool SetLayerBounds(const gfx::IntRect&amp; aLayerBounds) {</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     if (mLayerBounds.IsEqualEdges(aLayerBounds)) {</span>
+<span class="lineNum">      49 </span>            :       return false;
+<span class="lineNum">      50 </span>            :     }
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     mLayerBounds = aLayerBounds;</span>
+<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :     return true;</span></a>
+<span class="lineNum">      53 </span>            :   }
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   bool SetPostScale(float aXScale, float aYScale) {</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     if (mPostXScale == aXScale &amp;&amp; mPostYScale == aYScale) {</span>
+<span class="lineNum">      56 </span>            :       return false;
+<span class="lineNum">      57 </span>            :     }
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     mPostXScale = aXScale;</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     mPostYScale = aYScale;</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      61 </span>            :   }
+<span class="lineNum">      62 </span>            :   bool SetContentFlags(uint32_t aFlags) {
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :     if (aFlags == mContentFlags) {</span>
+<span class="lineNum">      64 </span>            :       return false;
+<span class="lineNum">      65 </span>            :     }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     mContentFlags = aFlags;</span>
+<span class="lineNum">      67 </span>            :     return true;
+<span class="lineNum">      68 </span>            :   }
+<span class="lineNum">      69 </span>            :   bool SetOpacity(float aOpacity) {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     if (aOpacity == mOpacity) {</span>
+<span class="lineNum">      71 </span>            :       return false;
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     mOpacity = aOpacity;</span>
+<span class="lineNum">      74 </span>            :     return true;
+<span class="lineNum">      75 </span>            :   }
+<span class="lineNum">      76 </span>            :   bool SetIsFixedPosition(bool aFixedPosition) {
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :     if (mIsFixedPosition == aFixedPosition) {</span>
+<span class="lineNum">      78 </span>            :       return false;
+<span class="lineNum">      79 </span>            :     }
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     mIsFixedPosition = aFixedPosition;</span>
+<a name="81"><span class="lineNum">      81 </span>            :     return true;</a>
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   bool SetScrollbarData(FrameMetrics::ViewID aScrollId, ScrollDirection aDir, float aThumbRatio) {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     if (mScrollbarTargetContainerId == aScrollId &amp;&amp;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :         mScrollbarDirection == aDir &amp;&amp;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :         mScrollbarThumbRatio == aThumbRatio)</span>
+<span class="lineNum">      87 </span>            :     {
+<span class="lineNum">      88 </span>            :       return false;
+<span class="lineNum">      89 </span>            :     }
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     mScrollbarTargetContainerId = aScrollId;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     mScrollbarDirection = aDir;</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     mScrollbarThumbRatio = aThumbRatio;</span>
+<a name="93"><span class="lineNum">      93 </span><span class="lineNoCov">          0 :     return true;</span></a>
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   bool SetIsScrollbarContainer(FrameMetrics::ViewID aScrollId) {</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     if (mIsScrollbarContainer &amp;&amp; mScrollbarTargetContainerId == aScrollId) {</span>
+<span class="lineNum">      97 </span>            :       return false;
+<span class="lineNum">      98 </span>            :     }
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     mIsScrollbarContainer = true;</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     mScrollbarTargetContainerId = aScrollId;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     102 </span>            :   }
+<span class="lineNum">     103 </span>            :   bool SetMixBlendMode(gfx::CompositionOp aMixBlendMode) {
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :     if (mMixBlendMode == aMixBlendMode) {</span>
+<span class="lineNum">     105 </span>            :       return false;
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :     mMixBlendMode = aMixBlendMode;</span>
+<span class="lineNum">     108 </span>            :     return true;
+<span class="lineNum">     109 </span>            :   }
+<span class="lineNum">     110 </span>            :   bool SetForceIsolatedGroup(bool aForceIsolatedGroup) {
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     if (mForceIsolatedGroup == aForceIsolatedGroup) {</span>
+<span class="lineNum">     112 </span>            :       return false;
+<span class="lineNum">     113 </span>            :     }
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     mForceIsolatedGroup = aForceIsolatedGroup;</span>
+<a name="115"><span class="lineNum">     115 </span>            :     return true;</a>
+<span class="lineNum">     116 </span>            :   }
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :   bool SetTransform(const gfx::Matrix4x4&amp; aMatrix) {</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     if (mTransform == aMatrix) {</span>
+<span class="lineNum">     119 </span>            :       return false;
+<span class="lineNum">     120 </span>            :     }
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     mTransform = aMatrix;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     123 </span>            :   }
+<span class="lineNum">     124 </span>            :   bool SetTransformIsPerspective(bool aIsPerspective) {
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :     if (mTransformIsPerspective == aIsPerspective) {</span>
+<span class="lineNum">     126 </span>            :       return false;
+<span class="lineNum">     127 </span>            :     }
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :     mTransformIsPerspective = aIsPerspective;</span>
+<a name="129"><span class="lineNum">     129 </span>            :     return true;</a>
+<span class="lineNum">     130 </span>            :   }
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :   bool SetScrolledClip(const Maybe&lt;LayerClip&gt;&amp; aScrolledClip) {</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     if (mScrolledClip == aScrolledClip) {</span>
+<span class="lineNum">     133 </span>            :       return false;
+<span class="lineNum">     134 </span>            :     }
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     mScrolledClip = aScrolledClip;</span>
+<a name="136"><span class="lineNum">     136 </span><span class="lineNoCov">          0 :     return true;</span></a>
+<span class="lineNum">     137 </span>            :   }
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   bool SetFixedPositionData(FrameMetrics::ViewID aScrollId,</span>
+<span class="lineNum">     139 </span>            :                             const LayerPoint&amp; aAnchor,
+<span class="lineNum">     140 </span>            :                             int32_t aSides)
+<span class="lineNum">     141 </span>            :   {
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     if (mFixedPositionData &amp;&amp;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :         mFixedPositionData-&gt;mScrollId == aScrollId &amp;&amp;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :         mFixedPositionData-&gt;mAnchor == aAnchor &amp;&amp;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :         mFixedPositionData-&gt;mSides == aSides) {</span>
+<span class="lineNum">     146 </span>            :       return false;
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     if (!mFixedPositionData) {</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :       mFixedPositionData.emplace();</span>
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     mFixedPositionData-&gt;mScrollId = aScrollId;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     mFixedPositionData-&gt;mAnchor = aAnchor;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     mFixedPositionData-&gt;mSides = aSides;</span>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :     return true;</span></a>
+<span class="lineNum">     155 </span>            :   }
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   bool SetStickyPositionData(FrameMetrics::ViewID aScrollId, LayerRect aOuter,</span>
+<span class="lineNum">     157 </span>            :                              LayerRect aInner)
+<span class="lineNum">     158 </span>            :   {
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     if (mStickyPositionData &amp;&amp;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :         mStickyPositionData-&gt;mOuter.IsEqualEdges(aOuter) &amp;&amp;</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :         mStickyPositionData-&gt;mInner.IsEqualEdges(aInner)) {</span>
+<span class="lineNum">     162 </span>            :       return false;
+<span class="lineNum">     163 </span>            :     }
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     if (!mStickyPositionData) {</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :       mStickyPositionData.emplace();</span>
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :     mStickyPositionData-&gt;mScrollId = aScrollId;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     mStickyPositionData-&gt;mOuter = aOuter;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     mStickyPositionData-&gt;mInner = aInner;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     171 </span>            :   }
+<span class="lineNum">     172 </span>            : 
+<a name="173"><span class="lineNum">     173 </span>            :   // This returns true if scrolling info is equivalent for the purposes of</a>
+<span class="lineNum">     174 </span>            :   // APZ hit testing.
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   bool HitTestingInfoIsEqual(const SimpleLayerAttributes&amp; aOther) const {</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     if (mIsScrollbarContainer != aOther.mIsScrollbarContainer) {</span>
+<span class="lineNum">     177 </span>            :       return false;
+<span class="lineNum">     178 </span>            :     }
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     if (mScrollbarTargetContainerId != aOther.mScrollbarTargetContainerId) {</span>
+<span class="lineNum">     180 </span>            :       return false;
+<span class="lineNum">     181 </span>            :     }
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :     if (mScrollbarDirection != aOther.mScrollbarDirection) {</span>
+<span class="lineNum">     183 </span>            :       return false;
+<span class="lineNum">     184 </span>            :     }
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :     if (FixedPositionScrollContainerId() != aOther.FixedPositionScrollContainerId()) {</span>
+<span class="lineNum">     186 </span>            :       return false;
+<span class="lineNum">     187 </span>            :     }
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :     if (mTransform != aOther.mTransform) {</span>
+<span class="lineNum">     189 </span>            :       return false;
+<span class="lineNum">     190 </span>            :     }
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     192 </span>            :   }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :   //
+<span class="lineNum">     195 </span>            :   // Getters.
+<span class="lineNum">     196 </span>            :   //
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   const gfx::IntRect&amp; LayerBounds() const {
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     return mLayerBounds;</span>
+<span class="lineNum">     200 </span>            :   }
+<span class="lineNum">     201 </span>            :   float PostXScale() const {
+<span class="lineNum">     202 </span>            :     return mPostXScale;
+<span class="lineNum">     203 </span>            :   }
+<span class="lineNum">     204 </span>            :   float PostYScale() const {
+<span class="lineNum">     205 </span>            :     return mPostYScale;
+<span class="lineNum">     206 </span>            :   }
+<span class="lineNum">     207 </span>            :   uint32_t ContentFlags() const {
+<span class="lineNum">     208 </span>            :     return mContentFlags;
+<span class="lineNum">     209 </span>            :   }
+<span class="lineNum">     210 </span>            :   float Opacity() const {
+<span class="lineNum">     211 </span>            :     return mOpacity;
+<span class="lineNum">     212 </span>            :   }
+<span class="lineNum">     213 </span>            :   bool IsFixedPosition() const {
+<span class="lineNum">     214 </span>            :     return mIsFixedPosition;
+<span class="lineNum">     215 </span>            :   }
+<span class="lineNum">     216 </span>            :   FrameMetrics::ViewID ScrollbarTargetContainerId() const {
+<span class="lineNum">     217 </span>            :     return mScrollbarTargetContainerId;
+<span class="lineNum">     218 </span>            :   }
+<span class="lineNum">     219 </span>            :   ScrollDirection ScrollbarDirection() const {
+<span class="lineNum">     220 </span>            :     return mScrollbarDirection;
+<span class="lineNum">     221 </span>            :   }
+<span class="lineNum">     222 </span>            :   float ScrollbarThumbRatio() const {
+<span class="lineNum">     223 </span>            :     return mScrollbarThumbRatio;
+<span class="lineNum">     224 </span>            :   }
+<span class="lineNum">     225 </span>            :   float IsScrollbarContainer() const {
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :     return mIsScrollbarContainer;</span>
+<span class="lineNum">     227 </span>            :   }
+<span class="lineNum">     228 </span>            :   gfx::CompositionOp MixBlendMode() const {
+<span class="lineNum">     229 </span>            :     return mMixBlendMode;
+<span class="lineNum">     230 </span>            :   }
+<span class="lineNum">     231 </span>            :   bool ForceIsolatedGroup() const {
+<span class="lineNum">     232 </span>            :     return mForceIsolatedGroup;
+<span class="lineNum">     233 </span>            :   }
+<span class="lineNum">     234 </span>            :   const gfx::Matrix4x4&amp; Transform() const {
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :     return mTransform;</span>
+<span class="lineNum">     236 </span>            :   }
+<span class="lineNum">     237 </span>            :   bool TransformIsPerspective() const {
+<span class="lineNum">     238 </span>            :     return mTransformIsPerspective;
+<span class="lineNum">     239 </span>            :   }
+<span class="lineNum">     240 </span>            :   const Maybe&lt;LayerClip&gt;&amp; ScrolledClip() const {
+<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :     return mScrolledClip;</span></a>
+<span class="lineNum">     242 </span>            :   }
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :   FrameMetrics::ViewID FixedPositionScrollContainerId() const {</span>
+<span class="lineNum">     244 </span>            :     return mFixedPositionData
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :            ? mFixedPositionData-&gt;mScrollId</span>
+<a name="246"><span class="lineNum">     246 </span><span class="lineNoCov">          0 :            : FrameMetrics::NULL_SCROLL_ID;</span></a>
+<span class="lineNum">     247 </span>            :   }
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :   LayerPoint FixedPositionAnchor() const {</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :     return mFixedPositionData ? mFixedPositionData-&gt;mAnchor : LayerPoint();</span>
+<span class="lineNum">     250 </span>            :   }
+<span class="lineNum">     251 </span>            :   int32_t FixedPositionSides() const {
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :     return mFixedPositionData ? mFixedPositionData-&gt;mSides : eSideBitsNone;</span>
+<span class="lineNum">     253 </span>            :   }
+<span class="lineNum">     254 </span>            :   bool IsStickyPosition() const {
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :     return !!mStickyPositionData;</span>
+<span class="lineNum">     256 </span>            :   }
+<span class="lineNum">     257 </span>            :   FrameMetrics::ViewID StickyScrollContainerId() const {
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :     return mStickyPositionData-&gt;mScrollId;</span>
+<span class="lineNum">     259 </span>            :   }
+<span class="lineNum">     260 </span>            :   const LayerRect&amp; StickyScrollRangeOuter() const {
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :     return mStickyPositionData-&gt;mOuter;</span>
+<span class="lineNum">     262 </span>            :   }
+<span class="lineNum">     263 </span>            :   const LayerRect&amp; StickyScrollRangeInner() const {
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :     return mStickyPositionData-&gt;mInner;</span>
+<a name="265"><span class="lineNum">     265 </span>            :   }</a>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :   bool operator ==(const SimpleLayerAttributes&amp; aOther) const {</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     return mLayerBounds == aOther.mLayerBounds &amp;&amp;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :            mTransform == aOther.mTransform &amp;&amp;</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :            mTransformIsPerspective == aOther.mTransformIsPerspective &amp;&amp;</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 :            mScrolledClip == aOther.mScrolledClip &amp;&amp;</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :            mPostXScale == aOther.mPostXScale &amp;&amp;</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :            mPostYScale == aOther.mPostYScale &amp;&amp;</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :            mContentFlags == aOther.mContentFlags &amp;&amp;</span>
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :            mOpacity == aOther.mOpacity &amp;&amp;</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :            mIsFixedPosition == aOther.mIsFixedPosition &amp;&amp;</span>
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :            mScrollbarTargetContainerId == aOther.mScrollbarTargetContainerId &amp;&amp;</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :            mScrollbarDirection == aOther.mScrollbarDirection &amp;&amp;</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :            mScrollbarThumbRatio == aOther.mScrollbarThumbRatio &amp;&amp;</span>
+<span class="lineNum">     280 </span>            :            mIsScrollbarContainer == aOther.mIsScrollbarContainer &amp;&amp;
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :            mMixBlendMode == aOther.mMixBlendMode &amp;&amp;</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :            mForceIsolatedGroup == aOther.mForceIsolatedGroup;</span>
+<span class="lineNum">     283 </span>            :   }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : private:
+<span class="lineNum">     286 </span>            :   gfx::IntRect mLayerBounds;
+<span class="lineNum">     287 </span>            :   gfx::Matrix4x4 mTransform;
+<span class="lineNum">     288 </span>            :   bool mTransformIsPerspective;
+<span class="lineNum">     289 </span>            :   Maybe&lt;LayerClip&gt; mScrolledClip;
+<span class="lineNum">     290 </span>            :   float mPostXScale;
+<span class="lineNum">     291 </span>            :   float mPostYScale;
+<span class="lineNum">     292 </span>            :   uint32_t mContentFlags;
+<span class="lineNum">     293 </span>            :   float mOpacity;
+<span class="lineNum">     294 </span>            :   bool mIsFixedPosition;
+<span class="lineNum">     295 </span>            :   uint64_t mScrollbarTargetContainerId;
+<span class="lineNum">     296 </span>            :   ScrollDirection mScrollbarDirection;
+<span class="lineNum">     297 </span>            :   // The scrollbar thumb ratio is the ratio of the thumb position (in the CSS
+<span class="lineNum">     298 </span>            :   // pixels of the scrollframe's parent's space) to the scroll position (in the
+<span class="lineNum">     299 </span>            :   // CSS pixels of the scrollframe's space).
+<span class="lineNum">     300 </span>            :   float mScrollbarThumbRatio;
+<span class="lineNum">     301 </span>            :   bool mIsScrollbarContainer;
+<span class="lineNum">     302 </span>            :   gfx::CompositionOp mMixBlendMode;
+<span class="lineNum">     303 </span>            :   bool mForceIsolatedGroup;
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :   struct FixedPositionData {</span>
+<span class="lineNum">     306 </span>            :     FrameMetrics::ViewID mScrollId;
+<span class="lineNum">     307 </span>            :     LayerPoint mAnchor;
+<span class="lineNum">     308 </span>            :     int32_t mSides;
+<span class="lineNum">     309 </span>            :   };
+<a name="310"><span class="lineNum">     310 </span>            :   Maybe&lt;FixedPositionData&gt; mFixedPositionData;</a>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :   struct StickyPositionData {</span>
+<span class="lineNum">     313 </span>            :     FrameMetrics::ViewID mScrollId;
+<span class="lineNum">     314 </span>            :     LayerRect mOuter;
+<span class="lineNum">     315 </span>            :     LayerRect mInner;
+<span class="lineNum">     316 </span>            :   };
+<span class="lineNum">     317 </span>            :   Maybe&lt;StickyPositionData&gt; mStickyPositionData;
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            :   // This class may only contain plain-old-data members that can be safely
+<span class="lineNum">     320 </span>            :   // copied over IPC. Make sure to add new members to operator ==.
+<span class="lineNum">     321 </span>            : };
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            : } // namespace layers
+<span class="lineNum">     324 </span>            : } // namespace mozilla
+<span class="lineNum">     325 </span>            : 
+<span class="lineNum">     326 </span>            : #endif // mozilla_gfx_layers_LayerAttributes_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

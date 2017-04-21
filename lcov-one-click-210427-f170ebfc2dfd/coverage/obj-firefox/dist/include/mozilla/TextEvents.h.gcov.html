@@ -1,0 +1,1034 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/TextEvents.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - TextEvents.h<span style="font-size: 80%;"> (source / <a href="TextEvents.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">170</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #ifndef mozilla_TextEvents_h__
+<span class="lineNum">       7 </span>            : #define mozilla_TextEvents_h__
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/Assertions.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/BasicEvents.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/CheckedInt.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/EventForwards.h&quot; // for KeyNameIndex, temporarily
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/TextRange.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/FontRange.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;nsCOMPtr.h&quot;
+<span class="lineNum">      18 </span>            : #include &quot;nsIDOMKeyEvent.h&quot;
+<span class="lineNum">      19 </span>            : #include &quot;nsISelectionController.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsISelectionListener.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;nsITransferable.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;nsRect.h&quot;
+<span class="lineNum">      23 </span>            : #include &quot;nsStringGlue.h&quot;
+<span class="lineNum">      24 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      25 </span>            : #include &quot;WritingModes.h&quot;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : class nsStringHashKey;
+<span class="lineNum">      28 </span>            : template&lt;class, class&gt; class nsDataHashtable;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : /******************************************************************************
+<span class="lineNum">      31 </span>            :  * virtual keycode values
+<span class="lineNum">      32 </span>            :  ******************************************************************************/
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : enum
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            : #define NS_DEFINE_VK(aDOMKeyName, aDOMKeyCode) NS_##aDOMKeyName = aDOMKeyCode,
+<span class="lineNum">      37 </span>            : #include &quot;mozilla/VirtualKeyCodeList.h&quot;
+<span class="lineNum">      38 </span>            : #undef NS_DEFINE_VK
+<span class="lineNum">      39 </span>            :   NS_VK_UNKNOWN = 0xFF
+<span class="lineNum">      40 </span>            : };
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : namespace mozilla {
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : enum : uint32_t
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            :   eKeyLocationStandard = nsIDOMKeyEvent::DOM_KEY_LOCATION_STANDARD,
+<span class="lineNum">      47 </span>            :   eKeyLocationLeft     = nsIDOMKeyEvent::DOM_KEY_LOCATION_LEFT,
+<span class="lineNum">      48 </span>            :   eKeyLocationRight    = nsIDOMKeyEvent::DOM_KEY_LOCATION_RIGHT,
+<span class="lineNum">      49 </span>            :   eKeyLocationNumpad   = nsIDOMKeyEvent::DOM_KEY_LOCATION_NUMPAD
+<span class="lineNum">      50 </span>            : };
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            : const nsCString GetDOMKeyCodeName(uint32_t aKeyCode);
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : namespace dom {
+<span class="lineNum">      55 </span>            :   class PBrowserParent;
+<span class="lineNum">      56 </span>            :   class PBrowserChild;
+<span class="lineNum">      57 </span>            : } // namespace dom
+<span class="lineNum">      58 </span>            : namespace plugins {
+<span class="lineNum">      59 </span>            :   class PPluginInstanceChild;
+<span class="lineNum">      60 </span>            : } // namespace plugins
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : /******************************************************************************
+<span class="lineNum">      63 </span>            :  * mozilla::AlternativeCharCode
+<span class="lineNum">      64 </span>            :  *
+<span class="lineNum">      65 </span>            :  * This stores alternative charCode values of a key event with some modifiers.
+<span class="lineNum">      66 </span>            :  * The stored values proper for testing shortcut key or access key.
+<span class="lineNum">      67 </span>            :  ******************************************************************************/
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : struct AlternativeCharCode
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :   AlternativeCharCode() :
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :     mUnshiftedCharCode(0), mShiftedCharCode(0)</span>
+<span class="lineNum">      73 </span>            :   {
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span>            :   AlternativeCharCode(uint32_t aUnshiftedCharCode, uint32_t aShiftedCharCode) :
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     mUnshiftedCharCode(aUnshiftedCharCode), mShiftedCharCode(aShiftedCharCode)</span>
+<span class="lineNum">      77 </span>            :   {
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            :   uint32_t mUnshiftedCharCode;
+<span class="lineNum">      80 </span>            :   uint32_t mShiftedCharCode;
+<span class="lineNum">      81 </span>            : };
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : /******************************************************************************
+<span class="lineNum">      84 </span>            :  * mozilla::ShortcutKeyCandidate
+<span class="lineNum">      85 </span>            :  *
+<span class="lineNum">      86 </span>            :  * This stores a candidate of shortcut key combination.
+<span class="lineNum">      87 </span>            :  ******************************************************************************/
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : struct ShortcutKeyCandidate
+<span class="lineNum">      90 </span>            : {
+<span class="lineNum">      91 </span>            :   ShortcutKeyCandidate(uint32_t aCharCode, bool aIgnoreShift)
+<span class="lineNum">      92 </span>            :     : mCharCode(aCharCode)
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     , mIgnoreShift(aIgnoreShift)</span>
+<span class="lineNum">      94 </span>            :   {
+<span class="lineNum">      95 </span>            :   }
+<span class="lineNum">      96 </span>            :   // The mCharCode value which must match keyboard shortcut definition.
+<span class="lineNum">      97 </span>            :   uint32_t mCharCode;
+<span class="lineNum">      98 </span>            :   // true if Shift state can be ignored.  Otherwise, Shift key state must
+<span class="lineNum">      99 </span>            :   // match keyboard shortcut definition.
+<span class="lineNum">     100 </span>            :   bool mIgnoreShift;
+<span class="lineNum">     101 </span>            : };
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : /******************************************************************************
+<span class="lineNum">     104 </span>            :  * mozilla::WidgetKeyboardEvent
+<a name="105"><span class="lineNum">     105 </span>            :  ******************************************************************************/</a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 : class WidgetKeyboardEvent : public WidgetInputEvent</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span>            : private:
+<span class="lineNum">     110 </span>            :   friend class dom::PBrowserParent;
+<span class="lineNum">     111 </span>            :   friend class dom::PBrowserChild;
+<a name="112"><span class="lineNum">     112 </span>            : </a>
+<span class="lineNum">     113 </span>            : protected:
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   WidgetKeyboardEvent()</span>
+<span class="lineNum">     115 </span>            :     : mNativeKeyEvent(nullptr)
+<span class="lineNum">     116 </span>            :     , mKeyCode(0)
+<span class="lineNum">     117 </span>            :     , mCharCode(0)
+<span class="lineNum">     118 </span>            :     , mPseudoCharCode(0)
+<span class="lineNum">     119 </span>            :     , mLocation(eKeyLocationStandard)
+<span class="lineNum">     120 </span>            :     , mAccessKeyForwardedToChild(false)
+<span class="lineNum">     121 </span>            :     , mUniqueId(0)
+<span class="lineNum">     122 </span>            : #ifdef XP_MACOSX
+<span class="lineNum">     123 </span>            :     , mNativeModifierFlags(0)
+<span class="lineNum">     124 </span>            :     , mNativeKeyCode(0)
+<span class="lineNum">     125 </span>            : #endif // #ifdef XP_MACOSX
+<span class="lineNum">     126 </span>            :     , mKeyNameIndex(KEY_NAME_INDEX_Unidentified)
+<span class="lineNum">     127 </span>            :     , mCodeNameIndex(CODE_NAME_INDEX_UNKNOWN)
+<span class="lineNum">     128 </span>            :     , mInputMethodAppState(eNotHandled)
+<span class="lineNum">     129 </span>            :     , mIsRepeat(false)
+<span class="lineNum">     130 </span>            :     , mIsComposing(false)
+<span class="lineNum">     131 </span>            :     , mIsReserved(false)
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :     , mIsSynthesizedByTIP(false)</span>
+<span class="lineNum">     133 </span>            :   {
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   }</span>
+<a name="135"><span class="lineNum">     135 </span>            : </a>
+<span class="lineNum">     136 </span>            : public:
+<a name="137"><span class="lineNum">     137 </span><span class="lineNoCov">          0 :   virtual WidgetKeyboardEvent* AsKeyboardEvent() override { return this; }</span></a>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   WidgetKeyboardEvent(bool aIsTrusted, EventMessage aMessage,</span>
+<span class="lineNum">     140 </span>            :                       nsIWidget* aWidget,
+<span class="lineNum">     141 </span>            :                       EventClassID aEventClassID = eKeyboardEventClass)
+<span class="lineNum">     142 </span>            :     : WidgetInputEvent(aIsTrusted, aMessage, aWidget, aEventClassID)
+<span class="lineNum">     143 </span>            :     , mNativeKeyEvent(nullptr)
+<span class="lineNum">     144 </span>            :     , mKeyCode(0)
+<span class="lineNum">     145 </span>            :     , mCharCode(0)
+<span class="lineNum">     146 </span>            :     , mPseudoCharCode(0)
+<span class="lineNum">     147 </span>            :     , mLocation(eKeyLocationStandard)
+<span class="lineNum">     148 </span>            :     , mAccessKeyForwardedToChild(false)
+<span class="lineNum">     149 </span>            :     , mUniqueId(0)
+<span class="lineNum">     150 </span>            : #ifdef XP_MACOSX
+<span class="lineNum">     151 </span>            :     , mNativeModifierFlags(0)
+<span class="lineNum">     152 </span>            :     , mNativeKeyCode(0)
+<span class="lineNum">     153 </span>            : #endif // #ifdef XP_MACOSX
+<span class="lineNum">     154 </span>            :     , mKeyNameIndex(KEY_NAME_INDEX_Unidentified)
+<span class="lineNum">     155 </span>            :     , mCodeNameIndex(CODE_NAME_INDEX_UNKNOWN)
+<span class="lineNum">     156 </span>            :     , mInputMethodAppState(eNotHandled)
+<span class="lineNum">     157 </span>            :     , mIsRepeat(false)
+<span class="lineNum">     158 </span>            :     , mIsComposing(false)
+<span class="lineNum">     159 </span>            :     , mIsReserved(false)
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :     , mIsSynthesizedByTIP(false)</span>
+<span class="lineNum">     161 </span>            :   {
+<span class="lineNum">     162 </span>            :     // If this is a keyboard event on a plugin, it shouldn't fired on content.
+<span class="lineNum">     163 </span>            :     mFlags.mOnlySystemGroupDispatchInContent =
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :       mFlags.mNoCrossProcessBoundaryForwarding = IsKeyEventOnPlugin();</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :   static bool IsKeyDownOrKeyDownOnPlugin(EventMessage aMessage)
+<span class="lineNum">     168 </span>            :   {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     return aMessage == eKeyDown || aMessage == eKeyDownOnPlugin;</span>
+<span class="lineNum">     170 </span>            :   }
+<span class="lineNum">     171 </span>            :   bool IsKeyDownOrKeyDownOnPlugin() const
+<span class="lineNum">     172 </span>            :   {
+<span class="lineNum">     173 </span>            :     return IsKeyDownOrKeyDownOnPlugin(mMessage);
+<span class="lineNum">     174 </span>            :   }
+<span class="lineNum">     175 </span>            :   static bool IsKeyUpOrKeyUpOnPlugin(EventMessage aMessage)
+<span class="lineNum">     176 </span>            :   {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     return aMessage == eKeyUp || aMessage == eKeyUpOnPlugin;</span>
+<span class="lineNum">     178 </span>            :   }
+<span class="lineNum">     179 </span>            :   bool IsKeyUpOrKeyUpOnPlugin() const
+<span class="lineNum">     180 </span>            :   {
+<span class="lineNum">     181 </span>            :     return IsKeyUpOrKeyUpOnPlugin(mMessage);
+<span class="lineNum">     182 </span>            :   }
+<span class="lineNum">     183 </span>            :   static bool IsKeyEventOnPlugin(EventMessage aMessage)
+<span class="lineNum">     184 </span>            :   {
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :     return aMessage == eKeyDownOnPlugin || aMessage == eKeyUpOnPlugin;</span>
+<span class="lineNum">     186 </span>            :   }
+<span class="lineNum">     187 </span>            :   bool IsKeyEventOnPlugin() const
+<span class="lineNum">     188 </span>            :   {
+<span class="lineNum">     189 </span>            :     return IsKeyEventOnPlugin(mMessage);
+<a name="190"><span class="lineNum">     190 </span>            :   }</a>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :   virtual WidgetEvent* Duplicate() const override</span>
+<span class="lineNum">     193 </span>            :   {
+<span class="lineNum">     194 </span>            :     MOZ_ASSERT(mClass == eKeyboardEventClass,
+<span class="lineNum">     195 </span>            :                &quot;Duplicate() must be overridden by sub class&quot;);
+<span class="lineNum">     196 </span>            :     // Not copying widget, it is a weak reference.
+<span class="lineNum">     197 </span>            :     WidgetKeyboardEvent* result =
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :       new WidgetKeyboardEvent(false, mMessage, nullptr);</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     result-&gt;AssignKeyEventData(*this, true);</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :     result-&gt;mFlags = mFlags;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     202 </span>            :   }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :   // OS translated Unicode chars which are used for accesskey and accelkey
+<span class="lineNum">     205 </span>            :   // handling. The handlers will try from first character to last character.
+<span class="lineNum">     206 </span>            :   nsTArray&lt;AlternativeCharCode&gt; mAlternativeCharCodes;
+<span class="lineNum">     207 </span>            :   // DOM KeyboardEvent.key only when mKeyNameIndex is KEY_NAME_INDEX_USE_STRING.
+<span class="lineNum">     208 </span>            :   nsString mKeyValue;
+<span class="lineNum">     209 </span>            :   // DOM KeyboardEvent.code only when mCodeNameIndex is
+<span class="lineNum">     210 </span>            :   // CODE_NAME_INDEX_USE_STRING.
+<span class="lineNum">     211 </span>            :   nsString mCodeValue;
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            : #ifdef XP_MACOSX
+<span class="lineNum">     214 </span>            :   // Values given by a native NSEvent, for use with Cocoa NPAPI plugins.
+<span class="lineNum">     215 </span>            :   nsString mNativeCharacters;
+<span class="lineNum">     216 </span>            :   nsString mNativeCharactersIgnoringModifiers;
+<span class="lineNum">     217 </span>            :   // If this is non-empty, create a text event for plugins instead of a
+<span class="lineNum">     218 </span>            :   // keyboard event.
+<span class="lineNum">     219 </span>            :   nsString mPluginTextEventString;
+<span class="lineNum">     220 </span>            : #endif // #ifdef XP_MACOSX
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :   // OS-specific native event can optionally be preserved
+<span class="lineNum">     223 </span>            :   void* mNativeKeyEvent;
+<span class="lineNum">     224 </span>            :   // A DOM keyCode value or 0.  If a keypress event whose mCharCode is 0, this
+<span class="lineNum">     225 </span>            :   // should be 0.
+<span class="lineNum">     226 </span>            :   uint32_t mKeyCode;
+<span class="lineNum">     227 </span>            :   // If the instance is a keypress event of a printable key, this is a UTF-16
+<span class="lineNum">     228 </span>            :   // value of the key.  Otherwise, 0.  This value must not be a control
+<span class="lineNum">     229 </span>            :   // character when some modifiers are active.  Then, this value should be an
+<span class="lineNum">     230 </span>            :   // unmodified value except Shift and AltGr.
+<span class="lineNum">     231 </span>            :   uint32_t mCharCode;
+<span class="lineNum">     232 </span>            :   // mPseudoCharCode is valid only when mMessage is an eKeyDown event.
+<span class="lineNum">     233 </span>            :   // This stores mCharCode value of keypress event which is fired with same
+<span class="lineNum">     234 </span>            :   // key value and same modifier state.
+<span class="lineNum">     235 </span>            :   uint32_t mPseudoCharCode;
+<span class="lineNum">     236 </span>            :   // One of eKeyLocation*
+<span class="lineNum">     237 </span>            :   uint32_t mLocation;
+<span class="lineNum">     238 </span>            :   // True if accesskey handling was forwarded to the child via
+<span class="lineNum">     239 </span>            :   // TabParent::HandleAccessKey. In this case, parent process menu access key
+<span class="lineNum">     240 </span>            :   // handling should be delayed until it is determined that there exists no
+<span class="lineNum">     241 </span>            :   // overriding access key in the content process.
+<span class="lineNum">     242 </span>            :   bool mAccessKeyForwardedToChild;
+<span class="lineNum">     243 </span>            :   // Unique id associated with a keydown / keypress event. Used in identifing
+<span class="lineNum">     244 </span>            :   // keypress events for removal from async event dispatch queue in metrofx
+<span class="lineNum">     245 </span>            :   // after preventDefault is called on keydown events. It's ok if this wraps
+<span class="lineNum">     246 </span>            :   // over long periods.
+<span class="lineNum">     247 </span>            :   uint32_t mUniqueId;
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : #ifdef XP_MACOSX
+<span class="lineNum">     250 </span>            :   // Values given by a native NSEvent, for use with Cocoa NPAPI plugins.
+<span class="lineNum">     251 </span>            :   uint32_t mNativeModifierFlags;
+<span class="lineNum">     252 </span>            :   uint16_t mNativeKeyCode;
+<span class="lineNum">     253 </span>            : #endif // #ifdef XP_MACOSX
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            :   // DOM KeyboardEvent.key
+<span class="lineNum">     256 </span>            :   KeyNameIndex mKeyNameIndex;
+<span class="lineNum">     257 </span>            :   // DOM KeyboardEvent.code
+<span class="lineNum">     258 </span>            :   CodeNameIndex mCodeNameIndex;
+<span class="lineNum">     259 </span>            :   // Indicates that the event is being handled by input method app
+<span class="lineNum">     260 </span>            :   typedef uint8_t InputMethodAppStateType;
+<span class="lineNum">     261 </span>            :   enum InputMethodAppState : InputMethodAppStateType
+<span class="lineNum">     262 </span>            :   {
+<span class="lineNum">     263 </span>            :     eNotHandled, // not yet handled by intput method app
+<span class="lineNum">     264 </span>            :     eHandling,   // being handled by intput method app
+<span class="lineNum">     265 </span>            :     eHandled     // handled by input method app
+<span class="lineNum">     266 </span>            :   };
+<span class="lineNum">     267 </span>            :   InputMethodAppState mInputMethodAppState;
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :   // Indicates whether the event is generated by auto repeat or not.
+<span class="lineNum">     270 </span>            :   // if this is keyup event, always false.
+<span class="lineNum">     271 </span>            :   bool mIsRepeat;
+<span class="lineNum">     272 </span>            :   // Indicates whether the event is generated during IME (or deadkey)
+<span class="lineNum">     273 </span>            :   // composition.  This is initialized by EventStateManager.  So, key event
+<span class="lineNum">     274 </span>            :   // dispatchers don't need to initialize this.
+<span class="lineNum">     275 </span>            :   bool mIsComposing;
+<span class="lineNum">     276 </span>            :   // Indicates if the key combination is reserved by chrome.  This is set by
+<span class="lineNum">     277 </span>            :   // nsXBLWindowKeyHandler at capturing phase of the default event group.
+<span class="lineNum">     278 </span>            :   bool mIsReserved;
+<span class="lineNum">     279 </span>            :   // Indicates whether the event is synthesized from Text Input Processor
+<span class="lineNum">     280 </span>            :   // or an actual event from nsAppShell.
+<span class="lineNum">     281 </span>            :   bool mIsSynthesizedByTIP;
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :   // If the key should cause keypress events, this returns true.
+<span class="lineNum">     284 </span>            :   // Otherwise, false.
+<span class="lineNum">     285 </span>            :   bool ShouldCauseKeypressEvents() const;
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :   // mCharCode value of non-eKeyPress events is always 0.  However, if
+<span class="lineNum">     288 </span>            :   // non-eKeyPress event has one or more alternative char code values,
+<span class="lineNum">     289 </span>            :   // its first item should be the mCharCode value of following eKeyPress event.
+<a name="290"><span class="lineNum">     290 </span>            :   // PseudoCharCode() returns mCharCode value for eKeyPress event,</a>
+<span class="lineNum">     291 </span>            :   // the first alternative char code value of non-eKeyPress event or 0.
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   uint32_t PseudoCharCode() const</span>
+<span class="lineNum">     293 </span>            :   {
+<a name="294"><span class="lineNum">     294 </span><span class="lineNoCov">          0 :     return mMessage == eKeyPress ? mCharCode : mPseudoCharCode;</span></a>
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :   void SetCharCode(uint32_t aCharCode)</span>
+<span class="lineNum">     297 </span>            :   {
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :     if (mMessage == eKeyPress) {</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :       mCharCode = aCharCode;</span>
+<span class="lineNum">     300 </span>            :     } else {
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :       mPseudoCharCode = aCharCode;</span>
+<span class="lineNum">     302 </span>            :     }
+<a name="303"><span class="lineNum">     303 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :   void GetDOMKeyName(nsAString&amp; aKeyName)</span>
+<span class="lineNum">     306 </span>            :   {
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :     if (mKeyNameIndex == KEY_NAME_INDEX_USE_STRING) {</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :       aKeyName = mKeyValue;</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     310 </span>            :     }
+<a name="311"><span class="lineNum">     311 </span><span class="lineNoCov">          0 :     GetDOMKeyName(mKeyNameIndex, aKeyName);</span></a>
+<span class="lineNum">     312 </span>            :   }
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   void GetDOMCodeName(nsAString&amp; aCodeName)</span>
+<span class="lineNum">     314 </span>            :   {
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :     if (mCodeNameIndex == CODE_NAME_INDEX_USE_STRING) {</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :       aCodeName = mCodeValue;</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     318 </span>            :     }
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :     GetDOMCodeName(mCodeNameIndex, aCodeName);</span>
+<a name="320"><span class="lineNum">     320 </span>            :   }</a>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   bool IsModifierKeyEvent() const</span>
+<span class="lineNum">     323 </span>            :   {
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     return GetModifierForKeyName(mKeyNameIndex) != MODIFIER_NONE;</span>
+<span class="lineNum">     325 </span>            :   }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            :   /**
+<span class="lineNum">     328 </span>            :    * Get the candidates for shortcut key.
+<span class="lineNum">     329 </span>            :    *
+<span class="lineNum">     330 </span>            :    * @param aCandidates [out] the candidate shortcut key combination list.
+<span class="lineNum">     331 </span>            :    *                          the first item is most preferred.
+<span class="lineNum">     332 </span>            :    */
+<span class="lineNum">     333 </span>            :   void GetShortcutKeyCandidates(ShortcutKeyCandidateArray&amp; aCandidates);
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            :   /**
+<span class="lineNum">     336 </span>            :    * Get the candidates for access key.
+<span class="lineNum">     337 </span>            :    *
+<span class="lineNum">     338 </span>            :    * @param aCandidates [out] the candidate access key list.
+<span class="lineNum">     339 </span>            :    *                          the first item is most preferred.
+<span class="lineNum">     340 </span>            :    */
+<span class="lineNum">     341 </span>            :   void GetAccessKeyCandidates(nsTArray&lt;uint32_t&gt;&amp; aCandidates);
+<span class="lineNum">     342 </span>            : 
+<span class="lineNum">     343 </span>            :   static void Shutdown();
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :   /**
+<span class="lineNum">     346 </span>            :    * ComputeLocationFromCodeValue() returns one of .mLocation value
+<span class="lineNum">     347 </span>            :    * (eKeyLocation*) which is the most preferred value for the specified code
+<span class="lineNum">     348 </span>            :    * value.
+<span class="lineNum">     349 </span>            :    */
+<span class="lineNum">     350 </span>            :   static uint32_t ComputeLocationFromCodeValue(CodeNameIndex aCodeNameIndex);
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :   /**
+<span class="lineNum">     353 </span>            :    * ComputeKeyCodeFromKeyNameIndex() return a .mKeyCode value which can be
+<span class="lineNum">     354 </span>            :    * mapped from the specified key value.  Note that this returns 0 if the
+<span class="lineNum">     355 </span>            :    * key name index is KEY_NAME_INDEX_Unidentified or KEY_NAME_INDEX_USE_STRING.
+<span class="lineNum">     356 </span>            :    * This means that this method is useful only for non-printable keys.
+<span class="lineNum">     357 </span>            :    */
+<span class="lineNum">     358 </span>            :   static uint32_t ComputeKeyCodeFromKeyNameIndex(KeyNameIndex aKeyNameIndex);
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :   /**
+<span class="lineNum">     361 </span>            :    * GetModifierForKeyName() returns a value of Modifier which is activated
+<span class="lineNum">     362 </span>            :    * by the aKeyNameIndex.
+<span class="lineNum">     363 </span>            :    */
+<span class="lineNum">     364 </span>            :   static Modifier GetModifierForKeyName(KeyNameIndex aKeyNameIndex);
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :   /**
+<span class="lineNum">     367 </span>            :    * IsLockableModifier() returns true if aKeyNameIndex is a lockable modifier
+<span class="lineNum">     368 </span>            :    * key such as CapsLock and NumLock.
+<span class="lineNum">     369 </span>            :    */
+<span class="lineNum">     370 </span>            :   static bool IsLockableModifier(KeyNameIndex aKeyNameIndex);
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span>            :   static void GetDOMKeyName(KeyNameIndex aKeyNameIndex,
+<span class="lineNum">     373 </span>            :                             nsAString&amp; aKeyName);
+<span class="lineNum">     374 </span>            :   static void GetDOMCodeName(CodeNameIndex aCodeNameIndex,
+<span class="lineNum">     375 </span>            :                              nsAString&amp; aCodeName);
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span>            :   static KeyNameIndex GetKeyNameIndex(const nsAString&amp; aKeyValue);
+<span class="lineNum">     378 </span>            :   static CodeNameIndex GetCodeNameIndex(const nsAString&amp; aCodeValue);
+<span class="lineNum">     379 </span>            : 
+<a name="380"><span class="lineNum">     380 </span>            :   static const char* GetCommandStr(Command aCommand);</a>
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :   void AssignKeyEventData(const WidgetKeyboardEvent&amp; aEvent, bool aCopyTargets)</span>
+<span class="lineNum">     383 </span>            :   {
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :     AssignInputEventData(aEvent, aCopyTargets);</span>
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :     mKeyCode = aEvent.mKeyCode;</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :     mCharCode = aEvent.mCharCode;</span>
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :     mPseudoCharCode = aEvent.mPseudoCharCode;</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :     mLocation = aEvent.mLocation;</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :     mAlternativeCharCodes = aEvent.mAlternativeCharCodes;</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     mIsRepeat = aEvent.mIsRepeat;</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :     mIsComposing = aEvent.mIsComposing;</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :     mIsReserved = aEvent.mIsReserved;</span>
+<span class="lineNum">     394 </span><span class="lineNoCov">          0 :     mAccessKeyForwardedToChild = aEvent.mAccessKeyForwardedToChild;</span>
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :     mKeyNameIndex = aEvent.mKeyNameIndex;</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :     mCodeNameIndex = aEvent.mCodeNameIndex;</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :     mKeyValue = aEvent.mKeyValue;</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :     mCodeValue = aEvent.mCodeValue;</span>
+<span class="lineNum">     399 </span>            :     // Don't copy mNativeKeyEvent because it may be referred after its instance
+<span class="lineNum">     400 </span>            :     // is destroyed.
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :     mNativeKeyEvent = nullptr;</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :     mUniqueId = aEvent.mUniqueId;</span>
+<span class="lineNum">     403 </span>            : #ifdef XP_MACOSX
+<span class="lineNum">     404 </span>            :     mNativeKeyCode = aEvent.mNativeKeyCode;
+<span class="lineNum">     405 </span>            :     mNativeModifierFlags = aEvent.mNativeModifierFlags;
+<span class="lineNum">     406 </span>            :     mNativeCharacters.Assign(aEvent.mNativeCharacters);
+<span class="lineNum">     407 </span>            :     mNativeCharactersIgnoringModifiers.
+<span class="lineNum">     408 </span>            :       Assign(aEvent.mNativeCharactersIgnoringModifiers);
+<span class="lineNum">     409 </span>            :     mPluginTextEventString.Assign(aEvent.mPluginTextEventString);
+<span class="lineNum">     410 </span>            : #endif
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :     mInputMethodAppState = aEvent.mInputMethodAppState;</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :     mIsSynthesizedByTIP = aEvent.mIsSynthesizedByTIP;</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            : private:
+<span class="lineNum">     416 </span>            :   static const char16_t* const kKeyNames[];
+<span class="lineNum">     417 </span>            :   static const char16_t* const kCodeNames[];
+<span class="lineNum">     418 </span>            :   typedef nsDataHashtable&lt;nsStringHashKey,
+<span class="lineNum">     419 </span>            :                           KeyNameIndex&gt; KeyNameIndexHashtable;
+<span class="lineNum">     420 </span>            :   typedef nsDataHashtable&lt;nsStringHashKey,
+<span class="lineNum">     421 </span>            :                           CodeNameIndex&gt; CodeNameIndexHashtable;
+<span class="lineNum">     422 </span>            :   static KeyNameIndexHashtable* sKeyNameIndexHashtable;
+<span class="lineNum">     423 </span>            :   static CodeNameIndexHashtable* sCodeNameIndexHashtable;
+<span class="lineNum">     424 </span>            : };
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            : /******************************************************************************
+<span class="lineNum">     427 </span>            :  * mozilla::WidgetCompositionEvent
+<a name="428"><span class="lineNum">     428 </span>            :  ******************************************************************************/</a>
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 : class WidgetCompositionEvent : public WidgetGUIEvent</span>
+<span class="lineNum">     431 </span>            : {
+<span class="lineNum">     432 </span>            : private:
+<span class="lineNum">     433 </span>            :   friend class mozilla::dom::PBrowserParent;
+<a name="434"><span class="lineNum">     434 </span>            :   friend class mozilla::dom::PBrowserChild;</a>
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span><span class="lineNoCov">          0 :   WidgetCompositionEvent()</span>
+<span class="lineNum">     437 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :   }</span>
+<a name="439"><span class="lineNum">     439 </span>            : </a>
+<span class="lineNum">     440 </span>            : public:
+<span class="lineNum">     441 </span><span class="lineNoCov">          0 :   virtual WidgetCompositionEvent* AsCompositionEvent() override</span>
+<span class="lineNum">     442 </span>            :   {
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :     return this;</span>
+<a name="444"><span class="lineNum">     444 </span>            :   }</a>
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :   WidgetCompositionEvent(bool aIsTrusted, EventMessage aMessage,</span>
+<span class="lineNum">     447 </span>            :                          nsIWidget* aWidget)
+<span class="lineNum">     448 </span>            :     : WidgetGUIEvent(aIsTrusted, aMessage, aWidget, eCompositionEventClass)
+<span class="lineNum">     449 </span>            :     , mNativeIMEContext(aWidget)
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :     , mOriginalMessage(eVoidEvent)</span>
+<span class="lineNum">     451 </span>            :   {
+<a name="452"><span class="lineNum">     452 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :   virtual WidgetEvent* Duplicate() const override</span>
+<span class="lineNum">     455 </span>            :   {
+<span class="lineNum">     456 </span>            :     MOZ_ASSERT(mClass == eCompositionEventClass,
+<span class="lineNum">     457 </span>            :                &quot;Duplicate() must be overridden by sub class&quot;);
+<span class="lineNum">     458 </span>            :     // Not copying widget, it is a weak reference.
+<span class="lineNum">     459 </span>            :     WidgetCompositionEvent* result =
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :       new WidgetCompositionEvent(false, mMessage, nullptr);</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :     result-&gt;AssignCompositionEventData(*this, true);</span>
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :     result-&gt;mFlags = mFlags;</span>
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     464 </span>            :   }
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :   // The composition string or the commit string.  If the instance is a
+<span class="lineNum">     467 </span>            :   // compositionstart event, this is initialized with selected text by
+<span class="lineNum">     468 </span>            :   // TextComposition automatically.
+<span class="lineNum">     469 </span>            :   nsString mData;
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            :   RefPtr&lt;TextRangeArray&gt; mRanges;
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            :   // mNativeIMEContext stores the native IME context which causes the
+<span class="lineNum">     474 </span>            :   // composition event.
+<span class="lineNum">     475 </span>            :   widget::NativeIMEContext mNativeIMEContext;
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :   // If the instance is a clone of another event, mOriginalMessage stores
+<span class="lineNum">     478 </span>            :   // the another event's mMessage.
+<a name="479"><span class="lineNum">     479 </span>            :   EventMessage mOriginalMessage;</a>
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :   void AssignCompositionEventData(const WidgetCompositionEvent&amp; aEvent,</span>
+<span class="lineNum">     482 </span>            :                                   bool aCopyTargets)
+<span class="lineNum">     483 </span>            :   {
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :     AssignGUIEventData(aEvent, aCopyTargets);</span>
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :     mData = aEvent.mData;</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :     mOriginalMessage = aEvent.mOriginalMessage;</span>
+<span class="lineNum">     488 </span><span class="lineNoCov">          0 :     mRanges = aEvent.mRanges;</span>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            :     // Currently, we don't need to copy the other members because they are
+<span class="lineNum">     491 </span>            :     // for internal use only (not available from JS).
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :   bool IsComposing() const</span>
+<span class="lineNum">     495 </span>            :   {
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     return mRanges &amp;&amp; mRanges-&gt;IsComposing();</span>
+<span class="lineNum">     497 </span>            :   }
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :   uint32_t TargetClauseOffset() const</span>
+<span class="lineNum">     500 </span>            :   {
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :     return mRanges ? mRanges-&gt;TargetClauseOffset() : 0;</span>
+<span class="lineNum">     502 </span>            :   }
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            :   uint32_t TargetClauseLength() const
+<span class="lineNum">     505 </span>            :   {
+<span class="lineNum">     506 </span>            :     uint32_t length = UINT32_MAX;
+<span class="lineNum">     507 </span>            :     if (mRanges) {
+<span class="lineNum">     508 </span>            :       length = mRanges-&gt;TargetClauseLength();
+<span class="lineNum">     509 </span>            :     }
+<span class="lineNum">     510 </span>            :     return length == UINT32_MAX ? mData.Length() : length;
+<span class="lineNum">     511 </span>            :   }
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :   uint32_t RangeCount() const
+<span class="lineNum">     514 </span>            :   {
+<span class="lineNum">     515 </span>            :     return mRanges ? mRanges-&gt;Length() : 0;
+<a name="516"><span class="lineNum">     516 </span>            :   }</a>
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span><span class="lineNoCov">          0 :   bool CausesDOMTextEvent() const</span>
+<span class="lineNum">     519 </span>            :   {
+<span class="lineNum">     520 </span><span class="lineNoCov">          0 :     return mMessage == eCompositionChange ||</span>
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :            mMessage == eCompositionCommit ||</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :            mMessage == eCompositionCommitAsIs;</span>
+<a name="523"><span class="lineNum">     523 </span>            :   }</a>
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :   bool CausesDOMCompositionEndEvent() const</span>
+<span class="lineNum">     526 </span>            :   {
+<span class="lineNum">     527 </span><span class="lineNoCov">          0 :     return mMessage == eCompositionEnd ||</span>
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :            mMessage == eCompositionCommit ||</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :            mMessage == eCompositionCommitAsIs;</span>
+<span class="lineNum">     530 </span>            :   }
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :   bool IsFollowedByCompositionEnd() const
+<span class="lineNum">     533 </span>            :   {
+<span class="lineNum">     534 </span>            :     return IsFollowedByCompositionEnd(mOriginalMessage);
+<span class="lineNum">     535 </span>            :   }
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            :   static bool IsFollowedByCompositionEnd(EventMessage aEventMessage)
+<span class="lineNum">     538 </span>            :   {
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :     return aEventMessage == eCompositionCommit ||</span>
+<span class="lineNum">     540 </span>            :            aEventMessage == eCompositionCommitAsIs;
+<span class="lineNum">     541 </span>            :   }
+<span class="lineNum">     542 </span>            : };
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span>            : /******************************************************************************
+<span class="lineNum">     545 </span>            :  * mozilla::WidgetQueryContentEvent
+<a name="546"><span class="lineNum">     546 </span>            :  ******************************************************************************/</a>
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span><span class="lineNoCov">          0 : class WidgetQueryContentEvent : public WidgetGUIEvent</span>
+<span class="lineNum">     549 </span>            : {
+<span class="lineNum">     550 </span>            : private:
+<span class="lineNum">     551 </span>            :   friend class dom::PBrowserParent;
+<span class="lineNum">     552 </span>            :   friend class dom::PBrowserChild;
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span>            :   WidgetQueryContentEvent()
+<span class="lineNum">     555 </span>            :     : mSucceeded(false)
+<span class="lineNum">     556 </span>            :     , mUseNativeLineBreak(true)
+<span class="lineNum">     557 </span>            :     , mWithFontRanges(false)
+<span class="lineNum">     558 </span>            :   {
+<span class="lineNum">     559 </span>            :     MOZ_CRASH(&quot;WidgetQueryContentEvent is created without proper arguments&quot;);
+<span class="lineNum">     560 </span>            :   }
+<a name="561"><span class="lineNum">     561 </span>            : </a>
+<span class="lineNum">     562 </span>            : public:
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :   virtual WidgetQueryContentEvent* AsQueryContentEvent() override</span>
+<span class="lineNum">     564 </span>            :   {
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :     return this;</span>
+<a name="566"><span class="lineNum">     566 </span>            :   }</a>
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :   WidgetQueryContentEvent(bool aIsTrusted, EventMessage aMessage,</span>
+<span class="lineNum">     569 </span>            :                           nsIWidget* aWidget)
+<span class="lineNum">     570 </span>            :     : WidgetGUIEvent(aIsTrusted, aMessage, aWidget, eQueryContentEventClass)
+<span class="lineNum">     571 </span>            :     , mSucceeded(false)
+<span class="lineNum">     572 </span>            :     , mUseNativeLineBreak(true)
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :     , mWithFontRanges(false)</span>
+<span class="lineNum">     574 </span>            :   {
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     576 </span>            : 
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :   WidgetQueryContentEvent(EventMessage aMessage,</span>
+<span class="lineNum">     578 </span>            :                           const WidgetQueryContentEvent&amp; aOtherEvent)
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :     : WidgetGUIEvent(aOtherEvent.IsTrusted(), aMessage,</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :                      const_cast&lt;nsIWidget*&gt;(aOtherEvent.mWidget.get()),</span>
+<span class="lineNum">     581 </span>            :                      eQueryContentEventClass)
+<span class="lineNum">     582 </span>            :     , mSucceeded(false)
+<span class="lineNum">     583 </span>            :     , mUseNativeLineBreak(aOtherEvent.mUseNativeLineBreak)
+<span class="lineNum">     584 </span><span class="lineNoCov">          0 :     , mWithFontRanges(false)</span>
+<span class="lineNum">     585 </span>            :   {
+<a name="586"><span class="lineNum">     586 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span><span class="lineNoCov">          0 :   virtual WidgetEvent* Duplicate() const override</span>
+<span class="lineNum">     589 </span>            :   {
+<span class="lineNum">     590 </span>            :     // This event isn't an internal event of any DOM event.
+<span class="lineNum">     591 </span>            :     NS_ASSERTION(!IsAllowedToDispatchDOMEvent(),
+<span class="lineNum">     592 </span>            :       &quot;WidgetQueryContentEvent needs to support Duplicate()&quot;);
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :     MOZ_CRASH(&quot;WidgetQueryContentEvent doesn't support Duplicate()&quot;);</span>
+<span class="lineNum">     594 </span>            :   }
+<span class="lineNum">     595 </span>            : 
+<span class="lineNum">     596 </span>            :   struct Options final
+<span class="lineNum">     597 </span>            :   {
+<span class="lineNum">     598 </span>            :     bool mUseNativeLineBreak;
+<span class="lineNum">     599 </span>            :     bool mRelativeToInsertionPoint;
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span>            :     explicit Options()
+<span class="lineNum">     602 </span>            :       : mUseNativeLineBreak(true)
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :       , mRelativeToInsertionPoint(false)</span>
+<span class="lineNum">     604 </span>            :     {
+<span class="lineNum">     605 </span>            :     }
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span>            :     explicit Options(const WidgetQueryContentEvent&amp; aEvent)
+<span class="lineNum">     608 </span>            :       : mUseNativeLineBreak(aEvent.mUseNativeLineBreak)
+<span class="lineNum">     609 </span><span class="lineNoCov">          0 :       , mRelativeToInsertionPoint(aEvent.mInput.mRelativeToInsertionPoint)</span>
+<span class="lineNum">     610 </span>            :     {
+<span class="lineNum">     611 </span>            :     }
+<span class="lineNum">     612 </span>            :   };
+<span class="lineNum">     613 </span>            : 
+<span class="lineNum">     614 </span>            :   void Init(const Options&amp; aOptions)
+<span class="lineNum">     615 </span>            :   {
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :     mUseNativeLineBreak = aOptions.mUseNativeLineBreak;</span>
+<span class="lineNum">     617 </span><span class="lineNoCov">          0 :     mInput.mRelativeToInsertionPoint = aOptions.mRelativeToInsertionPoint;</span>
+<span class="lineNum">     618 </span>            :     MOZ_ASSERT(mInput.IsValidEventMessage(mMessage));
+<span class="lineNum">     619 </span>            :   }
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span>            :   void InitForQueryTextContent(int64_t aOffset, uint32_t aLength,
+<span class="lineNum">     622 </span>            :                                const Options&amp; aOptions = Options())
+<span class="lineNum">     623 </span>            :   {
+<span class="lineNum">     624 </span>            :     NS_ASSERTION(mMessage == eQueryTextContent,
+<span class="lineNum">     625 </span>            :                  &quot;wrong initializer is called&quot;);
+<span class="lineNum">     626 </span><span class="lineNoCov">          0 :     mInput.mOffset = aOffset;</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :     mInput.mLength = aLength;</span>
+<span class="lineNum">     628 </span>            :     Init(aOptions);
+<span class="lineNum">     629 </span>            :     MOZ_ASSERT(mInput.IsValidOffset());
+<span class="lineNum">     630 </span>            :   }
+<span class="lineNum">     631 </span>            : 
+<span class="lineNum">     632 </span>            :   void InitForQueryCaretRect(int64_t aOffset,
+<span class="lineNum">     633 </span>            :                              const Options&amp; aOptions = Options())
+<span class="lineNum">     634 </span>            :   {
+<span class="lineNum">     635 </span>            :     NS_ASSERTION(mMessage == eQueryCaretRect,
+<span class="lineNum">     636 </span>            :                  &quot;wrong initializer is called&quot;);
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :     mInput.mOffset = aOffset;</span>
+<span class="lineNum">     638 </span>            :     Init(aOptions);
+<span class="lineNum">     639 </span>            :     MOZ_ASSERT(mInput.IsValidOffset());
+<span class="lineNum">     640 </span>            :   }
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            :   void InitForQueryTextRect(int64_t aOffset, uint32_t aLength,
+<span class="lineNum">     643 </span>            :                             const Options&amp; aOptions = Options())
+<span class="lineNum">     644 </span>            :   {
+<span class="lineNum">     645 </span>            :     NS_ASSERTION(mMessage == eQueryTextRect,
+<span class="lineNum">     646 </span>            :                  &quot;wrong initializer is called&quot;);
+<span class="lineNum">     647 </span><span class="lineNoCov">          0 :     mInput.mOffset = aOffset;</span>
+<span class="lineNum">     648 </span><span class="lineNoCov">          0 :     mInput.mLength = aLength;</span>
+<span class="lineNum">     649 </span>            :     Init(aOptions);
+<span class="lineNum">     650 </span>            :     MOZ_ASSERT(mInput.IsValidOffset());
+<span class="lineNum">     651 </span>            :   }
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span>            :   void InitForQuerySelectedText(SelectionType aSelectionType,
+<span class="lineNum">     654 </span>            :                                 const Options&amp; aOptions = Options())
+<span class="lineNum">     655 </span>            :   {
+<span class="lineNum">     656 </span>            :     MOZ_ASSERT(mMessage == eQuerySelectedText);
+<span class="lineNum">     657 </span>            :     MOZ_ASSERT(aSelectionType != SelectionType::eNone);
+<span class="lineNum">     658 </span><span class="lineNoCov">          0 :     mInput.mSelectionType = aSelectionType;</span>
+<span class="lineNum">     659 </span>            :     Init(aOptions);
+<span class="lineNum">     660 </span>            :   }
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span>            :   void InitForQueryDOMWidgetHittest(const mozilla::LayoutDeviceIntPoint&amp; aPoint)
+<span class="lineNum">     663 </span>            :   {
+<span class="lineNum">     664 </span>            :     NS_ASSERTION(mMessage == eQueryDOMWidgetHittest,
+<span class="lineNum">     665 </span>            :                  &quot;wrong initializer is called&quot;);
+<span class="lineNum">     666 </span>            :     mRefPoint = aPoint;
+<span class="lineNum">     667 </span>            :   }
+<span class="lineNum">     668 </span>            : 
+<span class="lineNum">     669 </span>            :   void InitForQueryTextRectArray(uint32_t aOffset, uint32_t aLength,
+<span class="lineNum">     670 </span>            :                                  const Options&amp; aOptions = Options())
+<span class="lineNum">     671 </span>            :   {
+<span class="lineNum">     672 </span>            :     NS_ASSERTION(mMessage == eQueryTextRectArray,
+<span class="lineNum">     673 </span>            :                  &quot;wrong initializer is called&quot;);
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :     mInput.mOffset = aOffset;</span>
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :     mInput.mLength = aLength;</span>
+<span class="lineNum">     676 </span>            :     Init(aOptions);
+<span class="lineNum">     677 </span>            :   }
+<span class="lineNum">     678 </span>            : 
+<span class="lineNum">     679 </span>            :   void RequestFontRanges()
+<span class="lineNum">     680 </span>            :   {
+<span class="lineNum">     681 </span>            :     NS_ASSERTION(mMessage == eQueryTextContent,
+<span class="lineNum">     682 </span>            :                  &quot;not querying text content&quot;);
+<span class="lineNum">     683 </span><span class="lineNoCov">          0 :     mWithFontRanges = true;</span>
+<span class="lineNum">     684 </span>            :   }
+<span class="lineNum">     685 </span>            : 
+<span class="lineNum">     686 </span>            :   uint32_t GetSelectionStart(void) const
+<span class="lineNum">     687 </span>            :   {
+<span class="lineNum">     688 </span>            :     NS_ASSERTION(mMessage == eQuerySelectedText,
+<span class="lineNum">     689 </span>            :                  &quot;not querying selection&quot;);
+<span class="lineNum">     690 </span>            :     return mReply.mOffset + (mReply.mReversed ? mReply.mString.Length() : 0);
+<span class="lineNum">     691 </span>            :   }
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span>            :   uint32_t GetSelectionEnd(void) const
+<span class="lineNum">     694 </span>            :   {
+<span class="lineNum">     695 </span>            :     NS_ASSERTION(mMessage == eQuerySelectedText,
+<span class="lineNum">     696 </span>            :                  &quot;not querying selection&quot;);
+<span class="lineNum">     697 </span>            :     return mReply.mOffset + (mReply.mReversed ? 0 : mReply.mString.Length());
+<span class="lineNum">     698 </span>            :   }
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span>            :   mozilla::WritingMode GetWritingMode(void) const
+<span class="lineNum">     701 </span>            :   {
+<span class="lineNum">     702 </span>            :     NS_ASSERTION(mMessage == eQuerySelectedText ||
+<span class="lineNum">     703 </span>            :                  mMessage == eQueryCaretRect ||
+<span class="lineNum">     704 </span>            :                  mMessage == eQueryTextRect,
+<span class="lineNum">     705 </span>            :                  &quot;not querying selection or text rect&quot;);
+<span class="lineNum">     706 </span>            :     return mReply.mWritingMode;
+<span class="lineNum">     707 </span>            :   }
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span>            :   bool mSucceeded;
+<span class="lineNum">     710 </span>            :   bool mUseNativeLineBreak;
+<span class="lineNum">     711 </span>            :   bool mWithFontRanges;
+<a name="712"><span class="lineNum">     712 </span>            :   struct Input final</a>
+<span class="lineNum">     713 </span>            :   {
+<span class="lineNum">     714 </span><span class="lineNoCov">          0 :     uint32_t EndOffset() const</span>
+<span class="lineNum">     715 </span>            :     {
+<span class="lineNum">     716 </span>            :       CheckedInt&lt;uint32_t&gt; endOffset =
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 :         CheckedInt&lt;uint32_t&gt;(mOffset) + mLength;</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :       return NS_WARN_IF(!endOffset.isValid()) ? UINT32_MAX : endOffset.value();</span>
+<span class="lineNum">     719 </span>            :     }
+<span class="lineNum">     720 </span>            : 
+<span class="lineNum">     721 </span>            :     int64_t mOffset;
+<span class="lineNum">     722 </span>            :     uint32_t mLength;
+<span class="lineNum">     723 </span>            :     SelectionType mSelectionType;
+<span class="lineNum">     724 </span>            :     // If mOffset is true, mOffset is relative to the start offset of
+<span class="lineNum">     725 </span>            :     // composition if there is, otherwise, the start of the first selection
+<span class="lineNum">     726 </span>            :     // range.
+<span class="lineNum">     727 </span>            :     bool mRelativeToInsertionPoint;
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span>            :     Input()
+<span class="lineNum">     730 </span>            :       : mOffset(0)
+<span class="lineNum">     731 </span>            :       , mLength(0)
+<span class="lineNum">     732 </span>            :       , mSelectionType(SelectionType::eNormal)
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :       , mRelativeToInsertionPoint(false)</span>
+<span class="lineNum">     734 </span>            :     {
+<a name="735"><span class="lineNum">     735 </span>            :     }</a>
+<span class="lineNum">     736 </span>            : 
+<span class="lineNum">     737 </span><span class="lineNoCov">          0 :     bool IsValidOffset() const</span>
+<span class="lineNum">     738 </span>            :     {
+<a name="739"><span class="lineNum">     739 </span><span class="lineNoCov">          0 :       return mRelativeToInsertionPoint || mOffset &gt;= 0;</span></a>
+<span class="lineNum">     740 </span>            :     }
+<span class="lineNum">     741 </span><span class="lineNoCov">          0 :     bool IsValidEventMessage(EventMessage aEventMessage) const</span>
+<span class="lineNum">     742 </span>            :     {
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :       if (!mRelativeToInsertionPoint) {</span>
+<span class="lineNum">     744 </span>            :         return true;
+<span class="lineNum">     745 </span>            :       }
+<span class="lineNum">     746 </span><span class="lineNoCov">          0 :       switch (aEventMessage) {</span>
+<span class="lineNum">     747 </span>            :         case eQueryTextContent:
+<span class="lineNum">     748 </span>            :         case eQueryCaretRect:
+<span class="lineNum">     749 </span>            :         case eQueryTextRect:
+<span class="lineNum">     750 </span>            :           return true;
+<span class="lineNum">     751 </span>            :         default:
+<span class="lineNum">     752 </span><span class="lineNoCov">          0 :           return false;</span>
+<a name="753"><span class="lineNum">     753 </span>            :       }</a>
+<span class="lineNum">     754 </span>            :     }
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :     bool MakeOffsetAbsolute(uint32_t aInsertionPointOffset)</span>
+<span class="lineNum">     756 </span>            :     {
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :       if (NS_WARN_IF(!mRelativeToInsertionPoint)) {</span>
+<span class="lineNum">     758 </span>            :         return true;
+<span class="lineNum">     759 </span>            :       }
+<span class="lineNum">     760 </span><span class="lineNoCov">          0 :       mRelativeToInsertionPoint = false;</span>
+<span class="lineNum">     761 </span>            :       // If mOffset + aInsertionPointOffset becomes negative value,
+<span class="lineNum">     762 </span>            :       // we should assume the absolute offset is 0.
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :       if (mOffset &lt; 0 &amp;&amp; -mOffset &gt; aInsertionPointOffset) {</span>
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 :         mOffset = 0;</span>
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">     766 </span>            :       }
+<span class="lineNum">     767 </span>            :       // Otherwise, we don't allow too large offset.
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :       CheckedInt&lt;uint32_t&gt; absOffset = mOffset + aInsertionPointOffset;</span>
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :       if (NS_WARN_IF(!absOffset.isValid())) {</span>
+<span class="lineNum">     770 </span><span class="lineNoCov">          0 :         mOffset = UINT32_MAX;</span>
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">     772 </span>            :       }
+<span class="lineNum">     773 </span><span class="lineNoCov">          0 :       mOffset = absOffset.value();</span>
+<span class="lineNum">     774 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     775 </span>            :     }
+<a name="776"><span class="lineNum">     776 </span>            :   } mInput;</a>
+<span class="lineNum">     777 </span>            : 
+<span class="lineNum">     778 </span><span class="lineNoCov">          0 :   struct Reply final</span>
+<span class="lineNum">     779 </span>            :   {
+<span class="lineNum">     780 </span>            :     void* mContentsRoot;
+<span class="lineNum">     781 </span>            :     uint32_t mOffset;
+<span class="lineNum">     782 </span>            :     // mTentativeCaretOffset is used by only eQueryCharacterAtPoint.
+<span class="lineNum">     783 </span>            :     // This is the offset where caret would be if user clicked at the mRefPoint.
+<span class="lineNum">     784 </span>            :     uint32_t mTentativeCaretOffset;
+<span class="lineNum">     785 </span>            :     nsString mString;
+<span class="lineNum">     786 </span>            :     // mRect is used by eQueryTextRect, eQueryCaretRect, eQueryCharacterAtPoint
+<span class="lineNum">     787 </span>            :     // and eQueryEditorRect. The coordinates is system coordinates relative to
+<span class="lineNum">     788 </span>            :     // the top level widget of mFocusedWidget.  E.g., if a &lt;xul:panel&gt; which
+<span class="lineNum">     789 </span>            :     // is owned by a window has focused editor, the offset of mRect is relative
+<span class="lineNum">     790 </span>            :     // to the owner window, not the &lt;xul:panel&gt;.
+<span class="lineNum">     791 </span>            :     mozilla::LayoutDeviceIntRect mRect;
+<span class="lineNum">     792 </span>            :     // The return widget has the caret. This is set at all query events.
+<span class="lineNum">     793 </span>            :     nsIWidget* mFocusedWidget;
+<span class="lineNum">     794 </span>            :     // mozilla::WritingMode value at the end (focus) of the selection
+<span class="lineNum">     795 </span>            :     mozilla::WritingMode mWritingMode;
+<span class="lineNum">     796 </span>            :     // Used by eQuerySelectionAsTransferable
+<span class="lineNum">     797 </span>            :     nsCOMPtr&lt;nsITransferable&gt; mTransferable;
+<span class="lineNum">     798 </span>            :     // Used by eQueryTextContent with font ranges requested
+<span class="lineNum">     799 </span>            :     AutoTArray&lt;mozilla::FontRange, 1&gt; mFontRanges;
+<span class="lineNum">     800 </span>            :     // Used by eQueryTextRectArray
+<span class="lineNum">     801 </span>            :     nsTArray&lt;mozilla::LayoutDeviceIntRect&gt; mRectArray;
+<span class="lineNum">     802 </span>            :     // true if selection is reversed (end &lt; start)
+<span class="lineNum">     803 </span>            :     bool mReversed;
+<span class="lineNum">     804 </span>            :     // true if the selection exists
+<span class="lineNum">     805 </span>            :     bool mHasSelection;
+<span class="lineNum">     806 </span>            :     // true if DOM element under mouse belongs to widget
+<a name="807"><span class="lineNum">     807 </span>            :     bool mWidgetIsHit;</a>
+<span class="lineNum">     808 </span>            : 
+<span class="lineNum">     809 </span><span class="lineNoCov">          0 :     Reply()</span>
+<span class="lineNum">     810 </span>            :       : mContentsRoot(nullptr)
+<span class="lineNum">     811 </span>            :       , mOffset(NOT_FOUND)
+<span class="lineNum">     812 </span>            :       , mTentativeCaretOffset(NOT_FOUND)
+<span class="lineNum">     813 </span>            :       , mFocusedWidget(nullptr)
+<span class="lineNum">     814 </span>            :       , mReversed(false)
+<span class="lineNum">     815 </span>            :       , mHasSelection(false)
+<span class="lineNum">     816 </span><span class="lineNoCov">          0 :       , mWidgetIsHit(false)</span>
+<span class="lineNum">     817 </span>            :     {
+<span class="lineNum">     818 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     819 </span>            :   } mReply;
+<span class="lineNum">     820 </span>            : 
+<span class="lineNum">     821 </span>            :   enum
+<span class="lineNum">     822 </span>            :   {
+<span class="lineNum">     823 </span>            :     NOT_FOUND = UINT32_MAX
+<span class="lineNum">     824 </span>            :   };
+<span class="lineNum">     825 </span>            : 
+<span class="lineNum">     826 </span>            :   // values of mComputedScrollAction
+<span class="lineNum">     827 </span>            :   enum
+<span class="lineNum">     828 </span>            :   {
+<span class="lineNum">     829 </span>            :     SCROLL_ACTION_NONE,
+<span class="lineNum">     830 </span>            :     SCROLL_ACTION_LINE,
+<span class="lineNum">     831 </span>            :     SCROLL_ACTION_PAGE
+<span class="lineNum">     832 </span>            :   };
+<span class="lineNum">     833 </span>            : };
+<span class="lineNum">     834 </span>            : 
+<span class="lineNum">     835 </span>            : /******************************************************************************
+<span class="lineNum">     836 </span>            :  * mozilla::WidgetSelectionEvent
+<a name="837"><span class="lineNum">     837 </span>            :  ******************************************************************************/</a>
+<span class="lineNum">     838 </span>            : 
+<span class="lineNum">     839 </span><span class="lineNoCov">          0 : class WidgetSelectionEvent : public WidgetGUIEvent</span>
+<span class="lineNum">     840 </span>            : {
+<span class="lineNum">     841 </span>            : private:
+<span class="lineNum">     842 </span>            :   friend class mozilla::dom::PBrowserParent;
+<a name="843"><span class="lineNum">     843 </span>            :   friend class mozilla::dom::PBrowserChild;</a>
+<span class="lineNum">     844 </span>            : 
+<span class="lineNum">     845 </span><span class="lineNoCov">          0 :   WidgetSelectionEvent()</span>
+<span class="lineNum">     846 </span>            :     : mOffset(0)
+<span class="lineNum">     847 </span>            :     , mLength(0)
+<span class="lineNum">     848 </span>            :     , mReversed(false)
+<span class="lineNum">     849 </span>            :     , mExpandToClusterBoundary(true)
+<span class="lineNum">     850 </span>            :     , mSucceeded(false)
+<span class="lineNum">     851 </span><span class="lineNoCov">          0 :     , mUseNativeLineBreak(true)</span>
+<span class="lineNum">     852 </span>            :   {
+<span class="lineNum">     853 </span><span class="lineNoCov">          0 :   }</span>
+<a name="854"><span class="lineNum">     854 </span>            : </a>
+<span class="lineNum">     855 </span>            : public:
+<span class="lineNum">     856 </span><span class="lineNoCov">          0 :   virtual WidgetSelectionEvent* AsSelectionEvent() override</span>
+<span class="lineNum">     857 </span>            :   {
+<span class="lineNum">     858 </span><span class="lineNoCov">          0 :     return this;</span>
+<a name="859"><span class="lineNum">     859 </span>            :   }</a>
+<span class="lineNum">     860 </span>            : 
+<span class="lineNum">     861 </span><span class="lineNoCov">          0 :   WidgetSelectionEvent(bool aIsTrusted, EventMessage aMessage,</span>
+<span class="lineNum">     862 </span>            :                        nsIWidget* aWidget)
+<span class="lineNum">     863 </span>            :     : WidgetGUIEvent(aIsTrusted, aMessage, aWidget, eSelectionEventClass)
+<span class="lineNum">     864 </span>            :     , mOffset(0)
+<span class="lineNum">     865 </span>            :     , mLength(0)
+<span class="lineNum">     866 </span>            :     , mReversed(false)
+<span class="lineNum">     867 </span>            :     , mExpandToClusterBoundary(true)
+<span class="lineNum">     868 </span>            :     , mSucceeded(false)
+<span class="lineNum">     869 </span>            :     , mUseNativeLineBreak(true)
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :     , mReason(nsISelectionListener::NO_REASON)</span>
+<span class="lineNum">     871 </span>            :   {
+<a name="872"><span class="lineNum">     872 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     873 </span>            : 
+<span class="lineNum">     874 </span><span class="lineNoCov">          0 :   virtual WidgetEvent* Duplicate() const override</span>
+<span class="lineNum">     875 </span>            :   {
+<span class="lineNum">     876 </span>            :     // This event isn't an internal event of any DOM event.
+<span class="lineNum">     877 </span>            :     NS_ASSERTION(!IsAllowedToDispatchDOMEvent(),
+<span class="lineNum">     878 </span>            :       &quot;WidgetSelectionEvent needs to support Duplicate()&quot;);
+<span class="lineNum">     879 </span><span class="lineNoCov">          0 :     MOZ_CRASH(&quot;WidgetSelectionEvent doesn't support Duplicate()&quot;);</span>
+<span class="lineNum">     880 </span>            :     return nullptr;
+<span class="lineNum">     881 </span>            :   }
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span>            :   // Start offset of selection
+<span class="lineNum">     884 </span>            :   uint32_t mOffset;
+<span class="lineNum">     885 </span>            :   // Length of selection
+<span class="lineNum">     886 </span>            :   uint32_t mLength;
+<span class="lineNum">     887 </span>            :   // Selection &quot;anchor&quot; should be in front
+<span class="lineNum">     888 </span>            :   bool mReversed;
+<span class="lineNum">     889 </span>            :   // Cluster-based or character-based
+<span class="lineNum">     890 </span>            :   bool mExpandToClusterBoundary;
+<span class="lineNum">     891 </span>            :   // true if setting selection succeeded.
+<span class="lineNum">     892 </span>            :   bool mSucceeded;
+<span class="lineNum">     893 </span>            :   // true if native line breaks are used for mOffset and mLength
+<span class="lineNum">     894 </span>            :   bool mUseNativeLineBreak;
+<span class="lineNum">     895 </span>            :   // Fennec provides eSetSelection reason codes for downstream
+<span class="lineNum">     896 </span>            :   // use in AccessibleCaret visibility logic.
+<span class="lineNum">     897 </span>            :   int16_t mReason;
+<span class="lineNum">     898 </span>            : };
+<span class="lineNum">     899 </span>            : 
+<span class="lineNum">     900 </span>            : /******************************************************************************
+<span class="lineNum">     901 </span>            :  * mozilla::InternalEditorInputEvent
+<a name="902"><span class="lineNum">     902 </span>            :  ******************************************************************************/</a>
+<span class="lineNum">     903 </span>            : 
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 : class InternalEditorInputEvent : public InternalUIEvent</span>
+<span class="lineNum">     905 </span>            : {
+<span class="lineNum">     906 </span>            : private:
+<span class="lineNum">     907 </span>            :   InternalEditorInputEvent()
+<span class="lineNum">     908 </span>            :     : mIsComposing(false)
+<span class="lineNum">     909 </span>            :   {
+<span class="lineNum">     910 </span>            :   }
+<a name="911"><span class="lineNum">     911 </span>            : </a>
+<span class="lineNum">     912 </span>            : public:
+<span class="lineNum">     913 </span><span class="lineNoCov">          0 :   virtual InternalEditorInputEvent* AsEditorInputEvent() override</span>
+<span class="lineNum">     914 </span>            :   {
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :     return this;</span>
+<a name="916"><span class="lineNum">     916 </span>            :   }</a>
+<span class="lineNum">     917 </span>            : 
+<span class="lineNum">     918 </span><span class="lineNoCov">          0 :   InternalEditorInputEvent(bool aIsTrusted, EventMessage aMessage,</span>
+<span class="lineNum">     919 </span>            :                            nsIWidget* aWidget)
+<span class="lineNum">     920 </span>            :     : InternalUIEvent(aIsTrusted, aMessage, aWidget, eEditorInputEventClass)
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :     , mIsComposing(false)</span>
+<span class="lineNum">     922 </span>            :   {
+<a name="923"><span class="lineNum">     923 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :   virtual WidgetEvent* Duplicate() const override</span>
+<span class="lineNum">     926 </span>            :   {
+<span class="lineNum">     927 </span>            :     MOZ_ASSERT(mClass == eEditorInputEventClass,
+<span class="lineNum">     928 </span>            :                &quot;Duplicate() must be overridden by sub class&quot;);
+<span class="lineNum">     929 </span>            :     // Not copying widget, it is a weak reference.
+<span class="lineNum">     930 </span>            :     InternalEditorInputEvent* result =
+<span class="lineNum">     931 </span><span class="lineNoCov">          0 :       new InternalEditorInputEvent(false, mMessage, nullptr);</span>
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :     result-&gt;AssignEditorInputEventData(*this, true);</span>
+<span class="lineNum">     933 </span><span class="lineNoCov">          0 :     result-&gt;mFlags = mFlags;</span>
+<span class="lineNum">     934 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     935 </span>            :   }
+<span class="lineNum">     936 </span>            : 
+<a name="937"><span class="lineNum">     937 </span>            :   bool mIsComposing;</a>
+<span class="lineNum">     938 </span>            : 
+<span class="lineNum">     939 </span><span class="lineNoCov">          0 :   void AssignEditorInputEventData(const InternalEditorInputEvent&amp; aEvent,</span>
+<span class="lineNum">     940 </span>            :                                   bool aCopyTargets)
+<span class="lineNum">     941 </span>            :   {
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 :     AssignUIEventData(aEvent, aCopyTargets);</span>
+<span class="lineNum">     943 </span>            : 
+<span class="lineNum">     944 </span><span class="lineNoCov">          0 :     mIsComposing = aEvent.mIsComposing;</span>
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     946 </span>            : };
+<span class="lineNum">     947 </span>            : 
+<span class="lineNum">     948 </span>            : } // namespace mozilla
+<span class="lineNum">     949 </span>            : 
+<span class="lineNum">     950 </span>            : #endif // mozilla_TextEvents_h__
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

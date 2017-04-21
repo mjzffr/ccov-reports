@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - gcc/include/c++/4.9.4/bits/sstream.tcc</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">gcc/include/c++/4.9.4/bits</a> - sstream.tcc<span style="font-size: 80%;"> (source / <a href="sstream.tcc.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">111</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : // String based streams -*- C++ -*-</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : // Copyright (C) 1997-2014 Free Software Foundation, Inc.
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // This file is part of the GNU ISO C++ Library.  This library is free
+<span class="lineNum">       6 </span>            : // software; you can redistribute it and/or modify it under the
+<span class="lineNum">       7 </span>            : // terms of the GNU General Public License as published by the
+<span class="lineNum">       8 </span>            : // Free Software Foundation; either version 3, or (at your option)
+<span class="lineNum">       9 </span>            : // any later version.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // This library is distributed in the hope that it will be useful,
+<span class="lineNum">      12 </span>            : // but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class="lineNum">      13 </span>            : // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class="lineNum">      14 </span>            : // GNU General Public License for more details.
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : // Under Section 7 of GPL version 3, you are granted additional
+<span class="lineNum">      17 </span>            : // permissions described in the GCC Runtime Library Exception, version
+<span class="lineNum">      18 </span>            : // 3.1, as published by the Free Software Foundation.
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // You should have received a copy of the GNU General Public License and
+<span class="lineNum">      21 </span>            : // a copy of the GCC Runtime Library Exception along with this program;
+<span class="lineNum">      22 </span>            : // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<span class="lineNum">      23 </span>            : // &lt;http://www.gnu.org/licenses/&gt;.
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /** @file bits/sstream.tcc
+<span class="lineNum">      26 </span>            :  *  This is an internal header file, included by other library headers.
+<span class="lineNum">      27 </span>            :  *  Do not attempt to use it directly. @headername{sstream}
+<span class="lineNum">      28 </span>            :  */
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : //
+<span class="lineNum">      31 </span>            : // ISO C++ 14882: 27.7  String-based streams
+<span class="lineNum">      32 </span>            : //
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : #ifndef _SSTREAM_TCC
+<span class="lineNum">      35 </span>            : #define _SSTREAM_TCC 1
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : #pragma GCC system_header
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : namespace std _GLIBCXX_VISIBILITY(default)
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span>            : _GLIBCXX_BEGIN_NAMESPACE_VERSION
+<span class="lineNum">      42 </span>            : 
+<a name="43"><span class="lineNum">      43 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">      44 </span>            :     typename basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::int_type
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">      46 </span>            :     pbackfail(int_type __c)
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :       int_type __ret = traits_type::eof();</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :       if (this-&gt;eback() &lt; this-&gt;gptr())</span>
+<span class="lineNum">      50 </span>            :         {
+<span class="lineNum">      51 </span>            :           // Try to put back __c into input sequence in one of three ways.
+<span class="lineNum">      52 </span>            :           // Order these tests done in is unspecified by the standard.
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :           const bool __testeof = traits_type::eq_int_type(__c, __ret);</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :           if (!__testeof)</span>
+<span class="lineNum">      55 </span>            :             {
+<span class="lineNum">      56 </span>            :               const bool __testeq = traits_type::eq(traits_type::
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                                                     to_char_type(__c),</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :                                                     this-&gt;gptr()[-1]);         </span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :               const bool __testout = this-&gt;_M_mode &amp; ios_base::out;</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :               if (__testeq || __testout)</span>
+<span class="lineNum">      61 </span>            :                 {
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :                   this-&gt;gbump(-1);</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                   if (!__testeq)</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                     *this-&gt;gptr() = traits_type::to_char_type(__c);</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                   __ret = __c;</span>
+<span class="lineNum">      66 </span>            :                 }
+<span class="lineNum">      67 </span>            :             }
+<span class="lineNum">      68 </span>            :           else
+<span class="lineNum">      69 </span>            :             {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :               this-&gt;gbump(-1);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :               __ret = traits_type::not_eof(__c);</span>
+<span class="lineNum">      72 </span>            :             }
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">      75 </span>            :     }
+<span class="lineNum">      76 </span>            : 
+<a name="77"><span class="lineNum">      77 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">      78 </span>            :     typename basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::int_type
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">      80 </span>            :     overflow(int_type __c)
+<span class="lineNum">      81 </span>            :     {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       const bool __testout = this-&gt;_M_mode &amp; ios_base::out;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :       if (__builtin_expect(!__testout, false))</span>
+<span class="lineNum">      84 </span>            :         return traits_type::eof();
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       const bool __testeof = traits_type::eq_int_type(__c, traits_type::eof());</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :       if (__builtin_expect(__testeof, false))</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         return traits_type::not_eof(__c);</span>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       const __size_type __capacity = _M_string.capacity();</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       const __size_type __max_size = _M_string.max_size();</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       const bool __testput = this-&gt;pptr() &lt; this-&gt;epptr();</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       if (__builtin_expect(!__testput &amp;&amp; __capacity == __max_size, false))</span>
+<span class="lineNum">      94 </span>            :         return traits_type::eof();
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :       // Try to append __c into output sequence in one of two ways.
+<span class="lineNum">      97 </span>            :       // Order these tests done in is unspecified by the standard.
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :       const char_type __conv = traits_type::to_char_type(__c);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :       if (!__testput)</span>
+<span class="lineNum">     100 </span>            :         {
+<span class="lineNum">     101 </span>            :           // NB: Start ostringstream buffers at 512 chars.  This is an
+<span class="lineNum">     102 </span>            :           // experimental value (pronounced &quot;arbitrary&quot; in some of the
+<span class="lineNum">     103 </span>            :           // hipper English-speaking countries), and can be changed to
+<span class="lineNum">     104 </span>            :           // suit particular needs.
+<span class="lineNum">     105 </span>            :           //
+<span class="lineNum">     106 </span>            :           // _GLIBCXX_RESOLVE_LIB_DEFECTS
+<span class="lineNum">     107 </span>            :           // 169. Bad efficiency of overflow() mandated
+<span class="lineNum">     108 </span>            :           // 432. stringbuf::overflow() makes only one write position
+<span class="lineNum">     109 </span>            :           //      available
+<span class="lineNum">     110 </span>            :           const __size_type __opt_len = std::max(__size_type(2 * __capacity),
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                                                  __size_type(512));</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :           const __size_type __len = std::min(__opt_len, __max_size);</span>
+<span class="lineNum">     113 </span>            :           __string_type __tmp;
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :           __tmp.reserve(__len);</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :           if (this-&gt;pbase())</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :             __tmp.assign(this-&gt;pbase(), this-&gt;epptr() - this-&gt;pbase());</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           __tmp.push_back(__conv);</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :           _M_string.swap(__tmp);</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :           _M_sync(const_cast&lt;char_type*&gt;(_M_string.data()),</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                   this-&gt;gptr() - this-&gt;eback(), this-&gt;pptr() - this-&gt;pbase());</span>
+<span class="lineNum">     121 </span>            :         }
+<span class="lineNum">     122 </span>            :       else
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :         *this-&gt;pptr() = __conv;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       this-&gt;pbump(1);</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :       return __c;</span>
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span>            : 
+<a name="128"><span class="lineNum">     128 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">     129 </span>            :     typename basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::int_type
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">     131 </span>            :     underflow()
+<span class="lineNum">     132 </span>            :     {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :       int_type __ret = traits_type::eof();</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :       const bool __testin = this-&gt;_M_mode &amp; ios_base::in;</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :       if (__testin)</span>
+<span class="lineNum">     136 </span>            :         {
+<span class="lineNum">     137 </span>            :           // Update egptr() to match the actual string end.
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :           _M_update_egptr();</span>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :           if (this-&gt;gptr() &lt; this-&gt;egptr())</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :             __ret = traits_type::to_int_type(*this-&gt;gptr());</span>
+<span class="lineNum">     142 </span>            :         }
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">     144 </span>            :     }
+<span class="lineNum">     145 </span>            : 
+<a name="146"><span class="lineNum">     146 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">     147 </span>            :     typename basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::pos_type
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">     149 </span>            :     seekoff(off_type __off, ios_base::seekdir __way, ios_base::openmode __mode)
+<span class="lineNum">     150 </span>            :     {
+<span class="lineNum">     151 </span>            :       pos_type __ret =  pos_type(off_type(-1));
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       bool __testin = (ios_base::in &amp; this-&gt;_M_mode &amp; __mode) != 0;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :       bool __testout = (ios_base::out &amp; this-&gt;_M_mode &amp; __mode) != 0;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :       const bool __testboth = __testin &amp;&amp; __testout &amp;&amp; __way != ios_base::cur;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :       __testin &amp;= !(__mode &amp; ios_base::out);</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :       __testout &amp;= !(__mode &amp; ios_base::in);</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :       // _GLIBCXX_RESOLVE_LIB_DEFECTS
+<span class="lineNum">     159 </span>            :       // 453. basic_stringbuf::seekoff need not always fail for an empty stream.
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       const char_type* __beg = __testin ? this-&gt;eback() : this-&gt;pbase();</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       if ((__beg || !__off) &amp;&amp; (__testin || __testout || __testboth))</span>
+<span class="lineNum">     162 </span>            :         {
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :           _M_update_egptr();</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :           off_type __newoffi = __off;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :           off_type __newoffo = __newoffi;</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :           if (__way == ios_base::cur)</span>
+<span class="lineNum">     168 </span>            :             {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :               __newoffi += this-&gt;gptr() - __beg;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :               __newoffo += this-&gt;pptr() - __beg;</span>
+<span class="lineNum">     171 </span>            :             }
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :           else if (__way == ios_base::end)</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :             __newoffo = __newoffi += this-&gt;egptr() - __beg;</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :           if ((__testin || __testboth)</span>
+<span class="lineNum">     176 </span>            :               &amp;&amp; __newoffi &gt;= 0
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :               &amp;&amp; this-&gt;egptr() - __beg &gt;= __newoffi)</span>
+<span class="lineNum">     178 </span>            :             {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :               this-&gt;setg(this-&gt;eback(), this-&gt;eback() + __newoffi,</span>
+<span class="lineNum">     180 </span>            :                          this-&gt;egptr());
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :               __ret = pos_type(__newoffi);</span>
+<span class="lineNum">     182 </span>            :             }
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :           if ((__testout || __testboth)</span>
+<span class="lineNum">     184 </span>            :               &amp;&amp; __newoffo &gt;= 0
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :               &amp;&amp; this-&gt;egptr() - __beg &gt;= __newoffo)</span>
+<span class="lineNum">     186 </span>            :             {
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :               _M_pbump(this-&gt;pbase(), this-&gt;epptr(), __newoffo);</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :               __ret = pos_type(__newoffo);</span>
+<span class="lineNum">     189 </span>            :             }
+<span class="lineNum">     190 </span>            :         }
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            : 
+<a name="194"><span class="lineNum">     194 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">     195 </span>            :     typename basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::pos_type
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">     197 </span>            :     seekpos(pos_type __sp, ios_base::openmode __mode)
+<span class="lineNum">     198 </span>            :     {
+<span class="lineNum">     199 </span>            :       pos_type __ret =  pos_type(off_type(-1));
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :       const bool __testin = (ios_base::in &amp; this-&gt;_M_mode &amp; __mode) != 0;</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :       const bool __testout = (ios_base::out &amp; this-&gt;_M_mode &amp; __mode) != 0;</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       const char_type* __beg = __testin ? this-&gt;eback() : this-&gt;pbase();</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       if ((__beg || !off_type(__sp)) &amp;&amp; (__testin || __testout))</span>
+<span class="lineNum">     205 </span>            :         {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :           _M_update_egptr();</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :           const off_type __pos(__sp);</span>
+<span class="lineNum">     209 </span>            :           const bool __testpos = (0 &lt;= __pos
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :                                   &amp;&amp; __pos &lt;= this-&gt;egptr() - __beg);</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :           if (__testpos)</span>
+<span class="lineNum">     212 </span>            :             {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :               if (__testin)</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                 this-&gt;setg(this-&gt;eback(), this-&gt;eback() + __pos,</span>
+<span class="lineNum">     215 </span>            :                            this-&gt;egptr());
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :               if (__testout)</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                 _M_pbump(this-&gt;pbase(), this-&gt;epptr(), __pos);</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :               __ret = __sp;</span>
+<span class="lineNum">     219 </span>            :             }
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :       return __ret;</span>
+<span class="lineNum">     222 </span>            :     }
+<span class="lineNum">     223 </span>            : 
+<a name="224"><span class="lineNum">     224 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">     225 </span>            :     void
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">     227 </span>            :     _M_sync(char_type* __base, __size_type __i, __size_type __o)
+<span class="lineNum">     228 </span>            :     {
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       const bool __testin = _M_mode &amp; ios_base::in;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :       const bool __testout = _M_mode &amp; ios_base::out;</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :       char_type* __endg = __base + _M_string.size();</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :       char_type* __endp = __base + _M_string.capacity();</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :       if (__base != _M_string.data())</span>
+<span class="lineNum">     235 </span>            :         {
+<span class="lineNum">     236 </span>            :           // setbuf: __i == size of buffer area (_M_string.size() == 0).
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :           __endg += __i;</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :           __i = 0;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :           __endp = __endg;</span>
+<span class="lineNum">     240 </span>            :         }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :       if (__testin)</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :         this-&gt;setg(__base, __base + __i, __endg);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :       if (__testout)</span>
+<span class="lineNum">     245 </span>            :         {
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :           _M_pbump(__base, __endp, __o);</span>
+<span class="lineNum">     247 </span>            :           // egptr() always tracks the string end.  When !__testin,
+<span class="lineNum">     248 </span>            :           // for the correct functioning of the streambuf inlines
+<span class="lineNum">     249 </span>            :           // the other get area pointers are identical.
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :           if (!__testin)</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :             this-&gt;setg(__endg, __endg, __endg);</span>
+<span class="lineNum">     252 </span>            :         }
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     254 </span>            : 
+<a name="255"><span class="lineNum">     255 </span>            :   template &lt;class _CharT, class _Traits, class _Alloc&gt;</a>
+<span class="lineNum">     256 </span>            :     void
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :     basic_stringbuf&lt;_CharT, _Traits, _Alloc&gt;::</span>
+<span class="lineNum">     258 </span>            :     _M_pbump(char_type* __pbeg, char_type* __pend, off_type __off)
+<span class="lineNum">     259 </span>            :     {
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :       this-&gt;setp(__pbeg, __pend);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :       while (__off &gt; __gnu_cxx::__numeric_traits&lt;int&gt;::__max)</span>
+<span class="lineNum">     262 </span>            :         {
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :           this-&gt;pbump(__gnu_cxx::__numeric_traits&lt;int&gt;::__max);</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :           __off -= __gnu_cxx::__numeric_traits&lt;int&gt;::__max;</span>
+<span class="lineNum">     265 </span>            :         }
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :       this-&gt;pbump(__off);</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            :   // Inhibit implicit instantiations for required instantiations,
+<span class="lineNum">     270 </span>            :   // which are defined via explicit instantiations elsewhere.
+<span class="lineNum">     271 </span>            : #if _GLIBCXX_EXTERN_TEMPLATE
+<span class="lineNum">     272 </span>            :   extern template class basic_stringbuf&lt;char&gt;;
+<span class="lineNum">     273 </span>            :   extern template class basic_istringstream&lt;char&gt;;
+<span class="lineNum">     274 </span>            :   extern template class basic_ostringstream&lt;char&gt;;
+<span class="lineNum">     275 </span>            :   extern template class basic_stringstream&lt;char&gt;;
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            : #ifdef _GLIBCXX_USE_WCHAR_T
+<span class="lineNum">     278 </span>            :   extern template class basic_stringbuf&lt;wchar_t&gt;;
+<span class="lineNum">     279 </span>            :   extern template class basic_istringstream&lt;wchar_t&gt;;
+<span class="lineNum">     280 </span>            :   extern template class basic_ostringstream&lt;wchar_t&gt;;
+<span class="lineNum">     281 </span>            :   extern template class basic_stringstream&lt;wchar_t&gt;;
+<span class="lineNum">     282 </span>            : #endif
+<span class="lineNum">     283 </span>            : #endif
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : _GLIBCXX_END_NAMESPACE_VERSION
+<span class="lineNum">     286 </span>            : } // namespace std
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

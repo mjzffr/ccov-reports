@@ -1,0 +1,602 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/BufferList.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - BufferList.h<span style="font-size: 80%;"> (source / <a href="BufferList.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">158</td>
+            <td class="headerCovTableEntry">195</td>
+            <td class="headerCovTableEntryMed">81.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntryMed">88.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_BufferList_h
+<span class="lineNum">       8 </span>            : #define mozilla_BufferList_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/AllocPolicy.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/Move.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/ScopeExit.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Types.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/TypeTraits.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/Vector.h&quot;
+<span class="lineNum">      17 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : // BufferList represents a sequence of buffers of data. A BufferList can choose
+<span class="lineNum">      20 </span>            : // to own its buffers or not. The class handles writing to the buffers,
+<span class="lineNum">      21 </span>            : // iterating over them, and reading data out. Unlike SegmentedVector, the
+<span class="lineNum">      22 </span>            : // buffers may be of unequal size. Like SegmentedVector, BufferList is a nice
+<span class="lineNum">      23 </span>            : // way to avoid large contiguous allocations (which can trigger OOMs).
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : namespace mozilla {
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : template&lt;typename AllocPolicy&gt;
+<span class="lineNum">      28 </span>            : class BufferList : private AllocPolicy
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            :   // Each buffer in a BufferList has a size and a capacity. The first mSize
+<span class="lineNum">      31 </span>            :   // bytes are initialized and the remaining |mCapacity - mSize| bytes are free.
+<span class="lineNum">      32 </span>            :   struct Segment
+<span class="lineNum">      33 </span>            :   {
+<span class="lineNum">      34 </span>            :     char* mData;
+<span class="lineNum">      35 </span>            :     size_t mSize;
+<span class="lineNum">      36 </span>            :     size_t mCapacity;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :     Segment(char* aData, size_t aSize, size_t aCapacity)
+<a name="39"><span class="lineNum">      39 </span>            :      : mData(aData),</a>
+<span class="lineNum">      40 </span>            :        mSize(aSize),
+<span class="lineNum">      41 </span><span class="lineCov">       1146 :        mCapacity(aCapacity)</span>
+<span class="lineNum">      42 </span>            :     {
+<span class="lineNum">      43 </span>            :     }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :     Segment(const Segment&amp;) = delete;
+<span class="lineNum">      46 </span>            :     Segment&amp; operator=(const Segment&amp;) = delete;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :     Segment(Segment&amp;&amp;) = default;
+<span class="lineNum">      49 </span>            :     Segment&amp; operator=(Segment&amp;&amp;) = default;
+<a name="50"><span class="lineNum">      50 </span>            : </a>
+<span class="lineNum">      51 </span>            :     char* Start() const { return mData; }
+<span class="lineNum">      52 </span><span class="lineCov">       5101 :     char* End() const { return mData + mSize; }</span>
+<span class="lineNum">      53 </span>            :   };
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :   template&lt;typename OtherAllocPolicy&gt;
+<span class="lineNum">      56 </span>            :   friend class BufferList;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :  public:
+<span class="lineNum">      59 </span>            :   // For the convenience of callers, all segments are required to be a multiple
+<span class="lineNum">      60 </span>            :   // of 8 bytes in capacity. Also, every buffer except the last one is required
+<span class="lineNum">      61 </span>            :   // to be full (i.e., size == capacity). Therefore, a byte at offset N within
+<span class="lineNum">      62 </span>            :   // the BufferList and stored in memory at an address A will satisfy
+<span class="lineNum">      63 </span>            :   // (N % Align == A % Align) if Align == 2, 4, or 8.
+<span class="lineNum">      64 </span>            :   static const size_t kSegmentAlignment = 8;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   // Allocate a BufferList. The BufferList will free all its buffers when it is
+<span class="lineNum">      67 </span>            :   // destroyed. An initial buffer of size aInitialSize and capacity
+<span class="lineNum">      68 </span>            :   // aInitialCapacity is allocated automatically. This data will be contiguous
+<a name="69"><span class="lineNum">      69 </span>            :   // an can be accessed via |Start()|. Subsequent buffers will be allocated with</a>
+<span class="lineNum">      70 </span>            :   // capacity aStandardCapacity.
+<span class="lineNum">      71 </span><span class="lineCov">        851 :   BufferList(size_t aInitialSize,</span>
+<span class="lineNum">      72 </span>            :              size_t aInitialCapacity,
+<span class="lineNum">      73 </span>            :              size_t aStandardCapacity,
+<span class="lineNum">      74 </span>            :              AllocPolicy aAP = AllocPolicy())
+<span class="lineNum">      75 </span>            :    : AllocPolicy(aAP),
+<span class="lineNum">      76 </span>            :      mOwning(true),
+<span class="lineNum">      77 </span>            :      mSegments(aAP),
+<span class="lineNum">      78 </span>            :      mSize(0),
+<span class="lineNum">      79 </span><span class="lineCov">       1702 :      mStandardCapacity(aStandardCapacity)</span>
+<span class="lineNum">      80 </span>            :   {
+<span class="lineNum">      81 </span>            :     MOZ_ASSERT(aInitialCapacity % kSegmentAlignment == 0);
+<span class="lineNum">      82 </span>            :     MOZ_ASSERT(aStandardCapacity % kSegmentAlignment == 0);
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">        851 :     if (aInitialCapacity) {</span>
+<span class="lineNum">      85 </span><span class="lineCov">        466 :       AllocateSegment(aInitialSize, aInitialCapacity);</span>
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span><span class="lineCov">        851 :   }</span>
+<span class="lineNum">      88 </span>            : 
+<a name="89"><span class="lineNum">      89 </span>            :   BufferList(const BufferList&amp; aOther) = delete;</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">        296 :   BufferList(BufferList&amp;&amp; aOther)</span>
+<span class="lineNum">      92 </span>            :    : mOwning(aOther.mOwning),
+<span class="lineNum">      93 </span><span class="lineCov">        296 :      mSegments(Move(aOther.mSegments)),</span>
+<span class="lineNum">      94 </span>            :      mSize(aOther.mSize),
+<span class="lineNum">      95 </span><span class="lineCov">        888 :      mStandardCapacity(aOther.mStandardCapacity)</span>
+<span class="lineNum">      96 </span>            :   {
+<span class="lineNum">      97 </span><span class="lineCov">        296 :     aOther.mSegments.clear();</span>
+<span class="lineNum">      98 </span><span class="lineCov">        296 :     aOther.mSize = 0;</span>
+<span class="lineNum">      99 </span><span class="lineCov">        296 :   }</span>
+<span class="lineNum">     100 </span>            : 
+<a name="101"><span class="lineNum">     101 </span>            :   BufferList&amp; operator=(const BufferList&amp; aOther) = delete;</a>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">        215 :   BufferList&amp; operator=(BufferList&amp;&amp; aOther)</span>
+<span class="lineNum">     104 </span>            :   {
+<span class="lineNum">     105 </span><span class="lineCov">        215 :     Clear();</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">        215 :     mOwning = aOther.mOwning;</span>
+<span class="lineNum">     108 </span><span class="lineCov">        215 :     mSegments = Move(aOther.mSegments);</span>
+<span class="lineNum">     109 </span><span class="lineCov">        215 :     mSize = aOther.mSize;</span>
+<span class="lineNum">     110 </span><span class="lineCov">        215 :     aOther.mSegments.clear();</span>
+<span class="lineNum">     111 </span><span class="lineCov">        215 :     aOther.mSize = 0;</span>
+<span class="lineNum">     112 </span><span class="lineCov">        215 :     return *this;</span>
+<a name="113"><span class="lineNum">     113 </span>            :   }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">       2302 :   ~BufferList() { Clear(); }</span>
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :   // Returns the sum of the sizes of all the buffers.
+<a name="118"><span class="lineNum">     118 </span>            :   size_t Size() const { return mSize; }</a>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">       1546 :   void Clear()</span>
+<span class="lineNum">     121 </span>            :   {
+<span class="lineNum">     122 </span><span class="lineCov">       1546 :     if (mOwning) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">       4013 :       for (Segment&amp; segment : mSegments) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">        951 :         this-&gt;free_(segment.mData);</span>
+<span class="lineNum">     125 </span>            :       }
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span><span class="lineCov">       1546 :     mSegments.clear();</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">       1546 :     mSize = 0;</span>
+<span class="lineNum">     130 </span><span class="lineCov">       1546 :   }</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :   // Iterates over bytes in the segments. You can advance it by as many bytes as
+<span class="lineNum">     133 </span>            :   // you choose.
+<span class="lineNum">     134 </span>            :   class IterImpl
+<span class="lineNum">     135 </span>            :   {
+<span class="lineNum">     136 </span>            :     // Invariants:
+<span class="lineNum">     137 </span>            :     //   (0) mSegment &lt;= bufferList.mSegments.size()
+<span class="lineNum">     138 </span>            :     //   (1) mData &lt;= mDataEnd
+<span class="lineNum">     139 </span>            :     //   (2) If mSegment is not the last segment, mData &lt; mDataEnd
+<span class="lineNum">     140 </span>            :     uintptr_t mSegment;
+<span class="lineNum">     141 </span>            :     char* mData;
+<span class="lineNum">     142 </span>            :     char* mDataEnd;
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :     friend class BufferList;
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :   public:
+<span class="lineNum">     147 </span><span class="lineCov">        236 :     explicit IterImpl(const BufferList&amp; aBuffers)</span>
+<span class="lineNum">     148 </span>            :      : mSegment(0),
+<span class="lineNum">     149 </span>            :        mData(nullptr),
+<span class="lineNum">     150 </span><span class="lineCov">        781 :        mDataEnd(nullptr)</span>
+<span class="lineNum">     151 </span>            :     {
+<span class="lineNum">     152 </span><span class="lineCov">        781 :       if (!aBuffers.mSegments.empty()) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">       1562 :         mData = aBuffers.mSegments[0].Start();</span>
+<span class="lineNum">     154 </span><span class="lineCov">       1798 :         mDataEnd = aBuffers.mSegments[0].End();</span>
+<span class="lineNum">     155 </span>            :       }
+<span class="lineNum">     156 </span><span class="lineCov">        236 :     }</span>
+<span class="lineNum">     157 </span>            : 
+<a name="158"><span class="lineNum">     158 </span>            :     // Returns a pointer to the raw data. It is valid to access up to</a>
+<span class="lineNum">     159 </span>            :     // RemainingInSegment bytes of this buffer.
+<span class="lineNum">     160 </span><span class="lineCov">       2983 :     char* Data() const</span>
+<span class="lineNum">     161 </span>            :     {
+<span class="lineNum">     162 </span><span class="lineCov">       5143 :       MOZ_RELEASE_ASSERT(!Done());</span>
+<span class="lineNum">     163 </span><span class="lineCov">       2983 :       return mData;</span>
+<span class="lineNum">     164 </span>            :     }
+<span class="lineNum">     165 </span>            : 
+<a name="166"><span class="lineNum">     166 </span>            :     // Returns true if the memory in the range [Data(), Data() + aBytes) is all</a>
+<span class="lineNum">     167 </span>            :     // part of one contiguous buffer.
+<span class="lineNum">     168 </span><span class="lineCov">       6128 :     bool HasRoomFor(size_t aBytes) const</span>
+<span class="lineNum">     169 </span>            :     {
+<span class="lineNum">     170 </span><span class="lineCov">       6313 :       MOZ_RELEASE_ASSERT(mData &lt;= mDataEnd);</span>
+<span class="lineNum">     171 </span><span class="lineCov">       6313 :       return size_t(mDataEnd - mData) &gt;= aBytes;</span>
+<span class="lineNum">     172 </span>            :     }
+<span class="lineNum">     173 </span>            : 
+<a name="174"><span class="lineNum">     174 </span>            :     // Returns the maximum value aBytes for which HasRoomFor(aBytes) will be</a>
+<span class="lineNum">     175 </span>            :     // true.
+<a name="176"><span class="lineNum">     176 </span><span class="lineCov">       1425 :     size_t RemainingInSegment() const</span></a>
+<span class="lineNum">     177 </span>            :     {
+<span class="lineNum">     178 </span><span class="lineCov">       1610 :       MOZ_RELEASE_ASSERT(mData &lt;= mDataEnd);</span>
+<span class="lineNum">     179 </span><span class="lineCov">       1610 :       return mDataEnd - mData;</span>
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :     // Advances the iterator by aBytes bytes. aBytes must be less than
+<span class="lineNum">     183 </span>            :     // RemainingInSegment(). If advancing by aBytes takes the iterator to the
+<span class="lineNum">     184 </span>            :     // end of a buffer, it will be moved to the beginning of the next buffer
+<span class="lineNum">     185 </span>            :     // unless it is the last buffer.
+<span class="lineNum">     186 </span><span class="lineCov">       4012 :     void Advance(const BufferList&amp; aBuffers, size_t aBytes)</span>
+<span class="lineNum">     187 </span>            :     {
+<span class="lineNum">     188 </span><span class="lineCov">       8024 :       const Segment&amp; segment = aBuffers.mSegments[mSegment];</span>
+<span class="lineNum">     189 </span><span class="lineCov">       4012 :       MOZ_RELEASE_ASSERT(segment.Start() &lt;= mData);</span>
+<span class="lineNum">     190 </span><span class="lineCov">       4012 :       MOZ_RELEASE_ASSERT(mData &lt;= mDataEnd);</span>
+<span class="lineNum">     191 </span><span class="lineCov">       7839 :       MOZ_RELEASE_ASSERT(mDataEnd == segment.End());</span>
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">       4197 :       MOZ_RELEASE_ASSERT(HasRoomFor(aBytes));</span>
+<span class="lineNum">     194 </span><span class="lineCov">       4012 :       mData += aBytes;</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">       4012 :       if (mData == mDataEnd &amp;&amp; mSegment + 1 &lt; aBuffers.mSegments.length()) {</span>
+<span class="lineNum">     197 </span><span class="lineCov">        308 :         mSegment++;</span>
+<span class="lineNum">     198 </span><span class="lineCov">        616 :         const Segment&amp; nextSegment = aBuffers.mSegments[mSegment];</span>
+<span class="lineNum">     199 </span><span class="lineCov">        308 :         mData = nextSegment.Start();</span>
+<span class="lineNum">     200 </span><span class="lineCov">        308 :         mDataEnd = nextSegment.End();</span>
+<span class="lineNum">     201 </span><span class="lineCov">        308 :         MOZ_RELEASE_ASSERT(mData &lt; mDataEnd);</span>
+<span class="lineNum">     202 </span>            :       }
+<span class="lineNum">     203 </span><span class="lineCov">       4012 :     }</span>
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            :     // Advance the iterator by aBytes, possibly crossing segments. This function
+<a name="206"><span class="lineNum">     206 </span>            :     // returns false if it runs out of buffers to advance through. Otherwise it</a>
+<span class="lineNum">     207 </span>            :     // returns true.
+<span class="lineNum">     208 </span><span class="lineCov">        876 :     bool AdvanceAcrossSegments(const BufferList&amp; aBuffers, size_t aBytes)</span>
+<span class="lineNum">     209 </span>            :     {
+<span class="lineNum">     210 </span><span class="lineCov">        876 :       size_t bytes = aBytes;</span>
+<span class="lineNum">     211 </span><span class="lineCov">       2589 :       while (bytes) {</span>
+<span class="lineNum">     212 </span><span class="lineCov">       1674 :         size_t toAdvance = std::min(bytes, RemainingInSegment());</span>
+<span class="lineNum">     213 </span><span class="lineCov">        837 :         if (!toAdvance) {</span>
+<span class="lineNum">     214 </span>            :           return false;
+<span class="lineNum">     215 </span>            :         }
+<span class="lineNum">     216 </span><span class="lineCov">        837 :         Advance(aBuffers, toAdvance);</span>
+<span class="lineNum">     217 </span><span class="lineCov">        837 :         bytes -= toAdvance;</span>
+<span class="lineNum">     218 </span>            :       }
+<span class="lineNum">     219 </span>            :       return true;
+<span class="lineNum">     220 </span>            :     }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :     // Returns true when the iterator reaches the end of the BufferList.
+<span class="lineNum">     223 </span>            :     bool Done() const
+<span class="lineNum">     224 </span>            :     {
+<span class="lineNum">     225 </span><span class="lineCov">       4510 :       return mData == mDataEnd;</span>
+<span class="lineNum">     226 </span>            :     }
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :    private:
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :     // Count the bytes we would need to advance in order to reach aTarget.
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :     size_t BytesUntil(const BufferList&amp; aBuffers, const IterImpl&amp; aTarget) const {</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :       size_t offset = 0;</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :       MOZ_ASSERT(aTarget.IsIn(aBuffers));
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :       char* data = mData;</span>
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :       for (uintptr_t segment = mSegment; segment &lt; aTarget.mSegment; segment++) {</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         offset += aBuffers.mSegments[segment].End() - data;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :         data = aBuffers.mSegments[segment].mData;</span>
+<span class="lineNum">     240 </span>            :       }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :       MOZ_RELEASE_ASSERT(IsIn(aBuffers));</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :       MOZ_RELEASE_ASSERT(aTarget.mData &gt;= data);</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :       offset += aTarget.mData - data;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :       return offset;</span>
+<span class="lineNum">     247 </span>            :     }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :     bool IsIn(const BufferList&amp; aBuffers) const {
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :       return mSegment &lt; aBuffers.mSegments.length() &amp;&amp;</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :              mData &gt;= aBuffers.mSegments[mSegment].mData &amp;&amp;</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :              mData &lt; aBuffers.mSegments[mSegment].End();</span>
+<span class="lineNum">     253 </span>            :     }
+<span class="lineNum">     254 </span>            :   };
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   // Special convenience method that returns Iter().Data().
+<span class="lineNum">     257 </span><span class="lineCov">        512 :   char* Start() { return mSegments[0].mData; }</span>
+<span class="lineNum">     258 </span><span class="lineCov">        228 :   const char* Start() const { return mSegments[0].mData; }</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">        126 :   IterImpl Iter() const { return IterImpl(*this); }</span>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :   // Copies aSize bytes from aData into the BufferList. The storage for these
+<span class="lineNum">     263 </span>            :   // bytes may be split across multiple buffers. Size() is increased by aSize.
+<span class="lineNum">     264 </span>            :   inline bool WriteBytes(const char* aData, size_t aSize);
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :   // Copies possibly non-contiguous byte range starting at aIter into
+<span class="lineNum">     267 </span>            :   // aData. aIter is advanced by aSize bytes. Returns false if it runs out of
+<span class="lineNum">     268 </span>            :   // data before aSize.
+<span class="lineNum">     269 </span>            :   inline bool ReadBytes(IterImpl&amp; aIter, char* aData, size_t aSize) const;
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :   // Return a new BufferList that shares storage with this BufferList. The new
+<span class="lineNum">     272 </span>            :   // BufferList is read-only. It allows iteration over aSize bytes starting at
+<span class="lineNum">     273 </span>            :   // aIter. Borrow can fail, in which case *aSuccess will be false upon
+<span class="lineNum">     274 </span>            :   // return. The borrowed BufferList can use a different AllocPolicy than the
+<span class="lineNum">     275 </span>            :   // original one. However, it is not responsible for freeing buffers, so the
+<span class="lineNum">     276 </span>            :   // AllocPolicy is only used for the buffer vector.
+<span class="lineNum">     277 </span>            :   template&lt;typename BorrowingAllocPolicy&gt;
+<span class="lineNum">     278 </span>            :   BufferList&lt;BorrowingAllocPolicy&gt; Borrow(IterImpl&amp; aIter, size_t aSize, bool* aSuccess,
+<span class="lineNum">     279 </span>            :                                           BorrowingAllocPolicy aAP = BorrowingAllocPolicy()) const;
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :   // Return a new BufferList and move storage from this BufferList to it. The
+<span class="lineNum">     282 </span>            :   // new BufferList owns the buffers. Move can fail, in which case *aSuccess
+<span class="lineNum">     283 </span>            :   // will be false upon return. The new BufferList can use a different
+<span class="lineNum">     284 </span>            :   // AllocPolicy than the original one. The new OtherAllocPolicy is responsible
+<span class="lineNum">     285 </span>            :   // for freeing buffers, so the OtherAllocPolicy must use freeing method
+<span class="lineNum">     286 </span>            :   // compatible to the original one.
+<span class="lineNum">     287 </span>            :   template&lt;typename OtherAllocPolicy&gt;
+<span class="lineNum">     288 </span>            :   BufferList&lt;OtherAllocPolicy&gt; MoveFallible(bool* aSuccess, OtherAllocPolicy aAP = OtherAllocPolicy());
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   // Return a new BufferList that adopts the byte range starting at Iter so that
+<span class="lineNum">     291 </span>            :   // range [aIter, aIter + aSize) is transplanted to the returned BufferList.
+<span class="lineNum">     292 </span>            :   // Contents of the buffer before aIter + aSize is left undefined.
+<span class="lineNum">     293 </span>            :   // Extract can fail, in which case *aSuccess will be false upon return. The
+<span class="lineNum">     294 </span>            :   // moved buffers are erased from the original BufferList. In case of extract
+<span class="lineNum">     295 </span>            :   // fails, the original BufferList is intact.  All other iterators except aIter
+<span class="lineNum">     296 </span>            :   // are invalidated.
+<span class="lineNum">     297 </span>            :   // This method requires aIter and aSize to be 8-byte aligned.
+<span class="lineNum">     298 </span>            :   BufferList Extract(IterImpl&amp; aIter, size_t aSize, bool* aSuccess);
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :   // Return the number of bytes from 'start' to 'end', two iterators within
+<span class="lineNum">     301 </span>            :   // this BufferList.
+<span class="lineNum">     302 </span>            :   size_t RangeLength(const IterImpl&amp; start, const IterImpl&amp; end) const {
+<span class="lineNum">     303 </span>            :     MOZ_ASSERT(start.IsIn(*this) &amp;&amp; end.IsIn(*this));
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     return start.BytesUntil(*this, end);</span>
+<span class="lineNum">     305 </span>            :   }
+<a name="306"><span class="lineNum">     306 </span>            : </a>
+<span class="lineNum">     307 </span>            : private:
+<span class="lineNum">     308 </span><span class="lineCov">          5 :   explicit BufferList(AllocPolicy aAP)</span>
+<span class="lineNum">     309 </span>            :    : AllocPolicy(aAP),
+<span class="lineNum">     310 </span>            :      mOwning(false),
+<span class="lineNum">     311 </span>            :      mSize(0),
+<span class="lineNum">     312 </span><span class="lineCov">         10 :      mStandardCapacity(0)</span>
+<span class="lineNum">     313 </span>            :   {
+<span class="lineNum">     314 </span><span class="lineCov">          5 :   }</span>
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">        951 :   void* AllocateSegment(size_t aSize, size_t aCapacity)</span>
+<span class="lineNum">     317 </span>            :   {
+<span class="lineNum">     318 </span><span class="lineCov">        951 :     MOZ_RELEASE_ASSERT(mOwning);</span>
+<span class="lineNum">     319 </span>            :     MOZ_ASSERT(aSize &lt;= aCapacity);
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">       1717 :     char* data = this-&gt;template pod_malloc&lt;char&gt;(aCapacity);</span>
+<span class="lineNum">     322 </span><span class="lineCov">        951 :     if (!data) {</span>
+<span class="lineNum">     323 </span>            :       return nullptr;
+<span class="lineNum">     324 </span>            :     }
+<span class="lineNum">     325 </span><span class="lineCov">       1902 :     if (!mSegments.append(Segment(data, aSize, aCapacity))) {</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       this-&gt;free_(data);</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :       return nullptr;</span>
+<span class="lineNum">     328 </span>            :     }
+<span class="lineNum">     329 </span><span class="lineCov">        951 :     mSize += aSize;</span>
+<span class="lineNum">     330 </span><span class="lineCov">        951 :     return data;</span>
+<span class="lineNum">     331 </span>            :   }
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :   bool mOwning;
+<span class="lineNum">     334 </span>            :   Vector&lt;Segment, 1, AllocPolicy&gt; mSegments;
+<span class="lineNum">     335 </span>            :   size_t mSize;
+<span class="lineNum">     336 </span>            :   size_t mStandardCapacity;
+<span class="lineNum">     337 </span>            : };
+<span class="lineNum">     338 </span>            : 
+<a name="339"><span class="lineNum">     339 </span>            : template&lt;typename AllocPolicy&gt;</a>
+<span class="lineNum">     340 </span>            : bool
+<span class="lineNum">     341 </span><span class="lineCov">     197446 : BufferList&lt;AllocPolicy&gt;::WriteBytes(const char* aData, size_t aSize)</span>
+<span class="lineNum">     342 </span>            : {
+<span class="lineNum">     343 </span><span class="lineCov">     197446 :   MOZ_RELEASE_ASSERT(mOwning);</span>
+<span class="lineNum">     344 </span><span class="lineCov">     197446 :   MOZ_RELEASE_ASSERT(mStandardCapacity);</span>
+<span class="lineNum">     345 </span>            : 
+<span class="lineNum">     346 </span><span class="lineCov">     197446 :   size_t copied = 0;</span>
+<span class="lineNum">     347 </span><span class="lineCov">     197446 :   size_t remaining = aSize;</span>
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span><span class="lineCov">     197446 :   if (!mSegments.empty()) {</span>
+<span class="lineNum">     350 </span><span class="lineCov">     197451 :     Segment&amp; lastSegment = mSegments.back();</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">     394522 :     size_t toCopy = std::min(aSize, lastSegment.mCapacity - lastSegment.mSize);</span>
+<span class="lineNum">     353 </span><span class="lineCov">     197261 :     memcpy(lastSegment.mData + lastSegment.mSize, aData, toCopy);</span>
+<span class="lineNum">     354 </span><span class="lineCov">     197261 :     lastSegment.mSize += toCopy;</span>
+<span class="lineNum">     355 </span><span class="lineCov">     197261 :     mSize += toCopy;</span>
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span><span class="lineCov">     197261 :     copied += toCopy;</span>
+<span class="lineNum">     358 </span><span class="lineCov">     197261 :     remaining -= toCopy;</span>
+<span class="lineNum">     359 </span>            :   }
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span><span class="lineCov">     197931 :   while (remaining) {</span>
+<span class="lineNum">     362 </span><span class="lineCov">        970 :     size_t toCopy = std::min(remaining, mStandardCapacity);</span>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">        485 :     void* data = AllocateSegment(toCopy, mStandardCapacity);</span>
+<span class="lineNum">     365 </span><span class="lineCov">        485 :     if (!data) {</span>
+<span class="lineNum">     366 </span>            :       return false;
+<span class="lineNum">     367 </span>            :     }
+<span class="lineNum">     368 </span><span class="lineCov">        485 :     memcpy(data, aData + copied, toCopy);</span>
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span><span class="lineCov">        485 :     copied += toCopy;</span>
+<span class="lineNum">     371 </span><span class="lineCov">        485 :     remaining -= toCopy;</span>
+<span class="lineNum">     372 </span>            :   }
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            :   return true;
+<span class="lineNum">     375 </span>            : }
+<span class="lineNum">     376 </span>            : 
+<a name="377"><span class="lineNum">     377 </span>            : template&lt;typename AllocPolicy&gt;</a>
+<span class="lineNum">     378 </span>            : bool
+<span class="lineNum">     379 </span><span class="lineCov">        146 : BufferList&lt;AllocPolicy&gt;::ReadBytes(IterImpl&amp; aIter, char* aData, size_t aSize) const</span>
+<span class="lineNum">     380 </span>            : {
+<span class="lineNum">     381 </span><span class="lineCov">        146 :   size_t copied = 0;</span>
+<span class="lineNum">     382 </span><span class="lineCov">        146 :   size_t remaining = aSize;</span>
+<span class="lineNum">     383 </span><span class="lineCov">        433 :   while (remaining) {</span>
+<span class="lineNum">     384 </span><span class="lineCov">        282 :     size_t toCopy = std::min(aIter.RemainingInSegment(), remaining);</span>
+<span class="lineNum">     385 </span><span class="lineCov">        141 :     if (!toCopy) {</span>
+<span class="lineNum">     386 </span>            :       // We've run out of data in the last segment.
+<span class="lineNum">     387 </span>            :       return false;
+<span class="lineNum">     388 </span>            :     }
+<span class="lineNum">     389 </span><span class="lineCov">        141 :     memcpy(aData + copied, aIter.Data(), toCopy);</span>
+<span class="lineNum">     390 </span><span class="lineCov">        141 :     copied += toCopy;</span>
+<span class="lineNum">     391 </span><span class="lineCov">        141 :     remaining -= toCopy;</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineCov">        141 :     aIter.Advance(*this, toCopy);</span>
+<span class="lineNum">     394 </span>            :   }
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :   return true;
+<span class="lineNum">     397 </span>            : }
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            : template&lt;typename AllocPolicy&gt; template&lt;typename BorrowingAllocPolicy&gt;
+<span class="lineNum">     400 </span>            : BufferList&lt;BorrowingAllocPolicy&gt;
+<span class="lineNum">     401 </span><span class="lineCov">          5 : BufferList&lt;AllocPolicy&gt;::Borrow(IterImpl&amp; aIter, size_t aSize, bool* aSuccess,</span>
+<span class="lineNum">     402 </span>            :                                 BorrowingAllocPolicy aAP) const
+<span class="lineNum">     403 </span>            : {
+<span class="lineNum">     404 </span><span class="lineCov">          5 :   BufferList&lt;BorrowingAllocPolicy&gt; result(aAP);</span>
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span><span class="lineCov">          5 :   size_t size = aSize;</span>
+<span class="lineNum">     407 </span><span class="lineCov">         15 :   while (size) {</span>
+<span class="lineNum">     408 </span><span class="lineCov">         10 :     size_t toAdvance = std::min(size, aIter.RemainingInSegment());</span>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span><span class="lineCov">         15 :     if (!toAdvance || !result.mSegments.append(typename BufferList&lt;BorrowingAllocPolicy&gt;::Segment(aIter.mData, toAdvance, toAdvance))) {</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :       *aSuccess = false;</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :       return result;</span>
+<span class="lineNum">     413 </span>            :     }
+<span class="lineNum">     414 </span><span class="lineCov">          5 :     aIter.Advance(*this, toAdvance);</span>
+<span class="lineNum">     415 </span><span class="lineCov">          5 :     size -= toAdvance;</span>
+<span class="lineNum">     416 </span>            :   }
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span><span class="lineCov">          5 :   result.mSize = aSize;</span>
+<span class="lineNum">     419 </span><span class="lineCov">          5 :   *aSuccess = true;</span>
+<span class="lineNum">     420 </span><span class="lineCov">          5 :   return result;</span>
+<span class="lineNum">     421 </span>            : }
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : template&lt;typename AllocPolicy&gt; template&lt;typename OtherAllocPolicy&gt;
+<span class="lineNum">     424 </span>            : BufferList&lt;OtherAllocPolicy&gt;
+<span class="lineNum">     425 </span><span class="lineCov">        190 : BufferList&lt;AllocPolicy&gt;::MoveFallible(bool* aSuccess, OtherAllocPolicy aAP)</span>
+<span class="lineNum">     426 </span>            : {
+<span class="lineNum">     427 </span><span class="lineCov">        190 :   BufferList&lt;OtherAllocPolicy&gt; result(0, 0, mStandardCapacity, aAP);</span>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            :   IterImpl iter = Iter();
+<span class="lineNum">     430 </span><span class="lineCov">        380 :   while (!iter.Done()) {</span>
+<span class="lineNum">     431 </span><span class="lineCov">        375 :     size_t toAdvance = iter.RemainingInSegment();</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">        570 :     if (!toAdvance || !result.mSegments.append(typename BufferList&lt;OtherAllocPolicy&gt;::Segment(iter.mData, toAdvance, toAdvance))) {</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :       *aSuccess = false;</span>
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :       result.mSegments.clear();</span>
+<span class="lineNum">     436 </span>            :       return result;
+<span class="lineNum">     437 </span>            :     }
+<span class="lineNum">     438 </span><span class="lineCov">        190 :     iter.Advance(*this, toAdvance);</span>
+<span class="lineNum">     439 </span>            :   }
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span><span class="lineCov">        190 :   result.mSize = mSize;</span>
+<span class="lineNum">     442 </span><span class="lineCov">        190 :   mSegments.clear();</span>
+<span class="lineNum">     443 </span><span class="lineCov">        190 :   mSize = 0;</span>
+<span class="lineNum">     444 </span><span class="lineCov">        190 :   *aSuccess = true;</span>
+<span class="lineNum">     445 </span><span class="lineCov">        190 :   return result;</span>
+<span class="lineNum">     446 </span>            : }
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span>            : template&lt;typename AllocPolicy&gt;
+<span class="lineNum">     449 </span>            : BufferList&lt;AllocPolicy&gt;
+<span class="lineNum">     450 </span><span class="lineCov">          5 : BufferList&lt;AllocPolicy&gt;::Extract(IterImpl&amp; aIter, size_t aSize, bool* aSuccess)</span>
+<span class="lineNum">     451 </span>            : {
+<span class="lineNum">     452 </span><span class="lineCov">          5 :   MOZ_RELEASE_ASSERT(aSize);</span>
+<span class="lineNum">     453 </span><span class="lineCov">          5 :   MOZ_RELEASE_ASSERT(mOwning);</span>
+<span class="lineNum">     454 </span>            :   MOZ_ASSERT(aSize % kSegmentAlignment == 0);
+<span class="lineNum">     455 </span>            :   MOZ_ASSERT(intptr_t(aIter.mData) % kSegmentAlignment == 0);
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span><span class="lineCov">          5 :   IterImpl iter = aIter;</span>
+<span class="lineNum">     458 </span><span class="lineCov">          5 :   size_t size = aSize;</span>
+<span class="lineNum">     459 </span><span class="lineCov">         10 :   size_t toCopy = std::min(size, aIter.RemainingInSegment());</span>
+<span class="lineNum">     460 </span>            :   MOZ_ASSERT(toCopy % kSegmentAlignment == 0);
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span><span class="lineCov">          5 :   BufferList result(0, toCopy, mStandardCapacity);</span>
+<span class="lineNum">     463 </span><span class="lineCov">         10 :   BufferList error(0, 0, mStandardCapacity);</span>
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :   // Copy the head
+<span class="lineNum">     466 </span><span class="lineCov">          5 :   if (!result.WriteBytes(aIter.mData, toCopy)) {</span>
+<span class="lineNum">     467 </span><span class="lineNoCov">          0 :     *aSuccess = false;</span>
+<span class="lineNum">     468 </span><span class="lineNoCov">          0 :     return error;</span>
+<span class="lineNum">     469 </span>            :   }
+<span class="lineNum">     470 </span><span class="lineCov">          5 :   iter.Advance(*this, toCopy);</span>
+<span class="lineNum">     471 </span><span class="lineCov">          5 :   size -= toCopy;</span>
+<a name="472"><span class="lineNum">     472 </span>            : </a>
+<span class="lineNum">     473 </span>            :   // Move segments to result
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :   auto resultGuard = MakeScopeExit([&amp;] {</span>
+<span class="lineNum">     475 </span><span class="lineNoCov">          0 :     *aSuccess = false;</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :     result.mSegments.erase(result.mSegments.begin()+1, result.mSegments.end());</span>
+<span class="lineNum">     477 </span><span class="lineCov">         10 :   });</span>
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span><span class="lineCov">          5 :   size_t movedSize = 0;</span>
+<span class="lineNum">     480 </span><span class="lineCov">          5 :   uintptr_t toRemoveStart = iter.mSegment;</span>
+<span class="lineNum">     481 </span><span class="lineCov">          5 :   uintptr_t toRemoveEnd = iter.mSegment;</span>
+<span class="lineNum">     482 </span><span class="lineCov">         15 :   while (!iter.Done() &amp;&amp;</span>
+<span class="lineNum">     483 </span><span class="lineCov">          5 :          !iter.HasRoomFor(size)) {</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :     if (!result.mSegments.append(Segment(mSegments[iter.mSegment].mData,</span>
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :                                          mSegments[iter.mSegment].mSize,</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :                                          mSegments[iter.mSegment].mCapacity))) {</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :       return error;</span>
+<span class="lineNum">     488 </span>            :     }
+<span class="lineNum">     489 </span><span class="lineNoCov">          0 :     movedSize += iter.RemainingInSegment();</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :     size -= iter.RemainingInSegment();</span>
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :     toRemoveEnd++;</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :     iter.Advance(*this, iter.RemainingInSegment());</span>
+<span class="lineNum">     493 </span>            :   }
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineCov">          5 :   if (size)  {</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     if (!iter.HasRoomFor(size) ||</span>
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :         !result.WriteBytes(iter.Data(), size)) {</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :       return error;</span>
+<span class="lineNum">     499 </span>            :     }
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :     iter.Advance(*this, size);</span>
+<span class="lineNum">     501 </span>            :   }
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">          5 :   mSegments.erase(mSegments.begin() + toRemoveStart, mSegments.begin() + toRemoveEnd);</span>
+<span class="lineNum">     504 </span><span class="lineCov">          5 :   mSize -= movedSize;</span>
+<span class="lineNum">     505 </span><span class="lineCov">          5 :   aIter.mSegment = iter.mSegment - (toRemoveEnd - toRemoveStart);</span>
+<span class="lineNum">     506 </span><span class="lineCov">          5 :   aIter.mData = iter.mData;</span>
+<span class="lineNum">     507 </span><span class="lineCov">          5 :   aIter.mDataEnd = iter.mDataEnd;</span>
+<span class="lineNum">     508 </span>            :   MOZ_ASSERT(aIter.mDataEnd == mSegments[aIter.mSegment].End());
+<span class="lineNum">     509 </span><span class="lineCov">          5 :   result.mSize = aSize;</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineCov">          5 :   resultGuard.release();</span>
+<span class="lineNum">     512 </span><span class="lineCov">          5 :   *aSuccess = true;</span>
+<span class="lineNum">     513 </span><span class="lineCov">         10 :   return result;</span>
+<span class="lineNum">     514 </span>            : }
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            : } // namespace mozilla
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            : #endif /* mozilla_BufferList_h */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

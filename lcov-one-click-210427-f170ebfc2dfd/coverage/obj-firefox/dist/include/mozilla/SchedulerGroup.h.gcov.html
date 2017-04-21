@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/SchedulerGroup.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - SchedulerGroup.h<span style="font-size: 80%;"> (source / <a href="SchedulerGroup.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_SchedulerGroup_h
+<span class="lineNum">       8 </span>            : #define mozilla_SchedulerGroup_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/AlreadyAddRefed.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/TaskCategory.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;nsCOMPtr.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;nsISupportsImpl.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : class nsIEventTarget;
+<span class="lineNum">      16 </span>            : class nsIRunnable;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace mozilla {
+<span class="lineNum">      19 </span>            : class AbstractThread;
+<span class="lineNum">      20 </span>            : namespace dom {
+<span class="lineNum">      21 </span>            : class TabGroup;
+<span class="lineNum">      22 </span>            : }
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : // The &quot;main thread&quot; in Gecko will soon be a set of cooperatively scheduled
+<span class="lineNum">      25 </span>            : // &quot;fibers&quot;. Global state in Gecko will be partitioned into a series of &quot;groups&quot;
+<span class="lineNum">      26 </span>            : // (with roughly one group per tab). Runnables will be annotated with the set of
+<span class="lineNum">      27 </span>            : // groups that they touch. Two runnables may run concurrently on different
+<span class="lineNum">      28 </span>            : // fibers as long as they touch different groups.
+<span class="lineNum">      29 </span>            : //
+<span class="lineNum">      30 </span>            : // A Dispatcher is an abstract class to represent a &quot;group&quot;. Essentially the
+<span class="lineNum">      31 </span>            : // only functionality offered by a Dispatcher is the ability to dispatch
+<a name="32"><span class="lineNum">      32 </span>            : // runnables to the group. TabGroup, DocGroup, and SystemGroup are the concrete</a>
+<span class="lineNum">      33 </span>            : // implementations of Dispatcher.
+<span class="lineNum">      34 </span><span class="lineCov">        120 : class SchedulerGroup</span>
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            : public:
+<span class="lineNum">      37 </span>            :   SchedulerGroup();
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :   NS_INLINE_DECL_PURE_VIRTUAL_REFCOUNTING
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   class MOZ_STACK_CLASS AutoProcessEvent final {
+<span class="lineNum">      42 </span>            :   public:
+<span class="lineNum">      43 </span>            :     AutoProcessEvent();
+<span class="lineNum">      44 </span>            :     ~AutoProcessEvent();
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :   private:
+<span class="lineNum">      47 </span>            :     SchedulerGroup* mPrevRunningDispatcher;
+<span class="lineNum">      48 </span>            :   };
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :   // Ensure that it's valid to access the TabGroup at this time.
+<span class="lineNum">      51 </span>            :   void ValidateAccess() const
+<span class="lineNum">      52 </span>            :   {
+<span class="lineNum">      53 </span>            :     MOZ_ASSERT(!sRunningDispatcher || mAccessValid);
+<span class="lineNum">      54 </span>            :   }
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :   class Runnable;
+<span class="lineNum">      57 </span>            :   friend class Runnable;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :   bool* GetValidAccessPtr() { return &amp;mAccessValid; }</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :   virtual nsresult Dispatch(const char* aName,
+<span class="lineNum">      62 </span>            :                             TaskCategory aCategory,
+<span class="lineNum">      63 </span>            :                             already_AddRefed&lt;nsIRunnable&gt;&amp;&amp; aRunnable);
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :   virtual nsIEventTarget* EventTargetFor(TaskCategory aCategory) const;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :   // Must always be called on the main thread. The returned AbstractThread can
+<span class="lineNum">      68 </span>            :   // always be used off the main thread.
+<span class="lineNum">      69 </span>            :   AbstractThread* AbstractMainThreadFor(TaskCategory aCategory);
+<span class="lineNum">      70 </span>            : 
+<a name="71"><span class="lineNum">      71 </span>            :   // This method performs a safe cast. It returns null if |this| is not of the</a>
+<span class="lineNum">      72 </span>            :   // requested type.
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :   virtual dom::TabGroup* AsTabGroup() { return nullptr; }</span>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :   static nsresult UnlabeledDispatch(const char* aName,
+<span class="lineNum">      76 </span>            :                                     TaskCategory aCategory,
+<span class="lineNum">      77 </span>            :                                     already_AddRefed&lt;nsIRunnable&gt;&amp;&amp; aRunnable);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            : protected:
+<span class="lineNum">      80 </span>            :   // Implementations are guaranteed that this method is called on the main
+<span class="lineNum">      81 </span>            :   // thread.
+<span class="lineNum">      82 </span>            :   virtual AbstractThread* AbstractMainThreadForImpl(TaskCategory aCategory);
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   // Helper method to create an event target specific to a particular TaskCategory.
+<span class="lineNum">      85 </span>            :   virtual already_AddRefed&lt;nsIEventTarget&gt;
+<span class="lineNum">      86 </span>            :   CreateEventTargetFor(TaskCategory aCategory);
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :   // Given an event target returned by |dispatcher-&gt;CreateEventTargetFor|, this
+<span class="lineNum">      89 </span>            :   // function returns |dispatcher|.
+<span class="lineNum">      90 </span>            :   static SchedulerGroup* FromEventTarget(nsIEventTarget* aEventTarget);
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :   nsresult LabeledDispatch(const char* aName,
+<span class="lineNum">      93 </span>            :                            TaskCategory aCategory,
+<span class="lineNum">      94 </span>            :                            already_AddRefed&lt;nsIRunnable&gt;&amp;&amp; aRunnable);
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   void CreateEventTargets(bool aNeedValidation);
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :   // Shuts down this dispatcher. If aXPCOMShutdown is true, invalidates this
+<span class="lineNum">      99 </span>            :   // dispatcher.
+<span class="lineNum">     100 </span>            :   void Shutdown(bool aXPCOMShutdown);
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :   enum ValidationType {
+<span class="lineNum">     103 </span>            :     StartValidation,
+<span class="lineNum">     104 </span>            :     EndValidation,
+<span class="lineNum">     105 </span>            :   };
+<span class="lineNum">     106 </span>            :   void SetValidatingAccess(ValidationType aType);
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :   static SchedulerGroup* sRunningDispatcher;
+<span class="lineNum">     109 </span>            :   bool mAccessValid;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :   nsCOMPtr&lt;nsIEventTarget&gt; mEventTargets[size_t(TaskCategory::Count)];
+<span class="lineNum">     112 </span>            :   RefPtr&lt;AbstractThread&gt; mAbstractThreads[size_t(TaskCategory::Count)];
+<span class="lineNum">     113 </span>            : };
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            : } // namespace mozilla
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : #endif // mozilla_SchedulerGroup_h
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - security/sandbox/chromium-shim/base/threading/platform_thread_linux.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">security/sandbox/chromium-shim/base/threading</a> - platform_thread_linux.cpp<span style="font-size: 80%;"> (source / <a href="platform_thread_linux.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : // This is a cut down version of Chromium source file base/threading/platform_thread_linux.h
+<span class="lineNum">       8 </span>            : // with only the functions required. It also has a dummy implementation of
+<span class="lineNum">       9 </span>            : // SetCurrentThreadPriorityForPlatform, which should not be called.
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;base/threading/platform_thread.h&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &quot;base/threading/platform_thread_internal_posix.h&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/Assertions.h&quot;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace base {
+<span class="lineNum">      18 </span>            : namespace internal {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : namespace {
+<span class="lineNum">      21 </span>            : const struct sched_param kRealTimePrio = {8};
+<span class="lineNum">      22 </span>            : }  // namespace
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : const ThreadPriorityToNiceValuePair kThreadPriorityToNiceValueMap[4] = {
+<span class="lineNum">      25 </span>            :     {ThreadPriority::BACKGROUND, 10},
+<span class="lineNum">      26 </span>            :     {ThreadPriority::NORMAL, 0},
+<span class="lineNum">      27 </span>            :     {ThreadPriority::DISPLAY, -8},
+<span class="lineNum">      28 </span>            :     {ThreadPriority::REALTIME_AUDIO, -10},
+<a name="29"><span class="lineNum">      29 </span>            : };</a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 : bool SetCurrentThreadPriorityForPlatform(ThreadPriority priority) {</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   MOZ_CRASH();</span>
+<a name="33"><span class="lineNum">      33 </span>            : }</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 : bool GetCurrentThreadPriorityForPlatform(ThreadPriority* priority) {</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :   int maybe_sched_rr = 0;</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   struct sched_param maybe_realtime_prio = {0};</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   if (pthread_getschedparam(pthread_self(), &amp;maybe_sched_rr,</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :                             &amp;maybe_realtime_prio) == 0 &amp;&amp;</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       maybe_sched_rr == SCHED_RR &amp;&amp;</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       maybe_realtime_prio.sched_priority == kRealTimePrio.sched_priority) {</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     *priority = ThreadPriority::REALTIME_AUDIO;</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      44 </span>            :   }
+<span class="lineNum">      45 </span>            :   return false;
+<span class="lineNum">      46 </span>            : }
+<span class="lineNum">      47 </span>            : 
+<a name="48"><span class="lineNum">      48 </span>            : }  // namespace internal</a>
+<span class="lineNum">      49 </span>            : 
+<a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 : void InitThreading() {}</span></a>
+<span class="lineNum">      51 </span>            : 
+<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 : void TerminateOnThread() {}</span></a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 : size_t GetDefaultThreadStackSize(const pthread_attr_t&amp; attributes) {</span>
+<span class="lineNum">      55 </span>            : #if !defined(THREAD_SANITIZER)
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   return 0;</span>
+<span class="lineNum">      57 </span>            : #else
+<span class="lineNum">      58 </span>            :   // ThreadSanitizer bloats the stack heavily. Evidence has been that the
+<span class="lineNum">      59 </span>            :   // default stack size isn't enough for some browser tests.
+<span class="lineNum">      60 </span>            :   return 2 * (1 &lt;&lt; 23);  // 2 times 8192K (the default stack size on Linux).
+<span class="lineNum">      61 </span>            : #endif
+<span class="lineNum">      62 </span>            : }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : }  // namespace base
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

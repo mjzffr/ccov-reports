@@ -1,0 +1,439 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/js/GCHashTable.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/js</a> - GCHashTable.h<span style="font-size: 80%;"> (source / <a href="GCHashTable.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">53</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntryMed">75.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntryLo">65.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-</a>
+<span class="lineNum">       2 </span>            :  * vim: set ts=8 sts=4 et sw=4 tw=99:
+<span class="lineNum">       3 </span>            :  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef GCHashTable_h
+<span class="lineNum">       8 </span>            : #define GCHashTable_h
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;js/GCPolicyAPI.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;js/HashTable.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;js/RootingAPI.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;js/SweepingAPI.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;js/TracingAPI.h&quot;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace JS {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : // Define a reasonable default GC policy for GC-aware Maps.
+<a name="19"><span class="lineNum">      19 </span>            : template &lt;typename Key, typename Value&gt;</a>
+<a name="20"><span class="lineNum">      20 </span>            : struct DefaultMapSweepPolicy {</a>
+<span class="lineNum">      21 </span><span class="lineCov">      31334 :     static bool needsSweep(Key* key, Value* value) {</span>
+<span class="lineNum">      22 </span><span class="lineCov">      52035 :         return GCPolicy&lt;Key&gt;::needsSweep(key) || GCPolicy&lt;Value&gt;::needsSweep(value);</span>
+<span class="lineNum">      23 </span>            :     }
+<span class="lineNum">      24 </span>            : };
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : // A GCHashMap is a GC-aware HashMap, meaning that it has additional trace and
+<span class="lineNum">      27 </span>            : // sweep methods that know how to visit all keys and values in the table.
+<span class="lineNum">      28 </span>            : // HashMaps that contain GC pointers will generally want to use this GCHashMap
+<span class="lineNum">      29 </span>            : // specialization instead of HashMap, because this conveniently supports tracing
+<span class="lineNum">      30 </span>            : // keys and values, and cleaning up weak entries.
+<span class="lineNum">      31 </span>            : //
+<span class="lineNum">      32 </span>            : // GCHashMap::trace applies GCPolicy&lt;T&gt;::trace to each entry's key and value.
+<span class="lineNum">      33 </span>            : // Most types of GC pointers already have appropriate specializations of
+<span class="lineNum">      34 </span>            : // GCPolicy, so they should just work as keys and values. Any struct type with a
+<span class="lineNum">      35 </span>            : // default constructor and trace and sweep functions should work as well. If you
+<span class="lineNum">      36 </span>            : // need to define your own GCPolicy specialization, generic helpers can be found
+<span class="lineNum">      37 </span>            : // in js/public/TracingAPI.h.
+<span class="lineNum">      38 </span>            : //
+<span class="lineNum">      39 </span>            : // The MapSweepPolicy template parameter controls how the table drops entries
+<span class="lineNum">      40 </span>            : // when swept. GCHashMap::sweep applies MapSweepPolicy::needsSweep to each table
+<span class="lineNum">      41 </span>            : // entry; if it returns true, the entry is dropped. The default MapSweepPolicy
+<span class="lineNum">      42 </span>            : // drops the entry if either the key or value is about to be finalized,
+<span class="lineNum">      43 </span>            : // according to its GCPolicy&lt;T&gt;::needsSweep method. (This default is almost
+<span class="lineNum">      44 </span>            : // always fine: it's hard to imagine keeping such an entry around anyway.)
+<span class="lineNum">      45 </span>            : //
+<span class="lineNum">      46 </span>            : // Note that this HashMap only knows *how* to trace and sweep, but it does not
+<span class="lineNum">      47 </span>            : // itself cause tracing or sweeping to be invoked. For tracing, it must be used
+<span class="lineNum">      48 </span>            : // with Rooted or PersistentRooted, or barriered and traced manually. For
+<span class="lineNum">      49 </span>            : // sweeping, currently it requires an explicit call to &lt;map&gt;.sweep().
+<span class="lineNum">      50 </span>            : template &lt;typename Key,
+<span class="lineNum">      51 </span>            :           typename Value,
+<span class="lineNum">      52 </span>            :           typename HashPolicy = js::DefaultHasher&lt;Key&gt;,
+<a name="53"><span class="lineNum">      53 </span>            :           typename AllocPolicy = js::TempAllocPolicy,</a>
+<span class="lineNum">      54 </span>            :           typename MapSweepPolicy = DefaultMapSweepPolicy&lt;Key, Value&gt;&gt;
+<span class="lineNum">      55 </span><span class="lineCov">      17076 : class GCHashMap : public js::HashMap&lt;Key, Value, HashPolicy, AllocPolicy&gt;</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :     using Base = js::HashMap&lt;Key, Value, HashPolicy, AllocPolicy&gt;;
+<a name="58"><span class="lineNum">      58 </span>            : </a>
+<span class="lineNum">      59 </span>            :   public:
+<span class="lineNum">      60 </span><span class="lineCov">       8478 :     explicit GCHashMap(AllocPolicy a = AllocPolicy()) : Base(a)  {}</span>
+<a name="61"><span class="lineNum">      61 </span>            : </a>
+<span class="lineNum">      62 </span>            :     static void trace(GCHashMap* map, JSTracer* trc) { map-&gt;trace(trc); }
+<span class="lineNum">      63 </span><span class="lineCov">       5768 :     void trace(JSTracer* trc) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">      11536 :         if (!this-&gt;initialized())</span>
+<span class="lineNum">      65 </span><span class="lineCov">       5768 :             return;</span>
+<span class="lineNum">      66 </span><span class="lineCov">      12833 :         for (typename Base::Enum e(*this); !e.empty(); e.popFront()) {</span>
+<span class="lineNum">      67 </span><span class="lineCov">       5331 :             GCPolicy&lt;Value&gt;::trace(trc, &amp;e.front().value(), &quot;hashmap value&quot;);</span>
+<span class="lineNum">      68 </span><span class="lineCov">       3554 :             GCPolicy&lt;Key&gt;::trace(trc, &amp;e.front().mutableKey(), &quot;hashmap key&quot;);</span>
+<span class="lineNum">      69 </span>            :         }
+<a name="70"><span class="lineNum">      70 </span>            :     }</a>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">      20720 :     void sweep() {</span>
+<span class="lineNum">      73 </span><span class="lineCov">      41440 :         if (!this-&gt;initialized())</span>
+<span class="lineNum">      74 </span><span class="lineCov">      20721 :             return;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">     110252 :         for (typename Base::Enum e(*this); !e.empty(); e.popFront()) {</span>
+<span class="lineNum">      77 </span><span class="lineCov">     376513 :             if (MapSweepPolicy::needsSweep(&amp;e.front().mutableKey(), &amp;e.front().value()))</span>
+<span class="lineNum">      78 </span><span class="lineCov">      16902 :                 e.removeFront();</span>
+<span class="lineNum">      79 </span>            :         }
+<span class="lineNum">      80 </span>            :     }
+<a name="81"><span class="lineNum">      81 </span>            : </a>
+<span class="lineNum">      82 </span>            :     // GCHashMap is movable
+<span class="lineNum">      83 </span><span class="lineCov">       1755 :     GCHashMap(GCHashMap&amp;&amp; rhs) : Base(mozilla::Move(rhs)) {}</span>
+<span class="lineNum">      84 </span>            :     void operator=(GCHashMap&amp;&amp; rhs) {
+<span class="lineNum">      85 </span>            :         MOZ_ASSERT(this != &amp;rhs, &quot;self-move assignment is prohibited&quot;);
+<span class="lineNum">      86 </span>            :         Base::operator=(mozilla::Move(rhs));
+<span class="lineNum">      87 </span>            :     }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :   private:
+<span class="lineNum">      90 </span>            :     // GCHashMap is not copyable or assignable
+<span class="lineNum">      91 </span>            :     GCHashMap(const GCHashMap&amp; hm) = delete;
+<span class="lineNum">      92 </span>            :     GCHashMap&amp; operator=(const GCHashMap&amp; hm) = delete;
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : } // namespace JS
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            : namespace js {
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : // HashMap that supports rekeying.
+<span class="lineNum">     100 </span>            : //
+<span class="lineNum">     101 </span>            : // If your keys are pointers to something like JSObject that can be tenured or
+<span class="lineNum">     102 </span>            : // compacted, prefer to use GCHashMap with MovableCellHasher, which takes
+<span class="lineNum">     103 </span>            : // advantage of the Zone's stable id table to make rekeying unnecessary.
+<span class="lineNum">     104 </span>            : template &lt;typename Key,
+<span class="lineNum">     105 </span>            :           typename Value,
+<span class="lineNum">     106 </span>            :           typename HashPolicy = DefaultHasher&lt;Key&gt;,
+<span class="lineNum">     107 </span>            :           typename AllocPolicy = TempAllocPolicy,
+<span class="lineNum">     108 </span>            :           typename MapSweepPolicy = JS::DefaultMapSweepPolicy&lt;Key, Value&gt;&gt;
+<span class="lineNum">     109 </span><span class="lineCov">       2306 : class GCRekeyableHashMap : public JS::GCHashMap&lt;Key, Value, HashPolicy, AllocPolicy, MapSweepPolicy&gt;</span>
+<span class="lineNum">     110 </span>            : {
+<span class="lineNum">     111 </span>            :     using Base = JS::GCHashMap&lt;Key, Value, HashPolicy, AllocPolicy&gt;;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   public:
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">       1401 :     explicit GCRekeyableHashMap(AllocPolicy a = AllocPolicy()) : Base(a)  {}</span></a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">       4515 :     void sweep() {</span>
+<span class="lineNum">     117 </span><span class="lineCov">       9030 :         if (!this-&gt;initialized())</span>
+<span class="lineNum">     118 </span><span class="lineCov">       4515 :             return;</span>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">      27493 :         for (typename Base::Enum e(*this); !e.empty(); e.popFront()) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">      54535 :             Key key(e.front().key());</span>
+<span class="lineNum">     122 </span><span class="lineCov">      55389 :             if (MapSweepPolicy::needsSweep(&amp;key, &amp;e.front().value()))</span>
+<span class="lineNum">     123 </span><span class="lineCov">        247 :                 e.removeFront();</span>
+<span class="lineNum">     124 </span><span class="lineCov">      39060 :             else if (!HashPolicy::match(key, e.front().key()))</span>
+<span class="lineNum">     125 </span>            :                 e.rekeyFront(key);
+<span class="lineNum">     126 </span>            :         }
+<span class="lineNum">     127 </span>            :     }
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     // GCRekeyableHashMap is movable
+<span class="lineNum">     130 </span>            :     GCRekeyableHashMap(GCRekeyableHashMap&amp;&amp; rhs) : Base(mozilla::Move(rhs)) {}
+<span class="lineNum">     131 </span>            :     void operator=(GCRekeyableHashMap&amp;&amp; rhs) {
+<span class="lineNum">     132 </span>            :         MOZ_ASSERT(this != &amp;rhs, &quot;self-move assignment is prohibited&quot;);
+<span class="lineNum">     133 </span>            :         Base::operator=(mozilla::Move(rhs));
+<span class="lineNum">     134 </span>            :     }
+<span class="lineNum">     135 </span>            : };
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : template &lt;typename Wrapper, typename... Args&gt;
+<span class="lineNum">     138 </span>            : class WrappedPtrOperations&lt;JS::GCHashMap&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     139 </span>            : {
+<span class="lineNum">     140 </span>            :     using Map = JS::GCHashMap&lt;Args...&gt;;
+<span class="lineNum">     141 </span>            :     using Lookup = typename Map::Lookup;
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     const Map&amp; map() const { return static_cast&lt;const Wrapper*&gt;(this)-&gt;get(); }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :   public:
+<span class="lineNum">     146 </span>            :     using AddPtr = typename Map::AddPtr;
+<span class="lineNum">     147 </span>            :     using Ptr = typename Map::Ptr;
+<span class="lineNum">     148 </span>            :     using Range = typename Map::Range;
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<a name="150"><span class="lineNum">     150 </span><span class="lineNoCov">          0 :     bool initialized() const                   { return map().initialized(); }</span></a>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     Ptr lookup(const Lookup&amp; l) const          { return map().lookup(l); }</span>
+<span class="lineNum">     152 </span><span class="lineCov">      23921 :     AddPtr lookupForAdd(const Lookup&amp; l) const { return map().lookupForAdd(l); }</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     Range all() const                          { return map().all(); }</span>
+<span class="lineNum">     154 </span>            :     bool empty() const                         { return map().empty(); }
+<span class="lineNum">     155 </span><span class="lineCov">         10 :     uint32_t count() const                     { return map().count(); }</span>
+<span class="lineNum">     156 </span>            :     size_t capacity() const                    { return map().capacity(); }
+<span class="lineNum">     157 </span>            :     bool has(const Lookup&amp; l) const            { return map().lookup(l).found(); }
+<span class="lineNum">     158 </span>            :     size_t sizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf) const {
+<span class="lineNum">     159 </span>            :         return map().sizeOfExcludingThis(mallocSizeOf);
+<span class="lineNum">     160 </span>            :     }
+<span class="lineNum">     161 </span>            :     size_t sizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf) const {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :         return mallocSizeOf(this) + map().sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">     163 </span>            :     }
+<span class="lineNum">     164 </span>            : };
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : template &lt;typename Wrapper, typename... Args&gt;
+<span class="lineNum">     167 </span>            : class MutableWrappedPtrOperations&lt;JS::GCHashMap&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     168 </span>            :   : public WrappedPtrOperations&lt;JS::GCHashMap&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     169 </span>            : {
+<span class="lineNum">     170 </span>            :     using Map = JS::GCHashMap&lt;Args...&gt;;
+<span class="lineNum">     171 </span>            :     using Lookup = typename Map::Lookup;
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :     Map&amp; map() { return static_cast&lt;Wrapper*&gt;(this)-&gt;get(); }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :   public:
+<span class="lineNum">     176 </span>            :     using AddPtr = typename Map::AddPtr;
+<span class="lineNum">     177 </span>            :     struct Enum : public Map::Enum { explicit Enum(Wrapper&amp; o) : Map::Enum(o.map()) {} };
+<span class="lineNum">     178 </span>            :     using Ptr = typename Map::Ptr;
+<span class="lineNum">     179 </span>            :     using Range = typename Map::Range;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">        850 :     bool init(uint32_t len = 16) { return map().init(len); }</span>
+<span class="lineNum">     182 </span><span class="lineCov">        185 :     void clear()                 { map().clear(); }</span>
+<span class="lineNum">     183 </span>            :     void finish()                { map().finish(); }
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     void remove(Ptr p)           { map().remove(p); }</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :     template&lt;typename KeyInput, typename ValueInput&gt;
+<span class="lineNum">     187 </span>            :     bool add(AddPtr&amp; p, KeyInput&amp;&amp; k, ValueInput&amp;&amp; v) {
+<span class="lineNum">     188 </span><span class="lineCov">       5480 :         return map().add(p, mozilla::Forward&lt;KeyInput&gt;(k), mozilla::Forward&lt;ValueInput&gt;(v));</span>
+<span class="lineNum">     189 </span>            :     }
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :     template&lt;typename KeyInput&gt;
+<span class="lineNum">     192 </span>            :     bool add(AddPtr&amp; p, KeyInput&amp;&amp; k) {
+<span class="lineNum">     193 </span>            :         return map().add(p, mozilla::Forward&lt;KeyInput&gt;(k), Map::Value());
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :     template&lt;typename KeyInput, typename ValueInput&gt;
+<span class="lineNum">     197 </span>            :     bool relookupOrAdd(AddPtr&amp; p, KeyInput&amp;&amp; k, ValueInput&amp;&amp; v) {
+<span class="lineNum">     198 </span>            :         return map().relookupOrAdd(p, k,
+<span class="lineNum">     199 </span>            :                                    mozilla::Forward&lt;KeyInput&gt;(k),
+<span class="lineNum">     200 </span>            :                                    mozilla::Forward&lt;ValueInput&gt;(v));
+<span class="lineNum">     201 </span>            :     }
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            :     template&lt;typename KeyInput, typename ValueInput&gt;
+<span class="lineNum">     204 </span>            :     bool put(KeyInput&amp;&amp; k, ValueInput&amp;&amp; v) {
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :         return map().put(mozilla::Forward&lt;KeyInput&gt;(k), mozilla::Forward&lt;ValueInput&gt;(v));</span>
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :     template&lt;typename KeyInput, typename ValueInput&gt;
+<span class="lineNum">     209 </span>            :     bool putNew(KeyInput&amp;&amp; k, ValueInput&amp;&amp; v) {
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         return map().putNew(mozilla::Forward&lt;KeyInput&gt;(k), mozilla::Forward&lt;ValueInput&gt;(v));</span>
+<span class="lineNum">     211 </span>            :     }
+<span class="lineNum">     212 </span>            : };
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : } // namespace js
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            : namespace JS {
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : // A GCHashSet is a HashSet with an additional trace method that knows
+<span class="lineNum">     219 </span>            : // be traced to be kept alive will generally want to use this GCHashSet
+<span class="lineNum">     220 </span>            : // specialization in lieu of HashSet.
+<span class="lineNum">     221 </span>            : //
+<span class="lineNum">     222 </span>            : // Most types of GC pointers can be traced with no extra infrastructure. For
+<span class="lineNum">     223 </span>            : // structs and non-gc-pointer members, ensure that there is a specialization of
+<span class="lineNum">     224 </span>            : // GCPolicy&lt;T&gt; with an appropriate trace method available to handle the custom
+<span class="lineNum">     225 </span>            : // type. Generic helpers can be found in js/public/TracingAPI.h.
+<span class="lineNum">     226 </span>            : //
+<span class="lineNum">     227 </span>            : // Note that although this HashSet's trace will deal correctly with moved
+<span class="lineNum">     228 </span>            : // elements, it does not itself know when to barrier or trace elements. To
+<span class="lineNum">     229 </span>            : // function properly it must either be used with Rooted or barriered and traced
+<span class="lineNum">     230 </span>            : // manually.
+<span class="lineNum">     231 </span>            : template &lt;typename T,
+<span class="lineNum">     232 </span>            :           typename HashPolicy = js::DefaultHasher&lt;T&gt;,
+<span class="lineNum">     233 </span>            :           typename AllocPolicy = js::TempAllocPolicy&gt;
+<span class="lineNum">     234 </span><span class="lineCov">      18340 : class GCHashSet : public js::HashSet&lt;T, HashPolicy, AllocPolicy&gt;</span>
+<span class="lineNum">     235 </span>            : {
+<span class="lineNum">     236 </span>            :     using Base = js::HashSet&lt;T, HashPolicy, AllocPolicy&gt;;
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   public:
+<span class="lineNum">     239 </span><span class="lineCov">       6030 :     explicit GCHashSet(AllocPolicy a = AllocPolicy()) : Base(a)  {}</span>
+<a name="240"><span class="lineNum">     240 </span>            : </a>
+<span class="lineNum">     241 </span>            :     static void trace(GCHashSet* set, JSTracer* trc) { set-&gt;trace(trc); }
+<span class="lineNum">     242 </span><span class="lineCov">       3474 :     void trace(JSTracer* trc) {</span>
+<span class="lineNum">     243 </span><span class="lineCov">       6948 :         if (!this-&gt;initialized())</span>
+<span class="lineNum">     244 </span><span class="lineCov">       3474 :             return;</span>
+<span class="lineNum">     245 </span><span class="lineCov">     128480 :         for (typename Base::Enum e(*this); !e.empty(); e.popFront())</span>
+<span class="lineNum">     246 </span><span class="lineCov">     245944 :             GCPolicy&lt;T&gt;::trace(trc, &amp;e.mutableFront(), &quot;hashset element&quot;);</span>
+<a name="247"><span class="lineNum">     247 </span>            :     }</a>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">      20080 :     void sweep() {</span>
+<span class="lineNum">     250 </span><span class="lineCov">      40160 :         if (!this-&gt;initialized())</span>
+<span class="lineNum">     251 </span><span class="lineCov">      20082 :             return;</span>
+<span class="lineNum">     252 </span><span class="lineCov">     709116 :         for (typename Base::Enum e(*this); !e.empty(); e.popFront()) {</span>
+<span class="lineNum">     253 </span><span class="lineCov">    2010470 :             if (GCPolicy&lt;T&gt;::needsSweep(&amp;e.mutableFront()))</span>
+<span class="lineNum">     254 </span><span class="lineCov">     127933 :                 e.removeFront();</span>
+<span class="lineNum">     255 </span>            :         }
+<span class="lineNum">     256 </span>            :     }
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            :     // GCHashSet is movable
+<span class="lineNum">     259 </span><span class="lineCov">       3260 :     GCHashSet(GCHashSet&amp;&amp; rhs) : Base(mozilla::Move(rhs)) {}</span>
+<span class="lineNum">     260 </span>            :     void operator=(GCHashSet&amp;&amp; rhs) {
+<span class="lineNum">     261 </span>            :         MOZ_ASSERT(this != &amp;rhs, &quot;self-move assignment is prohibited&quot;);
+<span class="lineNum">     262 </span>            :         Base::operator=(mozilla::Move(rhs));
+<span class="lineNum">     263 </span>            :     }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :   private:
+<span class="lineNum">     266 </span>            :     // GCHashSet is not copyable or assignable
+<span class="lineNum">     267 </span>            :     GCHashSet(const GCHashSet&amp; hs) = delete;
+<span class="lineNum">     268 </span>            :     GCHashSet&amp; operator=(const GCHashSet&amp; hs) = delete;
+<span class="lineNum">     269 </span>            : };
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            : } // namespace JS
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            : namespace js {
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span>            : template &lt;typename Wrapper, typename... Args&gt;
+<span class="lineNum">     276 </span>            : class WrappedPtrOperations&lt;JS::GCHashSet&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     277 </span>            : {
+<span class="lineNum">     278 </span>            :     using Set = JS::GCHashSet&lt;Args...&gt;;
+<span class="lineNum">     279 </span>            :     using Lookup = typename Set::Lookup;
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span>            :     const Set&amp; set() const { return static_cast&lt;const Wrapper*&gt;(this)-&gt;get(); }
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :   public:
+<span class="lineNum">     284 </span>            :     using AddPtr = typename Set::AddPtr;
+<span class="lineNum">     285 </span>            :     using Entry = typename Set::Entry;
+<span class="lineNum">     286 </span>            :     using Ptr = typename Set::Ptr;
+<span class="lineNum">     287 </span>            :     using Range = typename Set::Range;
+<a name="288"><span class="lineNum">     288 </span>            : </a>
+<a name="289"><span class="lineNum">     289 </span><span class="lineCov">     328573 :     bool initialized() const                   { return set().initialized(); }</span></a>
+<span class="lineNum">     290 </span><span class="lineCov">       6350 :     Ptr lookup(const Lookup&amp; l) const          { return set().lookup(l); }</span>
+<span class="lineNum">     291 </span><span class="lineCov">    1548132 :     AddPtr lookupForAdd(const Lookup&amp; l) const { return set().lookupForAdd(l); }</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :     Range all() const                          { return set().all(); }</span>
+<span class="lineNum">     293 </span><span class="lineCov">        370 :     bool empty() const                         { return set().empty(); }</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     uint32_t count() const                     { return set().count(); }</span>
+<span class="lineNum">     295 </span>            :     size_t capacity() const                    { return set().capacity(); }
+<span class="lineNum">     296 </span>            :     bool has(const Lookup&amp; l) const            { return set().lookup(l).found(); }
+<span class="lineNum">     297 </span>            :     size_t sizeOfExcludingThis(mozilla::MallocSizeOf mallocSizeOf) const {
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :         return set().sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">     299 </span>            :     }
+<span class="lineNum">     300 </span>            :     size_t sizeOfIncludingThis(mozilla::MallocSizeOf mallocSizeOf) const {
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :         return mallocSizeOf(this) + set().sizeOfExcludingThis(mallocSizeOf);</span>
+<span class="lineNum">     302 </span>            :     }
+<span class="lineNum">     303 </span>            : };
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            : template &lt;typename Wrapper, typename... Args&gt;
+<span class="lineNum">     306 </span>            : class MutableWrappedPtrOperations&lt;JS::GCHashSet&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     307 </span>            :   : public WrappedPtrOperations&lt;JS::GCHashSet&lt;Args...&gt;, Wrapper&gt;
+<span class="lineNum">     308 </span>            : {
+<span class="lineNum">     309 </span>            :     using Set = JS::GCHashSet&lt;Args...&gt;;
+<span class="lineNum">     310 </span>            :     using Lookup = typename Set::Lookup;
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :     Set&amp; set() { return static_cast&lt;Wrapper*&gt;(this)-&gt;get(); }
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span>            :   public:
+<span class="lineNum">     315 </span>            :     using AddPtr = typename Set::AddPtr;
+<span class="lineNum">     316 </span>            :     using Entry = typename Set::Entry;
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :     struct Enum : public Set::Enum { explicit Enum(Wrapper&amp; o) : Set::Enum(o.set()) {} };</span>
+<span class="lineNum">     318 </span>            :     using Ptr = typename Set::Ptr;
+<span class="lineNum">     319 </span>            :     using Range = typename Set::Range;
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">       3380 :     bool init(uint32_t len = 16) { return set().init(len); }</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :     void clear()                 { set().clear(); }</span>
+<span class="lineNum">     323 </span>            :     void finish()                { set().finish(); }
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     void remove(Ptr p)           { set().remove(p); }</span>
+<span class="lineNum">     325 </span>            :     void remove(const Lookup&amp; l) { set().remove(l); }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            :     template&lt;typename TInput&gt;
+<span class="lineNum">     328 </span>            :     bool add(AddPtr&amp; p, TInput&amp;&amp; t) {
+<span class="lineNum">     329 </span><span class="lineCov">      27705 :         return set().add(p, mozilla::Forward&lt;TInput&gt;(t));</span>
+<span class="lineNum">     330 </span>            :     }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :     template&lt;typename TInput&gt;
+<span class="lineNum">     333 </span>            :     bool relookupOrAdd(AddPtr&amp; p, const Lookup&amp; l, TInput&amp;&amp; t) {
+<span class="lineNum">     334 </span><span class="lineCov">      35639 :         return set().relookupOrAdd(p, l, mozilla::Forward&lt;TInput&gt;(t));</span>
+<span class="lineNum">     335 </span>            :     }
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            :     template&lt;typename TInput&gt;
+<span class="lineNum">     338 </span>            :     bool put(TInput&amp;&amp; t) {
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :         return set().put(mozilla::Forward&lt;TInput&gt;(t));</span>
+<span class="lineNum">     340 </span>            :     }
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            :     template&lt;typename TInput&gt;
+<span class="lineNum">     343 </span>            :     bool putNew(TInput&amp;&amp; t) {
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :         return set().putNew(mozilla::Forward&lt;TInput&gt;(t));</span>
+<span class="lineNum">     345 </span>            :     }
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :     template&lt;typename TInput&gt;
+<span class="lineNum">     348 </span>            :     bool putNew(const Lookup&amp; l, TInput&amp;&amp; t) {
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :         return set().putNew(l, mozilla::Forward&lt;TInput&gt;(t));</span>
+<span class="lineNum">     350 </span>            :     }
+<span class="lineNum">     351 </span>            : };
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            : } /* namespace js */
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span>            : #endif /* GCHashTable_h */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,1514 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/MozPromise.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - MozPromise.h<span style="font-size: 80%;"> (source / <a href="MozPromise.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">385</td>
+            <td class="headerCovTableEntryLo">0.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">3350</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #if !defined(MozPromise_h_)
+<span class="lineNum">       8 </span>            : #define MozPromise_h_
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/AbstractThread.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/IndexSequence.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/Logging.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/Maybe.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Mutex.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;mozilla/Monitor.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;mozilla/Tuple.h&quot;
+<span class="lineNum">      17 </span>            : #include &quot;mozilla/TypeTraits.h&quot;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;nsTArray.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;nsThreadUtils.h&quot;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #if defined(DEBUG) || !defined(RELEASE_OR_BETA)
+<span class="lineNum">      23 </span>            : #define PROMISE_DEBUG
+<span class="lineNum">      24 </span>            : #endif
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">      27 </span>            : #define PROMISE_ASSERT MOZ_RELEASE_ASSERT
+<span class="lineNum">      28 </span>            : #else
+<span class="lineNum">      29 </span>            : #define PROMISE_ASSERT(...) do { } while (0)
+<span class="lineNum">      30 </span>            : #endif
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : namespace mozilla {
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : extern LazyLogModule gMozPromiseLog;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : #define PROMISE_LOG(x, ...) \
+<span class="lineNum">      37 </span>            :   MOZ_LOG(gMozPromiseLog, mozilla::LogLevel::Debug, (x, ##__VA_ARGS__))
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : namespace detail {
+<span class="lineNum">      40 </span>            : template&lt;typename ThisType, typename Ret, typename ArgType&gt;
+<span class="lineNum">      41 </span>            : static TrueType TakesArgumentHelper(Ret (ThisType::*)(ArgType));
+<span class="lineNum">      42 </span>            : template&lt;typename ThisType, typename Ret, typename ArgType&gt;
+<span class="lineNum">      43 </span>            : static TrueType TakesArgumentHelper(Ret (ThisType::*)(ArgType) const);
+<span class="lineNum">      44 </span>            : template&lt;typename ThisType, typename Ret&gt;
+<span class="lineNum">      45 </span>            : static FalseType TakesArgumentHelper(Ret (ThisType::*)());
+<span class="lineNum">      46 </span>            : template&lt;typename ThisType, typename Ret&gt;
+<span class="lineNum">      47 </span>            : static FalseType TakesArgumentHelper(Ret (ThisType::*)() const);
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : template&lt;typename ThisType, typename Ret, typename ArgType&gt;
+<span class="lineNum">      50 </span>            : static Ret ReturnTypeHelper(Ret (ThisType::*)(ArgType));
+<span class="lineNum">      51 </span>            : template&lt;typename ThisType, typename Ret, typename ArgType&gt;
+<span class="lineNum">      52 </span>            : static Ret ReturnTypeHelper(Ret (ThisType::*)(ArgType) const);
+<span class="lineNum">      53 </span>            : template&lt;typename ThisType, typename Ret&gt;
+<span class="lineNum">      54 </span>            : static Ret ReturnTypeHelper(Ret (ThisType::*)());
+<span class="lineNum">      55 </span>            : template&lt;typename ThisType, typename Ret&gt;
+<span class="lineNum">      56 </span>            : static Ret ReturnTypeHelper(Ret (ThisType::*)() const);
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : template&lt;typename MethodType&gt;
+<span class="lineNum">      59 </span>            : struct ReturnType {
+<span class="lineNum">      60 </span>            :   typedef decltype(detail::ReturnTypeHelper(DeclVal&lt;MethodType&gt;())) Type;
+<span class="lineNum">      61 </span>            : };
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : } // namespace detail
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : template&lt;typename MethodType&gt;
+<span class="lineNum">      66 </span>            : struct TakesArgument {
+<span class="lineNum">      67 </span>            :   static const bool value = decltype(detail::TakesArgumentHelper(DeclVal&lt;MethodType&gt;()))::value;
+<span class="lineNum">      68 </span>            : };
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : template&lt;typename MethodType, typename TargetType&gt;
+<span class="lineNum">      71 </span>            : struct ReturnTypeIs {
+<span class="lineNum">      72 </span>            :   static const bool value = IsConvertible&lt;typename detail::ReturnType&lt;MethodType&gt;::Type, TargetType&gt;::value;
+<span class="lineNum">      73 </span>            : };
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : /*
+<span class="lineNum">      76 </span>            :  * A promise manages an asynchronous request that may or may not be able to be
+<span class="lineNum">      77 </span>            :  * fulfilled immediately. When an API returns a promise, the consumer may attach
+<span class="lineNum">      78 </span>            :  * callbacks to be invoked (asynchronously, on a specified thread) when the
+<span class="lineNum">      79 </span>            :  * request is either completed (resolved) or cannot be completed (rejected).
+<span class="lineNum">      80 </span>            :  * Whereas JS promise callbacks are dispatched from Microtask checkpoints,
+<span class="lineNum">      81 </span>            :  * MozPromises resolution/rejection make a normal round-trip through the event
+<span class="lineNum">      82 </span>            :  * loop, which simplifies their ordering semantics relative to other native code.
+<span class="lineNum">      83 </span>            :  *
+<span class="lineNum">      84 </span>            :  * MozPromises attempt to mirror the spirit of JS Promises to the extent that
+<span class="lineNum">      85 </span>            :  * is possible (and desirable) in C++. While the intent is that MozPromises
+<span class="lineNum">      86 </span>            :  * feel familiar to programmers who are accustomed to their JS-implemented cousin,
+<span class="lineNum">      87 </span>            :  * we don't shy away from imposing restrictions and adding features that make
+<span class="lineNum">      88 </span>            :  * sense for the use cases we encounter.
+<span class="lineNum">      89 </span>            :  *
+<span class="lineNum">      90 </span>            :  * A MozPromise is ThreadSafe, and may be -&gt;Then()ed on any thread. The Then()
+<span class="lineNum">      91 </span>            :  * call accepts resolve and reject callbacks, and returns a magic object which
+<span class="lineNum">      92 </span>            :  * will be implicitly converted to a MozPromise::Request or a MozPromise object
+<span class="lineNum">      93 </span>            :  * depending on how the return value is used. The magic object serves several
+<span class="lineNum">      94 </span>            :  * purposes for the consumer.
+<span class="lineNum">      95 </span>            :  *
+<span class="lineNum">      96 </span>            :  *   (1) When converting to a MozPromise::Request, it allows the caller to
+<span class="lineNum">      97 </span>            :  *       cancel the delivery of the resolve/reject value if it has not already
+<span class="lineNum">      98 </span>            :  *       occurred, via Disconnect() (this must be done on the target thread to
+<span class="lineNum">      99 </span>            :  *       avoid racing).
+<span class="lineNum">     100 </span>            :  *
+<span class="lineNum">     101 </span>            :  *   (2) When converting to a MozPromise (which is called a completion promise),
+<span class="lineNum">     102 </span>            :  *       it allows promise chaining so -&gt;Then() can be called again to attach
+<span class="lineNum">     103 </span>            :  *       more resolve and reject callbacks. If the resolve/reject callback
+<span class="lineNum">     104 </span>            :  *       returns a new MozPromise, that promise is chained to the completion
+<span class="lineNum">     105 </span>            :  *       promise, such that its resolve/reject value will be forwarded along
+<span class="lineNum">     106 </span>            :  *       when it arrives. If the resolve/reject callback returns void, the
+<span class="lineNum">     107 </span>            :  *       completion promise is resolved/rejected with the same value that was
+<span class="lineNum">     108 </span>            :  *       passed to the callback.
+<span class="lineNum">     109 </span>            :  *
+<span class="lineNum">     110 </span>            :  * The MozPromise APIs skirt traditional XPCOM convention by returning nsRefPtrs
+<span class="lineNum">     111 </span>            :  * (rather than already_AddRefed) from various methods. This is done to allow elegant
+<span class="lineNum">     112 </span>            :  * chaining of calls without cluttering up the code with intermediate variables, and
+<span class="lineNum">     113 </span>            :  * without introducing separate API variants for callers that want a return value
+<span class="lineNum">     114 </span>            :  * (from, say, -&gt;Then()) from those that don't.
+<span class="lineNum">     115 </span>            :  *
+<span class="lineNum">     116 </span>            :  * When IsExclusive is true, the MozPromise does a release-mode assertion that
+<span class="lineNum">     117 </span>            :  * there is at most one call to either Then(...) or ChainTo(...).
+<a name="118"><span class="lineNum">     118 </span>            :  */</a>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 : class MozPromiseRefcountable</span>
+<a name="121"><span class="lineNum">     121 </span>            : {</a>
+<span class="lineNum">     122 </span>            : public:
+<a name="123"><span class="lineNum">     123 </span><span class="lineNoCov">          0 :   NS_INLINE_DECL_THREADSAFE_REFCOUNTING(MozPromiseRefcountable)</span></a>
+<span class="lineNum">     124 </span>            : protected:
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :   virtual ~MozPromiseRefcountable() {}</span>
+<span class="lineNum">     126 </span>            : };
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : template&lt;typename T&gt; class MozPromiseHolder;
+<span class="lineNum">     129 </span>            : template&lt;typename T&gt; class MozPromiseRequestHolder;
+<span class="lineNum">     130 </span>            : template&lt;typename ResolveValueT, typename RejectValueT, bool IsExclusive&gt;
+<span class="lineNum">     131 </span>            : class MozPromise : public MozPromiseRefcountable
+<span class="lineNum">     132 </span>            : {
+<span class="lineNum">     133 </span>            :   static const uint32_t sMagic = 0xcecace11;
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : public:
+<a name="136"><span class="lineNum">     136 </span>            :   typedef ResolveValueT ResolveValueType;</a>
+<span class="lineNum">     137 </span>            :   typedef RejectValueT RejectValueType;
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   class ResolveOrRejectValue</span>
+<span class="lineNum">     139 </span>            :   {
+<span class="lineNum">     140 </span>            :   public:
+<span class="lineNum">     141 </span>            :     template&lt;typename ResolveValueType_&gt;
+<span class="lineNum">     142 </span>            :     void SetResolve(ResolveValueType_&amp;&amp; aResolveValue)
+<a name="143"><span class="lineNum">     143 </span>            :     {</a>
+<span class="lineNum">     144 </span>            :       MOZ_ASSERT(IsNothing());
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       mResolveValue.emplace(Forward&lt;ResolveValueType_&gt;(aResolveValue));</span>
+<span class="lineNum">     146 </span>            :     }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     template&lt;typename RejectValueType_&gt;
+<span class="lineNum">     149 </span>            :     void SetReject(RejectValueType_&amp;&amp; aRejectValue)
+<a name="150"><span class="lineNum">     150 </span>            :     {</a>
+<span class="lineNum">     151 </span>            :       MOZ_ASSERT(IsNothing());
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :       mRejectValue.emplace(Forward&lt;RejectValueType_&gt;(aRejectValue));</span>
+<span class="lineNum">     153 </span>            :     }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     template&lt;typename ResolveValueType_&gt;
+<span class="lineNum">     156 </span>            :     static ResolveOrRejectValue MakeResolve(ResolveValueType_&amp;&amp; aResolveValue)
+<span class="lineNum">     157 </span>            :     {
+<span class="lineNum">     158 </span>            :       ResolveOrRejectValue val;
+<span class="lineNum">     159 </span>            :       val.SetResolve(Forward&lt;ResolveValueType_&gt;(aResolveValue));
+<span class="lineNum">     160 </span>            :       return val;
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :     template&lt;typename RejectValueType_&gt;
+<span class="lineNum">     164 </span>            :     static ResolveOrRejectValue MakeReject(RejectValueType_&amp;&amp; aRejectValue)
+<span class="lineNum">     165 </span>            :     {
+<span class="lineNum">     166 </span>            :       ResolveOrRejectValue val;
+<span class="lineNum">     167 </span>            :       val.SetReject(Forward&lt;RejectValueType_&gt;(aRejectValue));
+<span class="lineNum">     168 </span>            :       return val;
+<a name="169"><span class="lineNum">     169 </span>            :     }</a>
+<span class="lineNum">     170 </span>            : 
+<a name="171"><span class="lineNum">     171 </span><span class="lineNoCov">          0 :     bool IsResolve() const { return mResolveValue.isSome(); }</span></a>
+<span class="lineNum">     172 </span>            :     bool IsReject() const { return mRejectValue.isSome(); }
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     bool IsNothing() const { return mResolveValue.isNothing() &amp;&amp; mRejectValue.isNothing(); }</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :     const ResolveValueType&amp; ResolveValue() const { return mResolveValue.ref(); }</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     const RejectValueType&amp; RejectValue() const { return mRejectValue.ref(); }</span>
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :   private:
+<span class="lineNum">     179 </span>            :     Maybe&lt;ResolveValueType&gt; mResolveValue;
+<span class="lineNum">     180 </span>            :     Maybe&lt;RejectValueType&gt; mRejectValue;
+<span class="lineNum">     181 </span>            :   };
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            : protected:
+<span class="lineNum">     184 </span>            :   // MozPromise is the public type, and never constructed directly. Construct
+<span class="lineNum">     185 </span>            :   // a MozPromise::Private, defined below.
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   MozPromise(const char* aCreationSite, bool aIsCompletionPromise)</span>
+<span class="lineNum">     187 </span>            :     : mCreationSite(aCreationSite)
+<span class="lineNum">     188 </span>            :     , mMutex(&quot;MozPromise Mutex&quot;)
+<span class="lineNum">     189 </span>            :     , mHaveRequest(false)
+<span class="lineNum">     190 </span>            :     , mIsCompletionPromise(aIsCompletionPromise)
+<span class="lineNum">     191 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :     , mMagic4(&amp;mMutex)</span>
+<span class="lineNum">     193 </span>            : #endif
+<span class="lineNum">     194 </span>            :   {
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s creating MozPromise (%p)&quot;, mCreationSite, this);</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : public:
+<span class="lineNum">     199 </span>            :   // MozPromise::Private allows us to separate the public interface (upon which
+<span class="lineNum">     200 </span>            :   // consumers of the promise may invoke methods like Then()) from the private
+<span class="lineNum">     201 </span>            :   // interface (upon which the creator of the promise may invoke Resolve() or
+<span class="lineNum">     202 </span>            :   // Reject()). APIs should create and store a MozPromise::Private (usually
+<span class="lineNum">     203 </span>            :   // via a MozPromiseHolder), and return a MozPromise to consumers.
+<span class="lineNum">     204 </span>            :   //
+<span class="lineNum">     205 </span>            :   // NB: We can include the definition of this class inline once B2G ICS is gone.
+<span class="lineNum">     206 </span>            :   class Private;
+<span class="lineNum">     207 </span>            : 
+<a name="208"><span class="lineNum">     208 </span>            :   template&lt;typename ResolveValueType_&gt;</a>
+<span class="lineNum">     209 </span>            :   static RefPtr&lt;MozPromise&gt;
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :   CreateAndResolve(ResolveValueType_&amp;&amp; aResolveValue, const char* aResolveSite)</span>
+<span class="lineNum">     211 </span>            :   {
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :     RefPtr&lt;typename MozPromise::Private&gt; p = new MozPromise::Private(aResolveSite);</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     p-&gt;Resolve(Forward&lt;ResolveValueType_&gt;(aResolveValue), aResolveSite);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :     return p.forget();</span>
+<span class="lineNum">     215 </span>            :   }
+<span class="lineNum">     216 </span>            : 
+<a name="217"><span class="lineNum">     217 </span>            :   template&lt;typename RejectValueType_&gt;</a>
+<span class="lineNum">     218 </span>            :   static RefPtr&lt;MozPromise&gt;
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   CreateAndReject(RejectValueType_&amp;&amp; aRejectValue, const char* aRejectSite)</span>
+<span class="lineNum">     220 </span>            :   {
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :     RefPtr&lt;typename MozPromise::Private&gt; p = new MozPromise::Private(aRejectSite);</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     p-&gt;Reject(Forward&lt;RejectValueType_&gt;(aRejectValue), aRejectSite);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :     return p.forget();</span>
+<span class="lineNum">     224 </span>            :   }
+<span class="lineNum">     225 </span>            : 
+<a name="226"><span class="lineNum">     226 </span>            :   typedef MozPromise&lt;nsTArray&lt;ResolveValueType&gt;, RejectValueType, IsExclusive&gt; AllPromiseType;</a>
+<span class="lineNum">     227 </span>            : private:
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :   class AllPromiseHolder : public MozPromiseRefcountable</span>
+<span class="lineNum">     229 </span>            :   {
+<span class="lineNum">     230 </span>            :   public:
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :     explicit AllPromiseHolder(size_t aDependentPromises)</span>
+<span class="lineNum">     232 </span>            :       : mPromise(new typename AllPromiseType::Private(__func__))
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :       , mOutstandingPromises(aDependentPromises)</span>
+<span class="lineNum">     234 </span>            :     {
+<span class="lineNum">     235 </span>            :       MOZ_ASSERT(aDependentPromises &gt; 0);
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :       mResolveValues.SetLength(aDependentPromises);</span>
+<a name="237"><span class="lineNum">     237 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :     void Resolve(size_t aIndex, ResolveValueType&amp;&amp; aResolveValue)</span>
+<span class="lineNum">     240 </span>            :     {
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :       if (!mPromise) {</span>
+<span class="lineNum">     242 </span>            :         // Already rejected.
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">     244 </span>            :       }
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :       mResolveValues[aIndex].emplace(Move(aResolveValue));</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :       if (--mOutstandingPromises == 0) {</span>
+<span class="lineNum">     248 </span>            :         nsTArray&lt;ResolveValueType&gt; resolveValues;
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :         resolveValues.SetCapacity(mResolveValues.Length());</span>
+<span class="lineNum">     250 </span><span class="lineNoCov">          0 :         for (size_t i = 0; i &lt; mResolveValues.Length(); ++i) {</span>
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :           resolveValues.AppendElement(Move(mResolveValues[i].ref()));</span>
+<span class="lineNum">     252 </span>            :         }
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :         mPromise-&gt;Resolve(Move(resolveValues), __func__);</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :         mPromise = nullptr;</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         mResolveValues.Clear();</span>
+<span class="lineNum">     257 </span>            :       }
+<a name="258"><span class="lineNum">     258 </span>            :     }</a>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :     void Reject(RejectValueType&amp;&amp; aRejectValue)</span>
+<span class="lineNum">     261 </span>            :     {
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       if (!mPromise) {</span>
+<span class="lineNum">     263 </span>            :         // Already rejected.
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">     265 </span>            :       }
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :       mPromise-&gt;Reject(Move(aRejectValue), __func__);</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :       mPromise = nullptr;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       mResolveValues.Clear();</span>
+<a name="270"><span class="lineNum">     270 </span>            :     }</a>
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     AllPromiseType* Promise() { return mPromise; }</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            :   private:
+<span class="lineNum">     275 </span>            :     nsTArray&lt;Maybe&lt;ResolveValueType&gt;&gt; mResolveValues;
+<span class="lineNum">     276 </span>            :     RefPtr&lt;typename AllPromiseType::Private&gt; mPromise;
+<span class="lineNum">     277 </span>            :     size_t mOutstandingPromises;
+<span class="lineNum">     278 </span>            :   };
+<span class="lineNum">     279 </span>            : public:
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :   static RefPtr&lt;AllPromiseType&gt; All(AbstractThread* aProcessingThread, nsTArray&lt;RefPtr&lt;MozPromise&gt;&gt;&amp; aPromises)</span>
+<span class="lineNum">     282 </span>            :   {
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :     if (aPromises.Length() == 0) {</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :       return AllPromiseType::CreateAndResolve(nsTArray&lt;ResolveValueType&gt;(), __func__);</span>
+<span class="lineNum">     285 </span>            :     }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     RefPtr&lt;AllPromiseHolder&gt; holder = new AllPromiseHolder(aPromises.Length());</span>
+<a name="288"><span class="lineNum">     288 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; aPromises.Length(); ++i) {</span></a>
+<a name="289"><span class="lineNum">     289 </span><span class="lineNoCov">          0 :       aPromises[i]-&gt;Then(aProcessingThread, __func__,</span></a>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :         [holder, i] (ResolveValueType aResolveValue) -&gt; void { holder-&gt;Resolve(i, Move(aResolveValue)); },</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :         [holder] (RejectValueType aRejectValue) -&gt; void { holder-&gt;Reject(Move(aRejectValue)); }</span>
+<span class="lineNum">     292 </span>            :       );
+<span class="lineNum">     293 </span>            :     }
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :     return holder-&gt;Promise();</span>
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :   class Request : public MozPromiseRefcountable
+<span class="lineNum">     298 </span>            :   {
+<span class="lineNum">     299 </span>            :   public:
+<span class="lineNum">     300 </span>            :     virtual void Disconnect() = 0;
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :   protected:
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :     Request() : mComplete(false), mDisconnected(false) {}</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     virtual ~Request() {}</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :     bool mComplete;
+<span class="lineNum">     307 </span>            :     bool mDisconnected;
+<span class="lineNum">     308 </span>            :   };
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            : protected:
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            :   /*
+<span class="lineNum">     313 </span>            :    * A ThenValue tracks a single consumer waiting on the promise. When a consumer
+<span class="lineNum">     314 </span>            :    * invokes promise-&gt;Then(...), a ThenValue is created. Once the Promise is
+<span class="lineNum">     315 </span>            :    * resolved or rejected, a {Resolve,Reject}Runnable is dispatched, which
+<span class="lineNum">     316 </span>            :    * invokes the resolve/reject method and then deletes the ThenValue.
+<span class="lineNum">     317 </span>            :    */
+<span class="lineNum">     318 </span>            :   class ThenValueBase : public Request
+<span class="lineNum">     319 </span>            :   {
+<span class="lineNum">     320 </span>            :     friend class MozPromise;
+<span class="lineNum">     321 </span>            :     static const uint32_t sMagic = 0xfadece11;
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            :   public:
+<span class="lineNum">     324 </span>            :     class ResolveOrRejectRunnable : public CancelableRunnable
+<a name="325"><span class="lineNum">     325 </span>            :     {</a>
+<span class="lineNum">     326 </span>            :     public:
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :       ResolveOrRejectRunnable(ThenValueBase* aThenValue, MozPromise* aPromise)</span>
+<span class="lineNum">     328 </span>            :         : mThenValue(aThenValue)
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :         , mPromise(aPromise)</span>
+<span class="lineNum">     330 </span>            :       {
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :         MOZ_DIAGNOSTIC_ASSERT(!mPromise-&gt;IsPending());</span>
+<a name="332"><span class="lineNum">     332 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :       ~ResolveOrRejectRunnable()</span>
+<span class="lineNum">     335 </span>            :       {
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :         if (mThenValue) {</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :           mThenValue-&gt;AssertIsDead();</span>
+<span class="lineNum">     338 </span>            :         }
+<a name="339"><span class="lineNum">     339 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :       NS_IMETHOD Run() override</span>
+<span class="lineNum">     342 </span>            :       {
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :         PROMISE_LOG(&quot;ResolveOrRejectRunnable::Run() [this=%p]&quot;, this);</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :         mThenValue-&gt;DoResolveOrReject(mPromise-&gt;Value());</span>
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :         mThenValue = nullptr;</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :         mPromise = nullptr;</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :         return NS_OK;</span>
+<a name="348"><span class="lineNum">     348 </span>            :       }</a>
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :       nsresult Cancel() override</span>
+<span class="lineNum">     351 </span>            :       {
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :         return Run();</span>
+<span class="lineNum">     353 </span>            :       }
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span>            :     private:
+<span class="lineNum">     356 </span>            :       RefPtr&lt;ThenValueBase&gt; mThenValue;
+<span class="lineNum">     357 </span>            :       RefPtr&lt;MozPromise&gt; mPromise;
+<a name="358"><span class="lineNum">     358 </span>            :     };</a>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :     ThenValueBase(AbstractThread* aResponseTarget,</span>
+<span class="lineNum">     361 </span>            :                   const char* aCallSite)
+<span class="lineNum">     362 </span>            :       : mResponseTarget(aResponseTarget)
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :       , mCallSite(aCallSite)</span>
+<span class="lineNum">     364 </span>            :     {
+<span class="lineNum">     365 </span>            :       MOZ_ASSERT(aResponseTarget);
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :     }</span>
+<a name="367"><span class="lineNum">     367 </span>            : </a>
+<span class="lineNum">     368 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :     ~ThenValueBase()</span>
+<span class="lineNum">     370 </span>            :     {
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :       mMagic1 = 0;</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :       mMagic2 = 0;</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     }</span>
+<a name="374"><span class="lineNum">     374 </span>            : #endif</a>
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineNoCov">          0 :     void AssertIsDead()</span>
+<span class="lineNum">     377 </span>            :     {
+<span class="lineNum">     378 </span><span class="lineNoCov">          0 :       PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic);</span>
+<span class="lineNum">     379 </span>            :       // We want to assert that this ThenValues is dead - that is to say, that
+<span class="lineNum">     380 </span>            :       // there are no consumers waiting for the result. In the case of a normal
+<span class="lineNum">     381 </span>            :       // ThenValue, we check that it has been disconnected, which is the way
+<span class="lineNum">     382 </span>            :       // that the consumer signals that it no longer wishes to hear about the
+<span class="lineNum">     383 </span>            :       // result. If this ThenValue has a completion promise (which is mutually
+<span class="lineNum">     384 </span>            :       // exclusive with being disconnectable), we recursively assert that every
+<span class="lineNum">     385 </span>            :       // ThenValue associated with the completion promise is dead.
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :       if (mCompletionPromise) {</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :         mCompletionPromise-&gt;AssertIsDead();</span>
+<span class="lineNum">     388 </span>            :       } else {
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :         MOZ_DIAGNOSTIC_ASSERT(Request::mDisconnected);</span>
+<span class="lineNum">     390 </span>            :       }
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :     void Dispatch(MozPromise *aPromise)</span>
+<span class="lineNum">     394 </span>            :     {
+<span class="lineNum">     395 </span><span class="lineNoCov">          0 :       PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic);</span>
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :       aPromise-&gt;mMutex.AssertCurrentThreadOwns();</span>
+<span class="lineNum">     397 </span>            :       MOZ_ASSERT(!aPromise-&gt;IsPending());
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :       nsCOMPtr&lt;nsIRunnable&gt; r = new ResolveOrRejectRunnable(this, aPromise);</span>
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :       PROMISE_LOG(&quot;%s Then() call made from %s [Runnable=%p, Promise=%p, ThenValue=%p]&quot;,</span>
+<span class="lineNum">     401 </span>            :                   aPromise-&gt;mValue.IsResolve() ? &quot;Resolving&quot; : &quot;Rejecting&quot;, mCallSite,
+<span class="lineNum">     402 </span>            :                   r.get(), aPromise, this);
+<span class="lineNum">     403 </span>            : 
+<span class="lineNum">     404 </span>            :       // Promise consumers are allowed to disconnect the Request object and
+<span class="lineNum">     405 </span>            :       // then shut down the thread or task queue that the promise result would
+<span class="lineNum">     406 </span>            :       // be dispatched on. So we unfortunately can't assert that promise
+<span class="lineNum">     407 </span>            :       // dispatch succeeds. :-(
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :       mResponseTarget-&gt;Dispatch(r.forget(), AbstractThread::DontAssertDispatchSuccess);</span>
+<a name="409"><span class="lineNum">     409 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :     void Disconnect() override</span>
+<span class="lineNum">     412 </span>            :     {
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :       MOZ_DIAGNOSTIC_ASSERT(mResponseTarget-&gt;IsCurrentThreadIn());</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :       MOZ_DIAGNOSTIC_ASSERT(!Request::mComplete);</span>
+<span class="lineNum">     415 </span><span class="lineNoCov">          0 :       Request::mDisconnected = true;</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span>            :       // We could support rejecting the completion promise on disconnection, but
+<span class="lineNum">     418 </span>            :       // then we'd need to have some sort of default reject value. The use cases
+<span class="lineNum">     419 </span>            :       // of disconnection and completion promise chaining seem pretty orthogonal,
+<span class="lineNum">     420 </span>            :       // so let's use assert against it.
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :       MOZ_DIAGNOSTIC_ASSERT(!mCompletionPromise);</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span>            :   protected:
+<a name="425"><span class="lineNum">     425 </span>            :     virtual already_AddRefed&lt;MozPromise&gt; DoResolveOrRejectInternal(const ResolveOrRejectValue&amp; aValue) = 0;</a>
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :     void DoResolveOrReject(const ResolveOrRejectValue&amp; aValue)</span>
+<span class="lineNum">     428 </span>            :     {
+<span class="lineNum">     429 </span><span class="lineNoCov">          0 :       PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic);</span>
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :       MOZ_DIAGNOSTIC_ASSERT(mResponseTarget-&gt;IsCurrentThreadIn());</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :       Request::mComplete = true;</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :       if (Request::mDisconnected) {</span>
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :         PROMISE_LOG(&quot;ThenValue::DoResolveOrReject disconnected - bailing out [this=%p]&quot;, this);</span>
+<span class="lineNum">     434 </span><span class="lineNoCov">          0 :         return;</span>
+<span class="lineNum">     435 </span>            :       }
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :       // Invoke the resolve or reject method.
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :       RefPtr&lt;MozPromise&gt; result = DoResolveOrRejectInternal(aValue);</span>
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span>            :       // If there's a completion promise, resolve it appropriately with the
+<span class="lineNum">     441 </span>            :       // result of the method.
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :       if (RefPtr&lt;Private&gt; p = mCompletionPromise.forget()) {</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :         if (result) {</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :           result-&gt;ChainTo(p.forget(), &quot;&lt;chained completion promise&gt;&quot;);</span>
+<span class="lineNum">     445 </span>            :         } else {
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :           p-&gt;ResolveOrReject(aValue, &quot;&lt;completion of non-promise-returning method&gt;&quot;);</span>
+<span class="lineNum">     447 </span>            :         }
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     449 </span>            :     }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :     RefPtr&lt;AbstractThread&gt; mResponseTarget; // May be released on any thread.
+<span class="lineNum">     452 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     453 </span>            :     uint32_t mMagic1 = sMagic;
+<span class="lineNum">     454 </span>            : #endif
+<span class="lineNum">     455 </span>            :     RefPtr&lt;Private&gt; mCompletionPromise;
+<span class="lineNum">     456 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     457 </span>            :     uint32_t mMagic2 = sMagic;
+<span class="lineNum">     458 </span>            : #endif
+<span class="lineNum">     459 </span>            :     const char* mCallSite;
+<span class="lineNum">     460 </span>            :   };
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :   /*
+<span class="lineNum">     463 </span>            :    * We create two overloads for invoking Resolve/Reject Methods so as to
+<span class="lineNum">     464 </span>            :    * make the resolve/reject value argument &quot;optional&quot;.
+<span class="lineNum">     465 </span>            :    */
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span>            :   template&lt;typename ThisType, typename MethodType, typename ValueType&gt;
+<span class="lineNum">     468 </span>            :   static typename EnableIf&lt;ReturnTypeIs&lt;MethodType, RefPtr&lt;MozPromise&gt;&gt;::value &amp;&amp;
+<span class="lineNum">     469 </span>            :                            TakesArgument&lt;MethodType&gt;::value,
+<span class="lineNum">     470 </span>            :                            already_AddRefed&lt;MozPromise&gt;&gt;::Type
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :   InvokeCallbackMethod(ThisType* aThisVal, MethodType aMethod, ValueType&amp;&amp; aValue)</span>
+<span class="lineNum">     472 </span>            :   {
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :     return ((*aThisVal).*aMethod)(Forward&lt;ValueType&gt;(aValue)).forget();</span>
+<span class="lineNum">     474 </span>            :   }
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            :   template&lt;typename ThisType, typename MethodType, typename ValueType&gt;
+<span class="lineNum">     477 </span>            :   static typename EnableIf&lt;ReturnTypeIs&lt;MethodType, void&gt;::value &amp;&amp;
+<a name="478"><span class="lineNum">     478 </span>            :                            TakesArgument&lt;MethodType&gt;::value,</a>
+<span class="lineNum">     479 </span>            :                            already_AddRefed&lt;MozPromise&gt;&gt;::Type
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :   InvokeCallbackMethod(ThisType* aThisVal, MethodType aMethod, ValueType&amp;&amp; aValue)</span>
+<span class="lineNum">     481 </span>            :   {
+<span class="lineNum">     482 </span><span class="lineNoCov">          0 :     ((*aThisVal).*aMethod)(Forward&lt;ValueType&gt;(aValue));</span>
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     484 </span>            :   }
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :   template&lt;typename ThisType, typename MethodType, typename ValueType&gt;
+<span class="lineNum">     487 </span>            :   static typename EnableIf&lt;ReturnTypeIs&lt;MethodType, RefPtr&lt;MozPromise&gt;&gt;::value &amp;&amp;
+<span class="lineNum">     488 </span>            :                            !TakesArgument&lt;MethodType&gt;::value,
+<span class="lineNum">     489 </span>            :                            already_AddRefed&lt;MozPromise&gt;&gt;::Type
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :   InvokeCallbackMethod(ThisType* aThisVal, MethodType aMethod, ValueType&amp;&amp; aValue)</span>
+<span class="lineNum">     491 </span>            :   {
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :     return ((*aThisVal).*aMethod)().forget();</span>
+<span class="lineNum">     493 </span>            :   }
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :   template&lt;typename ThisType, typename MethodType, typename ValueType&gt;
+<span class="lineNum">     496 </span>            :   static typename EnableIf&lt;ReturnTypeIs&lt;MethodType, void&gt;::value &amp;&amp;
+<a name="497"><span class="lineNum">     497 </span>            :                            !TakesArgument&lt;MethodType&gt;::value,</a>
+<span class="lineNum">     498 </span>            :                            already_AddRefed&lt;MozPromise&gt;&gt;::Type
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :   InvokeCallbackMethod(ThisType* aThisVal, MethodType aMethod, ValueType&amp;&amp; aValue)</span>
+<span class="lineNum">     500 </span>            :   {
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :     ((*aThisVal).*aMethod)();</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :     return nullptr;</span>
+<span class="lineNum">     503 </span>            :   }
+<a name="504"><span class="lineNum">     504 </span>            : </a>
+<span class="lineNum">     505 </span>            :   template&lt;typename ThisType, typename ResolveMethodType, typename RejectMethodType&gt;
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :   class MethodThenValue : public ThenValueBase</span>
+<a name="507"><span class="lineNum">     507 </span>            :   {</a>
+<span class="lineNum">     508 </span>            :   public:
+<span class="lineNum">     509 </span><span class="lineNoCov">          0 :     MethodThenValue(AbstractThread* aResponseTarget, ThisType* aThisVal,</span>
+<span class="lineNum">     510 </span>            :                     ResolveMethodType aResolveMethod, RejectMethodType aRejectMethod,
+<span class="lineNum">     511 </span>            :                     const char* aCallSite)
+<span class="lineNum">     512 </span>            :       : ThenValueBase(aResponseTarget, aCallSite)
+<span class="lineNum">     513 </span>            :       , mThisVal(aThisVal)
+<span class="lineNum">     514 </span>            :       , mResolveMethod(aResolveMethod)
+<a name="515"><span class="lineNum">     515 </span><span class="lineNoCov">          0 :       , mRejectMethod(aRejectMethod) {}</span></a>
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span><span class="lineNoCov">          0 :     void Disconnect() override</span>
+<span class="lineNum">     518 </span>            :     {
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 :       ThenValueBase::Disconnect();</span>
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span>            :       // If a Request has been disconnected, we don't guarantee that the
+<span class="lineNum">     522 </span>            :       // resolve/reject runnable will be dispatched. Null out our refcounted
+<span class="lineNum">     523 </span>            :       // this-value now so that it's released predictably on the dispatch thread.
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :       mThisVal = nullptr;</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span>            :   protected:
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :     already_AddRefed&lt;MozPromise&gt; DoResolveOrRejectInternal(const ResolveOrRejectValue&amp; aValue) override</span>
+<span class="lineNum">     529 </span>            :     {
+<span class="lineNum">     530 </span>            :       RefPtr&lt;MozPromise&gt; completion;
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :       if (aValue.IsResolve()) {</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :         completion = InvokeCallbackMethod(mThisVal.get(), mResolveMethod, aValue.ResolveValue());</span>
+<span class="lineNum">     533 </span>            :       } else {
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :         completion = InvokeCallbackMethod(mThisVal.get(), mRejectMethod, aValue.RejectValue());</span>
+<span class="lineNum">     535 </span>            :       }
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            :       // Null out mThisVal after invoking the callback so that any references are
+<span class="lineNum">     538 </span>            :       // released predictably on the dispatch thread. Otherwise, it would be
+<span class="lineNum">     539 </span>            :       // released on whatever thread last drops its reference to the ThenValue,
+<span class="lineNum">     540 </span>            :       // which may or may not be ok.
+<span class="lineNum">     541 </span><span class="lineNoCov">          0 :       mThisVal = nullptr;</span>
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :       return completion.forget();</span>
+<span class="lineNum">     544 </span>            :     }
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span>            :   private:
+<span class="lineNum">     547 </span>            :     RefPtr&lt;ThisType&gt; mThisVal; // Only accessed and refcounted on dispatch thread.
+<span class="lineNum">     548 </span>            :     ResolveMethodType mResolveMethod;
+<span class="lineNum">     549 </span>            :     RejectMethodType mRejectMethod;
+<span class="lineNum">     550 </span>            :   };
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span>            :   // Specialization of MethodThenValue (with 3rd template arg being 'void')
+<span class="lineNum">     553 </span>            :   // that only takes one method, to be called with a ResolveOrRejectValue.
+<span class="lineNum">     554 </span>            :   template&lt;typename ThisType, typename ResolveRejectMethodType&gt;
+<span class="lineNum">     555 </span>            :   class MethodThenValue&lt;ThisType, ResolveRejectMethodType, void&gt; : public ThenValueBase
+<span class="lineNum">     556 </span>            :   {
+<span class="lineNum">     557 </span>            :   public:
+<span class="lineNum">     558 </span>            :     MethodThenValue(AbstractThread* aResponseTarget, ThisType* aThisVal,
+<span class="lineNum">     559 </span>            :                     ResolveRejectMethodType aResolveRejectMethod,
+<span class="lineNum">     560 </span>            :                     const char* aCallSite)
+<span class="lineNum">     561 </span>            :       : ThenValueBase(aResponseTarget, aCallSite)
+<span class="lineNum">     562 </span>            :       , mThisVal(aThisVal)
+<span class="lineNum">     563 </span>            :       , mResolveRejectMethod(aResolveRejectMethod)
+<span class="lineNum">     564 </span>            :     {}
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            :     void Disconnect() override
+<span class="lineNum">     567 </span>            :     {
+<span class="lineNum">     568 </span>            :       ThenValueBase::Disconnect();
+<span class="lineNum">     569 </span>            : 
+<span class="lineNum">     570 </span>            :       // If a Request has been disconnected, we don't guarantee that the
+<span class="lineNum">     571 </span>            :       // resolve/reject runnable will be dispatched. Null out our refcounted
+<span class="lineNum">     572 </span>            :       // this-value now so that it's released predictably on the dispatch thread.
+<span class="lineNum">     573 </span>            :       mThisVal = nullptr;
+<span class="lineNum">     574 </span>            :     }
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            :   protected:
+<span class="lineNum">     577 </span>            :     already_AddRefed&lt;MozPromise&gt; DoResolveOrRejectInternal(const ResolveOrRejectValue&amp; aValue) override
+<span class="lineNum">     578 </span>            :     {
+<span class="lineNum">     579 </span>            :       RefPtr&lt;MozPromise&gt; completion =
+<span class="lineNum">     580 </span>            :         InvokeCallbackMethod(mThisVal.get(), mResolveRejectMethod, aValue);
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            :       // Null out mThisVal after invoking the callback so that any references are
+<span class="lineNum">     583 </span>            :       // released predictably on the dispatch thread. Otherwise, it would be
+<span class="lineNum">     584 </span>            :       // released on whatever thread last drops its reference to the ThenValue,
+<span class="lineNum">     585 </span>            :       // which may or may not be ok.
+<span class="lineNum">     586 </span>            :       mThisVal = nullptr;
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            :       return completion.forget();
+<span class="lineNum">     589 </span>            :     }
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span>            :   private:
+<span class="lineNum">     592 </span>            :     RefPtr&lt;ThisType&gt; mThisVal; // Only accessed and refcounted on dispatch thread.
+<span class="lineNum">     593 </span>            :     ResolveRejectMethodType mResolveRejectMethod;
+<span class="lineNum">     594 </span>            :   };
+<span class="lineNum">     595 </span>            : 
+<a name="596"><span class="lineNum">     596 </span>            :   // NB: We could use std::function here instead of a template if it were supported. :-(</a>
+<span class="lineNum">     597 </span>            :   template&lt;typename ResolveFunction, typename RejectFunction&gt;
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :   class FunctionThenValue : public ThenValueBase</span>
+<a name="599"><span class="lineNum">     599 </span>            :   {</a>
+<span class="lineNum">     600 </span>            :   public:
+<span class="lineNum">     601 </span><span class="lineNoCov">          0 :     FunctionThenValue(AbstractThread* aResponseTarget,</span>
+<span class="lineNum">     602 </span>            :                       ResolveFunction&amp;&amp; aResolveFunction,
+<span class="lineNum">     603 </span>            :                       RejectFunction&amp;&amp; aRejectFunction,
+<span class="lineNum">     604 </span>            :                       const char* aCallSite)
+<span class="lineNum">     605 </span><span class="lineNoCov">          0 :       : ThenValueBase(aResponseTarget, aCallSite)</span>
+<span class="lineNum">     606 </span>            :     {
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :       mResolveFunction.emplace(Move(aResolveFunction));</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :       mRejectFunction.emplace(Move(aRejectFunction));</span>
+<a name="609"><span class="lineNum">     609 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">     610 </span>            : 
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :     void Disconnect() override</span>
+<span class="lineNum">     612 </span>            :     {
+<span class="lineNum">     613 </span><span class="lineNoCov">          0 :       ThenValueBase::Disconnect();</span>
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :       // If a Request has been disconnected, we don't guarantee that the
+<span class="lineNum">     616 </span>            :       // resolve/reject runnable will be dispatched. Destroy our callbacks
+<span class="lineNum">     617 </span>            :       // now so that any references in closures are released predictable on
+<span class="lineNum">     618 </span>            :       // the dispatch thread.
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :       mResolveFunction.reset();</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :       mRejectFunction.reset();</span>
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     622 </span>            : 
+<span class="lineNum">     623 </span>            :   protected:
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :     already_AddRefed&lt;MozPromise&gt; DoResolveOrRejectInternal(const ResolveOrRejectValue&amp; aValue) override</span>
+<span class="lineNum">     625 </span>            :     {
+<span class="lineNum">     626 </span>            :       // Note: The usage of InvokeCallbackMethod here requires that
+<span class="lineNum">     627 </span>            :       // ResolveFunction/RejectFunction are capture-lambdas (i.e. anonymous
+<span class="lineNum">     628 </span>            :       // classes with ::operator()), since it allows us to share code more easily.
+<span class="lineNum">     629 </span>            :       // We could fix this if need be, though it's quite easy to work around by
+<span class="lineNum">     630 </span>            :       // just capturing something.
+<span class="lineNum">     631 </span>            :       RefPtr&lt;MozPromise&gt; completion;
+<span class="lineNum">     632 </span><span class="lineNoCov">          0 :       if (aValue.IsResolve()) {</span>
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :         completion = InvokeCallbackMethod(mResolveFunction.ptr(), &amp;ResolveFunction::operator(), aValue.ResolveValue());</span>
+<span class="lineNum">     634 </span>            :       } else {
+<span class="lineNum">     635 </span><span class="lineNoCov">          0 :         completion = InvokeCallbackMethod(mRejectFunction.ptr(), &amp;RejectFunction::operator(), aValue.RejectValue());</span>
+<span class="lineNum">     636 </span>            :       }
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span>            :       // Destroy callbacks after invocation so that any references in closures are
+<span class="lineNum">     639 </span>            :       // released predictably on the dispatch thread. Otherwise, they would be
+<span class="lineNum">     640 </span>            :       // released on whatever thread last drops its reference to the ThenValue,
+<span class="lineNum">     641 </span>            :       // which may or may not be ok.
+<span class="lineNum">     642 </span><span class="lineNoCov">          0 :       mResolveFunction.reset();</span>
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 :       mRejectFunction.reset();</span>
+<span class="lineNum">     644 </span>            : 
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :       return completion.forget();</span>
+<span class="lineNum">     646 </span>            :     }
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            :   private:
+<span class="lineNum">     649 </span>            :     Maybe&lt;ResolveFunction&gt; mResolveFunction; // Only accessed and deleted on dispatch thread.
+<span class="lineNum">     650 </span>            :     Maybe&lt;RejectFunction&gt; mRejectFunction; // Only accessed and deleted on dispatch thread.
+<span class="lineNum">     651 </span>            :   };
+<span class="lineNum">     652 </span>            : 
+<span class="lineNum">     653 </span>            :   // Specialization of FunctionThenValue (with 2nd template arg being 'void')
+<a name="654"><span class="lineNum">     654 </span>            :   // that only takes one function, to be called with a ResolveOrRejectValue.</a>
+<span class="lineNum">     655 </span>            :   template&lt;typename ResolveRejectFunction&gt;
+<span class="lineNum">     656 </span><span class="lineNoCov">          0 :   class FunctionThenValue&lt;ResolveRejectFunction, void&gt; : public ThenValueBase</span>
+<a name="657"><span class="lineNum">     657 </span>            :   {</a>
+<span class="lineNum">     658 </span>            :   public:
+<span class="lineNum">     659 </span><span class="lineNoCov">          0 :     FunctionThenValue(AbstractThread* aResponseTarget,</span>
+<span class="lineNum">     660 </span>            :                       ResolveRejectFunction&amp;&amp; aResolveRejectFunction,
+<span class="lineNum">     661 </span>            :                       const char* aCallSite)
+<span class="lineNum">     662 </span><span class="lineNoCov">          0 :       : ThenValueBase(aResponseTarget, aCallSite)</span>
+<span class="lineNum">     663 </span>            :     {
+<span class="lineNum">     664 </span><span class="lineNoCov">          0 :       mResolveRejectFunction.emplace(Move(aResolveRejectFunction));</span>
+<a name="665"><span class="lineNum">     665 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span><span class="lineNoCov">          0 :     void Disconnect() override</span>
+<span class="lineNum">     668 </span>            :     {
+<span class="lineNum">     669 </span><span class="lineNoCov">          0 :       ThenValueBase::Disconnect();</span>
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span>            :       // If a Request has been disconnected, we don't guarantee that the
+<span class="lineNum">     672 </span>            :       // resolve/reject runnable will be dispatched. Destroy our callbacks
+<span class="lineNum">     673 </span>            :       // now so that any references in closures are released predictable on
+<span class="lineNum">     674 </span>            :       // the dispatch thread.
+<span class="lineNum">     675 </span><span class="lineNoCov">          0 :       mResolveRejectFunction.reset();</span>
+<span class="lineNum">     676 </span><span class="lineNoCov">          0 :     }</span>
+<a name="677"><span class="lineNum">     677 </span>            : </a>
+<span class="lineNum">     678 </span>            :   protected:
+<span class="lineNum">     679 </span><span class="lineNoCov">          0 :     already_AddRefed&lt;MozPromise&gt; DoResolveOrRejectInternal(const ResolveOrRejectValue&amp; aValue) override</span>
+<span class="lineNum">     680 </span>            :     {
+<span class="lineNum">     681 </span>            :       // Note: The usage of InvokeCallbackMethod here requires that
+<span class="lineNum">     682 </span>            :       // ResolveRejectFunction is capture-lambdas (i.e. anonymous
+<span class="lineNum">     683 </span>            :       // classes with ::operator()), since it allows us to share code more easily.
+<span class="lineNum">     684 </span>            :       // We could fix this if need be, though it's quite easy to work around by
+<span class="lineNum">     685 </span>            :       // just capturing something.
+<span class="lineNum">     686 </span>            :       RefPtr&lt;MozPromise&gt; completion =
+<span class="lineNum">     687 </span>            :         InvokeCallbackMethod(mResolveRejectFunction.ptr(),
+<span class="lineNum">     688 </span>            :                              &amp;ResolveRejectFunction::operator(),
+<span class="lineNum">     689 </span><span class="lineNoCov">          0 :                              aValue);</span>
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span>            :       // Destroy callbacks after invocation so that any references in closures are
+<span class="lineNum">     692 </span>            :       // released predictably on the dispatch thread. Otherwise, they would be
+<span class="lineNum">     693 </span>            :       // released on whatever thread last drops its reference to the ThenValue,
+<span class="lineNum">     694 </span>            :       // which may or may not be ok.
+<span class="lineNum">     695 </span><span class="lineNoCov">          0 :       mResolveRejectFunction.reset();</span>
+<span class="lineNum">     696 </span>            : 
+<span class="lineNum">     697 </span><span class="lineNoCov">          0 :       return completion.forget();</span>
+<span class="lineNum">     698 </span>            :     }
+<span class="lineNum">     699 </span>            : 
+<span class="lineNum">     700 </span>            :   private:
+<span class="lineNum">     701 </span>            :     Maybe&lt;ResolveRejectFunction&gt; mResolveRejectFunction; // Only accessed and deleted on dispatch thread.
+<span class="lineNum">     702 </span>            :   };
+<a name="703"><span class="lineNum">     703 </span>            : </a>
+<span class="lineNum">     704 </span>            : public:
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :   void ThenInternal(AbstractThread* aResponseThread, ThenValueBase* aThenValue,</span>
+<span class="lineNum">     706 </span>            :                     const char* aCallSite)
+<span class="lineNum">     707 </span>            :   {
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :     PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic &amp;&amp; mMagic3 == sMagic &amp;&amp; mMagic4 == &amp;mMutex);</span>
+<span class="lineNum">     709 </span>            :     MOZ_ASSERT(aResponseThread);
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     711 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(!IsExclusive || !mHaveRequest);</span>
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :     mHaveRequest = true;</span>
+<span class="lineNum">     713 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s invoking Then() [this=%p, aThenValue=%p, isPending=%d]&quot;,</span>
+<span class="lineNum">     714 </span>            :                 aCallSite, this, aThenValue, (int) IsPending());
+<span class="lineNum">     715 </span><span class="lineNoCov">          0 :     if (!IsPending()) {</span>
+<span class="lineNum">     716 </span><span class="lineNoCov">          0 :       aThenValue-&gt;Dispatch(this);</span>
+<span class="lineNum">     717 </span>            :     } else {
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :       mThenValues.AppendElement(aThenValue);</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     721 </span>            : 
+<span class="lineNum">     722 </span>            : private:
+<span class="lineNum">     723 </span>            :   /*
+<span class="lineNum">     724 </span>            :    * A command object to store all information needed to make a request to
+<span class="lineNum">     725 </span>            :    * the promise. This allows us to delay the request until further use is
+<span class="lineNum">     726 </span>            :    * known (whether it is -&gt;Then() again for more promise chaining or -&gt;Track()
+<span class="lineNum">     727 </span>            :    * to terminate chaining and issue the request).
+<span class="lineNum">     728 </span>            :    *
+<span class="lineNum">     729 </span>            :    * This allows a unified syntax for promise chaining and disconnection
+<span class="lineNum">     730 </span>            :    * and feels more like its JS counterpart.
+<span class="lineNum">     731 </span>            :    */
+<span class="lineNum">     732 </span>            :   class ThenCommand
+<span class="lineNum">     733 </span>            :   {
+<span class="lineNum">     734 </span>            :     friend class MozPromise;
+<span class="lineNum">     735 </span>            : 
+<span class="lineNum">     736 </span>            :     ThenCommand(AbstractThread* aResponseThread,
+<span class="lineNum">     737 </span>            :                 const char* aCallSite,
+<span class="lineNum">     738 </span>            :                 already_AddRefed&lt;ThenValueBase&gt; aThenValue,
+<span class="lineNum">     739 </span>            :                 MozPromise* aReceiver)
+<span class="lineNum">     740 </span>            :       : mResponseThread(aResponseThread)
+<a name="741"><span class="lineNum">     741 </span>            :       , mCallSite(aCallSite)</a>
+<span class="lineNum">     742 </span>            :       , mThenValue(aThenValue)
+<span class="lineNum">     743 </span><span class="lineNoCov">          0 :       , mReceiver(aReceiver)</span>
+<span class="lineNum">     744 </span>            :     {
+<span class="lineNum">     745 </span>            :       MOZ_ASSERT(aResponseThread);
+<span class="lineNum">     746 </span>            :     }
+<span class="lineNum">     747 </span>            : 
+<span class="lineNum">     748 </span>            :     ThenCommand(ThenCommand&amp;&amp; aOther) = default;
+<a name="749"><span class="lineNum">     749 </span>            : </a>
+<span class="lineNum">     750 </span>            :   public:
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :     ~ThenCommand()</span>
+<span class="lineNum">     752 </span>            :     {
+<span class="lineNum">     753 </span>            :       // Issue the request now if the return value of Then() is not used.
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :       if (mThenValue) {</span>
+<span class="lineNum">     755 </span><span class="lineNoCov">          0 :         mReceiver-&gt;ThenInternal(mResponseThread, mThenValue, mCallSite);</span>
+<span class="lineNum">     756 </span>            :       }
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     758 </span>            : 
+<span class="lineNum">     759 </span>            :     // Allow RefPtr&lt;MozPromise&gt; p = somePromise-&gt;Then();
+<span class="lineNum">     760 </span>            :     //       p-&gt;Then(thread1, ...);
+<span class="lineNum">     761 </span>            :     //       p-&gt;Then(thread2, ...);
+<span class="lineNum">     762 </span><span class="lineNoCov">          0 :     operator RefPtr&lt;MozPromise&gt;()</span>
+<span class="lineNum">     763 </span>            :     {
+<span class="lineNum">     764 </span><span class="lineNoCov">          0 :       RefPtr&lt;ThenValueBase&gt; thenValue = mThenValue.forget();</span>
+<span class="lineNum">     765 </span>            :       // mCompletionPromise must be created before ThenInternal() to avoid race.
+<span class="lineNum">     766 </span>            :       RefPtr&lt;MozPromise::Private&gt; p = new MozPromise::Private(
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :         &quot;&lt;completion promise&gt;&quot;, true /* aIsCompletionPromise */);</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :       thenValue-&gt;mCompletionPromise = p;</span>
+<span class="lineNum">     769 </span>            :       // Note ThenInternal() might nullify mCompletionPromise before return.
+<span class="lineNum">     770 </span>            :       // So we need to return p instead of mCompletionPromise.
+<span class="lineNum">     771 </span><span class="lineNoCov">          0 :       mReceiver-&gt;ThenInternal(mResponseThread, thenValue, mCallSite);</span>
+<span class="lineNum">     772 </span><span class="lineNoCov">          0 :       return p;</span>
+<span class="lineNum">     773 </span>            :     }
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span>            :     template &lt;typename... Ts&gt;
+<span class="lineNum">     776 </span><span class="lineNoCov">          0 :     auto Then(Ts&amp;&amp;... aArgs)</span>
+<span class="lineNum">     777 </span>            :       -&gt; decltype(DeclVal&lt;MozPromise&gt;().Then(Forward&lt;Ts&gt;(aArgs)...))
+<span class="lineNum">     778 </span>            :     {
+<span class="lineNum">     779 </span><span class="lineNoCov">          0 :       return static_cast&lt;RefPtr&lt;MozPromise&gt;&gt;(*this)-&gt;Then(Forward&lt;Ts&gt;(aArgs)...);</span>
+<span class="lineNum">     780 </span>            :     }
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span><span class="lineNoCov">          0 :     void Track(MozPromiseRequestHolder&lt;MozPromise&gt;&amp; aRequestHolder)</span>
+<span class="lineNum">     783 </span>            :     {
+<span class="lineNum">     784 </span><span class="lineNoCov">          0 :       RefPtr&lt;ThenValueBase&gt; thenValue = mThenValue.forget();</span>
+<span class="lineNum">     785 </span><span class="lineNoCov">          0 :       mReceiver-&gt;ThenInternal(mResponseThread, thenValue, mCallSite);</span>
+<span class="lineNum">     786 </span><span class="lineNoCov">          0 :       aRequestHolder.Track(thenValue.forget());</span>
+<span class="lineNum">     787 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span>            :     // Allow calling -&gt;Then() again for more promise chaining or -&gt;Track() to
+<span class="lineNum">     790 </span>            :     // end chaining and track the request for future disconnection.
+<span class="lineNum">     791 </span>            :     ThenCommand* operator-&gt;()
+<span class="lineNum">     792 </span>            :     {
+<span class="lineNum">     793 </span>            :       return this;
+<span class="lineNum">     794 </span>            :     }
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span>            :   private:
+<span class="lineNum">     797 </span>            :     AbstractThread* mResponseThread;
+<span class="lineNum">     798 </span>            :     const char* mCallSite;
+<span class="lineNum">     799 </span>            :     RefPtr&lt;ThenValueBase&gt; mThenValue;
+<span class="lineNum">     800 </span>            :     MozPromise* mReceiver;
+<span class="lineNum">     801 </span>            :   };
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span>            : public:
+<span class="lineNum">     804 </span>            :   template&lt;typename ThisType, typename ResolveMethodType, typename RejectMethodType&gt;
+<span class="lineNum">     805 </span><span class="lineNoCov">          0 :   ThenCommand Then(AbstractThread* aResponseThread, const char* aCallSite,</span>
+<span class="lineNum">     806 </span>            :     ThisType* aThisVal, ResolveMethodType aResolveMethod, RejectMethodType aRejectMethod)
+<span class="lineNum">     807 </span>            :   {
+<span class="lineNum">     808 </span>            :     using ThenType = MethodThenValue&lt;ThisType, ResolveMethodType, RejectMethodType&gt;;
+<span class="lineNum">     809 </span>            :     RefPtr&lt;ThenValueBase&gt; thenValue = new ThenType(aResponseThread,
+<span class="lineNum">     810 </span><span class="lineNoCov">          0 :        aThisVal, aResolveMethod, aRejectMethod, aCallSite);</span>
+<span class="lineNum">     811 </span><span class="lineNoCov">          0 :     return ThenCommand(aResponseThread, aCallSite, thenValue.forget(), this);</span>
+<span class="lineNum">     812 </span>            :   }
+<span class="lineNum">     813 </span>            : 
+<span class="lineNum">     814 </span>            :   template&lt;typename ThisType, typename ResolveRejectMethodType&gt;
+<span class="lineNum">     815 </span>            :   ThenCommand Then(AbstractThread* aResponseThread, const char* aCallSite,
+<span class="lineNum">     816 </span>            :     ThisType* aThisVal, ResolveRejectMethodType aResolveRejectMethod)
+<span class="lineNum">     817 </span>            :   {
+<span class="lineNum">     818 </span>            :     using ThenType = MethodThenValue&lt;ThisType, ResolveRejectMethodType, void&gt;;
+<span class="lineNum">     819 </span>            :     RefPtr&lt;ThenValueBase&gt; thenValue = new ThenType(aResponseThread,
+<span class="lineNum">     820 </span>            :        aThisVal, aResolveRejectMethod, aCallSite);
+<span class="lineNum">     821 </span>            :     return ThenCommand(aResponseThread, aCallSite, thenValue.forget(), this);
+<span class="lineNum">     822 </span>            :   }
+<span class="lineNum">     823 </span>            : 
+<span class="lineNum">     824 </span>            :   template&lt;typename ResolveFunction, typename RejectFunction&gt;
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :   ThenCommand Then(AbstractThread* aResponseThread, const char* aCallSite,</span>
+<span class="lineNum">     826 </span>            :     ResolveFunction&amp;&amp; aResolveFunction, RejectFunction&amp;&amp; aRejectFunction)
+<span class="lineNum">     827 </span>            :   {
+<span class="lineNum">     828 </span>            :     using ThenType = FunctionThenValue&lt;ResolveFunction, RejectFunction&gt;;
+<span class="lineNum">     829 </span>            :     RefPtr&lt;ThenValueBase&gt; thenValue = new ThenType(aResponseThread,
+<span class="lineNum">     830 </span><span class="lineNoCov">          0 :       Move(aResolveFunction), Move(aRejectFunction), aCallSite);</span>
+<span class="lineNum">     831 </span><span class="lineNoCov">          0 :     return ThenCommand(aResponseThread, aCallSite, thenValue.forget(), this);</span>
+<span class="lineNum">     832 </span>            :   }
+<span class="lineNum">     833 </span>            : 
+<span class="lineNum">     834 </span>            :   template&lt;typename ResolveRejectFunction&gt;
+<span class="lineNum">     835 </span><span class="lineNoCov">          0 :   ThenCommand Then(AbstractThread* aResponseThread, const char* aCallSite,</span>
+<span class="lineNum">     836 </span>            :                    ResolveRejectFunction&amp;&amp; aResolveRejectFunction)
+<span class="lineNum">     837 </span>            :   {
+<span class="lineNum">     838 </span>            :     using ThenType = FunctionThenValue&lt;ResolveRejectFunction, void&gt;;
+<span class="lineNum">     839 </span>            :     RefPtr&lt;ThenValueBase&gt; thenValue = new ThenType(aResponseThread,
+<span class="lineNum">     840 </span><span class="lineNoCov">          0 :       Move(aResolveRejectFunction), aCallSite);</span>
+<span class="lineNum">     841 </span><span class="lineNoCov">          0 :     return ThenCommand(aResponseThread, aCallSite, thenValue.forget(), this);</span>
+<a name="842"><span class="lineNum">     842 </span>            :   }</a>
+<span class="lineNum">     843 </span>            : 
+<span class="lineNum">     844 </span><span class="lineNoCov">          0 :   void ChainTo(already_AddRefed&lt;Private&gt; aChainedPromise, const char* aCallSite)</span>
+<span class="lineNum">     845 </span>            :   {
+<span class="lineNum">     846 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     847 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(!IsExclusive || !mHaveRequest);</span>
+<span class="lineNum">     848 </span><span class="lineNoCov">          0 :     mHaveRequest = true;</span>
+<span class="lineNum">     849 </span><span class="lineNoCov">          0 :     RefPtr&lt;Private&gt; chainedPromise = aChainedPromise;</span>
+<span class="lineNum">     850 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s invoking Chain() [this=%p, chainedPromise=%p, isPending=%d]&quot;,</span>
+<span class="lineNum">     851 </span>            :                 aCallSite, this, chainedPromise.get(), (int) IsPending());
+<span class="lineNum">     852 </span><span class="lineNoCov">          0 :     if (!IsPending()) {</span>
+<span class="lineNum">     853 </span><span class="lineNoCov">          0 :       ForwardTo(chainedPromise);</span>
+<span class="lineNum">     854 </span>            :     } else {
+<span class="lineNum">     855 </span><span class="lineNoCov">          0 :       mChainedPromises.AppendElement(chainedPromise);</span>
+<span class="lineNum">     856 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     857 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     858 </span>            : 
+<span class="lineNum">     859 </span>            :   // Note we expose the function AssertIsDead() instead of IsDead() since
+<span class="lineNum">     860 </span>            :   // checking IsDead() is a data race in the situation where the request is not
+<a name="861"><span class="lineNum">     861 </span>            :   // dead. Therefore we enforce the form |Assert(IsDead())| by exposing</a>
+<span class="lineNum">     862 </span>            :   // AssertIsDead() only.
+<span class="lineNum">     863 </span><span class="lineNoCov">          0 :   void AssertIsDead()</span>
+<span class="lineNum">     864 </span>            :   {
+<span class="lineNum">     865 </span><span class="lineNoCov">          0 :     PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic &amp;&amp; mMagic3 == sMagic &amp;&amp; mMagic4 == &amp;mMutex);</span>
+<span class="lineNum">     866 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     867 </span><span class="lineNoCov">          0 :     for (auto&amp;&amp; then : mThenValues) {</span>
+<span class="lineNum">     868 </span><span class="lineNoCov">          0 :       then-&gt;AssertIsDead();</span>
+<span class="lineNum">     869 </span>            :     }
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :     for (auto&amp;&amp; chained : mChainedPromises) {</span>
+<span class="lineNum">     871 </span><span class="lineNoCov">          0 :       chained-&gt;AssertIsDead();</span>
+<span class="lineNum">     872 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     873 </span><span class="lineNoCov">          0 :   }</span>
+<a name="874"><span class="lineNum">     874 </span>            : </a>
+<span class="lineNum">     875 </span>            : protected:
+<span class="lineNum">     876 </span><span class="lineNoCov">          0 :   bool IsPending() const { return mValue.IsNothing(); }</span>
+<span class="lineNum">     877 </span><span class="lineNoCov">          0 :   const ResolveOrRejectValue&amp; Value() const</span>
+<span class="lineNum">     878 </span>            :   {
+<span class="lineNum">     879 </span>            :     // This method should only be called once the value has stabilized. As
+<span class="lineNum">     880 </span>            :     // such, we don't need to acquire the lock here.
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(!IsPending());</span>
+<span class="lineNum">     882 </span><span class="lineNoCov">          0 :     return mValue;</span>
+<a name="883"><span class="lineNum">     883 </span>            :   }</a>
+<span class="lineNum">     884 </span>            : 
+<span class="lineNum">     885 </span><span class="lineNoCov">          0 :   void DispatchAll()</span>
+<span class="lineNum">     886 </span>            :   {
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :     mMutex.AssertCurrentThreadOwns();</span>
+<span class="lineNum">     888 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; mThenValues.Length(); ++i) {</span>
+<span class="lineNum">     889 </span><span class="lineNoCov">          0 :       mThenValues[i]-&gt;Dispatch(this);</span>
+<span class="lineNum">     890 </span>            :     }
+<span class="lineNum">     891 </span><span class="lineNoCov">          0 :     mThenValues.Clear();</span>
+<span class="lineNum">     892 </span>            : 
+<span class="lineNum">     893 </span><span class="lineNoCov">          0 :     for (size_t i = 0; i &lt; mChainedPromises.Length(); ++i) {</span>
+<span class="lineNum">     894 </span><span class="lineNoCov">          0 :       ForwardTo(mChainedPromises[i]);</span>
+<span class="lineNum">     895 </span>            :     }
+<span class="lineNum">     896 </span><span class="lineNoCov">          0 :     mChainedPromises.Clear();</span>
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span><span class="lineNoCov">          0 :   void ForwardTo(Private* aOther)</span>
+<span class="lineNum">     900 </span>            :   {
+<span class="lineNum">     901 </span>            :     MOZ_ASSERT(!IsPending());
+<span class="lineNum">     902 </span><span class="lineNoCov">          0 :     if (mValue.IsResolve()) {</span>
+<span class="lineNum">     903 </span><span class="lineNoCov">          0 :       aOther-&gt;Resolve(mValue.ResolveValue(), &quot;&lt;chained promise&gt;&quot;);</span>
+<span class="lineNum">     904 </span>            :     } else {
+<span class="lineNum">     905 </span><span class="lineNoCov">          0 :       aOther-&gt;Reject(mValue.RejectValue(), &quot;&lt;chained promise&gt;&quot;);</span>
+<span class="lineNum">     906 </span>            :     }
+<a name="907"><span class="lineNum">     907 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     908 </span>            : 
+<span class="lineNum">     909 </span><span class="lineNoCov">          0 :   virtual ~MozPromise()</span>
+<span class="lineNum">     910 </span>            :   {
+<span class="lineNum">     911 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;MozPromise::~MozPromise [this=%p]&quot;, this);</span>
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :     AssertIsDead();</span>
+<span class="lineNum">     913 </span>            :     // We can't guarantee a completion promise will always be revolved or
+<span class="lineNum">     914 </span>            :     // rejected since ResolveOrRejectRunnable might not run when dispatch fails.
+<span class="lineNum">     915 </span>            :     if (!mIsCompletionPromise) {
+<span class="lineNum">     916 </span>            :       MOZ_ASSERT(!IsPending());
+<span class="lineNum">     917 </span>            :       MOZ_ASSERT(mThenValues.IsEmpty());
+<span class="lineNum">     918 </span>            :       MOZ_ASSERT(mChainedPromises.IsEmpty());
+<span class="lineNum">     919 </span>            :     }
+<span class="lineNum">     920 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :     mMagic1 = 0;</span>
+<span class="lineNum">     922 </span><span class="lineNoCov">          0 :     mMagic2 = 0;</span>
+<span class="lineNum">     923 </span><span class="lineNoCov">          0 :     mMagic3 = 0;</span>
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :     mMagic4 = nullptr;</span>
+<span class="lineNum">     925 </span>            : #endif
+<span class="lineNum">     926 </span><span class="lineNoCov">          0 :   };</span>
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            :   const char* mCreationSite; // For logging
+<span class="lineNum">     929 </span>            :   Mutex mMutex;
+<span class="lineNum">     930 </span>            :   ResolveOrRejectValue mValue;
+<span class="lineNum">     931 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     932 </span>            :   uint32_t mMagic1 = sMagic;
+<span class="lineNum">     933 </span>            : #endif
+<span class="lineNum">     934 </span>            :   // Try shows we never have more than 3 elements when IsExclusive is false.
+<span class="lineNum">     935 </span>            :   // So '3' is a good value to avoid heap allocation in most cases.
+<span class="lineNum">     936 </span>            :   AutoTArray&lt;RefPtr&lt;ThenValueBase&gt;, IsExclusive ? 1 : 3&gt; mThenValues;
+<span class="lineNum">     937 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     938 </span>            :   uint32_t mMagic2 = sMagic;
+<span class="lineNum">     939 </span>            : #endif
+<span class="lineNum">     940 </span>            :   nsTArray&lt;RefPtr&lt;Private&gt;&gt; mChainedPromises;
+<span class="lineNum">     941 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     942 </span>            :   uint32_t mMagic3 = sMagic;
+<span class="lineNum">     943 </span>            : #endif
+<span class="lineNum">     944 </span>            :   bool mHaveRequest;
+<span class="lineNum">     945 </span>            :   const bool mIsCompletionPromise;
+<span class="lineNum">     946 </span>            : #ifdef PROMISE_DEBUG
+<span class="lineNum">     947 </span>            :   void* mMagic4;
+<span class="lineNum">     948 </span>            : #endif
+<span class="lineNum">     949 </span>            : };
+<a name="950"><span class="lineNum">     950 </span>            : </a>
+<span class="lineNum">     951 </span>            : template&lt;typename ResolveValueT, typename RejectValueT, bool IsExclusive&gt;
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 : class MozPromise&lt;ResolveValueT, RejectValueT, IsExclusive&gt;::Private</span>
+<span class="lineNum">     953 </span>            :   : public MozPromise&lt;ResolveValueT, RejectValueT, IsExclusive&gt;
+<a name="954"><span class="lineNum">     954 </span>            : {</a>
+<span class="lineNum">     955 </span>            : public:
+<span class="lineNum">     956 </span><span class="lineNoCov">          0 :   explicit Private(const char* aCreationSite, bool aIsCompletionPromise = false)</span>
+<span class="lineNum">     957 </span><span class="lineNoCov">          0 :     : MozPromise(aCreationSite, aIsCompletionPromise) {}</span>
+<span class="lineNum">     958 </span>            : 
+<span class="lineNum">     959 </span>            :   template&lt;typename ResolveValueT_&gt;
+<span class="lineNum">     960 </span><span class="lineNoCov">          0 :   void Resolve(ResolveValueT_&amp;&amp; aResolveValue, const char* aResolveSite)</span>
+<span class="lineNum">     961 </span>            :   {
+<span class="lineNum">     962 </span><span class="lineNoCov">          0 :     PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic &amp;&amp; mMagic3 == sMagic &amp;&amp; mMagic4 == &amp;mMutex);</span>
+<span class="lineNum">     963 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     964 </span>            :     MOZ_ASSERT(IsPending());
+<span class="lineNum">     965 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s resolving MozPromise (%p created at %s)&quot;, aResolveSite, this, mCreationSite);</span>
+<span class="lineNum">     966 </span><span class="lineNoCov">          0 :     mValue.SetResolve(Forward&lt;ResolveValueT_&gt;(aResolveValue));</span>
+<span class="lineNum">     967 </span><span class="lineNoCov">          0 :     DispatchAll();</span>
+<span class="lineNum">     968 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     969 </span>            : 
+<span class="lineNum">     970 </span>            :   template&lt;typename RejectValueT_&gt;
+<span class="lineNum">     971 </span><span class="lineNoCov">          0 :   void Reject(RejectValueT_&amp;&amp; aRejectValue, const char* aRejectSite)</span>
+<span class="lineNum">     972 </span>            :   {
+<span class="lineNum">     973 </span><span class="lineNoCov">          0 :     PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic &amp;&amp; mMagic3 == sMagic &amp;&amp; mMagic4 == &amp;mMutex);</span>
+<span class="lineNum">     974 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     975 </span>            :     MOZ_ASSERT(IsPending());
+<span class="lineNum">     976 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s rejecting MozPromise (%p created at %s)&quot;, aRejectSite, this, mCreationSite);</span>
+<span class="lineNum">     977 </span><span class="lineNoCov">          0 :     mValue.SetReject(Forward&lt;RejectValueT_&gt;(aRejectValue));</span>
+<span class="lineNum">     978 </span><span class="lineNoCov">          0 :     DispatchAll();</span>
+<span class="lineNum">     979 </span><span class="lineNoCov">          0 :   }</span>
+<a name="980"><span class="lineNum">     980 </span>            : </a>
+<span class="lineNum">     981 </span>            :   template&lt;typename ResolveOrRejectValue_&gt;
+<span class="lineNum">     982 </span><span class="lineNoCov">          0 :   void ResolveOrReject(ResolveOrRejectValue_&amp;&amp; aValue, const char* aSite)</span>
+<span class="lineNum">     983 </span>            :   {
+<span class="lineNum">     984 </span><span class="lineNoCov">          0 :     PROMISE_ASSERT(mMagic1 == sMagic &amp;&amp; mMagic2 == sMagic &amp;&amp; mMagic3 == sMagic &amp;&amp; mMagic4 == &amp;mMutex);</span>
+<span class="lineNum">     985 </span><span class="lineNoCov">          0 :     MutexAutoLock lock(mMutex);</span>
+<span class="lineNum">     986 </span>            :     MOZ_ASSERT(IsPending());
+<span class="lineNum">     987 </span><span class="lineNoCov">          0 :     PROMISE_LOG(&quot;%s resolveOrRejecting MozPromise (%p created at %s)&quot;, aSite, this, mCreationSite);</span>
+<span class="lineNum">     988 </span><span class="lineNoCov">          0 :     mValue = Forward&lt;ResolveOrRejectValue_&gt;(aValue);</span>
+<span class="lineNum">     989 </span><span class="lineNoCov">          0 :     DispatchAll();</span>
+<span class="lineNum">     990 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     991 </span>            : };
+<span class="lineNum">     992 </span>            : 
+<span class="lineNum">     993 </span>            : // A generic promise type that does the trick for simple use cases.
+<span class="lineNum">     994 </span>            : typedef MozPromise&lt;bool, nsresult, /* IsExclusive = */ false&gt; GenericPromise;
+<span class="lineNum">     995 </span>            : 
+<span class="lineNum">     996 </span>            : /*
+<span class="lineNum">     997 </span>            :  * Class to encapsulate a promise for a particular role. Use this as the member
+<span class="lineNum">     998 </span>            :  * variable for a class whose method returns a promise.
+<span class="lineNum">     999 </span>            :  */
+<span class="lineNum">    1000 </span>            : template&lt;typename PromiseType&gt;
+<span class="lineNum">    1001 </span>            : class MozPromiseHolder
+<span class="lineNum">    1002 </span>            : {
+<span class="lineNum">    1003 </span>            : public:
+<span class="lineNum">    1004 </span>            :   MozPromiseHolder()
+<span class="lineNum">    1005 </span><span class="lineCov">          5 :     : mMonitor(nullptr) {}</span>
+<span class="lineNum">    1006 </span>            : 
+<span class="lineNum">    1007 </span>            :   MozPromiseHolder(MozPromiseHolder&amp;&amp; aOther)
+<span class="lineNum">    1008 </span><span class="lineNoCov">          0 :     : mMonitor(nullptr), mPromise(aOther.mPromise.forget()) {}</span>
+<span class="lineNum">    1009 </span>            : 
+<span class="lineNum">    1010 </span>            :   // Move semantics.
+<span class="lineNum">    1011 </span><span class="lineNoCov">          0 :   MozPromiseHolder&amp; operator=(MozPromiseHolder&amp;&amp; aOther)</span>
+<span class="lineNum">    1012 </span>            :   {
+<span class="lineNum">    1013 </span>            :     MOZ_ASSERT(!mMonitor &amp;&amp; !aOther.mMonitor);
+<span class="lineNum">    1014 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(!mPromise);</span>
+<span class="lineNum">    1015 </span><span class="lineNoCov">          0 :     mPromise = aOther.mPromise;</span>
+<span class="lineNum">    1016 </span><span class="lineNoCov">          0 :     aOther.mPromise = nullptr;</span>
+<span class="lineNum">    1017 </span><span class="lineNoCov">          0 :     return *this;</span>
+<span class="lineNum">    1018 </span>            :   }
+<span class="lineNum">    1019 </span>            : 
+<a name="1020"><span class="lineNum">    1020 </span><span class="lineCov">          5 :   ~MozPromiseHolder() { MOZ_ASSERT(!mPromise); }</span></a>
+<span class="lineNum">    1021 </span>            : 
+<span class="lineNum">    1022 </span><span class="lineNoCov">          0 :   already_AddRefed&lt;PromiseType&gt; Ensure(const char* aMethodName) {</span>
+<span class="lineNum">    1023 </span>            :     if (mMonitor) {
+<span class="lineNum">    1024 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1025 </span>            :     }
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :     if (!mPromise) {</span>
+<span class="lineNum">    1027 </span><span class="lineNoCov">          0 :       mPromise = new (typename PromiseType::Private)(aMethodName);</span>
+<span class="lineNum">    1028 </span>            :     }
+<span class="lineNum">    1029 </span><span class="lineNoCov">          0 :     RefPtr&lt;PromiseType&gt; p = mPromise.get();</span>
+<span class="lineNum">    1030 </span><span class="lineNoCov">          0 :     return p.forget();</span>
+<span class="lineNum">    1031 </span>            :   }
+<span class="lineNum">    1032 </span>            : 
+<span class="lineNum">    1033 </span>            :   // Provide a Monitor that should always be held when accessing this instance.
+<span class="lineNum">    1034 </span><span class="lineCov">          5 :   void SetMonitor(Monitor* aMonitor) { mMonitor = aMonitor; }</span>
+<span class="lineNum">    1035 </span>            : 
+<span class="lineNum">    1036 </span>            :   bool IsEmpty() const
+<span class="lineNum">    1037 </span>            :   {
+<span class="lineNum">    1038 </span>            :     if (mMonitor) {
+<a name="1039"><span class="lineNum">    1039 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();</a>
+<span class="lineNum">    1040 </span>            :     }
+<span class="lineNum">    1041 </span><span class="lineNoCov">          0 :     return !mPromise;</span>
+<span class="lineNum">    1042 </span>            :   }
+<span class="lineNum">    1043 </span>            : 
+<span class="lineNum">    1044 </span><span class="lineNoCov">          0 :   already_AddRefed&lt;typename PromiseType::Private&gt; Steal()</span>
+<span class="lineNum">    1045 </span>            :   {
+<span class="lineNum">    1046 </span>            :     if (mMonitor) {
+<span class="lineNum">    1047 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1048 </span>            :     }
+<span class="lineNum">    1049 </span>            : 
+<span class="lineNum">    1050 </span><span class="lineNoCov">          0 :     RefPtr&lt;typename PromiseType::Private&gt; p = mPromise;</span>
+<span class="lineNum">    1051 </span><span class="lineNoCov">          0 :     mPromise = nullptr;</span>
+<span class="lineNum">    1052 </span><span class="lineNoCov">          0 :     return p.forget();</span>
+<a name="1053"><span class="lineNum">    1053 </span>            :   }</a>
+<span class="lineNum">    1054 </span>            : 
+<span class="lineNum">    1055 </span><span class="lineNoCov">          0 :   void Resolve(const typename PromiseType::ResolveValueType&amp; aResolveValue,</span>
+<span class="lineNum">    1056 </span>            :                const char* aMethodName)
+<span class="lineNum">    1057 </span>            :   {
+<span class="lineNum">    1058 </span>            :     if (mMonitor) {
+<span class="lineNum">    1059 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1060 </span>            :     }
+<span class="lineNum">    1061 </span>            :     MOZ_ASSERT(mPromise);
+<span class="lineNum">    1062 </span><span class="lineNoCov">          0 :     mPromise-&gt;Resolve(aResolveValue, aMethodName);</span>
+<a name="1063"><span class="lineNum">    1063 </span><span class="lineNoCov">          0 :     mPromise = nullptr;</span></a>
+<span class="lineNum">    1064 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1065 </span><span class="lineNoCov">          0 :   void Resolve(typename PromiseType::ResolveValueType&amp;&amp; aResolveValue,</span>
+<span class="lineNum">    1066 </span>            :                const char* aMethodName)
+<span class="lineNum">    1067 </span>            :   {
+<span class="lineNum">    1068 </span>            :     if (mMonitor) {
+<span class="lineNum">    1069 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1070 </span>            :     }
+<span class="lineNum">    1071 </span>            :     MOZ_ASSERT(mPromise);
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 :     mPromise-&gt;Resolve(Move(aResolveValue), aMethodName);</span>
+<span class="lineNum">    1073 </span><span class="lineNoCov">          0 :     mPromise = nullptr;</span>
+<span class="lineNum">    1074 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1075 </span>            : 
+<span class="lineNum">    1076 </span><span class="lineNoCov">          0 :   void ResolveIfExists(const typename PromiseType::ResolveValueType&amp; aResolveValue,</span>
+<span class="lineNum">    1077 </span>            :                        const char* aMethodName)
+<span class="lineNum">    1078 </span>            :   {
+<span class="lineNum">    1079 </span><span class="lineNoCov">          0 :     if (!IsEmpty()) {</span>
+<span class="lineNum">    1080 </span><span class="lineNoCov">          0 :       Resolve(aResolveValue, aMethodName);</span>
+<span class="lineNum">    1081 </span>            :     }
+<span class="lineNum">    1082 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1083 </span><span class="lineNoCov">          0 :   void ResolveIfExists(typename PromiseType::ResolveValueType&amp;&amp; aResolveValue,</span>
+<span class="lineNum">    1084 </span>            :                        const char* aMethodName)
+<span class="lineNum">    1085 </span>            :   {
+<span class="lineNum">    1086 </span><span class="lineNoCov">          0 :     if (!IsEmpty()) {</span>
+<span class="lineNum">    1087 </span><span class="lineNoCov">          0 :       Resolve(Move(aResolveValue), aMethodName);</span>
+<span class="lineNum">    1088 </span>            :     }
+<a name="1089"><span class="lineNum">    1089 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">    1090 </span>            : 
+<span class="lineNum">    1091 </span><span class="lineNoCov">          0 :   void Reject(const typename PromiseType::RejectValueType&amp; aRejectValue,</span>
+<span class="lineNum">    1092 </span>            :               const char* aMethodName)
+<span class="lineNum">    1093 </span>            :   {
+<span class="lineNum">    1094 </span>            :     if (mMonitor) {
+<span class="lineNum">    1095 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1096 </span>            :     }
+<span class="lineNum">    1097 </span>            :     MOZ_ASSERT(mPromise);
+<span class="lineNum">    1098 </span><span class="lineNoCov">          0 :     mPromise-&gt;Reject(aRejectValue, aMethodName);</span>
+<a name="1099"><span class="lineNum">    1099 </span><span class="lineNoCov">          0 :     mPromise = nullptr;</span></a>
+<span class="lineNum">    1100 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1101 </span><span class="lineNoCov">          0 :   void Reject(typename PromiseType::RejectValueType&amp;&amp; aRejectValue,</span>
+<span class="lineNum">    1102 </span>            :               const char* aMethodName)
+<span class="lineNum">    1103 </span>            :   {
+<span class="lineNum">    1104 </span>            :     if (mMonitor) {
+<span class="lineNum">    1105 </span>            :       mMonitor-&gt;AssertCurrentThreadOwns();
+<span class="lineNum">    1106 </span>            :     }
+<span class="lineNum">    1107 </span>            :     MOZ_ASSERT(mPromise);
+<span class="lineNum">    1108 </span><span class="lineNoCov">          0 :     mPromise-&gt;Reject(Move(aRejectValue), aMethodName);</span>
+<span class="lineNum">    1109 </span><span class="lineNoCov">          0 :     mPromise = nullptr;</span>
+<span class="lineNum">    1110 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1111 </span>            : 
+<span class="lineNum">    1112 </span><span class="lineNoCov">          0 :   void RejectIfExists(const typename PromiseType::RejectValueType&amp; aRejectValue,</span>
+<span class="lineNum">    1113 </span>            :                       const char* aMethodName)
+<span class="lineNum">    1114 </span>            :   {
+<span class="lineNum">    1115 </span><span class="lineNoCov">          0 :     if (!IsEmpty()) {</span>
+<span class="lineNum">    1116 </span><span class="lineNoCov">          0 :       Reject(aRejectValue, aMethodName);</span>
+<span class="lineNum">    1117 </span>            :     }
+<span class="lineNum">    1118 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 :   void RejectIfExists(typename PromiseType::RejectValueType&amp;&amp; aRejectValue,</span>
+<span class="lineNum">    1120 </span>            :                       const char* aMethodName)
+<span class="lineNum">    1121 </span>            :   {
+<span class="lineNum">    1122 </span><span class="lineNoCov">          0 :     if (!IsEmpty()) {</span>
+<span class="lineNum">    1123 </span><span class="lineNoCov">          0 :       Reject(Move(aRejectValue), aMethodName);</span>
+<span class="lineNum">    1124 </span>            :     }
+<span class="lineNum">    1125 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1126 </span>            : 
+<span class="lineNum">    1127 </span>            : private:
+<span class="lineNum">    1128 </span>            :   Monitor* mMonitor;
+<span class="lineNum">    1129 </span>            :   RefPtr&lt;typename PromiseType::Private&gt; mPromise;
+<span class="lineNum">    1130 </span>            : };
+<span class="lineNum">    1131 </span>            : 
+<span class="lineNum">    1132 </span>            : /*
+<span class="lineNum">    1133 </span>            :  * Class to encapsulate a MozPromise::Request reference. Use this as the member
+<span class="lineNum">    1134 </span>            :  * variable for a class waiting on a MozPromise.
+<span class="lineNum">    1135 </span>            :  */
+<span class="lineNum">    1136 </span>            : template&lt;typename PromiseType&gt;
+<span class="lineNum">    1137 </span>            : class MozPromiseRequestHolder
+<span class="lineNum">    1138 </span>            : {
+<span class="lineNum">    1139 </span>            : public:
+<span class="lineNum">    1140 </span><span class="lineNoCov">          0 :   MozPromiseRequestHolder() {}</span>
+<span class="lineNum">    1141 </span><span class="lineNoCov">          0 :   ~MozPromiseRequestHolder() { MOZ_ASSERT(!mRequest); }</span>
+<span class="lineNum">    1142 </span>            : 
+<span class="lineNum">    1143 </span><span class="lineNoCov">          0 :   void Track(RefPtr&lt;typename PromiseType::Request&gt;&amp;&amp; aRequest)</span>
+<span class="lineNum">    1144 </span>            :   {
+<span class="lineNum">    1145 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(!Exists());</span>
+<span class="lineNum">    1146 </span><span class="lineNoCov">          0 :     mRequest = Move(aRequest);</span>
+<span class="lineNum">    1147 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1148 </span>            : 
+<span class="lineNum">    1149 </span><span class="lineNoCov">          0 :   void Complete()</span>
+<span class="lineNum">    1150 </span>            :   {
+<span class="lineNum">    1151 </span><span class="lineNoCov">          0 :     MOZ_DIAGNOSTIC_ASSERT(Exists());</span>
+<span class="lineNum">    1152 </span><span class="lineNoCov">          0 :     mRequest = nullptr;</span>
+<span class="lineNum">    1153 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1154 </span>            : 
+<span class="lineNum">    1155 </span>            :   // Disconnects and forgets an outstanding promise. The resolve/reject methods
+<span class="lineNum">    1156 </span>            :   // will never be called.
+<span class="lineNum">    1157 </span><span class="lineNoCov">          0 :   void Disconnect() {</span>
+<span class="lineNum">    1158 </span>            :     MOZ_ASSERT(Exists());
+<span class="lineNum">    1159 </span><span class="lineNoCov">          0 :     mRequest-&gt;Disconnect();</span>
+<span class="lineNum">    1160 </span><span class="lineNoCov">          0 :     mRequest = nullptr;</span>
+<span class="lineNum">    1161 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1162 </span>            : 
+<span class="lineNum">    1163 </span><span class="lineNoCov">          0 :   void DisconnectIfExists() {</span>
+<span class="lineNum">    1164 </span><span class="lineNoCov">          0 :     if (Exists()) {</span>
+<span class="lineNum">    1165 </span><span class="lineNoCov">          0 :       Disconnect();</span>
+<span class="lineNum">    1166 </span>            :     }
+<span class="lineNum">    1167 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">    1168 </span>            : 
+<span class="lineNum">    1169 </span><span class="lineNoCov">          0 :   bool Exists() const { return !!mRequest; }</span>
+<span class="lineNum">    1170 </span>            : 
+<span class="lineNum">    1171 </span>            : private:
+<span class="lineNum">    1172 </span>            :   RefPtr&lt;typename PromiseType::Request&gt; mRequest;
+<span class="lineNum">    1173 </span>            : };
+<span class="lineNum">    1174 </span>            : 
+<span class="lineNum">    1175 </span>            : template &lt;typename Return&gt;
+<span class="lineNum">    1176 </span>            : struct IsMozPromise
+<span class="lineNum">    1177 </span>            :   : FalseType
+<span class="lineNum">    1178 </span>            : {};
+<span class="lineNum">    1179 </span>            : 
+<span class="lineNum">    1180 </span>            : template&lt;typename ResolveValueT, typename RejectValueT, bool IsExclusive&gt;
+<span class="lineNum">    1181 </span>            : struct IsMozPromise&lt;MozPromise&lt;ResolveValueT, RejectValueT, IsExclusive&gt;&gt;
+<span class="lineNum">    1182 </span>            :   : TrueType
+<span class="lineNum">    1183 </span>            : {};
+<span class="lineNum">    1184 </span>            : 
+<span class="lineNum">    1185 </span>            : // Asynchronous Potentially-Cross-Thread Method Calls.
+<span class="lineNum">    1186 </span>            : //
+<span class="lineNum">    1187 </span>            : // This machinery allows callers to schedule a promise-returning function
+<span class="lineNum">    1188 </span>            : // (a method and object, or a function object like a lambda) to be invoked
+<span class="lineNum">    1189 </span>            : // asynchronously on a given thread, while at the same time receiving a
+<span class="lineNum">    1190 </span>            : // promise upon which to invoke Then() immediately. InvokeAsync dispatches a
+<span class="lineNum">    1191 </span>            : // task to invoke the function on the proper thread and also chain the
+<span class="lineNum">    1192 </span>            : // resulting promise to the one that the caller received, so that resolve/
+<span class="lineNum">    1193 </span>            : // reject values are forwarded through.
+<span class="lineNum">    1194 </span>            : 
+<span class="lineNum">    1195 </span>            : namespace detail {
+<span class="lineNum">    1196 </span>            : 
+<span class="lineNum">    1197 </span>            : // Non-templated base class to allow us to use MOZ_COUNT_{C,D}TOR, which cause
+<span class="lineNum">    1198 </span>            : // assertions when used on templated types.
+<span class="lineNum">    1199 </span>            : class MethodCallBase
+<a name="1200"><span class="lineNum">    1200 </span>            : {</a>
+<a name="1201"><span class="lineNum">    1201 </span>            : public:</a>
+<span class="lineNum">    1202 </span><span class="lineNoCov">          0 :   MethodCallBase() { MOZ_COUNT_CTOR(MethodCallBase); }</span>
+<span class="lineNum">    1203 </span><span class="lineNoCov">          0 :   virtual ~MethodCallBase() { MOZ_COUNT_DTOR(MethodCallBase); }</span>
+<span class="lineNum">    1204 </span>            : };
+<span class="lineNum">    1205 </span>            : 
+<a name="1206"><span class="lineNum">    1206 </span>            : template&lt;typename PromiseType, typename MethodType, typename ThisType,</a>
+<span class="lineNum">    1207 </span>            :          typename... Storages&gt;
+<span class="lineNum">    1208 </span><span class="lineNoCov">          0 : class MethodCall : public MethodCallBase</span>
+<span class="lineNum">    1209 </span>            : {
+<span class="lineNum">    1210 </span>            : public:
+<span class="lineNum">    1211 </span>            :   template&lt;typename... Args&gt;
+<span class="lineNum">    1212 </span><span class="lineNoCov">          0 :   MethodCall(MethodType aMethod, ThisType* aThisVal, Args&amp;&amp;... aArgs)</span>
+<span class="lineNum">    1213 </span>            :     : mMethod(aMethod)
+<span class="lineNum">    1214 </span>            :     , mThisVal(aThisVal)
+<span class="lineNum">    1215 </span><span class="lineNoCov">          0 :     , mArgs(Forward&lt;Args&gt;(aArgs)...)</span>
+<span class="lineNum">    1216 </span>            :   {
+<span class="lineNum">    1217 </span>            :     static_assert(sizeof...(Storages) == sizeof...(Args), &quot;Storages and Args should have equal sizes&quot;);
+<a name="1218"><span class="lineNum">    1218 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">    1219 </span>            : 
+<span class="lineNum">    1220 </span><span class="lineNoCov">          0 :   RefPtr&lt;PromiseType&gt; Invoke()</span>
+<span class="lineNum">    1221 </span>            :   {
+<span class="lineNum">    1222 </span><span class="lineNoCov">          0 :     return mArgs.apply(mThisVal.get(), mMethod);</span>
+<span class="lineNum">    1223 </span>            :   }
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span>            : private:
+<span class="lineNum">    1226 </span>            :   MethodType mMethod;
+<span class="lineNum">    1227 </span>            :   RefPtr&lt;ThisType&gt; mThisVal;
+<span class="lineNum">    1228 </span>            :   RunnableMethodArguments&lt;Storages...&gt; mArgs;
+<span class="lineNum">    1229 </span>            : };
+<span class="lineNum">    1230 </span>            : 
+<a name="1231"><span class="lineNum">    1231 </span>            : template&lt;typename PromiseType, typename MethodType, typename ThisType,</a>
+<span class="lineNum">    1232 </span>            :          typename... Storages&gt;
+<span class="lineNum">    1233 </span><span class="lineNoCov">          0 : class ProxyRunnable : public CancelableRunnable</span>
+<a name="1234"><span class="lineNum">    1234 </span>            : {</a>
+<span class="lineNum">    1235 </span>            : public:
+<span class="lineNum">    1236 </span><span class="lineNoCov">          0 :   ProxyRunnable(typename PromiseType::Private* aProxyPromise,</span>
+<span class="lineNum">    1237 </span>            :                 MethodCall&lt;PromiseType, MethodType, ThisType, Storages...&gt;* aMethodCall)
+<a name="1238"><span class="lineNum">    1238 </span><span class="lineNoCov">          0 :     : mProxyPromise(aProxyPromise), mMethodCall(aMethodCall) {}</span></a>
+<span class="lineNum">    1239 </span>            : 
+<span class="lineNum">    1240 </span><span class="lineNoCov">          0 :   NS_IMETHOD Run() override</span>
+<span class="lineNum">    1241 </span>            :   {
+<span class="lineNum">    1242 </span><span class="lineNoCov">          0 :     RefPtr&lt;PromiseType&gt; p = mMethodCall-&gt;Invoke();</span>
+<span class="lineNum">    1243 </span><span class="lineNoCov">          0 :     mMethodCall = nullptr;</span>
+<span class="lineNum">    1244 </span><span class="lineNoCov">          0 :     p-&gt;ChainTo(mProxyPromise.forget(), &quot;&lt;Proxy Promise&gt;&quot;);</span>
+<span class="lineNum">    1245 </span><span class="lineNoCov">          0 :     return NS_OK;</span>
+<a name="1246"><span class="lineNum">    1246 </span>            :   }</a>
+<span class="lineNum">    1247 </span>            : 
+<span class="lineNum">    1248 </span><span class="lineNoCov">          0 :   nsresult Cancel() override</span>
+<span class="lineNum">    1249 </span>            :   {
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 :     return Run();</span>
+<span class="lineNum">    1251 </span>            :   }
+<span class="lineNum">    1252 </span>            : 
+<span class="lineNum">    1253 </span>            : private:
+<span class="lineNum">    1254 </span>            :   RefPtr&lt;typename PromiseType::Private&gt; mProxyPromise;
+<span class="lineNum">    1255 </span>            :   nsAutoPtr&lt;MethodCall&lt;PromiseType, MethodType, ThisType, Storages...&gt;&gt; mMethodCall;
+<span class="lineNum">    1256 </span>            : };
+<span class="lineNum">    1257 </span>            : 
+<span class="lineNum">    1258 </span>            : template&lt;typename... Storages,
+<span class="lineNum">    1259 </span>            :          typename PromiseType, typename ThisType, typename... ArgTypes,
+<a name="1260"><span class="lineNum">    1260 </span>            :          typename... ActualArgTypes&gt;</a>
+<span class="lineNum">    1261 </span>            : static RefPtr&lt;PromiseType&gt;
+<span class="lineNum">    1262 </span><span class="lineNoCov">          0 : InvokeAsyncImpl(AbstractThread* aTarget, ThisType* aThisVal,</span>
+<span class="lineNum">    1263 </span>            :                 const char* aCallerName,
+<span class="lineNum">    1264 </span>            :                 RefPtr&lt;PromiseType&gt;(ThisType::*aMethod)(ArgTypes...),
+<span class="lineNum">    1265 </span>            :                 ActualArgTypes&amp;&amp;... aArgs)
+<span class="lineNum">    1266 </span>            : {
+<span class="lineNum">    1267 </span>            :   MOZ_ASSERT(aTarget);
+<span class="lineNum">    1268 </span>            : 
+<span class="lineNum">    1269 </span>            :   typedef RefPtr&lt;PromiseType&gt;(ThisType::*MethodType)(ArgTypes...);
+<span class="lineNum">    1270 </span>            :   typedef detail::MethodCall&lt;PromiseType, MethodType, ThisType, Storages...&gt; MethodCallType;
+<span class="lineNum">    1271 </span>            :   typedef detail::ProxyRunnable&lt;PromiseType, MethodType, ThisType, Storages...&gt; ProxyRunnableType;
+<span class="lineNum">    1272 </span>            : 
+<span class="lineNum">    1273 </span>            :   MethodCallType* methodCall =
+<span class="lineNum">    1274 </span><span class="lineNoCov">          0 :     new MethodCallType(aMethod, aThisVal, Forward&lt;ActualArgTypes&gt;(aArgs)...);</span>
+<span class="lineNum">    1275 </span><span class="lineNoCov">          0 :   RefPtr&lt;typename PromiseType::Private&gt; p = new (typename PromiseType::Private)(aCallerName);</span>
+<span class="lineNum">    1276 </span><span class="lineNoCov">          0 :   RefPtr&lt;ProxyRunnableType&gt; r = new ProxyRunnableType(p, methodCall);</span>
+<span class="lineNum">    1277 </span><span class="lineNoCov">          0 :   aTarget-&gt;Dispatch(r.forget());</span>
+<span class="lineNum">    1278 </span><span class="lineNoCov">          0 :   return p.forget();</span>
+<span class="lineNum">    1279 </span>            : }
+<span class="lineNum">    1280 </span>            : 
+<span class="lineNum">    1281 </span>            : constexpr bool Any()
+<span class="lineNum">    1282 </span>            : {
+<span class="lineNum">    1283 </span>            :   return false;
+<span class="lineNum">    1284 </span>            : }
+<span class="lineNum">    1285 </span>            : 
+<span class="lineNum">    1286 </span>            : template &lt;typename T1&gt;
+<span class="lineNum">    1287 </span>            : constexpr bool Any(T1 a)
+<span class="lineNum">    1288 </span>            : {
+<span class="lineNum">    1289 </span>            :   return static_cast&lt;bool&gt;(a);
+<span class="lineNum">    1290 </span>            : }
+<span class="lineNum">    1291 </span>            : 
+<span class="lineNum">    1292 </span>            : template &lt;typename T1, typename... Ts&gt;
+<span class="lineNum">    1293 </span>            : constexpr bool Any(T1 a, Ts... aOthers)
+<span class="lineNum">    1294 </span>            : {
+<span class="lineNum">    1295 </span>            :   return a || Any(aOthers...);
+<span class="lineNum">    1296 </span>            : }
+<span class="lineNum">    1297 </span>            : 
+<span class="lineNum">    1298 </span>            : } // namespace detail
+<span class="lineNum">    1299 </span>            : 
+<span class="lineNum">    1300 </span>            : // InvokeAsync with explicitly-specified storages.
+<span class="lineNum">    1301 </span>            : // See ParameterStorage in nsThreadUtils.h for help.
+<span class="lineNum">    1302 </span>            : template&lt;typename... Storages,
+<span class="lineNum">    1303 </span>            :          typename PromiseType, typename ThisType, typename... ArgTypes,
+<span class="lineNum">    1304 </span>            :          typename... ActualArgTypes,
+<span class="lineNum">    1305 </span>            :          typename EnableIf&lt;sizeof...(Storages) != 0, int&gt;::Type = 0&gt;
+<span class="lineNum">    1306 </span>            : static RefPtr&lt;PromiseType&gt;
+<span class="lineNum">    1307 </span>            : InvokeAsync(AbstractThread* aTarget, ThisType* aThisVal, const char* aCallerName,
+<span class="lineNum">    1308 </span>            :             RefPtr&lt;PromiseType&gt;(ThisType::*aMethod)(ArgTypes...),
+<span class="lineNum">    1309 </span>            :             ActualArgTypes&amp;&amp;... aArgs)
+<span class="lineNum">    1310 </span>            : {
+<span class="lineNum">    1311 </span>            :   static_assert(sizeof...(Storages) == sizeof...(ArgTypes),
+<span class="lineNum">    1312 </span>            :                 &quot;Provided Storages and method's ArgTypes should have equal sizes&quot;);
+<span class="lineNum">    1313 </span>            :   static_assert(sizeof...(Storages) == sizeof...(ActualArgTypes),
+<span class="lineNum">    1314 </span>            :                 &quot;Provided Storages and ActualArgTypes should have equal sizes&quot;);
+<span class="lineNum">    1315 </span>            :   return detail::InvokeAsyncImpl&lt;Storages...&gt;(
+<span class="lineNum">    1316 </span>            :            aTarget, aThisVal, aCallerName, aMethod,
+<span class="lineNum">    1317 </span><span class="lineNoCov">          0 :            Forward&lt;ActualArgTypes&gt;(aArgs)...);</span>
+<span class="lineNum">    1318 </span>            : }
+<span class="lineNum">    1319 </span>            : 
+<span class="lineNum">    1320 </span>            : // InvokeAsync with no explicitly-specified storages, will copy arguments and
+<span class="lineNum">    1321 </span>            : // then move them out of the runnable into the target method parameters.
+<span class="lineNum">    1322 </span>            : template&lt;typename... Storages,
+<span class="lineNum">    1323 </span>            :          typename PromiseType, typename ThisType, typename... ArgTypes,
+<span class="lineNum">    1324 </span>            :          typename... ActualArgTypes,
+<span class="lineNum">    1325 </span>            :          typename EnableIf&lt;sizeof...(Storages) == 0, int&gt;::Type = 0&gt;
+<span class="lineNum">    1326 </span>            : static RefPtr&lt;PromiseType&gt;
+<span class="lineNum">    1327 </span>            : InvokeAsync(AbstractThread* aTarget, ThisType* aThisVal, const char* aCallerName,
+<span class="lineNum">    1328 </span>            :             RefPtr&lt;PromiseType&gt;(ThisType::*aMethod)(ArgTypes...),
+<span class="lineNum">    1329 </span>            :             ActualArgTypes&amp;&amp;... aArgs)
+<span class="lineNum">    1330 </span>            : {
+<span class="lineNum">    1331 </span>            :   static_assert((!detail::Any(IsReference&lt;ArgTypes&gt;::value...)) &amp;&amp;
+<span class="lineNum">    1332 </span>            :                 (!detail::Any(IsPointer&lt;ArgTypes&gt;::value...)),
+<span class="lineNum">    1333 </span>            :                 &quot;Cannot pass reference/pointer types through InvokeAsync, Storages must be provided&quot;);
+<span class="lineNum">    1334 </span>            :   static_assert(sizeof...(ArgTypes) == sizeof...(ActualArgTypes),
+<span class="lineNum">    1335 </span>            :                 &quot;Method's ArgTypes and ActualArgTypes should have equal sizes&quot;);
+<span class="lineNum">    1336 </span>            :   return detail::InvokeAsyncImpl&lt;StoreCopyPassByRRef&lt;ArgTypes&gt;...&gt;(
+<span class="lineNum">    1337 </span>            :            aTarget, aThisVal, aCallerName, aMethod,
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :            Forward&lt;ActualArgTypes&gt;(aArgs)...);</span>
+<span class="lineNum">    1339 </span>            : }
+<span class="lineNum">    1340 </span>            : 
+<span class="lineNum">    1341 </span>            : namespace detail {
+<a name="1342"><span class="lineNum">    1342 </span>            : </a>
+<span class="lineNum">    1343 </span>            : template&lt;typename Function, typename PromiseType&gt;
+<span class="lineNum">    1344 </span><span class="lineNoCov">          0 : class ProxyFunctionRunnable : public CancelableRunnable</span>
+<span class="lineNum">    1345 </span>            : {
+<span class="lineNum">    1346 </span>            :   typedef typename Decay&lt;Function&gt;::Type FunctionStorage;
+<a name="1347"><span class="lineNum">    1347 </span>            : public:</a>
+<span class="lineNum">    1348 </span>            :   template &lt;typename F&gt;
+<span class="lineNum">    1349 </span><span class="lineNoCov">          0 :   ProxyFunctionRunnable(typename PromiseType::Private* aProxyPromise,</span>
+<span class="lineNum">    1350 </span>            :                         F&amp;&amp; aFunction)
+<span class="lineNum">    1351 </span>            :     : mProxyPromise(aProxyPromise)
+<a name="1352"><span class="lineNum">    1352 </span><span class="lineNoCov">          0 :     , mFunction(new FunctionStorage(Forward&lt;F&gt;(aFunction))) {}</span></a>
+<span class="lineNum">    1353 </span>            : 
+<span class="lineNum">    1354 </span><span class="lineNoCov">          0 :   NS_IMETHOD Run() override</span>
+<span class="lineNum">    1355 </span>            :   {
+<span class="lineNum">    1356 </span><span class="lineNoCov">          0 :     RefPtr&lt;PromiseType&gt; p = (*mFunction)();</span>
+<span class="lineNum">    1357 </span><span class="lineNoCov">          0 :     mFunction = nullptr;</span>
+<span class="lineNum">    1358 </span><span class="lineNoCov">          0 :     p-&gt;ChainTo(mProxyPromise.forget(), &quot;&lt;Proxy Promise&gt;&quot;);</span>
+<span class="lineNum">    1359 </span><span class="lineNoCov">          0 :     return NS_OK;</span>
+<a name="1360"><span class="lineNum">    1360 </span>            :   }</a>
+<span class="lineNum">    1361 </span>            : 
+<span class="lineNum">    1362 </span><span class="lineNoCov">          0 :   nsresult Cancel() override</span>
+<span class="lineNum">    1363 </span>            :   {
+<span class="lineNum">    1364 </span><span class="lineNoCov">          0 :     return Run();</span>
+<span class="lineNum">    1365 </span>            :   }
+<span class="lineNum">    1366 </span>            : 
+<span class="lineNum">    1367 </span>            : private:
+<span class="lineNum">    1368 </span>            :   RefPtr&lt;typename PromiseType::Private&gt; mProxyPromise;
+<span class="lineNum">    1369 </span>            :   UniquePtr&lt;FunctionStorage&gt; mFunction;
+<span class="lineNum">    1370 </span>            : };
+<span class="lineNum">    1371 </span>            : 
+<span class="lineNum">    1372 </span>            : // Note: The following struct and function are not for public consumption (yet?)
+<span class="lineNum">    1373 </span>            : // as we would prefer all calls to pass on-the-spot lambdas (or at least moved
+<span class="lineNum">    1374 </span>            : // function objects). They could be moved outside of detail if really needed.
+<span class="lineNum">    1375 </span>            : 
+<span class="lineNum">    1376 </span>            : // We prefer getting function objects by non-lvalue-ref (to avoid copying them
+<span class="lineNum">    1377 </span>            : // and their captures). This struct is a tag that allows the use of objects
+<span class="lineNum">    1378 </span>            : // through lvalue-refs where necessary.
+<span class="lineNum">    1379 </span>            : struct AllowInvokeAsyncFunctionLVRef {};
+<span class="lineNum">    1380 </span>            : 
+<span class="lineNum">    1381 </span>            : // Invoke a function object (e.g., lambda or std/mozilla::function)
+<span class="lineNum">    1382 </span>            : // asynchronously; note that the object will be copied if provided by lvalue-ref.
+<span class="lineNum">    1383 </span>            : // Return a promise that the function should eventually resolve or reject.
+<a name="1384"><span class="lineNum">    1384 </span>            : template&lt;typename Function&gt;</a>
+<span class="lineNum">    1385 </span>            : static auto
+<span class="lineNum">    1386 </span><span class="lineNoCov">          0 : InvokeAsync(AbstractThread* aTarget, const char* aCallerName,</span>
+<span class="lineNum">    1387 </span>            :             AllowInvokeAsyncFunctionLVRef, Function&amp;&amp; aFunction)
+<span class="lineNum">    1388 </span>            :   -&gt; decltype(aFunction())
+<span class="lineNum">    1389 </span>            : {
+<span class="lineNum">    1390 </span>            :   static_assert(IsRefcountedSmartPointer&lt;decltype(aFunction())&gt;::value
+<span class="lineNum">    1391 </span>            :                 &amp;&amp; IsMozPromise&lt;typename RemoveSmartPointer&lt;
+<span class="lineNum">    1392 </span>            :                                            decltype(aFunction())&gt;::Type&gt;::value,
+<span class="lineNum">    1393 </span>            :                 &quot;Function object must return RefPtr&lt;MozPromise&gt;&quot;);
+<span class="lineNum">    1394 </span>            :   MOZ_ASSERT(aTarget);
+<span class="lineNum">    1395 </span>            :   typedef typename RemoveSmartPointer&lt;decltype(aFunction())&gt;::Type PromiseType;
+<span class="lineNum">    1396 </span>            :   typedef detail::ProxyFunctionRunnable&lt;Function, PromiseType&gt; ProxyRunnableType;
+<span class="lineNum">    1397 </span>            : 
+<span class="lineNum">    1398 </span>            :   RefPtr&lt;typename PromiseType::Private&gt; p =
+<span class="lineNum">    1399 </span><span class="lineNoCov">          0 :     new (typename PromiseType::Private)(aCallerName);</span>
+<span class="lineNum">    1400 </span>            :   RefPtr&lt;ProxyRunnableType&gt; r =
+<span class="lineNum">    1401 </span><span class="lineNoCov">          0 :     new ProxyRunnableType(p, Forward&lt;Function&gt;(aFunction));</span>
+<span class="lineNum">    1402 </span><span class="lineNoCov">          0 :   aTarget-&gt;Dispatch(r.forget());</span>
+<span class="lineNum">    1403 </span><span class="lineNoCov">          0 :   return p.forget();</span>
+<span class="lineNum">    1404 </span>            : }
+<span class="lineNum">    1405 </span>            : 
+<span class="lineNum">    1406 </span>            : } // namespace detail
+<span class="lineNum">    1407 </span>            : 
+<span class="lineNum">    1408 </span>            : // Invoke a function object (e.g., lambda) asynchronously.
+<span class="lineNum">    1409 </span>            : // Return a promise that the function should eventually resolve or reject.
+<span class="lineNum">    1410 </span>            : template&lt;typename Function&gt;
+<span class="lineNum">    1411 </span>            : static auto
+<span class="lineNum">    1412 </span>            : InvokeAsync(AbstractThread* aTarget, const char* aCallerName,
+<span class="lineNum">    1413 </span>            :             Function&amp;&amp; aFunction)
+<span class="lineNum">    1414 </span>            :   -&gt; decltype(aFunction())
+<span class="lineNum">    1415 </span>            : {
+<span class="lineNum">    1416 </span>            :   static_assert(!IsLvalueReference&lt;Function&gt;::value,
+<span class="lineNum">    1417 </span>            :                 &quot;Function object must not be passed by lvalue-ref (to avoid &quot;
+<span class="lineNum">    1418 </span>            :                 &quot;unplanned copies); Consider move()ing the object.&quot;);
+<span class="lineNum">    1419 </span>            :   return detail::InvokeAsync(aTarget, aCallerName,
+<span class="lineNum">    1420 </span>            :                              detail::AllowInvokeAsyncFunctionLVRef(),
+<span class="lineNum">    1421 </span><span class="lineNoCov">          0 :                              Forward&lt;Function&gt;(aFunction));</span>
+<span class="lineNum">    1422 </span>            : }
+<span class="lineNum">    1423 </span>            : 
+<span class="lineNum">    1424 </span>            : #undef PROMISE_LOG
+<span class="lineNum">    1425 </span>            : #undef PROMISE_ASSERT
+<span class="lineNum">    1426 </span>            : #undef PROMISE_DEBUG
+<span class="lineNum">    1427 </span>            : 
+<span class="lineNum">    1428 </span>            : } // namespace mozilla
+<span class="lineNum">    1429 </span>            : 
+<span class="lineNum">    1430 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

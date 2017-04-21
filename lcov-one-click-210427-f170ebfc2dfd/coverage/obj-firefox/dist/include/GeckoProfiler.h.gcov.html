@@ -1,0 +1,704 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/GeckoProfiler.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include</a> - GeckoProfiler.h<span style="font-size: 80%;"> (source / <a href="GeckoProfiler.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">52</td>
+            <td class="headerCovTableEntryMed">76.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryMed">81.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : // The Gecko Profiler is an always-on profiler that takes fast and low overhead
+<span class="lineNum">       7 </span>            : // samples of the program execution using only userspace functionality for
+<span class="lineNum">       8 </span>            : // portability. The goal of this module is to provide performance data in a
+<span class="lineNum">       9 </span>            : // generic cross-platform way without requiring custom tools or kernel support.
+<span class="lineNum">      10 </span>            : //
+<span class="lineNum">      11 </span>            : // Samples are collected to form a timeline with optional timeline event
+<span class="lineNum">      12 </span>            : // (markers) used for filtering. Both &quot;periodic&quot; (in response to a timer) and
+<span class="lineNum">      13 </span>            : // &quot;synchronous&quot; (in response to an explicit sampling request via the API)
+<span class="lineNum">      14 </span>            : // samples are supported.
+<span class="lineNum">      15 </span>            : //
+<span class="lineNum">      16 </span>            : // The profiler collects samples that include native stacks and
+<span class="lineNum">      17 </span>            : // platform-independent &quot;pseudostacks&quot;.
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #ifndef SAMPLER_H
+<span class="lineNum">      20 </span>            : #define SAMPLER_H
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      23 </span>            : #include &lt;stdarg.h&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : #include &quot;MainThreadUtils.h&quot;
+<span class="lineNum">      26 </span>            : #include &quot;mozilla/Assertions.h&quot;
+<span class="lineNum">      27 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      28 </span>            : #include &quot;js/TypeDecls.h&quot;
+<span class="lineNum">      29 </span>            : #include &quot;mozilla/GuardObjects.h&quot;
+<span class="lineNum">      30 </span>            : #include &quot;mozilla/UniquePtr.h&quot;
+<span class="lineNum">      31 </span>            : #include &quot;mozilla/Vector.h&quot;
+<span class="lineNum">      32 </span>            : #include &quot;nsString.h&quot;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : class SpliceableJSONWriter;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : namespace mozilla {
+<span class="lineNum">      37 </span>            : class TimeStamp;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : namespace dom {
+<span class="lineNum">      40 </span>            : class Promise;
+<span class="lineNum">      41 </span>            : } // namespace dom
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            : } // namespace mozilla
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : class nsIProfilerStartParams;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : enum TracingKind {
+<span class="lineNum">      48 </span>            :   TRACING_EVENT,
+<span class="lineNum">      49 </span>            :   TRACING_INTERVAL_START,
+<span class="lineNum">      50 </span>            :   TRACING_INTERVAL_END,
+<span class="lineNum">      51 </span>            : };
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            : class ProfilerBacktrace;
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : struct ProfilerBacktraceDestructor
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :   void operator()(ProfilerBacktrace*);
+<span class="lineNum">      58 </span>            : };
+<span class="lineNum">      59 </span>            : using UniqueProfilerBacktrace =
+<span class="lineNum">      60 </span>            :   mozilla::UniquePtr&lt;ProfilerBacktrace, ProfilerBacktraceDestructor&gt;;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : #if !defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : // Use these for functions below that must be visible whether the profiler is
+<span class="lineNum">      65 </span>            : // enabled or not. When the profiler is disabled they are static inline
+<span class="lineNum">      66 </span>            : // functions (with a simple return value if they are non-void) that should be
+<span class="lineNum">      67 </span>            : // optimized away during compilation.
+<span class="lineNum">      68 </span>            : #define PROFILER_FUNC(decl, rv)  static inline decl { return rv; }
+<span class="lineNum">      69 </span>            : #define PROFILER_FUNC_VOID(decl) static inline void decl {}
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            : // Insert an RAII object in this scope to enter a pseudo stack frame. Any
+<span class="lineNum">      72 </span>            : // samples collected in this scope will contain this label in their pseudo
+<span class="lineNum">      73 </span>            : // stack. The name_space and info arguments must be string literals.
+<span class="lineNum">      74 </span>            : // Use PROFILER_LABEL_DYNAMIC if you want to add additional / dynamic
+<span class="lineNum">      75 </span>            : // information to the pseudo stack frame.
+<span class="lineNum">      76 </span>            : #define PROFILER_LABEL(name_space, info, category) do {} while (0)
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : // Similar to PROFILER_LABEL, PROFILER_LABEL_FUNC will push/pop the enclosing
+<span class="lineNum">      79 </span>            : // functon name as the pseudostack label.
+<span class="lineNum">      80 </span>            : #define PROFILER_LABEL_FUNC(category) do {} while (0)
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            : // Enter a pseudo stack frame in this scope and associate it with an
+<span class="lineNum">      83 </span>            : // additional string.
+<span class="lineNum">      84 </span>            : // This macro generates an RAII object. This RAII object stores the str
+<span class="lineNum">      85 </span>            : // pointer in a field; it does not copy the string. This means that the string
+<span class="lineNum">      86 </span>            : // you pass to this macro needs to live at least until the end of the current
+<span class="lineNum">      87 </span>            : // scope.
+<span class="lineNum">      88 </span>            : // If the profiler samples the current thread and walks the pseudo stack while
+<span class="lineNum">      89 </span>            : // this RAII object is on the stack, it will copy the supplied string into the
+<span class="lineNum">      90 </span>            : // profile buffer. So there's one string copy operation, and it happens at
+<span class="lineNum">      91 </span>            : // sample time.
+<span class="lineNum">      92 </span>            : // Compare this to the plain PROFILER_LABEL macro, which only accepts literal
+<span class="lineNum">      93 </span>            : // strings: When the pseudo stack frames generated by PROFILER_LABEL are
+<span class="lineNum">      94 </span>            : // sampled, no string copy needs to be made because the profile buffer can
+<span class="lineNum">      95 </span>            : // just store the raw pointers to the literal strings. Consequently,
+<span class="lineNum">      96 </span>            : // PROFILER_LABEL frames take up considerably less space in the profile buffer
+<span class="lineNum">      97 </span>            : // than PROFILER_LABEL_DYNAMIC frames.
+<span class="lineNum">      98 </span>            : #define PROFILER_LABEL_DYNAMIC(name_space, info, category, str) do {} while (0)
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            : // Insert a marker in the profile timeline. This is useful to delimit something
+<span class="lineNum">     101 </span>            : // important happening such as the first paint. Unlike profiler_label that are
+<span class="lineNum">     102 </span>            : // only recorded if a sample is collected while it is active, marker will always
+<span class="lineNum">     103 </span>            : // be collected.
+<span class="lineNum">     104 </span>            : #define PROFILER_MARKER(info) do {} while (0)
+<span class="lineNum">     105 </span>            : #define PROFILER_MARKER_PAYLOAD(info, payload) do { mozilla::UniquePtr&lt;ProfilerMarkerPayload&gt; payloadDeletor(payload); } while (0)
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : #else   // defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            : #define PROFILER_FUNC(decl, rv)  decl;
+<span class="lineNum">     110 </span>            : #define PROFILER_FUNC_VOID(decl) void decl;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : // we want the class and function name but can't easily get that using preprocessor macros
+<span class="lineNum">     113 </span>            : // __func__ doesn't have the class name and __PRETTY_FUNCTION__ has the parameters
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            : #define PROFILER_LABEL(name_space, info, category) MOZ_PLATFORM_TRACING(name_space &quot;::&quot; info) mozilla::SamplerStackFrameRAII SAMPLER_APPEND_LINE_NUMBER(sampler_raii)(name_space &quot;::&quot; info, category, __LINE__)
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : #define PROFILER_LABEL_FUNC(category) MOZ_PLATFORM_TRACING(SAMPLE_FUNCTION_NAME) mozilla::SamplerStackFrameRAII SAMPLER_APPEND_LINE_NUMBER(sampler_raii)(SAMPLE_FUNCTION_NAME, category, __LINE__)
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : #define PROFILER_LABEL_DYNAMIC(name_space, info, category, str) MOZ_PLATFORM_TRACING(name_space &quot;::&quot; info) mozilla::SamplerStackFrameDynamicRAII SAMPLER_APPEND_LINE_NUMBER(sampler_raii)(name_space &quot;::&quot; info, category, __LINE__, str)
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : #define PROFILER_MARKER(info) profiler_add_marker(info)
+<span class="lineNum">     122 </span>            : #define PROFILER_MARKER_PAYLOAD(info, payload) profiler_add_marker(info, payload)
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : #endif  // defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : // These functions are defined whether the profiler is enabled or not.
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            : // Adds a tracing marker to the PseudoStack. A no-op if the profiler is
+<span class="lineNum">     129 </span>            : // inactive or in privacy mode.
+<span class="lineNum">     130 </span>            : PROFILER_FUNC_VOID(profiler_tracing(const char* aCategory, const char* aInfo,
+<span class="lineNum">     131 </span>            :                                     TracingKind aKind = TRACING_EVENT))
+<span class="lineNum">     132 </span>            : PROFILER_FUNC_VOID(profiler_tracing(const char* aCategory, const char* aInfo,
+<span class="lineNum">     133 </span>            :                                     UniqueProfilerBacktrace aCause,
+<span class="lineNum">     134 </span>            :                                     TracingKind aKind = TRACING_EVENT))
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : // Initialize the profiler. If MOZ_PROFILER_STARTUP is set the profiler will be
+<span class="lineNum">     137 </span>            : // started. This call must happen before any other profiler calls (except
+<span class="lineNum">     138 </span>            : // profiler_start(), which will call profiler_init() if it hasn't already run).
+<span class="lineNum">     139 </span>            : PROFILER_FUNC_VOID(profiler_init(void* stackTop))
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : // Clean up the profiler module, stopping it if required. This function may
+<span class="lineNum">     142 </span>            : // also save a shutdown profile if requested. No profiler calls should happen
+<span class="lineNum">     143 </span>            : // after this point and all pseudo labels should have been popped.
+<span class="lineNum">     144 </span>            : PROFILER_FUNC_VOID(profiler_shutdown())
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : // Start the profiler -- initializing it first if necessary -- with the
+<span class="lineNum">     147 </span>            : // selected options. Stops and restarts the profiler if it is already active.
+<span class="lineNum">     148 </span>            : // After starting the profiler is &quot;active&quot;. The samples will be recorded in a
+<span class="lineNum">     149 </span>            : // circular buffer.
+<span class="lineNum">     150 </span>            : //   &quot;aEntries&quot; is the number of entries in the profiler's circular buffer.
+<span class="lineNum">     151 </span>            : //   &quot;aInterval&quot; the sampling interval, measured in millseconds.
+<span class="lineNum">     152 </span>            : PROFILER_FUNC_VOID(profiler_start(int aEntries, double aInterval,
+<span class="lineNum">     153 </span>            :                                   const char** aFeatures,
+<span class="lineNum">     154 </span>            :                                   uint32_t aFeatureCount,
+<span class="lineNum">     155 </span>            :                                   const char** aThreadNameFilters,
+<span class="lineNum">     156 </span>            :                                   uint32_t aFilterCount))
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : // Stop the profiler and discard the profile without saving it. A no-op if the
+<span class="lineNum">     159 </span>            : // profiler is inactive. After stopping the profiler is &quot;inactive&quot;.
+<span class="lineNum">     160 </span>            : PROFILER_FUNC_VOID(profiler_stop())
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            : // Pause and resume the profiler. No-ops if the profiler is inactive. While
+<span class="lineNum">     163 </span>            : // paused the profile will not take any samples and will not record any data
+<span class="lineNum">     164 </span>            : // into its buffers. The profiler remains fully initialized in this state.
+<span class="lineNum">     165 </span>            : // Timeline markers will still be stored. This feature will keep JavaScript
+<span class="lineNum">     166 </span>            : // profiling enabled, thus allowing toggling the profiler without invalidating
+<span class="lineNum">     167 </span>            : // the JIT.
+<span class="lineNum">     168 </span>            : PROFILER_FUNC_VOID(profiler_pause())
+<span class="lineNum">     169 </span>            : PROFILER_FUNC_VOID(profiler_resume())
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            : // Is the profiler active and paused? Returns false if the profiler is inactive.
+<span class="lineNum">     172 </span>            : PROFILER_FUNC(bool profiler_is_paused(), false)
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            : // Immediately capture the current thread's call stack and return it. A no-op
+<span class="lineNum">     175 </span>            : // if the profiler is inactive or in privacy mode.
+<span class="lineNum">     176 </span>            : PROFILER_FUNC(UniqueProfilerBacktrace profiler_get_backtrace(), nullptr)
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            : PROFILER_FUNC_VOID(profiler_get_backtrace_noalloc(char *output,
+<span class="lineNum">     179 </span>            :                                                   size_t outputSize))
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            : // Free a ProfilerBacktrace returned by profiler_get_backtrace().
+<span class="lineNum">     182 </span>            : #if !defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">     183 </span>            : inline void ProfilerBacktraceDestructor::operator()(ProfilerBacktrace* aBacktrace) {}
+<span class="lineNum">     184 </span>            : #endif
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            : // Is the profiler active? Note: the return value of this function can become
+<span class="lineNum">     187 </span>            : // immediately out-of-date. E.g. the profile might be active but then
+<span class="lineNum">     188 </span>            : // profiler_stop() is called immediately afterward. One common and reasonable
+<span class="lineNum">     189 </span>            : // pattern of usage is the following:
+<span class="lineNum">     190 </span>            : //
+<span class="lineNum">     191 </span>            : //   if (profiler_is_active()) {
+<span class="lineNum">     192 </span>            : //     ExpensiveData expensiveData = CreateExpensiveData();
+<span class="lineNum">     193 </span>            : //     PROFILER_OPERATION(expensiveData);
+<span class="lineNum">     194 </span>            : //   }
+<span class="lineNum">     195 </span>            : //
+<span class="lineNum">     196 </span>            : // where PROFILER_OPERATION is a no-op if the profiler is inactive. In this
+<span class="lineNum">     197 </span>            : // case the profiler_is_active() check is just an optimization -- it prevents
+<span class="lineNum">     198 </span>            : // us calling CreateExpensiveData() unnecessarily in most cases, but the
+<span class="lineNum">     199 </span>            : // expensive data will end up being created but not used if another thread
+<span class="lineNum">     200 </span>            : // stops the profiler between the CreateExpensiveData() and PROFILER_OPERATION
+<span class="lineNum">     201 </span>            : // calls.
+<span class="lineNum">     202 </span>            : //
+<span class="lineNum">     203 </span>            : PROFILER_FUNC(bool profiler_is_active(), false)
+<span class="lineNum">     204 </span>            : 
+<span class="lineNum">     205 </span>            : // Check if a profiler feature is active. Returns false if the profiler is
+<span class="lineNum">     206 </span>            : // inactive.
+<span class="lineNum">     207 </span>            : //
+<span class="lineNum">     208 </span>            : // Supported features: &quot;displaylistdump&quot;, &quot;gpu&quot;, &quot;layersdump&quot;, &quot;restyle&quot;.
+<span class="lineNum">     209 </span>            : PROFILER_FUNC(bool profiler_feature_active(const char*), false)
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            : // Set the current frame number. Operates the same whether the profiler is
+<span class="lineNum">     212 </span>            : // active or not.
+<span class="lineNum">     213 </span>            : PROFILER_FUNC_VOID(profiler_set_frame_number(int frameNumber))
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : // Get the profile encoded as a JSON string. A no-op (returning nullptr) if the
+<span class="lineNum">     216 </span>            : // profiler is inactive.
+<span class="lineNum">     217 </span>            : PROFILER_FUNC(mozilla::UniquePtr&lt;char[]&gt; profiler_get_profile(double aSinceTime = 0),
+<span class="lineNum">     218 </span>            :               nullptr)
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span>            : // Write the profile for this process (excluding subprocesses) into aWriter.
+<span class="lineNum">     221 </span>            : // Returns false if the profiler is inactive.
+<span class="lineNum">     222 </span>            : PROFILER_FUNC(bool profiler_stream_json_for_this_process(SpliceableJSONWriter&amp; aWriter,
+<span class="lineNum">     223 </span>            :                                                          double aSinceTime = 0),
+<span class="lineNum">     224 </span>            :               false)
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            : // Get the params used to start the profiler. Returns 0 and empty vectors (via
+<span class="lineNum">     227 </span>            : // outparams) if the profile is inactive.
+<span class="lineNum">     228 </span>            : PROFILER_FUNC_VOID(profiler_get_start_params(int* aEntrySize,
+<span class="lineNum">     229 </span>            :                                              double* aInterval,
+<span class="lineNum">     230 </span>            :                                              mozilla::Vector&lt;const char*&gt;* aFeatures,
+<span class="lineNum">     231 </span>            :                                              mozilla::Vector&lt;const char*&gt;* aFilters))
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            : // Get the profile and write it into a file. A no-op if the profile is
+<span class="lineNum">     234 </span>            : // inactive.
+<span class="lineNum">     235 </span>            : //
+<span class="lineNum">     236 </span>            : // This function is 'extern &quot;C&quot;' so that it is easily callable from a debugger
+<span class="lineNum">     237 </span>            : // in a build without debugging information (a workaround for
+<span class="lineNum">     238 </span>            : // http://llvm.org/bugs/show_bug.cgi?id=22211).
+<span class="lineNum">     239 </span>            : extern &quot;C&quot; {
+<span class="lineNum">     240 </span>            : PROFILER_FUNC_VOID(profiler_save_profile_to_file(const char* aFilename))
+<span class="lineNum">     241 </span>            : }
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            : // Get the features supported by the profiler that are accepted by
+<span class="lineNum">     244 </span>            : // profiler_init(). Returns a null terminated char* array. The result is the
+<span class="lineNum">     245 </span>            : // same whether the profiler is active or not.
+<span class="lineNum">     246 </span>            : PROFILER_FUNC(const char** profiler_get_features(), nullptr)
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            : // Get information about the current buffer status. A no-op when the profiler
+<span class="lineNum">     249 </span>            : // is inactive. Do not call this function; call profiler_get_buffer_info()
+<span class="lineNum">     250 </span>            : // instead.
+<span class="lineNum">     251 </span>            : PROFILER_FUNC_VOID(profiler_get_buffer_info_helper(uint32_t* aCurrentPosition,
+<span class="lineNum">     252 </span>            :                                                    uint32_t* aEntries,
+<span class="lineNum">     253 </span>            :                                                    uint32_t* aGeneration))
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            : // Get information about the current buffer status. Returns (via outparams) the
+<span class="lineNum">     256 </span>            : // current write position in the buffer, the total size of the buffer, and the
+<span class="lineNum">     257 </span>            : // generation of the buffer. Returns zeroes if the profiler is inactive.
+<span class="lineNum">     258 </span>            : //
+<span class="lineNum">     259 </span>            : // This information may be useful to a user-interface displaying the current
+<a name="260"><span class="lineNum">     260 </span>            : // status of the profiler, allowing the user to get a sense for how fast the</a>
+<span class="lineNum">     261 </span>            : // buffer is being written to, and how much data is visible.
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 : static inline void profiler_get_buffer_info(uint32_t* aCurrentPosition,</span>
+<span class="lineNum">     263 </span>            :                                             uint32_t* aEntries,
+<span class="lineNum">     264 </span>            :                                             uint32_t* aGeneration)
+<span class="lineNum">     265 </span>            : {
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :   *aCurrentPosition = 0;</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :   *aEntries = 0;</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :   *aGeneration = 0;</span>
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :   profiler_get_buffer_info_helper(aCurrentPosition, aEntries, aGeneration);</span>
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            : // Register/unregister threads with the profiler. Both functions operate the
+<span class="lineNum">     274 </span>            : // same whether the profiler is active or inactive.
+<span class="lineNum">     275 </span>            : PROFILER_FUNC_VOID(profiler_register_thread(const char* name,
+<span class="lineNum">     276 </span>            :                                             void* guessStackTop))
+<span class="lineNum">     277 </span>            : PROFILER_FUNC_VOID(profiler_unregister_thread())
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : // These functions tell the profiler that a thread went to sleep so that we can
+<span class="lineNum">     280 </span>            : // avoid sampling it while it's sleeping. Calling profiler_thread_sleep()
+<span class="lineNum">     281 </span>            : // twice without an intervening profiler_thread_wake() is an error. All three
+<span class="lineNum">     282 </span>            : // functions operate the same whether the profiler is active or inactive.
+<span class="lineNum">     283 </span>            : PROFILER_FUNC_VOID(profiler_thread_sleep())
+<span class="lineNum">     284 </span>            : PROFILER_FUNC_VOID(profiler_thread_wake())
+<span class="lineNum">     285 </span>            : PROFILER_FUNC(bool profiler_thread_is_sleeping(), false)
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            : // Call by the JSRuntime's operation callback. This is used to start profiling
+<span class="lineNum">     288 </span>            : // on auxiliary threads. Operates the same whether the profiler is active or
+<span class="lineNum">     289 </span>            : // not.
+<span class="lineNum">     290 </span>            : PROFILER_FUNC_VOID(profiler_js_interrupt_callback())
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            : // Gets the time since the last profiler_init() or profiler_start() call.
+<span class="lineNum">     293 </span>            : // Operates the same whether the profiler is active or inactive.
+<span class="lineNum">     294 </span>            : PROFILER_FUNC(double profiler_time(), 0)
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            : PROFILER_FUNC_VOID(profiler_log(const char *str))
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : // End of the functions defined whether the profiler is enabled or not.
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            : #if defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">     303 </span>            : #include &lt;signal.h&gt;
+<span class="lineNum">     304 </span>            : #include &quot;js/ProfilingStack.h&quot;
+<span class="lineNum">     305 </span>            : #include &quot;mozilla/Sprintf.h&quot;
+<span class="lineNum">     306 </span>            : #include &quot;mozilla/ThreadLocal.h&quot;
+<span class="lineNum">     307 </span>            : #include &quot;nscore.h&quot;
+<span class="lineNum">     308 </span>            : #include &quot;PseudoStack.h&quot;
+<span class="lineNum">     309 </span>            : #include &quot;nsIMemoryReporter.h&quot;
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            : // Make sure that we can use std::min here without the Windows headers messing with us.
+<span class="lineNum">     312 </span>            : #ifdef min
+<span class="lineNum">     313 </span>            : #undef min
+<span class="lineNum">     314 </span>            : #endif
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            : class nsISupports;
+<span class="lineNum">     317 </span>            : class ProfilerMarkerPayload;
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            : // Each thread gets its own PseudoStack on thread creation. ThreadInfo has the
+<span class="lineNum">     320 </span>            : // owning reference; tlsPseudoStack is a non-owning reference. On thread
+<span class="lineNum">     321 </span>            : // destruction, tlsPseudoStack is cleared, and the ThreadInfo (along with its
+<span class="lineNum">     322 </span>            : // PseudoStack) may or may not be destroyed.
+<span class="lineNum">     323 </span>            : //
+<span class="lineNum">     324 </span>            : // Non-owning PseudoStack references are also temporarily used by
+<span class="lineNum">     325 </span>            : // profiler_call_{enter,exit}() pairs. RAII classes ensure these calls are
+<span class="lineNum">     326 </span>            : // balanced, and they occur on the thread itself, which means they are
+<span class="lineNum">     327 </span>            : // necessarily bounded by the lifetime of the thread, which ensures they can't
+<span class="lineNum">     328 </span>            : // be used after the PseudoStack is destroyed.
+<span class="lineNum">     329 </span>            : //
+<span class="lineNum">     330 </span>            : extern MOZ_THREAD_LOCAL(PseudoStack*) tlsPseudoStack;
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : class ProfilerState;
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            : // The core profiler state. Null at process startup, it is set to a non-null
+<span class="lineNum">     335 </span>            : // value in profiler_init() and stays that way until profiler_shutdown() is
+<span class="lineNum">     336 </span>            : // called. Therefore it can be checked to determine if the profiler has been
+<span class="lineNum">     337 </span>            : // initialized but not yet shut down.
+<span class="lineNum">     338 </span>            : extern ProfilerState* gPS;
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span>            : #ifndef SAMPLE_FUNCTION_NAME
+<span class="lineNum">     341 </span>            : # if defined(__GNUC__) || defined(_MSC_VER)
+<span class="lineNum">     342 </span>            : #  define SAMPLE_FUNCTION_NAME __FUNCTION__
+<span class="lineNum">     343 </span>            : # else
+<span class="lineNum">     344 </span>            : #  define SAMPLE_FUNCTION_NAME __func__  // defined in C99, supported in various C++ compilers. Just raw function name.
+<span class="lineNum">     345 </span>            : # endif
+<span class="lineNum">     346 </span>            : #endif
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            : // Returns a handle to pass on exit. This can check that we are popping the
+<a name="349"><span class="lineNum">     349 </span>            : // correct callstack. Operates the same whether the profiler is active or not.</a>
+<span class="lineNum">     350 </span>            : static inline void*
+<span class="lineNum">     351 </span><span class="lineCov">        331 : profiler_call_enter(const char* aInfo,</span>
+<span class="lineNum">     352 </span>            :                     js::ProfileEntry::Category aCategory,
+<span class="lineNum">     353 </span>            :                     void *aFrameAddress, bool aCopy, uint32_t line,
+<span class="lineNum">     354 </span>            :                     const char* aDynamicString = nullptr)
+<span class="lineNum">     355 </span>            : {
+<span class="lineNum">     356 </span>            :   // This function runs both on and off the main thread.
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span><span class="lineCov">        331 :   MOZ_RELEASE_ASSERT(gPS);</span>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">        331 :   PseudoStack* stack = tlsPseudoStack.get();</span>
+<span class="lineNum">     361 </span><span class="lineCov">        331 :   if (!stack) {</span>
+<span class="lineNum">     362 </span>            :     return stack;
+<span class="lineNum">     363 </span>            :   }
+<span class="lineNum">     364 </span><span class="lineCov">        331 :   stack-&gt;push(aInfo, aCategory, aFrameAddress, aCopy, line, aDynamicString);</span>
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            :   // The handle is meant to support future changes but for now it is simply
+<span class="lineNum">     367 </span>            :   // used to avoid having to call tlsPseudoStack.get() in profiler_call_exit().
+<span class="lineNum">     368 </span><span class="lineCov">        331 :   return stack;</span>
+<span class="lineNum">     369 </span>            : }
+<a name="370"><span class="lineNum">     370 </span>            : </a>
+<span class="lineNum">     371 </span>            : static inline void
+<span class="lineNum">     372 </span><span class="lineCov">        331 : profiler_call_exit(void* aHandle)</span>
+<span class="lineNum">     373 </span>            : {
+<span class="lineNum">     374 </span>            :   // This function runs both on and off the main thread.
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span><span class="lineCov">        331 :   MOZ_RELEASE_ASSERT(gPS);</span>
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineCov">        331 :   if (!aHandle) {</span>
+<span class="lineNum">     379 </span><span class="lineCov">        331 :     return;</span>
+<span class="lineNum">     380 </span>            :   }
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineCov">        331 :   PseudoStack *stack = (PseudoStack*)aHandle;</span>
+<span class="lineNum">     383 </span>            :   stack-&gt;pop();
+<span class="lineNum">     384 </span>            : }
+<span class="lineNum">     385 </span>            : 
+<span class="lineNum">     386 </span>            : // Adds a marker to the PseudoStack. A no-op if the profiler is inactive or in
+<span class="lineNum">     387 </span>            : // privacy mode.
+<span class="lineNum">     388 </span>            : void profiler_add_marker(const char *aMarker,
+<span class="lineNum">     389 </span>            :                          ProfilerMarkerPayload *aPayload = nullptr);
+<span class="lineNum">     390 </span>            : 
+<span class="lineNum">     391 </span>            : #define SAMPLER_APPEND_LINE_NUMBER_PASTE(id, line) id ## line
+<span class="lineNum">     392 </span>            : #define SAMPLER_APPEND_LINE_NUMBER_EXPAND(id, line) SAMPLER_APPEND_LINE_NUMBER_PASTE(id, line)
+<span class="lineNum">     393 </span>            : #define SAMPLER_APPEND_LINE_NUMBER(id) SAMPLER_APPEND_LINE_NUMBER_EXPAND(id, __LINE__)
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            : // Uncomment this to turn on systrace or build with
+<span class="lineNum">     396 </span>            : // ac_add_options --enable-systace
+<span class="lineNum">     397 </span>            : //#define MOZ_USE_SYSTRACE
+<span class="lineNum">     398 </span>            : #ifdef MOZ_USE_SYSTRACE
+<span class="lineNum">     399 </span>            : #ifndef ATRACE_TAG
+<span class="lineNum">     400 </span>            : # define ATRACE_TAG ATRACE_TAG_ALWAYS
+<span class="lineNum">     401 </span>            : #endif
+<span class="lineNum">     402 </span>            : // We need HAVE_ANDROID_OS to be defined for Trace.h.
+<span class="lineNum">     403 </span>            : // If its not set we will set it temporary and remove it.
+<span class="lineNum">     404 </span>            : # ifndef HAVE_ANDROID_OS
+<span class="lineNum">     405 </span>            : #   define HAVE_ANDROID_OS
+<span class="lineNum">     406 </span>            : #   define REMOVE_HAVE_ANDROID_OS
+<span class="lineNum">     407 </span>            : # endif
+<span class="lineNum">     408 </span>            : // Android source code will include &lt;cutils/trace.h&gt; before this. There is no
+<span class="lineNum">     409 </span>            : // HAVE_ANDROID_OS defined in Firefox OS build at that time. Enabled it globally
+<span class="lineNum">     410 </span>            : // will cause other build break. So atrace_begin and atrace_end are not defined.
+<span class="lineNum">     411 </span>            : // It will cause a build-break when we include &lt;utils/Trace.h&gt;. Use undef
+<span class="lineNum">     412 </span>            : // _LIBS_CUTILS_TRACE_H will force &lt;cutils/trace.h&gt; to define atrace_begin and
+<span class="lineNum">     413 </span>            : // atrace_end with defined HAVE_ANDROID_OS again. Then there is no build-break.
+<span class="lineNum">     414 </span>            : # undef _LIBS_CUTILS_TRACE_H
+<span class="lineNum">     415 </span>            : # include &lt;utils/Trace.h&gt;
+<span class="lineNum">     416 </span>            : # define MOZ_PLATFORM_TRACING(name) android::ScopedTrace SAMPLER_APPEND_LINE_NUMBER(scopedTrace)(ATRACE_TAG, name);
+<span class="lineNum">     417 </span>            : # ifdef REMOVE_HAVE_ANDROID_OS
+<span class="lineNum">     418 </span>            : #  undef HAVE_ANDROID_OS
+<span class="lineNum">     419 </span>            : #  undef REMOVE_HAVE_ANDROID_OS
+<span class="lineNum">     420 </span>            : # endif
+<span class="lineNum">     421 </span>            : #else
+<span class="lineNum">     422 </span>            : # define MOZ_PLATFORM_TRACING(name)
+<span class="lineNum">     423 </span>            : #endif
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span>            : // FIXME/bug 789667: memory constraints wouldn't much of a problem for this
+<span class="lineNum">     426 </span>            : // small a sample buffer size, except that serializing the profile data is
+<span class="lineNum">     427 </span>            : // extremely, unnecessarily memory intensive.
+<span class="lineNum">     428 </span>            : #ifdef MOZ_WIDGET_GONK
+<span class="lineNum">     429 </span>            : # define PLATFORM_LIKELY_MEMORY_CONSTRAINED
+<span class="lineNum">     430 </span>            : #endif
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            : #if !defined(PLATFORM_LIKELY_MEMORY_CONSTRAINED) &amp;&amp; !defined(ARCH_ARMV6)
+<span class="lineNum">     433 </span>            : # define PROFILE_DEFAULT_ENTRIES 1000000
+<span class="lineNum">     434 </span>            : #else
+<span class="lineNum">     435 </span>            : # define PROFILE_DEFAULT_ENTRIES 100000
+<span class="lineNum">     436 </span>            : #endif
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            : // In the case of profiler_get_backtrace we know that we only need enough space
+<span class="lineNum">     439 </span>            : // for a single backtrace.
+<span class="lineNum">     440 </span>            : #define GET_BACKTRACE_DEFAULT_ENTRIES 1000
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            : #if defined(PLATFORM_LIKELY_MEMORY_CONSTRAINED)
+<span class="lineNum">     443 </span>            : // A 1ms sampling interval has been shown to be a large perf hit (10fps) on
+<span class="lineNum">     444 </span>            : // memory-constrained (low-end) platforms, and additionally to yield different
+<span class="lineNum">     445 </span>            : // results from the profiler. Where this is the important case, b2g, there are
+<span class="lineNum">     446 </span>            : // also many gecko processes which magnify these effects.
+<span class="lineNum">     447 </span>            : # define PROFILE_DEFAULT_INTERVAL 10
+<span class="lineNum">     448 </span>            : #else
+<span class="lineNum">     449 </span>            : #define PROFILE_DEFAULT_INTERVAL 1
+<span class="lineNum">     450 </span>            : #endif
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            : #define PROFILE_DEFAULT_FEATURES NULL
+<span class="lineNum">     453 </span>            : #define PROFILE_DEFAULT_FEATURE_COUNT 0
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            : namespace mozilla {
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : class MOZ_RAII SamplerStackFrameRAII {
+<span class="lineNum">     458 </span>            : public:
+<a name="459"><span class="lineNum">     459 </span>            :   // We only copy the strings at save time, so to take multiple parameters we'd</a>
+<span class="lineNum">     460 </span>            :   // need to copy them then.
+<span class="lineNum">     461 </span><span class="lineCov">        326 :   SamplerStackFrameRAII(const char *aInfo,</span>
+<span class="lineNum">     462 </span>            :     js::ProfileEntry::Category aCategory, uint32_t line
+<span class="lineNum">     463 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     464 </span>            :   {
+<span class="lineNum">     465 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<a name="466"><span class="lineNum">     466 </span><span class="lineCov">        326 :     mHandle = profiler_call_enter(aInfo, aCategory, this, false, line);</span></a>
+<span class="lineNum">     467 </span><span class="lineCov">        326 :   }</span>
+<span class="lineNum">     468 </span><span class="lineCov">        326 :   ~SamplerStackFrameRAII() {</span>
+<span class="lineNum">     469 </span><span class="lineCov">        326 :     profiler_call_exit(mHandle);</span>
+<span class="lineNum">     470 </span><span class="lineCov">        326 :   }</span>
+<span class="lineNum">     471 </span>            : private:
+<span class="lineNum">     472 </span>            :   MOZ_DECL_USE_GUARD_OBJECT_NOTIFIER
+<span class="lineNum">     473 </span>            :   void* mHandle;
+<span class="lineNum">     474 </span>            : };
+<span class="lineNum">     475 </span>            : 
+<a name="476"><span class="lineNum">     476 </span>            : class MOZ_RAII SamplerStackFrameDynamicRAII {</a>
+<span class="lineNum">     477 </span>            : public:
+<span class="lineNum">     478 </span><span class="lineCov">          5 :   SamplerStackFrameDynamicRAII(const char* aInfo,</span>
+<span class="lineNum">     479 </span>            :     js::ProfileEntry::Category aCategory, uint32_t aLine,
+<span class="lineNum">     480 </span>            :     const char* aDynamicString)
+<span class="lineNum">     481 </span>            :   {
+<span class="lineNum">     482 </span>            :     mHandle = profiler_call_enter(aInfo, aCategory, this, true, aLine,
+<span class="lineNum">     483 </span><span class="lineCov">          5 :                                   aDynamicString);</span>
+<a name="484"><span class="lineNum">     484 </span><span class="lineCov">          5 :   }</span></a>
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span><span class="lineCov">          5 :   ~SamplerStackFrameDynamicRAII() {</span>
+<span class="lineNum">     487 </span><span class="lineCov">          5 :     profiler_call_exit(mHandle);</span>
+<span class="lineNum">     488 </span><span class="lineCov">          5 :   }</span>
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            : private:
+<span class="lineNum">     491 </span>            :   void* mHandle;
+<span class="lineNum">     492 </span>            : };
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            : } // namespace mozilla
+<a name="495"><span class="lineNum">     495 </span>            : </a>
+<span class="lineNum">     496 </span>            : inline PseudoStack*
+<span class="lineNum">     497 </span><span class="lineCov">         75 : profiler_get_pseudo_stack(void)</span>
+<span class="lineNum">     498 </span>            : {
+<span class="lineNum">     499 </span>            :   // This function runs both on and off the main thread.
+<span class="lineNum">     500 </span>            : 
+<span class="lineNum">     501 </span><span class="lineCov">         75 :   MOZ_RELEASE_ASSERT(gPS);</span>
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineCov">         75 :   return tlsPseudoStack.get();</span>
+<span class="lineNum">     504 </span>            : }
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            : void profiler_set_js_context(JSContext* aCx);
+<span class="lineNum">     507 </span>            : void profiler_clear_js_context();
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span>            : class GeckoProfilerReporter final : public nsIMemoryReporter
+<span class="lineNum">     510 </span>            : {
+<span class="lineNum">     511 </span>            : public:
+<span class="lineNum">     512 </span>            :   NS_DECL_ISUPPORTS
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span><span class="lineCov">        120 :   GeckoProfilerReporter() {}</span>
+<span class="lineNum">     515 </span>            : 
+<span class="lineNum">     516 </span>            :   NS_IMETHOD
+<span class="lineNum">     517 </span>            :   CollectReports(nsIHandleReportCallback* aHandleReport,
+<span class="lineNum">     518 </span>            :                  nsISupports* aData, bool aAnonymize) override;
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            : private:
+<span class="lineNum">     521 </span><span class="lineCov">         60 :   ~GeckoProfilerReporter() {}</span>
+<span class="lineNum">     522 </span>            : };
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            : #endif  // defined(MOZ_GECKO_PROFILER)
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            : namespace mozilla {
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span>            : class MOZ_RAII GeckoProfilerInitRAII {
+<span class="lineNum">     529 </span>            : public:
+<span class="lineNum">     530 </span>            :   explicit GeckoProfilerInitRAII(void* stackTop) {
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :     profiler_init(stackTop);</span>
+<span class="lineNum">     532 </span>            :   }
+<span class="lineNum">     533 </span>            :   ~GeckoProfilerInitRAII() {
+<span class="lineNum">     534 </span><span class="lineNoCov">          0 :     profiler_shutdown();</span>
+<span class="lineNum">     535 </span>            :   }
+<span class="lineNum">     536 </span>            : };
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            : class MOZ_RAII GeckoProfilerThreadSleepRAII {
+<span class="lineNum">     539 </span>            : public:
+<span class="lineNum">     540 </span>            :   GeckoProfilerThreadSleepRAII() {
+<span class="lineNum">     541 </span><span class="lineCov">       2675 :     profiler_thread_sleep();</span>
+<span class="lineNum">     542 </span>            :   }
+<span class="lineNum">     543 </span>            :   ~GeckoProfilerThreadSleepRAII() {
+<span class="lineNum">     544 </span><span class="lineCov">       2675 :     profiler_thread_wake();</span>
+<span class="lineNum">     545 </span>            :   }
+<span class="lineNum">     546 </span>            : };
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            : // Temporarily wake up the profiling of a thread while servicing events such as
+<span class="lineNum">     549 </span>            : // Asynchronous Procedure Calls (APCs).
+<span class="lineNum">     550 </span>            : class MOZ_RAII GeckoProfilerThreadWakeRAII {
+<span class="lineNum">     551 </span>            : public:
+<span class="lineNum">     552 </span>            :   GeckoProfilerThreadWakeRAII()
+<span class="lineNum">     553 </span>            :     : mIssuedWake(profiler_thread_is_sleeping())
+<span class="lineNum">     554 </span>            :   {
+<span class="lineNum">     555 </span>            :     if (mIssuedWake) {
+<span class="lineNum">     556 </span>            :       profiler_thread_wake();
+<span class="lineNum">     557 </span>            :     }
+<span class="lineNum">     558 </span>            :   }
+<span class="lineNum">     559 </span>            :   ~GeckoProfilerThreadWakeRAII() {
+<span class="lineNum">     560 </span>            :     if (mIssuedWake) {
+<span class="lineNum">     561 </span>            :       MOZ_ASSERT(!profiler_thread_is_sleeping());
+<span class="lineNum">     562 </span>            :       profiler_thread_sleep();
+<span class="lineNum">     563 </span>            :     }
+<span class="lineNum">     564 </span>            :   }
+<span class="lineNum">     565 </span>            : private:
+<span class="lineNum">     566 </span>            :   bool mIssuedWake;
+<span class="lineNum">     567 </span>            : };
+<span class="lineNum">     568 </span>            : 
+<a name="569"><span class="lineNum">     569 </span>            : class MOZ_RAII GeckoProfilerTracingRAII {</a>
+<span class="lineNum">     570 </span>            : public:
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :   GeckoProfilerTracingRAII(const char* aCategory, const char* aInfo,</span>
+<span class="lineNum">     572 </span>            :                            UniqueProfilerBacktrace aBacktrace
+<span class="lineNum">     573 </span>            :                            MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     574 </span>            :     : mCategory(aCategory)
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :     , mInfo(aInfo)</span>
+<span class="lineNum">     576 </span>            :   {
+<span class="lineNum">     577 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :     profiler_tracing(mCategory, mInfo, Move(aBacktrace), TRACING_INTERVAL_START);</span>
+<a name="579"><span class="lineNum">     579 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineCov">          5 :   GeckoProfilerTracingRAII(const char* aCategory, const char* aInfo</span>
+<span class="lineNum">     582 </span>            :                            MOZ_GUARD_OBJECT_NOTIFIER_PARAM)
+<span class="lineNum">     583 </span>            :     : mCategory(aCategory)
+<span class="lineNum">     584 </span><span class="lineCov">          5 :     , mInfo(aInfo)</span>
+<span class="lineNum">     585 </span>            :   {
+<span class="lineNum">     586 </span>            :     MOZ_GUARD_OBJECT_NOTIFIER_INIT;
+<span class="lineNum">     587 </span><span class="lineCov">          5 :     profiler_tracing(mCategory, mInfo, TRACING_INTERVAL_START);</span>
+<a name="588"><span class="lineNum">     588 </span><span class="lineCov">          5 :   }</span></a>
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span><span class="lineCov">          5 :   ~GeckoProfilerTracingRAII() {</span>
+<span class="lineNum">     591 </span><span class="lineCov">          5 :     profiler_tracing(mCategory, mInfo, TRACING_INTERVAL_END);</span>
+<span class="lineNum">     592 </span><span class="lineCov">          5 :   }</span>
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span>            : protected:
+<span class="lineNum">     595 </span>            :   MOZ_DECL_USE_GUARD_OBJECT_NOTIFIER
+<span class="lineNum">     596 </span>            :   const char* mCategory;
+<span class="lineNum">     597 </span>            :   const char* mInfo;
+<span class="lineNum">     598 </span>            : };
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span>            : // Convenience class to register and unregister a thread with the profiler.
+<span class="lineNum">     601 </span>            : // Needs to be the first object on the stack of the thread.
+<span class="lineNum">     602 </span>            : class MOZ_STACK_CLASS AutoProfilerRegister final
+<span class="lineNum">     603 </span>            : {
+<span class="lineNum">     604 </span>            : public:
+<span class="lineNum">     605 </span>            :   explicit AutoProfilerRegister(const char* aName)
+<span class="lineNum">     606 </span>            :   {
+<span class="lineNum">     607 </span><span class="lineCov">        255 :     profiler_register_thread(aName, this);</span>
+<span class="lineNum">     608 </span>            :   }
+<span class="lineNum">     609 </span>            :   ~AutoProfilerRegister()
+<span class="lineNum">     610 </span>            :   {
+<span class="lineNum">     611 </span><span class="lineCov">        255 :     profiler_unregister_thread();</span>
+<span class="lineNum">     612 </span><span class="lineCov">        255 :   }</span>
+<span class="lineNum">     613 </span>            : private:
+<span class="lineNum">     614 </span>            :   AutoProfilerRegister(const AutoProfilerRegister&amp;) = delete;
+<span class="lineNum">     615 </span>            :   AutoProfilerRegister&amp; operator=(const AutoProfilerRegister&amp;) = delete;
+<span class="lineNum">     616 </span>            : };
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span>            : } // namespace mozilla
+<span class="lineNum">     619 </span>            : 
+<span class="lineNum">     620 </span>            : #endif // ifndef SAMPLER_H
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

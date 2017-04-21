@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/dom/TimeoutManager.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/dom</a> - TimeoutManager.h<span style="font-size: 80%;"> (source / <a href="TimeoutManager.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">27</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #ifndef mozilla_dom_TimeoutManager_h__
+<span class="lineNum">       8 </span>            : #define mozilla_dom_TimeoutManager_h__
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/dom/Timeout.h&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : class nsIEventTarget;
+<span class="lineNum">      13 </span>            : class nsITimeoutHandler;
+<span class="lineNum">      14 </span>            : class nsGlobalWindow;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace mozilla {
+<span class="lineNum">      17 </span>            : namespace dom {
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : class OrderedTimeoutIterator;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : // This class manages the timeouts in a Window's setTimeout/setInterval pool.
+<span class="lineNum">      22 </span>            : class TimeoutManager final
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span>            : public:
+<span class="lineNum">      25 </span>            :   explicit TimeoutManager(nsGlobalWindow&amp; aWindow);
+<span class="lineNum">      26 </span>            :   ~TimeoutManager();
+<span class="lineNum">      27 </span>            :   TimeoutManager(const TimeoutManager&amp; rhs) = delete;
+<span class="lineNum">      28 </span>            :   void operator=(const TimeoutManager&amp; rhs) = delete;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   bool IsRunningTimeout() const { return mTimeoutFiringDepth &gt; 0; }</span>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   static uint32_t GetNestingLevel() { return sNestingLevel; }</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :   static void SetNestingLevel(uint32_t aLevel) { sNestingLevel = aLevel; }</span>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   bool HasTimeouts() const
+<span class="lineNum">      36 </span>            :   {
+<span class="lineNum">      37 </span>            :     return !mNormalTimeouts.IsEmpty() ||
+<span class="lineNum">      38 </span>            :            !mTrackingTimeouts.IsEmpty();
+<span class="lineNum">      39 </span>            :   }
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   nsresult SetTimeout(nsITimeoutHandler* aHandler,
+<span class="lineNum">      42 </span>            :                       int32_t interval, bool aIsInterval,
+<span class="lineNum">      43 </span>            :                       mozilla::dom::Timeout::Reason aReason,
+<span class="lineNum">      44 </span>            :                       int32_t* aReturn);
+<span class="lineNum">      45 </span>            :   void ClearTimeout(int32_t aTimerId,
+<span class="lineNum">      46 </span>            :                     mozilla::dom::Timeout::Reason aReason);
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   // The timeout implementation functions.
+<span class="lineNum">      49 </span>            :   void RunTimeout(mozilla::dom::Timeout* aTimeout);
+<span class="lineNum">      50 </span>            :   // Return true if |aTimeout| needs to be reinserted into the timeout list.
+<span class="lineNum">      51 </span>            :   bool RescheduleTimeout(mozilla::dom::Timeout* aTimeout, const TimeStamp&amp; now,
+<span class="lineNum">      52 </span>            :                          bool aRunningPendingTimeouts);
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   void ClearAllTimeouts();
+<span class="lineNum">      55 </span>            :   uint32_t GetTimeoutId(mozilla::dom::Timeout::Reason aReason);
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   // Apply back pressure to the window if the TabGroup ThrottledEventQueue
+<span class="lineNum">      58 </span>            :   // exists and has too many runnables waiting to run.  For example, increase
+<span class="lineNum">      59 </span>            :   // the minimum timer delay, etc.
+<span class="lineNum">      60 </span>            :   void MaybeApplyBackPressure();
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :   // Check the current ThrottledEventQueue depth and update the back pressure
+<span class="lineNum">      63 </span>            :   // state.  If the queue has drained back pressure may be canceled.
+<span class="lineNum">      64 </span>            :   void CancelOrUpdateBackPressure(nsGlobalWindow* aWindow);
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   // When timers are being throttled and we reduce the thottle delay we must
+<span class="lineNum">      67 </span>            :   // reschedule.  The amount of the old throttle delay must be provided in
+<span class="lineNum">      68 </span>            :   // order to bound how many timers must be examined.
+<span class="lineNum">      69 </span>            :   nsresult ResetTimersForThrottleReduction();
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   int32_t DOMMinTimeoutValue(bool aIsTracking) const;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :   // aTimeout is the timeout that we're about to start running.  This function
+<span class="lineNum">      74 </span>            :   // returns the current timeout.
+<span class="lineNum">      75 </span>            :   mozilla::dom::Timeout* BeginRunningTimeout(mozilla::dom::Timeout* aTimeout);
+<span class="lineNum">      76 </span>            :   // aTimeout is the last running timeout.
+<span class="lineNum">      77 </span>            :   void EndRunningTimeout(mozilla::dom::Timeout* aTimeout);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :   void UnmarkGrayTimers();
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   // These four methods are intended to be called from the corresponding methods
+<span class="lineNum">      82 </span>            :   // on nsGlobalWindow.
+<span class="lineNum">      83 </span>            :   void Suspend();
+<span class="lineNum">      84 </span>            :   void Resume();
+<span class="lineNum">      85 </span>            :   void Freeze();
+<span class="lineNum">      86 </span>            :   void Thaw();
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :   // Initialize TimeoutManager before the first time it is accessed.
+<span class="lineNum">      89 </span>            :   static void Initialize();
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   // Exposed only for testing
+<span class="lineNum">      92 </span>            :   bool IsTimeoutTracking(uint32_t aTimeoutId);
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   // The document finished loading
+<span class="lineNum">      95 </span>            :   void OnDocumentLoaded();
+<span class="lineNum">      96 </span>            :   void StartThrottlingTrackingTimeouts();
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :   // Run some code for each Timeout in our list.  Note that this function
+<a name="99"><span class="lineNum">      99 </span>            :   // doesn't guarantee that Timeouts are iterated in any particular order.</a>
+<span class="lineNum">     100 </span>            :   template &lt;class Callable&gt;
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   void ForEachUnorderedTimeout(Callable c)</span>
+<span class="lineNum">     102 </span>            :   {
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :     mNormalTimeouts.ForEach(c);</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :     mTrackingTimeouts.ForEach(c);</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   // Run some code for each Timeout in our list, but let the callback cancel the
+<span class="lineNum">     108 </span>            :   // iteration by returning true.  Note that this function doesn't guarantee
+<a name="109"><span class="lineNum">     109 </span>            :   // that Timeouts are iterated in any particular order.</a>
+<span class="lineNum">     110 </span>            :   template &lt;class Callable&gt;
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   void ForEachUnorderedTimeoutAbortable(Callable c)</span>
+<span class="lineNum">     112 </span>            :   {
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :     if (!mNormalTimeouts.ForEachAbortable(c)) {</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :       mTrackingTimeouts.ForEachAbortable(c);</span>
+<span class="lineNum">     115 </span>            :     }
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            : private:
+<span class="lineNum">     119 </span>            :   nsresult ResetTimersForThrottleReduction(int32_t aPreviousThrottleDelayMS);
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : private:
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   struct Timeouts {</span>
+<span class="lineNum">     123 </span>            :     Timeouts()
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :       : mTimeoutInsertionPoint(nullptr)</span>
+<span class="lineNum">     125 </span>            :     {
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :     // Insert aTimeout into the list, before all timeouts that would
+<span class="lineNum">     129 </span>            :     // fire after it, but no earlier than mTimeoutInsertionPoint, if any.
+<span class="lineNum">     130 </span>            :     enum class SortBy
+<span class="lineNum">     131 </span>            :     {
+<span class="lineNum">     132 </span>            :       TimeRemaining,
+<span class="lineNum">     133 </span>            :       TimeWhen
+<span class="lineNum">     134 </span>            :     };
+<span class="lineNum">     135 </span>            :     void Insert(mozilla::dom::Timeout* aTimeout, SortBy aSortBy);
+<span class="lineNum">     136 </span>            :     nsresult ResetTimersForThrottleReduction(int32_t aPreviousThrottleDelayMS,
+<span class="lineNum">     137 </span>            :                                              const TimeoutManager&amp; aTimeoutManager,
+<span class="lineNum">     138 </span>            :                                              SortBy aSortBy,
+<span class="lineNum">     139 </span>            :                                              nsIEventTarget* aQueue);
+<a name="140"><span class="lineNum">     140 </span>            : </a>
+<span class="lineNum">     141 </span>            :     const Timeout* GetFirst() const { return mTimeoutList.getFirst(); }
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     Timeout* GetFirst() { return mTimeoutList.getFirst(); }</span>
+<span class="lineNum">     143 </span>            :     const Timeout* GetLast() const { return mTimeoutList.getLast(); }
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     Timeout* GetLast() { return mTimeoutList.getLast(); }</span>
+<span class="lineNum">     145 </span>            :     bool IsEmpty() const { return mTimeoutList.isEmpty(); }
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     void InsertFront(Timeout* aTimeout) { mTimeoutList.insertFront(aTimeout); }</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     void Clear() { mTimeoutList.clear(); }</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     void SetInsertionPoint(Timeout* aTimeout)
+<span class="lineNum">     150 </span>            :     {
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :       mTimeoutInsertionPoint = aTimeout;</span>
+<span class="lineNum">     152 </span>            :     }
+<span class="lineNum">     153 </span>            :     Timeout* InsertionPoint()
+<span class="lineNum">     154 </span>            :     {
+<span class="lineNum">     155 </span>            :       return mTimeoutInsertionPoint;
+<span class="lineNum">     156 </span>            :     }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :     template &lt;class Callable&gt;
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     void ForEach(Callable c)</span>
+<span class="lineNum">     160 </span>            :     {
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       for (Timeout* timeout = GetFirst();</span>
+<span class="lineNum">     162 </span>            :            timeout;
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :            timeout = timeout-&gt;getNext()) {</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         c(timeout);</span>
+<span class="lineNum">     165 </span>            :       }
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            :     // Returns true when a callback aborts iteration.
+<span class="lineNum">     169 </span>            :     template &lt;class Callable&gt;
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     bool ForEachAbortable(Callable c)</span>
+<span class="lineNum">     171 </span>            :     {
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       for (Timeout* timeout = GetFirst();</span>
+<span class="lineNum">     173 </span>            :            timeout;
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :            timeout = timeout-&gt;getNext()) {</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :         if (c(timeout)) {</span>
+<span class="lineNum">     176 </span>            :           return true;
+<span class="lineNum">     177 </span>            :         }
+<span class="lineNum">     178 </span>            :       }
+<span class="lineNum">     179 </span>            :       return false;
+<span class="lineNum">     180 </span>            :     }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :     friend class OrderedTimeoutIterator;
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            :   private:
+<span class="lineNum">     185 </span>            :     typedef mozilla::LinkedList&lt;mozilla::dom::Timeout&gt; TimeoutList;
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :     // mTimeoutList is generally sorted by mWhen, unless mTimeoutInsertionPoint is
+<span class="lineNum">     188 </span>            :     // non-null.  In that case, the dummy timeout pointed to by
+<span class="lineNum">     189 </span>            :     // mTimeoutInsertionPoint may have a later mWhen than some of the timeouts
+<span class="lineNum">     190 </span>            :     // that come after it.
+<span class="lineNum">     191 </span>            :     TimeoutList               mTimeoutList;
+<span class="lineNum">     192 </span>            :     // If mTimeoutInsertionPoint is non-null, insertions should happen after it.
+<span class="lineNum">     193 </span>            :     // This is a dummy timeout at the moment; if that ever changes, the logic in
+<span class="lineNum">     194 </span>            :     // ResetTimersForThrottleReduction needs to change.
+<span class="lineNum">     195 </span>            :     mozilla::dom::Timeout*    mTimeoutInsertionPoint;
+<span class="lineNum">     196 </span>            :   };
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   friend class OrderedTimeoutIterator;
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            :   // Each nsGlobalWindow object has a TimeoutManager member.  This reference
+<span class="lineNum">     201 </span>            :   // points to that holder object.
+<span class="lineNum">     202 </span>            :   nsGlobalWindow&amp;             mWindow;
+<span class="lineNum">     203 </span>            :   // The list of timeouts coming from non-tracking scripts.
+<span class="lineNum">     204 </span>            :   Timeouts                    mNormalTimeouts;
+<span class="lineNum">     205 </span>            :   // The list of timeouts coming from scripts on the tracking protection list.
+<span class="lineNum">     206 </span>            :   Timeouts                    mTrackingTimeouts;
+<span class="lineNum">     207 </span>            :   uint32_t                    mTimeoutIdCounter;
+<span class="lineNum">     208 </span>            :   uint32_t                    mTimeoutFiringDepth;
+<span class="lineNum">     209 </span>            :   mozilla::dom::Timeout*      mRunningTimeout;
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :    // The current idle request callback timeout handle
+<span class="lineNum">     212 </span>            :   uint32_t                    mIdleCallbackTimeoutCounter;
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   int32_t                     mBackPressureDelayMS;
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span>            :   nsCOMPtr&lt;nsITimer&gt;          mThrottleTrackingTimeoutsTimer;
+<span class="lineNum">     217 </span>            :   bool                        mThrottleTrackingTimeouts;
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :   static uint32_t             sNestingLevel;
+<span class="lineNum">     220 </span>            : };
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            : }
+<span class="lineNum">     223 </span>            : }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

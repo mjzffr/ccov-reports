@@ -1,0 +1,884 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/Atomics.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - Atomics.h<span style="font-size: 80%;"> (source / <a href="Atomics.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">47</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntryMed">87.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">54</td>
+            <td class="headerCovTableEntry">170</td>
+            <td class="headerCovTableEntryLo">31.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 2 -*- */</a>
+<span class="lineNum">       2 </span>            : /* vim: set ts=8 sts=2 et sw=2 tw=80: */
+<span class="lineNum">       3 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       4 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       5 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : /*
+<span class="lineNum">       8 </span>            :  * Implements (almost always) lock-free atomic operations. The operations here
+<span class="lineNum">       9 </span>            :  * are a subset of that which can be found in C++11's &lt;atomic&gt; header, with a
+<span class="lineNum">      10 </span>            :  * different API to enforce consistent memory ordering constraints.
+<span class="lineNum">      11 </span>            :  *
+<span class="lineNum">      12 </span>            :  * Anyone caught using |volatile| for inter-thread memory safety needs to be
+<span class="lineNum">      13 </span>            :  * sent a copy of this header and the C++11 standard.
+<span class="lineNum">      14 </span>            :  */
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #ifndef mozilla_Atomics_h
+<span class="lineNum">      17 </span>            : #define mozilla_Atomics_h
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #include &quot;mozilla/Assertions.h&quot;
+<span class="lineNum">      20 </span>            : #include &quot;mozilla/Attributes.h&quot;
+<span class="lineNum">      21 </span>            : #include &quot;mozilla/Compiler.h&quot;
+<span class="lineNum">      22 </span>            : #include &quot;mozilla/TypeTraits.h&quot;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;stdint.h&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : /*
+<span class="lineNum">      27 </span>            :  * Our minimum deployment target on clang/OS X is OS X 10.6, whose SDK
+<span class="lineNum">      28 </span>            :  * does not have &lt;atomic&gt;.  So be sure to check for &lt;atomic&gt; support
+<span class="lineNum">      29 </span>            :  * along with C++0x support.
+<span class="lineNum">      30 </span>            :  */
+<span class="lineNum">      31 </span>            : #if defined(_MSC_VER)
+<span class="lineNum">      32 </span>            : #  define MOZ_HAVE_CXX11_ATOMICS
+<span class="lineNum">      33 </span>            : #elif defined(__clang__) || defined(__GNUC__)
+<span class="lineNum">      34 </span>            :    /*
+<span class="lineNum">      35 </span>            :     * Clang doesn't like &lt;atomic&gt; from libstdc++ before 4.7 due to the
+<span class="lineNum">      36 </span>            :     * loose typing of the atomic builtins. GCC 4.5 and 4.6 lacks inline
+<span class="lineNum">      37 </span>            :     * definitions for unspecialized std::atomic and causes linking errors.
+<span class="lineNum">      38 </span>            :     * Therefore, we require at least 4.7.0 for using libstdc++.
+<span class="lineNum">      39 </span>            :     *
+<span class="lineNum">      40 </span>            :     * libc++ &lt;atomic&gt; is only functional with clang.
+<span class="lineNum">      41 </span>            :     */
+<span class="lineNum">      42 </span>            : #  if MOZ_USING_LIBSTDCXX &amp;&amp; MOZ_LIBSTDCXX_VERSION_AT_LEAST(4, 7, 0)
+<span class="lineNum">      43 </span>            : #    define MOZ_HAVE_CXX11_ATOMICS
+<span class="lineNum">      44 </span>            : #  elif MOZ_USING_LIBCXX &amp;&amp; defined(__clang__)
+<span class="lineNum">      45 </span>            : #    define MOZ_HAVE_CXX11_ATOMICS
+<span class="lineNum">      46 </span>            : #  endif
+<span class="lineNum">      47 </span>            : #endif
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            : namespace mozilla {
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            : /**
+<span class="lineNum">      52 </span>            :  * An enum of memory ordering possibilities for atomics.
+<span class="lineNum">      53 </span>            :  *
+<span class="lineNum">      54 </span>            :  * Memory ordering is the observable state of distinct values in memory.
+<span class="lineNum">      55 </span>            :  * (It's a separate concept from atomicity, which concerns whether an
+<span class="lineNum">      56 </span>            :  * operation can ever be observed in an intermediate state.  Don't
+<span class="lineNum">      57 </span>            :  * conflate the two!)  Given a sequence of operations in source code on
+<span class="lineNum">      58 </span>            :  * memory, it is *not* always the case that, at all times and on all
+<span class="lineNum">      59 </span>            :  * cores, those operations will appear to have occurred in that exact
+<span class="lineNum">      60 </span>            :  * sequence.  First, the compiler might reorder that sequence, if it
+<span class="lineNum">      61 </span>            :  * thinks another ordering will be more efficient.  Second, the CPU may
+<span class="lineNum">      62 </span>            :  * not expose so consistent a view of memory.  CPUs will often perform
+<span class="lineNum">      63 </span>            :  * their own instruction reordering, above and beyond that performed by
+<span class="lineNum">      64 </span>            :  * the compiler.  And each core has its own memory caches, and accesses
+<span class="lineNum">      65 </span>            :  * (reads and writes both) to &quot;memory&quot; may only resolve to out-of-date
+<span class="lineNum">      66 </span>            :  * cache entries -- not to the &quot;most recently&quot; performed operation in
+<span class="lineNum">      67 </span>            :  * some global sense.  Any access to a value that may be used by
+<span class="lineNum">      68 </span>            :  * multiple threads, potentially across multiple cores, must therefore
+<span class="lineNum">      69 </span>            :  * have a memory ordering imposed on it, for all code on all
+<span class="lineNum">      70 </span>            :  * threads/cores to have a sufficiently coherent worldview.
+<span class="lineNum">      71 </span>            :  *
+<span class="lineNum">      72 </span>            :  * http://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync and
+<span class="lineNum">      73 </span>            :  * http://en.cppreference.com/w/cpp/atomic/memory_order go into more
+<span class="lineNum">      74 </span>            :  * detail on all this, including examples of how each mode works.
+<span class="lineNum">      75 </span>            :  *
+<span class="lineNum">      76 </span>            :  * Note that for simplicity and practicality, not all of the modes in
+<span class="lineNum">      77 </span>            :  * C++11 are supported.  The missing C++11 modes are either subsumed by
+<span class="lineNum">      78 </span>            :  * the modes we provide below, or not relevant for the CPUs we support
+<span class="lineNum">      79 </span>            :  * in Gecko.  These three modes are confusing enough as it is!
+<span class="lineNum">      80 </span>            :  */
+<span class="lineNum">      81 </span>            : enum MemoryOrdering {
+<span class="lineNum">      82 </span>            :   /*
+<span class="lineNum">      83 </span>            :    * Relaxed ordering is the simplest memory ordering: none at all.
+<span class="lineNum">      84 </span>            :    * When the result of a write is observed, nothing may be inferred
+<span class="lineNum">      85 </span>            :    * about other memory.  Writes ostensibly performed &quot;before&quot; on the
+<span class="lineNum">      86 </span>            :    * writing thread may not yet be visible.  Writes performed &quot;after&quot; on
+<span class="lineNum">      87 </span>            :    * the writing thread may already be visible, if the compiler or CPU
+<span class="lineNum">      88 </span>            :    * reordered them.  (The latter can happen if reads and/or writes get
+<span class="lineNum">      89 </span>            :    * held up in per-processor caches.)  Relaxed ordering means
+<span class="lineNum">      90 </span>            :    * operations can always use cached values (as long as the actual
+<span class="lineNum">      91 </span>            :    * updates to atomic values actually occur, correctly, eventually), so
+<span class="lineNum">      92 </span>            :    * it's usually the fastest sort of atomic access.  For this reason,
+<span class="lineNum">      93 </span>            :    * *it's also the most dangerous kind of access*.
+<span class="lineNum">      94 </span>            :    *
+<span class="lineNum">      95 </span>            :    * Relaxed ordering is good for things like process-wide statistics
+<span class="lineNum">      96 </span>            :    * counters that don't need to be consistent with anything else, so
+<span class="lineNum">      97 </span>            :    * long as updates themselves are atomic.  (And so long as any
+<span class="lineNum">      98 </span>            :    * observations of that value can tolerate being out-of-date -- if you
+<span class="lineNum">      99 </span>            :    * need some sort of up-to-date value, you need some sort of other
+<span class="lineNum">     100 </span>            :    * synchronizing operation.)  It's *not* good for locks, mutexes,
+<span class="lineNum">     101 </span>            :    * reference counts, etc. that mediate access to other memory, or must
+<span class="lineNum">     102 </span>            :    * be observably consistent with other memory.
+<span class="lineNum">     103 </span>            :    *
+<span class="lineNum">     104 </span>            :    * x86 architectures don't take advantage of the optimization
+<span class="lineNum">     105 </span>            :    * opportunities that relaxed ordering permits.  Thus it's possible
+<span class="lineNum">     106 </span>            :    * that using relaxed ordering will &quot;work&quot; on x86 but fail elsewhere
+<span class="lineNum">     107 </span>            :    * (ARM, say, which *does* implement non-sequentially-consistent
+<span class="lineNum">     108 </span>            :    * relaxed ordering semantics).  Be extra-careful using relaxed
+<span class="lineNum">     109 </span>            :    * ordering if you can't easily test non-x86 architectures!
+<span class="lineNum">     110 </span>            :    */
+<span class="lineNum">     111 </span>            :   Relaxed,
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   /*
+<span class="lineNum">     114 </span>            :    * When an atomic value is updated with ReleaseAcquire ordering, and
+<span class="lineNum">     115 </span>            :    * that new value is observed with ReleaseAcquire ordering, prior
+<span class="lineNum">     116 </span>            :    * writes (atomic or not) are also observable.  What ReleaseAcquire
+<span class="lineNum">     117 </span>            :    * *doesn't* give you is any observable ordering guarantees for
+<span class="lineNum">     118 </span>            :    * ReleaseAcquire-ordered operations on different objects.  For
+<span class="lineNum">     119 </span>            :    * example, if there are two cores that each perform ReleaseAcquire
+<span class="lineNum">     120 </span>            :    * operations on separate objects, each core may or may not observe
+<span class="lineNum">     121 </span>            :    * the operations made by the other core.  The only way the cores can
+<span class="lineNum">     122 </span>            :    * be synchronized with ReleaseAcquire is if they both
+<span class="lineNum">     123 </span>            :    * ReleaseAcquire-access the same object.  This implies that you can't
+<span class="lineNum">     124 </span>            :    * necessarily describe some global total ordering of ReleaseAcquire
+<span class="lineNum">     125 </span>            :    * operations.
+<span class="lineNum">     126 </span>            :    *
+<span class="lineNum">     127 </span>            :    * ReleaseAcquire ordering is good for (as the name implies) atomic
+<span class="lineNum">     128 </span>            :    * operations on values controlling ownership of things: reference
+<span class="lineNum">     129 </span>            :    * counts, mutexes, and the like.  However, if you are thinking about
+<span class="lineNum">     130 </span>            :    * using these to implement your own locks or mutexes, you should take
+<span class="lineNum">     131 </span>            :    * a good, hard look at actual lock or mutex primitives first.
+<span class="lineNum">     132 </span>            :    */
+<span class="lineNum">     133 </span>            :   ReleaseAcquire,
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            :   /*
+<span class="lineNum">     136 </span>            :    * When an atomic value is updated with SequentiallyConsistent
+<span class="lineNum">     137 </span>            :    * ordering, all writes observable when the update is observed, just
+<span class="lineNum">     138 </span>            :    * as with ReleaseAcquire ordering.  But, furthermore, a global total
+<span class="lineNum">     139 </span>            :    * ordering of SequentiallyConsistent operations *can* be described.
+<span class="lineNum">     140 </span>            :    * For example, if two cores perform SequentiallyConsistent operations
+<span class="lineNum">     141 </span>            :    * on separate objects, one core will observably perform its update
+<span class="lineNum">     142 </span>            :    * (and all previous operations will have completed), then the other
+<span class="lineNum">     143 </span>            :    * core will observably perform its update (and all previous
+<span class="lineNum">     144 </span>            :    * operations will have completed).  (Although those previous
+<span class="lineNum">     145 </span>            :    * operations aren't themselves ordered -- they could be intermixed,
+<span class="lineNum">     146 </span>            :    * or ordered if they occur on atomic values with ordering
+<span class="lineNum">     147 </span>            :    * requirements.)  SequentiallyConsistent is the *simplest and safest*
+<span class="lineNum">     148 </span>            :    * ordering of atomic operations -- it's always as if one operation
+<span class="lineNum">     149 </span>            :    * happens, then another, then another, in some order -- and every
+<span class="lineNum">     150 </span>            :    * core observes updates to happen in that single order.  Because it
+<span class="lineNum">     151 </span>            :    * has the most synchronization requirements, operations ordered this
+<span class="lineNum">     152 </span>            :    * way also tend to be slowest.
+<span class="lineNum">     153 </span>            :    *
+<span class="lineNum">     154 </span>            :    * SequentiallyConsistent ordering can be desirable when multiple
+<span class="lineNum">     155 </span>            :    * threads observe objects, and they all have to agree on the
+<span class="lineNum">     156 </span>            :    * observable order of changes to them.  People expect
+<span class="lineNum">     157 </span>            :    * SequentiallyConsistent ordering, even if they shouldn't, when
+<span class="lineNum">     158 </span>            :    * writing code, atomic or otherwise.  SequentiallyConsistent is also
+<span class="lineNum">     159 </span>            :    * the ordering of choice when designing lockless data structures.  If
+<span class="lineNum">     160 </span>            :    * you don't know what order to use, use this one.
+<span class="lineNum">     161 </span>            :    */
+<span class="lineNum">     162 </span>            :   SequentiallyConsistent,
+<span class="lineNum">     163 </span>            : };
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            : } // namespace mozilla
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            : // Build up the underlying intrinsics.
+<span class="lineNum">     168 </span>            : #ifdef MOZ_HAVE_CXX11_ATOMICS
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : #  include &lt;atomic&gt;
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : namespace mozilla {
+<span class="lineNum">     173 </span>            : namespace detail {
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : /*
+<span class="lineNum">     176 </span>            :  * We provide CompareExchangeFailureOrder to work around a bug in some
+<span class="lineNum">     177 </span>            :  * versions of GCC's &lt;atomic&gt; header.  See bug 898491.
+<span class="lineNum">     178 </span>            :  */
+<span class="lineNum">     179 </span>            : template&lt;MemoryOrdering Order&gt; struct AtomicOrderConstraints;
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            : template&lt;&gt;
+<span class="lineNum">     182 </span>            : struct AtomicOrderConstraints&lt;Relaxed&gt;
+<span class="lineNum">     183 </span>            : {
+<span class="lineNum">     184 </span>            :   static const std::memory_order AtomicRMWOrder = std::memory_order_relaxed;
+<span class="lineNum">     185 </span>            :   static const std::memory_order LoadOrder = std::memory_order_relaxed;
+<span class="lineNum">     186 </span>            :   static const std::memory_order StoreOrder = std::memory_order_relaxed;
+<span class="lineNum">     187 </span>            :   static const std::memory_order CompareExchangeFailureOrder =
+<span class="lineNum">     188 </span>            :     std::memory_order_relaxed;
+<span class="lineNum">     189 </span>            : };
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            : template&lt;&gt;
+<span class="lineNum">     192 </span>            : struct AtomicOrderConstraints&lt;ReleaseAcquire&gt;
+<span class="lineNum">     193 </span>            : {
+<span class="lineNum">     194 </span>            :   static const std::memory_order AtomicRMWOrder = std::memory_order_acq_rel;
+<span class="lineNum">     195 </span>            :   static const std::memory_order LoadOrder = std::memory_order_acquire;
+<span class="lineNum">     196 </span>            :   static const std::memory_order StoreOrder = std::memory_order_release;
+<span class="lineNum">     197 </span>            :   static const std::memory_order CompareExchangeFailureOrder =
+<span class="lineNum">     198 </span>            :     std::memory_order_acquire;
+<span class="lineNum">     199 </span>            : };
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            : template&lt;&gt;
+<span class="lineNum">     202 </span>            : struct AtomicOrderConstraints&lt;SequentiallyConsistent&gt;
+<span class="lineNum">     203 </span>            : {
+<span class="lineNum">     204 </span>            :   static const std::memory_order AtomicRMWOrder = std::memory_order_seq_cst;
+<span class="lineNum">     205 </span>            :   static const std::memory_order LoadOrder = std::memory_order_seq_cst;
+<span class="lineNum">     206 </span>            :   static const std::memory_order StoreOrder = std::memory_order_seq_cst;
+<span class="lineNum">     207 </span>            :   static const std::memory_order CompareExchangeFailureOrder =
+<span class="lineNum">     208 </span>            :     std::memory_order_seq_cst;
+<span class="lineNum">     209 </span>            : };
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     212 </span>            : struct IntrinsicBase
+<span class="lineNum">     213 </span>            : {
+<span class="lineNum">     214 </span>            :   typedef std::atomic&lt;T&gt; ValueType;
+<span class="lineNum">     215 </span>            :   typedef AtomicOrderConstraints&lt;Order&gt; OrderedOp;
+<span class="lineNum">     216 </span>            : };
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     219 </span>            : struct IntrinsicMemoryOps : public IntrinsicBase&lt;T, Order&gt;
+<span class="lineNum">     220 </span>            : {
+<a name="221"><span class="lineNum">     221 </span>            :   typedef IntrinsicBase&lt;T, Order&gt; Base;</a>
+<span class="lineNum">     222 </span>            : 
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">    1277426 :   static T load(const typename Base::ValueType&amp; aPtr)</span></a>
+<span class="lineNum">     224 </span>            :   {
+<span class="lineNum">     225 </span><span class="lineCov">    5690858 :     return aPtr.load(Base::OrderedOp::LoadOrder);</span>
+<a name="226"><span class="lineNum">     226 </span>            :   }</a>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">     112615 :   static void store(typename Base::ValueType&amp; aPtr, T aVal)</span>
+<span class="lineNum">     229 </span>            :   {
+<span class="lineNum">     230 </span><span class="lineCov">     401814 :     aPtr.store(aVal, Base::OrderedOp::StoreOrder);</span>
+<a name="231"><span class="lineNum">     231 </span><span class="lineCov">     112615 :   }</span></a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">       2747 :   static T exchange(typename Base::ValueType&amp; aPtr, T aVal)</span>
+<span class="lineNum">     234 </span>            :   {
+<span class="lineNum">     235 </span><span class="lineCov">       5489 :     return aPtr.exchange(aVal, Base::OrderedOp::AtomicRMWOrder);</span>
+<a name="236"><span class="lineNum">     236 </span>            :   }</a>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">        683 :   static bool compareExchange(typename Base::ValueType&amp; aPtr,</span>
+<span class="lineNum">     239 </span>            :                               T aOldVal, T aNewVal)
+<span class="lineNum">     240 </span>            :   {
+<span class="lineNum">     241 </span>            :     return aPtr.compare_exchange_strong(aOldVal, aNewVal,
+<span class="lineNum">     242 </span>            :                                         Base::OrderedOp::AtomicRMWOrder,
+<span class="lineNum">     243 </span><span class="lineCov">        803 :                                         Base::OrderedOp::CompareExchangeFailureOrder);</span>
+<span class="lineNum">     244 </span>            :   }
+<span class="lineNum">     245 </span>            : };
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     248 </span>            : struct IntrinsicAddSub : public IntrinsicBase&lt;T, Order&gt;
+<span class="lineNum">     249 </span>            : {
+<a name="250"><span class="lineNum">     250 </span>            :   typedef IntrinsicBase&lt;T, Order&gt; Base;</a>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">       8459 :   static T add(typename Base::ValueType&amp; aPtr, T aVal)</span>
+<span class="lineNum">     253 </span>            :   {
+<span class="lineNum">     254 </span><span class="lineCov">     241133 :     return aPtr.fetch_add(aVal, Base::OrderedOp::AtomicRMWOrder);</span>
+<a name="255"><span class="lineNum">     255 </span>            :   }</a>
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span><span class="lineCov">       6221 :   static T sub(typename Base::ValueType&amp; aPtr, T aVal)</span>
+<span class="lineNum">     258 </span>            :   {
+<span class="lineNum">     259 </span><span class="lineCov">     574527 :     return aPtr.fetch_sub(aVal, Base::OrderedOp::AtomicRMWOrder);</span>
+<span class="lineNum">     260 </span>            :   }
+<span class="lineNum">     261 </span>            : };
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     264 </span>            : struct IntrinsicAddSub&lt;T*, Order&gt; : public IntrinsicBase&lt;T*, Order&gt;
+<span class="lineNum">     265 </span>            : {
+<span class="lineNum">     266 </span>            :   typedef IntrinsicBase&lt;T*, Order&gt; Base;
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :   static T* add(typename Base::ValueType&amp; aPtr, ptrdiff_t aVal)
+<span class="lineNum">     269 </span>            :   {
+<span class="lineNum">     270 </span>            :     return aPtr.fetch_add(aVal, Base::OrderedOp::AtomicRMWOrder);
+<span class="lineNum">     271 </span>            :   }
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span>            :   static T* sub(typename Base::ValueType&amp; aPtr, ptrdiff_t aVal)
+<span class="lineNum">     274 </span>            :   {
+<span class="lineNum">     275 </span>            :     return aPtr.fetch_sub(aVal, Base::OrderedOp::AtomicRMWOrder);
+<span class="lineNum">     276 </span>            :   }
+<span class="lineNum">     277 </span>            : };
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     280 </span>            : struct IntrinsicIncDec : public IntrinsicAddSub&lt;T, Order&gt;
+<span class="lineNum">     281 </span>            : {
+<a name="282"><span class="lineNum">     282 </span>            :   typedef IntrinsicBase&lt;T, Order&gt; Base;</a>
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span><span class="lineCov">       7259 :   static T inc(typename Base::ValueType&amp; aPtr)</span>
+<span class="lineNum">     285 </span>            :   {
+<span class="lineNum">     286 </span><span class="lineCov">       7259 :     return IntrinsicAddSub&lt;T, Order&gt;::add(aPtr, 1);</span>
+<a name="287"><span class="lineNum">     287 </span>            :   }</a>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">       5441 :   static T dec(typename Base::ValueType&amp; aPtr)</span>
+<span class="lineNum">     290 </span>            :   {
+<span class="lineNum">     291 </span><span class="lineCov">       5441 :     return IntrinsicAddSub&lt;T, Order&gt;::sub(aPtr, 1);</span>
+<span class="lineNum">     292 </span>            :   }
+<span class="lineNum">     293 </span>            : };
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     296 </span>            : struct AtomicIntrinsics : public IntrinsicMemoryOps&lt;T, Order&gt;,
+<span class="lineNum">     297 </span>            :                           public IntrinsicIncDec&lt;T, Order&gt;
+<span class="lineNum">     298 </span>            : {
+<a name="299"><span class="lineNum">     299 </span>            :   typedef IntrinsicBase&lt;T, Order&gt; Base;</a>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   static T or_(typename Base::ValueType&amp; aPtr, T aVal)</span>
+<span class="lineNum">     302 </span>            :   {
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :     return aPtr.fetch_or(aVal, Base::OrderedOp::AtomicRMWOrder);</span>
+<span class="lineNum">     304 </span>            :   }
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :   static T xor_(typename Base::ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     307 </span>            :   {
+<span class="lineNum">     308 </span>            :     return aPtr.fetch_xor(aVal, Base::OrderedOp::AtomicRMWOrder);
+<span class="lineNum">     309 </span>            :   }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :   static T and_(typename Base::ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     312 </span>            :   {
+<span class="lineNum">     313 </span>            :     return aPtr.fetch_and(aVal, Base::OrderedOp::AtomicRMWOrder);
+<span class="lineNum">     314 </span>            :   }
+<span class="lineNum">     315 </span>            : };
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     318 </span>            : struct AtomicIntrinsics&lt;T*, Order&gt;
+<span class="lineNum">     319 </span>            :   : public IntrinsicMemoryOps&lt;T*, Order&gt;, public IntrinsicIncDec&lt;T*, Order&gt;
+<span class="lineNum">     320 </span>            : {
+<span class="lineNum">     321 </span>            : };
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     324 </span>            : struct ToStorageTypeArgument
+<span class="lineNum">     325 </span>            : {
+<span class="lineNum">     326 </span>            :   static constexpr T convert (T aT) { return aT; }
+<span class="lineNum">     327 </span>            : };
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            : } // namespace detail
+<span class="lineNum">     330 </span>            : } // namespace mozilla
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : #elif defined(__GNUC__)
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span>            : namespace mozilla {
+<span class="lineNum">     335 </span>            : namespace detail {
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            : /*
+<span class="lineNum">     338 </span>            :  * The __sync_* family of intrinsics is documented here:
+<span class="lineNum">     339 </span>            :  *
+<span class="lineNum">     340 </span>            :  * http://gcc.gnu.org/onlinedocs/gcc-4.6.4/gcc/Atomic-Builtins.html
+<span class="lineNum">     341 </span>            :  *
+<span class="lineNum">     342 </span>            :  * While these intrinsics are deprecated in favor of the newer __atomic_*
+<span class="lineNum">     343 </span>            :  * family of intrincs:
+<span class="lineNum">     344 </span>            :  *
+<span class="lineNum">     345 </span>            :  * http://gcc.gnu.org/onlinedocs/gcc-4.7.3/gcc/_005f_005fatomic-Builtins.html
+<span class="lineNum">     346 </span>            :  *
+<span class="lineNum">     347 </span>            :  * any GCC version that supports the __atomic_* intrinsics will also support
+<span class="lineNum">     348 </span>            :  * the &lt;atomic&gt; header and so will be handled above.  We provide a version of
+<span class="lineNum">     349 </span>            :  * atomics using the __sync_* intrinsics to support older versions of GCC.
+<span class="lineNum">     350 </span>            :  *
+<span class="lineNum">     351 </span>            :  * All __sync_* intrinsics that we use below act as full memory barriers, for
+<span class="lineNum">     352 </span>            :  * both compiler and hardware reordering, except for __sync_lock_test_and_set,
+<span class="lineNum">     353 </span>            :  * which is a only an acquire barrier.  When we call __sync_lock_test_and_set,
+<span class="lineNum">     354 </span>            :  * we add a barrier above it as appropriate.
+<span class="lineNum">     355 </span>            :  */
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            : template&lt;MemoryOrdering Order&gt; struct Barrier;
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            : /*
+<span class="lineNum">     360 </span>            :  * Some processors (in particular, x86) don't require quite so many calls to
+<span class="lineNum">     361 </span>            :  * __sync_sychronize as our specializations of Barrier produce.  If
+<span class="lineNum">     362 </span>            :  * performance turns out to be an issue, defining these specializations
+<span class="lineNum">     363 </span>            :  * on a per-processor basis would be a good first tuning step.
+<span class="lineNum">     364 </span>            :  */
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            : template&lt;&gt;
+<span class="lineNum">     367 </span>            : struct Barrier&lt;Relaxed&gt;
+<span class="lineNum">     368 </span>            : {
+<span class="lineNum">     369 </span>            :   static void beforeLoad() {}
+<span class="lineNum">     370 </span>            :   static void afterLoad() {}
+<span class="lineNum">     371 </span>            :   static void beforeStore() {}
+<span class="lineNum">     372 </span>            :   static void afterStore() {}
+<span class="lineNum">     373 </span>            : };
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            : template&lt;&gt;
+<span class="lineNum">     376 </span>            : struct Barrier&lt;ReleaseAcquire&gt;
+<span class="lineNum">     377 </span>            : {
+<span class="lineNum">     378 </span>            :   static void beforeLoad() {}
+<span class="lineNum">     379 </span>            :   static void afterLoad() { __sync_synchronize(); }
+<span class="lineNum">     380 </span>            :   static void beforeStore() { __sync_synchronize(); }
+<span class="lineNum">     381 </span>            :   static void afterStore() {}
+<span class="lineNum">     382 </span>            : };
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span>            : template&lt;&gt;
+<span class="lineNum">     385 </span>            : struct Barrier&lt;SequentiallyConsistent&gt;
+<span class="lineNum">     386 </span>            : {
+<span class="lineNum">     387 </span>            :   static void beforeLoad() { __sync_synchronize(); }
+<span class="lineNum">     388 </span>            :   static void afterLoad() { __sync_synchronize(); }
+<span class="lineNum">     389 </span>            :   static void beforeStore() { __sync_synchronize(); }
+<span class="lineNum">     390 </span>            :   static void afterStore() { __sync_synchronize(); }
+<span class="lineNum">     391 </span>            : };
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            : template&lt;typename T, bool TIsEnum = IsEnum&lt;T&gt;::value&gt;
+<span class="lineNum">     394 </span>            : struct AtomicStorageType
+<span class="lineNum">     395 </span>            : {
+<span class="lineNum">     396 </span>            :   // For non-enums, just use the type directly.
+<span class="lineNum">     397 </span>            :   typedef T Type;
+<span class="lineNum">     398 </span>            : };
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     401 </span>            : struct AtomicStorageType&lt;T, true&gt;
+<span class="lineNum">     402 </span>            :   : Conditional&lt;sizeof(T) == 4, uint32_t, uint64_t&gt;
+<span class="lineNum">     403 </span>            : {
+<span class="lineNum">     404 </span>            :   static_assert(sizeof(T) == 4 || sizeof(T) == 8,
+<span class="lineNum">     405 </span>            :                 &quot;wrong type computed in conditional above&quot;);
+<span class="lineNum">     406 </span>            : };
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     409 </span>            : struct IntrinsicMemoryOps
+<span class="lineNum">     410 </span>            : {
+<span class="lineNum">     411 </span>            :   typedef typename AtomicStorageType&lt;T&gt;::Type ValueType;
+<span class="lineNum">     412 </span>            : 
+<span class="lineNum">     413 </span>            :   static T load(const ValueType&amp; aPtr)
+<span class="lineNum">     414 </span>            :   {
+<span class="lineNum">     415 </span>            :     Barrier&lt;Order&gt;::beforeLoad();
+<span class="lineNum">     416 </span>            :     T val = T(aPtr);
+<span class="lineNum">     417 </span>            :     Barrier&lt;Order&gt;::afterLoad();
+<span class="lineNum">     418 </span>            :     return val;
+<span class="lineNum">     419 </span>            :   }
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            :   static void store(ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     422 </span>            :   {
+<span class="lineNum">     423 </span>            :     Barrier&lt;Order&gt;::beforeStore();
+<span class="lineNum">     424 </span>            :     aPtr = ValueType(aVal);
+<span class="lineNum">     425 </span>            :     Barrier&lt;Order&gt;::afterStore();
+<span class="lineNum">     426 </span>            :   }
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            :   static T exchange(ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     429 </span>            :   {
+<span class="lineNum">     430 </span>            :     // __sync_lock_test_and_set is only an acquire barrier; loads and stores
+<span class="lineNum">     431 </span>            :     // can't be moved up from after to before it, but they can be moved down
+<span class="lineNum">     432 </span>            :     // from before to after it.  We may want a stricter ordering, so we need
+<span class="lineNum">     433 </span>            :     // an explicit barrier.
+<span class="lineNum">     434 </span>            :     Barrier&lt;Order&gt;::beforeStore();
+<span class="lineNum">     435 </span>            :     return T(__sync_lock_test_and_set(&amp;aPtr, ValueType(aVal)));
+<span class="lineNum">     436 </span>            :   }
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span>            :   static bool compareExchange(ValueType&amp; aPtr, T aOldVal, T aNewVal)
+<span class="lineNum">     439 </span>            :   {
+<span class="lineNum">     440 </span>            :     return __sync_bool_compare_and_swap(&amp;aPtr, ValueType(aOldVal), ValueType(aNewVal));
+<span class="lineNum">     441 </span>            :   }
+<span class="lineNum">     442 </span>            : };
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     445 </span>            : struct IntrinsicAddSub
+<span class="lineNum">     446 </span>            :   : public IntrinsicMemoryOps&lt;T, Order&gt;
+<span class="lineNum">     447 </span>            : {
+<span class="lineNum">     448 </span>            :   typedef IntrinsicMemoryOps&lt;T, Order&gt; Base;
+<span class="lineNum">     449 </span>            :   typedef typename Base::ValueType ValueType;
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            :   static T add(ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     452 </span>            :   {
+<span class="lineNum">     453 </span>            :     return T(__sync_fetch_and_add(&amp;aPtr, ValueType(aVal)));
+<span class="lineNum">     454 </span>            :   }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :   static T sub(ValueType&amp; aPtr, T aVal)
+<span class="lineNum">     457 </span>            :   {
+<span class="lineNum">     458 </span>            :     return T(__sync_fetch_and_sub(&amp;aPtr, ValueType(aVal)));
+<span class="lineNum">     459 </span>            :   }
+<span class="lineNum">     460 </span>            : };
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     463 </span>            : struct IntrinsicAddSub&lt;T*, Order&gt;
+<span class="lineNum">     464 </span>            :   : public IntrinsicMemoryOps&lt;T*, Order&gt;
+<span class="lineNum">     465 </span>            : {
+<span class="lineNum">     466 </span>            :   typedef IntrinsicMemoryOps&lt;T*, Order&gt; Base;
+<span class="lineNum">     467 </span>            :   typedef typename Base::ValueType ValueType;
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            :   /*
+<span class="lineNum">     470 </span>            :    * The reinterpret_casts are needed so that
+<span class="lineNum">     471 </span>            :    * __sync_fetch_and_{add,sub} will properly type-check.
+<span class="lineNum">     472 </span>            :    *
+<span class="lineNum">     473 </span>            :    * Also, these functions do not provide standard semantics for
+<span class="lineNum">     474 </span>            :    * pointer types, so we need to adjust the addend.
+<span class="lineNum">     475 </span>            :    */
+<span class="lineNum">     476 </span>            :   static ValueType add(ValueType&amp; aPtr, ptrdiff_t aVal)
+<span class="lineNum">     477 </span>            :   {
+<span class="lineNum">     478 </span>            :     ValueType amount = reinterpret_cast&lt;ValueType&gt;(aVal * sizeof(T));
+<span class="lineNum">     479 </span>            :     return __sync_fetch_and_add(&amp;aPtr, amount);
+<span class="lineNum">     480 </span>            :   }
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            :   static ValueType sub(ValueType&amp; aPtr, ptrdiff_t aVal)
+<span class="lineNum">     483 </span>            :   {
+<span class="lineNum">     484 </span>            :     ValueType amount = reinterpret_cast&lt;ValueType&gt;(aVal * sizeof(T));
+<span class="lineNum">     485 </span>            :     return __sync_fetch_and_sub(&amp;aPtr, amount);
+<span class="lineNum">     486 </span>            :   }
+<span class="lineNum">     487 </span>            : };
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     490 </span>            : struct IntrinsicIncDec : public IntrinsicAddSub&lt;T, Order&gt;
+<span class="lineNum">     491 </span>            : {
+<span class="lineNum">     492 </span>            :   typedef IntrinsicAddSub&lt;T, Order&gt; Base;
+<span class="lineNum">     493 </span>            :   typedef typename Base::ValueType ValueType;
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            :   static T inc(ValueType&amp; aPtr) { return Base::add(aPtr, 1); }
+<span class="lineNum">     496 </span>            :   static T dec(ValueType&amp; aPtr) { return Base::sub(aPtr, 1); }
+<span class="lineNum">     497 </span>            : };
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     500 </span>            : struct AtomicIntrinsics : public IntrinsicIncDec&lt;T, Order&gt;
+<span class="lineNum">     501 </span>            : {
+<span class="lineNum">     502 </span>            :   static T or_( T&amp; aPtr, T aVal) { return __sync_fetch_and_or(&amp;aPtr, aVal); }
+<span class="lineNum">     503 </span>            :   static T xor_(T&amp; aPtr, T aVal) { return __sync_fetch_and_xor(&amp;aPtr, aVal); }
+<span class="lineNum">     504 </span>            :   static T and_(T&amp; aPtr, T aVal) { return __sync_fetch_and_and(&amp;aPtr, aVal); }
+<span class="lineNum">     505 </span>            : };
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     508 </span>            : struct AtomicIntrinsics&lt;T*, Order&gt; : public IntrinsicIncDec&lt;T*, Order&gt;
+<span class="lineNum">     509 </span>            : {
+<span class="lineNum">     510 </span>            : };
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            : template&lt;typename T, bool TIsEnum = IsEnum&lt;T&gt;::value&gt;
+<span class="lineNum">     513 </span>            : struct ToStorageTypeArgument
+<span class="lineNum">     514 </span>            : {
+<span class="lineNum">     515 </span>            :   typedef typename AtomicStorageType&lt;T&gt;::Type ResultType;
+<span class="lineNum">     516 </span>            : 
+<span class="lineNum">     517 </span>            :   static constexpr ResultType convert (T aT) { return ResultType(aT); }
+<span class="lineNum">     518 </span>            : };
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span>            : template&lt;typename T&gt;
+<span class="lineNum">     521 </span>            : struct ToStorageTypeArgument&lt;T, false&gt;
+<span class="lineNum">     522 </span>            : {
+<span class="lineNum">     523 </span>            :   static constexpr T convert (T aT) { return aT; }
+<span class="lineNum">     524 </span>            : };
+<span class="lineNum">     525 </span>            : 
+<span class="lineNum">     526 </span>            : } // namespace detail
+<span class="lineNum">     527 </span>            : } // namespace mozilla
+<span class="lineNum">     528 </span>            : 
+<span class="lineNum">     529 </span>            : #else
+<span class="lineNum">     530 </span>            : # error &quot;Atomic compiler intrinsics are not supported on your platform&quot;
+<span class="lineNum">     531 </span>            : #endif
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span>            : namespace mozilla {
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            : namespace detail {
+<span class="lineNum">     536 </span>            : 
+<span class="lineNum">     537 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     538 </span>            : class AtomicBase
+<span class="lineNum">     539 </span>            : {
+<span class="lineNum">     540 </span>            :   static_assert(sizeof(T) == 4 || sizeof(T) == 8,
+<span class="lineNum">     541 </span>            :                 &quot;mozilla/Atomics.h only supports 32-bit and 64-bit types&quot;);
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            : protected:
+<span class="lineNum">     544 </span>            :   typedef typename detail::AtomicIntrinsics&lt;T, Order&gt; Intrinsics;
+<span class="lineNum">     545 </span>            :   typedef typename Intrinsics::ValueType ValueType;
+<span class="lineNum">     546 </span>            :   ValueType mValue;
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            : public:
+<span class="lineNum">     549 </span><span class="lineCov">      30654 :   constexpr AtomicBase() : mValue() {}</span>
+<span class="lineNum">     550 </span>            :   explicit constexpr AtomicBase(T aInit)
+<span class="lineNum">     551 </span><span class="lineCov">      95886 :     : mValue(ToStorageTypeArgument&lt;T&gt;::convert(aInit))</span>
+<span class="lineNum">     552 </span>            :   {}
+<span class="lineNum">     553 </span>            : 
+<span class="lineNum">     554 </span>            :   // Note: we can't provide operator T() here because Atomic&lt;bool&gt; inherits
+<span class="lineNum">     555 </span>            :   // from AtomcBase with T=uint32_t and not T=bool. If we implemented
+<span class="lineNum">     556 </span>            :   // operator T() here, it would cause errors when comparing Atomic&lt;bool&gt; with
+<span class="lineNum">     557 </span>            :   // a regular bool.
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span>            :   T operator=(T aVal)
+<span class="lineNum">     560 </span>            :   {
+<span class="lineNum">     561 </span><span class="lineCov">     525581 :     Intrinsics::store(mValue, aVal);</span>
+<span class="lineNum">     562 </span>            :     return aVal;
+<span class="lineNum">     563 </span>            :   }
+<span class="lineNum">     564 </span>            : 
+<span class="lineNum">     565 </span>            :   /**
+<span class="lineNum">     566 </span>            :    * Performs an atomic swap operation.  aVal is stored and the previous
+<a name="567"><span class="lineNum">     567 </span>            :    * value of this variable is returned.</a>
+<span class="lineNum">     568 </span>            :    */
+<a name="569"><span class="lineNum">     569 </span><span class="lineNoCov">          0 :   T exchange(T aVal)</span></a>
+<span class="lineNum">     570 </span>            :   {
+<span class="lineNum">     571 </span><span class="lineCov">       2747 :     return Intrinsics::exchange(mValue, aVal);</span>
+<span class="lineNum">     572 </span>            :   }
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :   /**
+<span class="lineNum">     575 </span>            :    * Performs an atomic compare-and-swap operation and returns true if it
+<span class="lineNum">     576 </span>            :    * succeeded. This is equivalent to atomically doing
+<span class="lineNum">     577 </span>            :    *
+<span class="lineNum">     578 </span>            :    *   if (mValue == aOldValue) {
+<span class="lineNum">     579 </span>            :    *     mValue = aNewValue;
+<span class="lineNum">     580 </span>            :    *     return true;
+<span class="lineNum">     581 </span>            :    *   } else {
+<span class="lineNum">     582 </span>            :    *     return false;
+<a name="583"><span class="lineNum">     583 </span>            :    *   }</a>
+<span class="lineNum">     584 </span>            :    */
+<span class="lineNum">     585 </span><span class="lineCov">          5 :   bool compareExchange(T aOldValue, T aNewValue)</span>
+<span class="lineNum">     586 </span>            :   {
+<span class="lineNum">     587 </span><span class="lineCov">        683 :     return Intrinsics::compareExchange(mValue, aOldValue, aNewValue);</span>
+<span class="lineNum">     588 </span>            :   }
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span>            : private:
+<span class="lineNum">     591 </span>            :   template&lt;MemoryOrdering AnyOrder&gt;
+<span class="lineNum">     592 </span>            :   AtomicBase(const AtomicBase&lt;T, AnyOrder&gt;&amp; aCopy) = delete;
+<span class="lineNum">     593 </span>            : };
+<span class="lineNum">     594 </span>            : 
+<span class="lineNum">     595 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     596 </span>            : class AtomicBaseIncDec : public AtomicBase&lt;T, Order&gt;
+<span class="lineNum">     597 </span>            : {
+<span class="lineNum">     598 </span>            :   typedef typename detail::AtomicBase&lt;T, Order&gt; Base;
+<span class="lineNum">     599 </span>            : 
+<span class="lineNum">     600 </span>            : public:
+<span class="lineNum">     601 </span><span class="lineCov">       1505 :   constexpr AtomicBaseIncDec() : Base() {}</span>
+<span class="lineNum">     602 </span><span class="lineCov">      24392 :   explicit constexpr AtomicBaseIncDec(T aInit) : Base(aInit) {}</span>
+<span class="lineNum">     603 </span>            : 
+<span class="lineNum">     604 </span>            :   using Base::operator=;
+<a name="605"><span class="lineNum">     605 </span>            : </a>
+<a name="606"><span class="lineNum">     606 </span><span class="lineCov">    7192966 :   operator T() const { return Base::Intrinsics::load(Base::mValue); }</span></a>
+<a name="607"><span class="lineNum">     607 </span><span class="lineCov">      92487 :   T operator++(int) { return Base::Intrinsics::inc(Base::mValue); }</span></a>
+<a name="608"><span class="lineNum">     608 </span><span class="lineCov">      86629 :   T operator--(int) { return Base::Intrinsics::dec(Base::mValue); }</span></a>
+<span class="lineNum">     609 </span><span class="lineCov">      77122 :   T operator++() { return Base::Intrinsics::inc(Base::mValue) + 1; }</span>
+<span class="lineNum">     610 </span><span class="lineCov">      49962 :   T operator--() { return Base::Intrinsics::dec(Base::mValue) - 1; }</span>
+<span class="lineNum">     611 </span>            : 
+<span class="lineNum">     612 </span>            : private:
+<span class="lineNum">     613 </span>            :   template&lt;MemoryOrdering AnyOrder&gt;
+<span class="lineNum">     614 </span>            :   AtomicBaseIncDec(const AtomicBaseIncDec&lt;T, AnyOrder&gt;&amp; aCopy) = delete;
+<span class="lineNum">     615 </span>            : };
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span>            : } // namespace detail
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span>            : /**
+<span class="lineNum">     620 </span>            :  * A wrapper for a type that enforces that all memory accesses are atomic.
+<span class="lineNum">     621 </span>            :  *
+<span class="lineNum">     622 </span>            :  * In general, where a variable |T foo| exists, |Atomic&lt;T&gt; foo| can be used in
+<span class="lineNum">     623 </span>            :  * its place.  Implementations for integral and pointer types are provided
+<span class="lineNum">     624 </span>            :  * below.
+<span class="lineNum">     625 </span>            :  *
+<span class="lineNum">     626 </span>            :  * Atomic accesses are sequentially consistent by default.  You should
+<span class="lineNum">     627 </span>            :  * use the default unless you are tall enough to ride the
+<span class="lineNum">     628 </span>            :  * memory-ordering roller coaster (if you're not sure, you aren't) and
+<span class="lineNum">     629 </span>            :  * you have a compelling reason to do otherwise.
+<span class="lineNum">     630 </span>            :  *
+<span class="lineNum">     631 </span>            :  * There is one exception to the case of atomic memory accesses: providing an
+<span class="lineNum">     632 </span>            :  * initial value of the atomic value is not guaranteed to be atomic.  This is a
+<span class="lineNum">     633 </span>            :  * deliberate design choice that enables static atomic variables to be declared
+<span class="lineNum">     634 </span>            :  * without introducing extra static constructors.
+<span class="lineNum">     635 </span>            :  */
+<span class="lineNum">     636 </span>            : template&lt;typename T,
+<span class="lineNum">     637 </span>            :          MemoryOrdering Order = SequentiallyConsistent,
+<span class="lineNum">     638 </span>            :          typename Enable = void&gt;
+<span class="lineNum">     639 </span>            : class Atomic;
+<span class="lineNum">     640 </span>            : 
+<span class="lineNum">     641 </span>            : /**
+<span class="lineNum">     642 </span>            :  * Atomic&lt;T&gt; implementation for integral types.
+<span class="lineNum">     643 </span>            :  *
+<span class="lineNum">     644 </span>            :  * In addition to atomic store and load operations, compound assignment and
+<span class="lineNum">     645 </span>            :  * increment/decrement operators are implemented which perform the
+<span class="lineNum">     646 </span>            :  * corresponding read-modify-write operation atomically.  Finally, an atomic
+<span class="lineNum">     647 </span>            :  * swap method is provided.
+<span class="lineNum">     648 </span>            :  */
+<span class="lineNum">     649 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     650 </span>            : class Atomic&lt;T, Order, typename EnableIf&lt;IsIntegral&lt;T&gt;::value &amp;&amp;
+<span class="lineNum">     651 </span>            :                        !IsSame&lt;T, bool&gt;::value&gt;::Type&gt;
+<span class="lineNum">     652 </span>            :   : public detail::AtomicBaseIncDec&lt;T, Order&gt;
+<span class="lineNum">     653 </span>            : {
+<span class="lineNum">     654 </span>            :   typedef typename detail::AtomicBaseIncDec&lt;T, Order&gt; Base;
+<span class="lineNum">     655 </span>            : 
+<span class="lineNum">     656 </span>            : public:
+<span class="lineNum">     657 </span><span class="lineCov">       1505 :   constexpr Atomic() : Base() {}</span>
+<span class="lineNum">     658 </span><span class="lineCov">       7036 :   explicit constexpr Atomic(T aInit) : Base(aInit) {}</span>
+<span class="lineNum">     659 </span>            : 
+<a name="660"><span class="lineNum">     660 </span>            :   using Base::operator=;</a>
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span><span class="lineCov">       1200 :   T operator+=(T aDelta)</span>
+<span class="lineNum">     663 </span>            :   {
+<span class="lineNum">     664 </span><span class="lineCov">     105763 :     return Base::Intrinsics::add(Base::mValue, aDelta) + aDelta;</span>
+<a name="665"><span class="lineNum">     665 </span>            :   }</a>
+<span class="lineNum">     666 </span>            : 
+<span class="lineNum">     667 </span><span class="lineCov">        780 :   T operator-=(T aDelta)</span>
+<span class="lineNum">     668 </span>            :   {
+<span class="lineNum">     669 </span><span class="lineCov">     431715 :     return Base::Intrinsics::sub(Base::mValue, aDelta) - aDelta;</span>
+<a name="670"><span class="lineNum">     670 </span>            :   }</a>
+<span class="lineNum">     671 </span>            : 
+<span class="lineNum">     672 </span><span class="lineNoCov">          0 :   T operator|=(T aVal)</span>
+<span class="lineNum">     673 </span>            :   {
+<span class="lineNum">     674 </span><span class="lineNoCov">          0 :     return Base::Intrinsics::or_(Base::mValue, aVal) | aVal;</span>
+<span class="lineNum">     675 </span>            :   }
+<span class="lineNum">     676 </span>            : 
+<span class="lineNum">     677 </span>            :   T operator^=(T aVal)
+<span class="lineNum">     678 </span>            :   {
+<span class="lineNum">     679 </span>            :     return Base::Intrinsics::xor_(Base::mValue, aVal) ^ aVal;
+<span class="lineNum">     680 </span>            :   }
+<span class="lineNum">     681 </span>            : 
+<span class="lineNum">     682 </span>            :   T operator&amp;=(T aVal)
+<span class="lineNum">     683 </span>            :   {
+<span class="lineNum">     684 </span>            :     return Base::Intrinsics::and_(Base::mValue, aVal) &amp; aVal;
+<span class="lineNum">     685 </span>            :   }
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span>            : private:
+<span class="lineNum">     688 </span>            :   Atomic(Atomic&lt;T, Order&gt;&amp; aOther) = delete;
+<span class="lineNum">     689 </span>            : };
+<span class="lineNum">     690 </span>            : 
+<span class="lineNum">     691 </span>            : /**
+<span class="lineNum">     692 </span>            :  * Atomic&lt;T&gt; implementation for pointer types.
+<span class="lineNum">     693 </span>            :  *
+<span class="lineNum">     694 </span>            :  * An atomic compare-and-swap primitive for pointer variables is provided, as
+<span class="lineNum">     695 </span>            :  * are atomic increment and decement operators.  Also provided are the compound
+<span class="lineNum">     696 </span>            :  * assignment operators for addition and subtraction. Atomic swap (via
+<span class="lineNum">     697 </span>            :  * exchange()) is included as well.
+<span class="lineNum">     698 </span>            :  */
+<span class="lineNum">     699 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     700 </span>            : class Atomic&lt;T*, Order&gt; : public detail::AtomicBaseIncDec&lt;T*, Order&gt;
+<span class="lineNum">     701 </span>            : {
+<span class="lineNum">     702 </span>            :   typedef typename detail::AtomicBaseIncDec&lt;T*, Order&gt; Base;
+<span class="lineNum">     703 </span>            : 
+<span class="lineNum">     704 </span>            : public:
+<span class="lineNum">     705 </span><span class="lineNoCov">          0 :   constexpr Atomic() : Base() {}</span>
+<span class="lineNum">     706 </span><span class="lineCov">      17356 :   explicit constexpr Atomic(T* aInit) : Base(aInit) {}</span>
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :   using Base::operator=;
+<span class="lineNum">     709 </span>            : 
+<span class="lineNum">     710 </span>            :   T* operator+=(ptrdiff_t aDelta)
+<span class="lineNum">     711 </span>            :   {
+<span class="lineNum">     712 </span>            :     return Base::Intrinsics::add(Base::mValue, aDelta) + aDelta;
+<span class="lineNum">     713 </span>            :   }
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span>            :   T* operator-=(ptrdiff_t aDelta)
+<span class="lineNum">     716 </span>            :   {
+<span class="lineNum">     717 </span>            :     return Base::Intrinsics::sub(Base::mValue, aDelta) - aDelta;
+<span class="lineNum">     718 </span>            :   }
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span>            : private:
+<span class="lineNum">     721 </span>            :   Atomic(Atomic&lt;T*, Order&gt;&amp; aOther) = delete;
+<span class="lineNum">     722 </span>            : };
+<span class="lineNum">     723 </span>            : 
+<span class="lineNum">     724 </span>            : /**
+<span class="lineNum">     725 </span>            :  * Atomic&lt;T&gt; implementation for enum types.
+<span class="lineNum">     726 </span>            :  *
+<span class="lineNum">     727 </span>            :  * The atomic store and load operations and the atomic swap method is provided.
+<span class="lineNum">     728 </span>            :  */
+<span class="lineNum">     729 </span>            : template&lt;typename T, MemoryOrdering Order&gt;
+<span class="lineNum">     730 </span>            : class Atomic&lt;T, Order, typename EnableIf&lt;IsEnum&lt;T&gt;::value&gt;::Type&gt;
+<span class="lineNum">     731 </span>            :   : public detail::AtomicBase&lt;T, Order&gt;
+<span class="lineNum">     732 </span>            : {
+<span class="lineNum">     733 </span>            :   typedef typename detail::AtomicBase&lt;T, Order&gt; Base;
+<span class="lineNum">     734 </span>            : 
+<span class="lineNum">     735 </span>            : public:
+<span class="lineNum">     736 </span><span class="lineCov">       6960 :   constexpr Atomic() : Base() {}</span>
+<span class="lineNum">     737 </span><span class="lineCov">       1722 :   explicit constexpr Atomic(T aInit) : Base(aInit) {}</span>
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span><span class="lineCov">     277400 :   operator T() const { return T(Base::Intrinsics::load(Base::mValue)); }</span>
+<span class="lineNum">     740 </span>            : 
+<span class="lineNum">     741 </span>            :   using Base::operator=;
+<span class="lineNum">     742 </span>            : 
+<span class="lineNum">     743 </span>            : private:
+<span class="lineNum">     744 </span>            :   Atomic(Atomic&lt;T, Order&gt;&amp; aOther) = delete;
+<span class="lineNum">     745 </span>            : };
+<span class="lineNum">     746 </span>            : 
+<span class="lineNum">     747 </span>            : /**
+<span class="lineNum">     748 </span>            :  * Atomic&lt;T&gt; implementation for boolean types.
+<span class="lineNum">     749 </span>            :  *
+<span class="lineNum">     750 </span>            :  * The atomic store and load operations and the atomic swap method is provided.
+<span class="lineNum">     751 </span>            :  *
+<span class="lineNum">     752 </span>            :  * Note:
+<span class="lineNum">     753 </span>            :  *
+<span class="lineNum">     754 </span>            :  * - sizeof(Atomic&lt;bool&gt;) != sizeof(bool) for some implementations of
+<span class="lineNum">     755 </span>            :  *   bool and/or some implementations of std::atomic. This is allowed in
+<span class="lineNum">     756 </span>            :  *   [atomic.types.generic]p9.
+<span class="lineNum">     757 </span>            :  *
+<span class="lineNum">     758 </span>            :  * - It's not obvious whether the 8-bit atomic functions on Windows are always
+<span class="lineNum">     759 </span>            :  *   inlined or not. If they are not inlined, the corresponding functions in the
+<span class="lineNum">     760 </span>            :  *   runtime library are not available on Windows XP. This is why we implement
+<span class="lineNum">     761 </span>            :  *   Atomic&lt;bool&gt; with an underlying type of uint32_t.
+<span class="lineNum">     762 </span>            :  */
+<span class="lineNum">     763 </span>            : template&lt;MemoryOrdering Order&gt;
+<span class="lineNum">     764 </span>            : class Atomic&lt;bool, Order&gt;
+<span class="lineNum">     765 </span>            :   : protected detail::AtomicBase&lt;uint32_t, Order&gt;
+<span class="lineNum">     766 </span>            : {
+<span class="lineNum">     767 </span>            :   typedef typename detail::AtomicBase&lt;uint32_t, Order&gt; Base;
+<span class="lineNum">     768 </span>            : 
+<span class="lineNum">     769 </span>            : public:
+<span class="lineNum">     770 </span><span class="lineCov">      22189 :   constexpr Atomic() : Base() {}</span>
+<span class="lineNum">     771 </span><span class="lineCov">      69772 :   explicit constexpr Atomic(bool aInit) : Base(aInit) {}</span>
+<a name="772"><span class="lineNum">     772 </span>            : </a>
+<span class="lineNum">     773 </span>            :   // We provide boolean wrappers for the underlying AtomicBase methods.
+<span class="lineNum">     774 </span><span class="lineCov">     388992 :   MOZ_IMPLICIT operator bool() const</span>
+<span class="lineNum">     775 </span>            :   {
+<span class="lineNum">     776 </span><span class="lineCov">     971739 :     return Base::Intrinsics::load(Base::mValue);</span>
+<span class="lineNum">     777 </span>            :   }
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span>            :   bool operator=(bool aVal)
+<span class="lineNum">     780 </span>            :   {
+<span class="lineNum">     781 </span><span class="lineCov">     142575 :     return Base::operator=(aVal);</span>
+<span class="lineNum">     782 </span>            :   }
+<span class="lineNum">     783 </span>            : 
+<span class="lineNum">     784 </span><span class="lineCov">       1311 :   bool exchange(bool aVal)</span>
+<span class="lineNum">     785 </span>            :   {
+<span class="lineNum">     786 </span><span class="lineCov">       2622 :     return Base::exchange(aVal);</span>
+<span class="lineNum">     787 </span>            :   }
+<span class="lineNum">     788 </span>            : 
+<span class="lineNum">     789 </span>            :   bool compareExchange(bool aOldValue, bool aNewValue)
+<span class="lineNum">     790 </span>            :   {
+<span class="lineNum">     791 </span><span class="lineNoCov">          0 :     return Base::compareExchange(aOldValue, aNewValue);</span>
+<span class="lineNum">     792 </span>            :   }
+<span class="lineNum">     793 </span>            : 
+<span class="lineNum">     794 </span>            : private:
+<span class="lineNum">     795 </span>            :   Atomic(Atomic&lt;bool, Order&gt;&amp; aOther) = delete;
+<span class="lineNum">     796 </span>            : };
+<span class="lineNum">     797 </span>            : 
+<span class="lineNum">     798 </span>            : } // namespace mozilla
+<span class="lineNum">     799 </span>            : 
+<span class="lineNum">     800 </span>            : #endif /* mozilla_Atomics_h */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

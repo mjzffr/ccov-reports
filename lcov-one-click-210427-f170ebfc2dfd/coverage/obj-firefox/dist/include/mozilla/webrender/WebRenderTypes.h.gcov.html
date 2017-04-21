@@ -1,0 +1,597 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/webrender/WebRenderTypes.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla/webrender</a> - WebRenderTypes.h<span style="font-size: 80%;"> (source / <a href="WebRenderTypes.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">126</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-</a>
+<span class="lineNum">       2 </span>            :  * This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #ifndef GFX_WEBRENDERTYPES_H
+<span class="lineNum">       7 </span>            : #define GFX_WEBRENDERTYPES_H
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &quot;mozilla/webrender/webrender_ffi.h&quot;
+<span class="lineNum">      10 </span>            : #include &quot;mozilla/Maybe.h&quot;
+<span class="lineNum">      11 </span>            : #include &quot;mozilla/gfx/Matrix.h&quot;
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/gfx/Types.h&quot;
+<span class="lineNum">      13 </span>            : #include &quot;mozilla/gfx/Tools.h&quot;
+<span class="lineNum">      14 </span>            : #include &quot;mozilla/Range.h&quot;
+<span class="lineNum">      15 </span>            : #include &quot;Units.h&quot;
+<span class="lineNum">      16 </span>            : #include &quot;nsStyleConsts.h&quot;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : typedef mozilla::Maybe&lt;WrImageMask&gt; MaybeImageMask;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : namespace mozilla {
+<span class="lineNum">      21 </span>            : namespace wr {
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : typedef WrGradientExtendMode GradientExtendMode;
+<span class="lineNum">      24 </span>            : typedef WrMixBlendMode MixBlendMode;
+<span class="lineNum">      25 </span>            : typedef WrImageRendering ImageRendering;
+<span class="lineNum">      26 </span>            : typedef WrImageFormat ImageFormat;
+<span class="lineNum">      27 </span>            : typedef WrWindowId WindowId;
+<span class="lineNum">      28 </span>            : typedef WrPipelineId PipelineId;
+<span class="lineNum">      29 </span>            : typedef WrImageKey ImageKey;
+<span class="lineNum">      30 </span>            : typedef WrFontKey FontKey;
+<span class="lineNum">      31 </span>            : typedef WrEpoch Epoch;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : inline WindowId NewWindowId(uint64_t aId) {
+<span class="lineNum">      34 </span>            :   WindowId id;
+<span class="lineNum">      35 </span>            :   id.mHandle = aId;
+<span class="lineNum">      36 </span>            :   return id;
+<span class="lineNum">      37 </span>            : }
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : inline Epoch NewEpoch(uint32_t aEpoch) {
+<span class="lineNum">      40 </span>            :   Epoch e;
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   e.mHandle = aEpoch;</span>
+<span class="lineNum">      42 </span>            :   return e;
+<span class="lineNum">      43 </span>            : }
+<a name="44"><span class="lineNum">      44 </span>            : </a>
+<span class="lineNum">      45 </span>            : inline Maybe&lt;WrImageFormat&gt;
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : SurfaceFormatToWrImageFormat(gfx::SurfaceFormat aFormat) {</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   switch (aFormat) {</span>
+<span class="lineNum">      48 </span>            :     case gfx::SurfaceFormat::R8G8B8X8:
+<span class="lineNum">      49 </span>            :       // TODO: use RGBA + opaque flag
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       return Some(WrImageFormat::RGBA8);</span>
+<span class="lineNum">      51 </span>            :     case gfx::SurfaceFormat::B8G8R8X8:
+<span class="lineNum">      52 </span>            :       // TODO: WebRender will have a BGRA + opaque flag for this but does not
+<span class="lineNum">      53 </span>            :       // have it yet (cf. issue #732).
+<span class="lineNum">      54 </span>            :     case gfx::SurfaceFormat::B8G8R8A8:
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :       return Some(WrImageFormat::RGBA8);</span>
+<span class="lineNum">      56 </span>            :     case gfx::SurfaceFormat::B8G8R8:
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :       return Some(WrImageFormat::RGB8);</span>
+<span class="lineNum">      58 </span>            :     case gfx::SurfaceFormat::A8:
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       return Some(WrImageFormat::A8);</span>
+<span class="lineNum">      60 </span>            :     case gfx::SurfaceFormat::UNKNOWN:
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       return Some(WrImageFormat::Invalid);</span>
+<span class="lineNum">      62 </span>            :     default:
+<span class="lineNum">      63 </span>            :       return Nothing();
+<span class="lineNum">      64 </span>            :   }
+<span class="lineNum">      65 </span>            : }
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : inline gfx::SurfaceFormat
+<span class="lineNum">      68 </span>            : WrImageFormatToSurfaceFormat(ImageFormat aFormat) {
+<span class="lineNum">      69 </span>            :   switch (aFormat) {
+<span class="lineNum">      70 </span>            :     case ImageFormat::RGBA8:
+<span class="lineNum">      71 </span>            :       return gfx::SurfaceFormat::B8G8R8A8;
+<span class="lineNum">      72 </span>            :     case ImageFormat::A8:
+<span class="lineNum">      73 </span>            :       return gfx::SurfaceFormat::A8;
+<span class="lineNum">      74 </span>            :     case ImageFormat::RGB8:
+<span class="lineNum">      75 </span>            :       return gfx::SurfaceFormat::B8G8R8;
+<span class="lineNum">      76 </span>            :     default:
+<span class="lineNum">      77 </span>            :       return gfx::SurfaceFormat::UNKNOWN;
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            : }
+<a name="80"><span class="lineNum">      80 </span>            : </a>
+<span class="lineNum">      81 </span>            : struct ImageDescriptor: public WrImageDescriptor {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   ImageDescriptor(const gfx::IntSize&amp; aSize, gfx::SurfaceFormat aFormat)</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     format = SurfaceFormatToWrImageFormat(aFormat).value();</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     width = aSize.width;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     height = aSize.height;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     stride = 0;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     is_opaque = gfx::IsOpaqueFormat(aFormat);</span>
+<a name="89"><span class="lineNum">      89 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   ImageDescriptor(const gfx::IntSize&amp; aSize, uint32_t aByteStride, gfx::SurfaceFormat aFormat)</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     format = SurfaceFormatToWrImageFormat(aFormat).value();</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     width = aSize.width;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     height = aSize.height;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     stride = aByteStride;</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :     is_opaque = gfx::IsOpaqueFormat(aFormat);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      99 </span>            : };
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : // Whenever possible, use wr::ImageKey instead of manipulating uint64_t.
+<span class="lineNum">     102 </span>            : inline uint64_t AsUint64(const ImageKey&amp; aId) {
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :   return (static_cast&lt;uint64_t&gt;(aId.mNamespace) &lt;&lt; 32)</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :         + static_cast&lt;uint64_t&gt;(aId.mHandle);</span>
+<span class="lineNum">     105 </span>            : }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : // Whenever possible, use wr::PipelineId instead of manipulating uint64_t.
+<span class="lineNum">     108 </span>            : inline uint64_t AsUint64(const PipelineId&amp; aId) {
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   return (static_cast&lt;uint64_t&gt;(aId.mNamespace) &lt;&lt; 32)</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         + static_cast&lt;uint64_t&gt;(aId.mHandle);</span>
+<span class="lineNum">     111 </span>            : }
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : inline PipelineId AsPipelineId(const uint64_t&amp; aId) {
+<span class="lineNum">     114 </span>            :   PipelineId pipeline;
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :   pipeline.mNamespace = aId &gt;&gt; 32;</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   pipeline.mHandle = aId;</span>
+<span class="lineNum">     117 </span>            :   return pipeline;
+<span class="lineNum">     118 </span>            : }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : inline ImageRendering ToImageRendering(gfx::SamplingFilter aFilter)
+<span class="lineNum">     121 </span>            : {
+<span class="lineNum">     122 </span>            :   return aFilter == gfx::SamplingFilter::POINT ? ImageRendering::Pixelated
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                                                : ImageRendering::Auto;</span>
+<a name="124"><span class="lineNum">     124 </span>            : }</a>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 : static inline MixBlendMode ToWrMixBlendMode(gfx::CompositionOp compositionOp)</span>
+<span class="lineNum">     127 </span>            : {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   switch (compositionOp)</span>
+<span class="lineNum">     129 </span>            :   {
+<span class="lineNum">     130 </span>            :       case gfx::CompositionOp::OP_MULTIPLY:
+<span class="lineNum">     131 </span>            :         return MixBlendMode::Multiply;
+<span class="lineNum">     132 </span>            :       case gfx::CompositionOp::OP_SCREEN:
+<span class="lineNum">     133 </span>            :         return MixBlendMode::Screen;
+<span class="lineNum">     134 </span>            :       case gfx::CompositionOp::OP_OVERLAY:
+<span class="lineNum">     135 </span>            :         return MixBlendMode::Overlay;
+<span class="lineNum">     136 </span>            :       case gfx::CompositionOp::OP_DARKEN:
+<span class="lineNum">     137 </span>            :         return MixBlendMode::Darken;
+<span class="lineNum">     138 </span>            :       case gfx::CompositionOp::OP_LIGHTEN:
+<span class="lineNum">     139 </span>            :         return MixBlendMode::Lighten;
+<span class="lineNum">     140 </span>            :       case gfx::CompositionOp::OP_COLOR_DODGE:
+<span class="lineNum">     141 </span>            :         return MixBlendMode::ColorDodge;
+<span class="lineNum">     142 </span>            :       case gfx::CompositionOp::OP_COLOR_BURN:
+<span class="lineNum">     143 </span>            :         return MixBlendMode::ColorBurn;
+<span class="lineNum">     144 </span>            :       case gfx::CompositionOp::OP_HARD_LIGHT:
+<span class="lineNum">     145 </span>            :         return MixBlendMode::HardLight;
+<span class="lineNum">     146 </span>            :       case gfx::CompositionOp::OP_SOFT_LIGHT:
+<span class="lineNum">     147 </span>            :         return MixBlendMode::SoftLight;
+<span class="lineNum">     148 </span>            :       case gfx::CompositionOp::OP_DIFFERENCE:
+<span class="lineNum">     149 </span>            :         return MixBlendMode::Difference;
+<span class="lineNum">     150 </span>            :       case gfx::CompositionOp::OP_EXCLUSION:
+<span class="lineNum">     151 </span>            :         return MixBlendMode::Exclusion;
+<span class="lineNum">     152 </span>            :       case gfx::CompositionOp::OP_HUE:
+<span class="lineNum">     153 </span>            :         return MixBlendMode::Hue;
+<span class="lineNum">     154 </span>            :       case gfx::CompositionOp::OP_SATURATION:
+<span class="lineNum">     155 </span>            :         return MixBlendMode::Saturation;
+<span class="lineNum">     156 </span>            :       case gfx::CompositionOp::OP_COLOR:
+<span class="lineNum">     157 </span>            :         return MixBlendMode::Color;
+<span class="lineNum">     158 </span>            :       case gfx::CompositionOp::OP_LUMINOSITY:
+<span class="lineNum">     159 </span>            :         return MixBlendMode::Luminosity;
+<span class="lineNum">     160 </span>            :       default:
+<span class="lineNum">     161 </span>            :         return MixBlendMode::Normal;
+<span class="lineNum">     162 </span>            :   }
+<a name="163"><span class="lineNum">     163 </span>            : }</a>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 : static inline WrColor ToWrColor(const gfx::Color&amp; color)</span>
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span>            :   WrColor c;
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   c.r = color.r;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   c.g = color.g;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :   c.b = color.b;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   c.a = color.a;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   return c;</span>
+<span class="lineNum">     173 </span>            : }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : template&lt;class T&gt;
+<span class="lineNum">     176 </span>            : static inline WrPoint ToWrPoint(const gfx::PointTyped&lt;T&gt;&amp; point)
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span>            :   WrPoint p;
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :   p.x = point.x;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   p.y = point.y;</span>
+<span class="lineNum">     181 </span>            :   return p;
+<span class="lineNum">     182 </span>            : }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : template&lt;class T&gt;
+<span class="lineNum">     185 </span>            : static inline WrPoint ToWrPoint(const gfx::IntPointTyped&lt;T&gt;&amp; point)
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span>            :   return ToWrPoint(IntPointToPoint(point));
+<span class="lineNum">     188 </span>            : }
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span>            : static inline WrPoint ToWrPoint(const gfx::Point&amp; point)
+<span class="lineNum">     191 </span>            : {
+<span class="lineNum">     192 </span>            :   WrPoint p;
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :   p.x = point.x;</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :   p.y = point.y;</span>
+<span class="lineNum">     195 </span>            :   return p;
+<span class="lineNum">     196 </span>            : }
+<a name="197"><span class="lineNum">     197 </span>            : </a>
+<span class="lineNum">     198 </span>            : template&lt;class T&gt;
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 : static inline WrRect ToWrRect(const gfx::RectTyped&lt;T&gt;&amp; rect)</span>
+<span class="lineNum">     200 </span>            : {
+<span class="lineNum">     201 </span>            :   WrRect r;
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :   r.x = rect.x;</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :   r.y = rect.y;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :   r.width = rect.width;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   r.height = rect.height;</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :   return r;</span>
+<span class="lineNum">     207 </span>            : }
+<a name="208"><span class="lineNum">     208 </span>            : </a>
+<span class="lineNum">     209 </span>            : template&lt;class T&gt;
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 : static inline WrRect ToWrRect(const gfx::IntRectTyped&lt;T&gt;&amp; rect)</span>
+<span class="lineNum">     211 </span>            : {
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   return ToWrRect(IntRectToRect(rect));</span>
+<span class="lineNum">     213 </span>            : }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            : template&lt;class T&gt;
+<span class="lineNum">     216 </span>            : static inline WrSize ToWrSize(const gfx::SizeTyped&lt;T&gt;&amp; size)
+<a name="217"><span class="lineNum">     217 </span>            : {</a>
+<span class="lineNum">     218 </span>            :   WrSize ls;
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   ls.width = size.width;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :   ls.height = size.height;</span>
+<span class="lineNum">     221 </span>            :   return ls;
+<span class="lineNum">     222 </span>            : }
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            : template&lt;class T&gt;
+<span class="lineNum">     225 </span>            : static inline WrSize ToWrSize(const gfx::IntSizeTyped&lt;T&gt;&amp; size)
+<span class="lineNum">     226 </span>            : {
+<span class="lineNum">     227 </span>            :   return ToWrSize(IntSizeToSize(size));
+<span class="lineNum">     228 </span>            : }
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            : template&lt;class S, class T&gt;
+<span class="lineNum">     231 </span>            : static inline WrMatrix ToWrMatrix(const gfx::Matrix4x4Typed&lt;S, T&gt;&amp; m)
+<span class="lineNum">     232 </span>            : {
+<span class="lineNum">     233 </span>            :   WrMatrix transform;
+<span class="lineNum">     234 </span>            :   static_assert(sizeof(m.components) == sizeof(transform.values),
+<span class="lineNum">     235 </span>            :       &quot;Matrix components size mismatch!&quot;);
+<span class="lineNum">     236 </span>            :   memcpy(transform.values, m.components, sizeof(transform.values));
+<span class="lineNum">     237 </span>            :   return transform;
+<a name="238"><span class="lineNum">     238 </span>            : }</a>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 : static inline WrBorderStyle ToWrBorderStyle(const uint8_t&amp; style)</span>
+<span class="lineNum">     241 </span>            : {
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :   switch (style) {</span>
+<span class="lineNum">     243 </span>            :   case NS_STYLE_BORDER_STYLE_NONE:
+<span class="lineNum">     244 </span>            :     return WrBorderStyle::None;
+<span class="lineNum">     245 </span>            :   case NS_STYLE_BORDER_STYLE_SOLID:
+<span class="lineNum">     246 </span>            :     return WrBorderStyle::Solid;
+<span class="lineNum">     247 </span>            :   case NS_STYLE_BORDER_STYLE_DOUBLE:
+<span class="lineNum">     248 </span>            :     return WrBorderStyle::Double;
+<span class="lineNum">     249 </span>            :   case NS_STYLE_BORDER_STYLE_DOTTED:
+<span class="lineNum">     250 </span>            :     return WrBorderStyle::Dotted;
+<span class="lineNum">     251 </span>            :   case NS_STYLE_BORDER_STYLE_DASHED:
+<span class="lineNum">     252 </span>            :     return WrBorderStyle::Dashed;
+<span class="lineNum">     253 </span>            :   case NS_STYLE_BORDER_STYLE_HIDDEN:
+<span class="lineNum">     254 </span>            :     return WrBorderStyle::Hidden;
+<span class="lineNum">     255 </span>            :   case NS_STYLE_BORDER_STYLE_GROOVE:
+<span class="lineNum">     256 </span>            :     return WrBorderStyle::Groove;
+<span class="lineNum">     257 </span>            :   case NS_STYLE_BORDER_STYLE_RIDGE:
+<span class="lineNum">     258 </span>            :     return WrBorderStyle::Ridge;
+<span class="lineNum">     259 </span>            :   case NS_STYLE_BORDER_STYLE_INSET:
+<span class="lineNum">     260 </span>            :     return WrBorderStyle::Inset;
+<span class="lineNum">     261 </span>            :   case NS_STYLE_BORDER_STYLE_OUTSET:
+<span class="lineNum">     262 </span>            :     return WrBorderStyle::Outset;
+<span class="lineNum">     263 </span>            :   default:
+<span class="lineNum">     264 </span>            :     MOZ_ASSERT(false);
+<span class="lineNum">     265 </span>            :   }
+<span class="lineNum">     266 </span>            :   return WrBorderStyle::None;
+<a name="267"><span class="lineNum">     267 </span>            : }</a>
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 : static inline WrBorderSide ToWrBorderSide(const gfx::Color&amp; color, const uint8_t&amp; style)</span>
+<span class="lineNum">     270 </span>            : {
+<span class="lineNum">     271 </span>            :   WrBorderSide bs;
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :   bs.color = ToWrColor(color);</span>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :   bs.style = ToWrBorderStyle(style);</span>
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :   return bs;</span>
+<span class="lineNum">     275 </span>            : }
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            : static inline WrBorderRadius ToWrUniformBorderRadius(const LayerSize&amp; aSize)
+<span class="lineNum">     278 </span>            : {
+<span class="lineNum">     279 </span>            :   WrBorderRadius br;
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   br.top_left = ToWrSize(aSize);</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :   br.top_right = ToWrSize(aSize);</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :   br.bottom_left = ToWrSize(aSize);</span>
+<span class="lineNum">     283 </span>            :   br.bottom_right = ToWrSize(aSize);
+<span class="lineNum">     284 </span>            :   return br;
+<span class="lineNum">     285 </span>            : }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            : static inline WrBorderRadius ToWrBorderRadius(const LayerSize&amp; topLeft, const LayerSize&amp; topRight,
+<span class="lineNum">     288 </span>            :                                               const LayerSize&amp; bottomLeft, const LayerSize&amp; bottomRight)
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span>            :   WrBorderRadius br;
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :   br.top_left = ToWrSize(topLeft);</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   br.top_right = ToWrSize(topRight);</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :   br.bottom_left = ToWrSize(bottomLeft);</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :   br.bottom_right = ToWrSize(bottomRight);</span>
+<span class="lineNum">     295 </span>            :   return br;
+<span class="lineNum">     296 </span>            : }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : static inline WrBorderWidths ToWrBorderWidths(float top, float right, float bottom, float left)
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span>            :   WrBorderWidths bw;
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :   bw.top = top;</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :   bw.right = right;</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :   bw.bottom = bottom;</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :   bw.left = left;</span>
+<span class="lineNum">     305 </span>            :   return bw;
+<span class="lineNum">     306 </span>            : }
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span>            : static inline WrNinePatchDescriptor ToWrNinePatchDescriptor(uint32_t width, uint32_t height,
+<span class="lineNum">     309 </span>            :                                                             const WrSideOffsets2Du32&amp; slice)
+<span class="lineNum">     310 </span>            : {
+<span class="lineNum">     311 </span>            :   WrNinePatchDescriptor patch;
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :   patch.width = width;</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :   patch.height = height;</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :   patch.slice = slice;</span>
+<span class="lineNum">     315 </span>            :   return patch;
+<span class="lineNum">     316 </span>            : }
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            : static inline WrSideOffsets2Du32 ToWrSideOffsets2Du32(uint32_t top, uint32_t right, uint32_t bottom, uint32_t left)
+<span class="lineNum">     319 </span>            : {
+<span class="lineNum">     320 </span>            :   WrSideOffsets2Du32 offset;
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :   offset.top = top;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :   offset.right = right;</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :   offset.bottom = bottom;</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :   offset.left = left;</span>
+<span class="lineNum">     325 </span>            :   return offset;
+<span class="lineNum">     326 </span>            : }
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span>            : static inline WrSideOffsets2Df32 ToWrSideOffsets2Df32(float top, float right, float bottom, float left)
+<span class="lineNum">     329 </span>            : {
+<span class="lineNum">     330 </span>            :   WrSideOffsets2Df32 offset;
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :   offset.top = top;</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :   offset.right = right;</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :   offset.bottom = bottom;</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :   offset.left = left;</span>
+<span class="lineNum">     335 </span>            :   return offset;
+<a name="336"><span class="lineNum">     336 </span>            : }</a>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 : static inline WrRepeatMode ToWrRepeatMode(uint8_t repeatMode)</span>
+<span class="lineNum">     339 </span>            : {
+<span class="lineNum">     340 </span>            :   switch (repeatMode) {
+<span class="lineNum">     341 </span>            :   case NS_STYLE_BORDER_IMAGE_REPEAT_STRETCH:
+<span class="lineNum">     342 </span>            :     return WrRepeatMode::Stretch;
+<span class="lineNum">     343 </span>            :   case NS_STYLE_BORDER_IMAGE_REPEAT_REPEAT:
+<span class="lineNum">     344 </span>            :     return WrRepeatMode::Repeat;
+<span class="lineNum">     345 </span>            :   case NS_STYLE_BORDER_IMAGE_REPEAT_ROUND:
+<span class="lineNum">     346 </span>            :     return WrRepeatMode::Round;
+<span class="lineNum">     347 </span>            :   case NS_STYLE_BORDER_IMAGE_REPEAT_SPACE:
+<span class="lineNum">     348 </span>            :     return WrRepeatMode::Space;
+<span class="lineNum">     349 </span>            :   default:
+<span class="lineNum">     350 </span>            :     MOZ_ASSERT(false);
+<span class="lineNum">     351 </span>            :   }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :   return WrRepeatMode::Stretch;
+<span class="lineNum">     354 </span>            : }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            : template&lt;class T&gt;
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 : static inline WrComplexClipRegion ToWrComplexClipRegion(const gfx::RectTyped&lt;T&gt;&amp; rect,</span>
+<span class="lineNum">     358 </span>            :                                                         const LayerSize&amp; size)
+<span class="lineNum">     359 </span>            : {
+<span class="lineNum">     360 </span>            :   WrComplexClipRegion complex_clip;
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :   complex_clip.rect = wr::ToWrRect(rect);</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :   complex_clip.radii = wr::ToWrUniformBorderRadius(size);</span>
+<span class="lineNum">     363 </span><span class="lineNoCov">          0 :   return complex_clip;</span>
+<span class="lineNum">     364 </span>            : }
+<span class="lineNum">     365 </span>            : 
+<span class="lineNum">     366 </span>            : static inline WrExternalImageId ToWrExternalImageId(uint64_t aID)
+<span class="lineNum">     367 </span>            : {
+<span class="lineNum">     368 </span>            :   WrExternalImageId Id;
+<span class="lineNum">     369 </span>            :   Id.mHandle = aID;
+<span class="lineNum">     370 </span>            :   return Id;
+<span class="lineNum">     371 </span>            : }
+<span class="lineNum">     372 </span>            : 
+<span class="lineNum">     373 </span>            : static inline WrExternalImage RawDataToWrExternalImage(const uint8_t* aBuff,
+<span class="lineNum">     374 </span>            :                                                        size_t size)
+<span class="lineNum">     375 </span>            : {
+<span class="lineNum">     376 </span>            :   return WrExternalImage {
+<span class="lineNum">     377 </span>            :     WrExternalImageType::RawData,
+<span class="lineNum">     378 </span>            :     0, 0.0f, 0.0f, 0.0f, 0.0f,
+<span class="lineNum">     379 </span>            :     aBuff, size
+<span class="lineNum">     380 </span>            :   };
+<span class="lineNum">     381 </span>            : }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span>            : static inline WrExternalImage NativeTextureToWrExternalImage(uint8_t aHandle,
+<span class="lineNum">     384 </span>            :                                                              float u0, float v0,
+<span class="lineNum">     385 </span>            :                                                              float u1, float v1)
+<span class="lineNum">     386 </span>            : {
+<span class="lineNum">     387 </span>            :   return WrExternalImage {
+<span class="lineNum">     388 </span>            :     WrExternalImageType::NativeTexture,
+<span class="lineNum">     389 </span>            :     aHandle, u0, v0, u1, v1,
+<span class="lineNum">     390 </span>            :     nullptr, 0
+<span class="lineNum">     391 </span>            :   };
+<span class="lineNum">     392 </span>            : }
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span>            : struct VecU8 {
+<span class="lineNum">     395 </span>            :   WrVecU8 inner;
+<span class="lineNum">     396 </span>            :   VecU8() {
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :     inner.data = nullptr;</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :     inner.capacity = 0;</span>
+<a name="399"><span class="lineNum">     399 </span>            :   }</a>
+<span class="lineNum">     400 </span>            :   VecU8(VecU8&amp;) = delete;
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :   VecU8(VecU8&amp;&amp; src) {</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :     inner = src.inner;</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :     src.inner.data = nullptr;</span>
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 :     src.inner.capacity = 0;</span>
+<span class="lineNum">     405 </span><span class="lineNoCov">          0 :   }</span>
+<a name="406"><span class="lineNum">     406 </span>            : </a>
+<span class="lineNum">     407 </span>            :   VecU8&amp;
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :   operator=(VecU8&amp;&amp; src) {</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :     inner = src.inner;</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :     src.inner.data = nullptr;</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :     src.inner.capacity = 0;</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :     return *this;</span>
+<span class="lineNum">     413 </span>            :   }
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            :   WrVecU8
+<span class="lineNum">     416 </span>            :   Extract() {
+<span class="lineNum">     417 </span>            :     WrVecU8 ret = inner;
+<span class="lineNum">     418 </span>            :     inner.data = nullptr;
+<span class="lineNum">     419 </span>            :     inner.capacity = 0;
+<span class="lineNum">     420 </span>            :     return ret;
+<a name="421"><span class="lineNum">     421 </span>            :   }</a>
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineNoCov">          0 :   ~VecU8() {</span>
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :     if (inner.data) {</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :       wr_vec_u8_free(inner);</span>
+<span class="lineNum">     426 </span>            :     }
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     428 </span>            : };
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span>            : struct ByteBuffer
+<span class="lineNum">     431 </span>            : {
+<span class="lineNum">     432 </span>            :   ByteBuffer(size_t aLength, uint8_t* aData)
+<span class="lineNum">     433 </span>            :     : mLength(aLength)
+<span class="lineNum">     434 </span>            :     , mData(aData)
+<span class="lineNum">     435 </span>            :     , mOwned(false)
+<span class="lineNum">     436 </span>            :   {}
+<span class="lineNum">     437 </span>            : 
+<a name="438"><span class="lineNum">     438 </span>            :   // XXX: this is a bit of hack that assumes</a>
+<span class="lineNum">     439 </span>            :   // the allocators are the same
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :   explicit ByteBuffer(VecU8&amp;&amp; vec)</span>
+<span class="lineNum">     441 </span>            :   {
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :     if (vec.inner.capacity) {</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :       mLength = vec.inner.length;</span>
+<span class="lineNum">     444 </span><span class="lineNoCov">          0 :       mData = vec.inner.data;</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :       vec.inner.data = nullptr;</span>
+<span class="lineNum">     446 </span><span class="lineNoCov">          0 :       vec.inner.capacity = 0;</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :       mOwned = true;</span>
+<span class="lineNum">     448 </span>            :     } else {
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :       mOwned = false;</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :       mData = nullptr;</span>
+<span class="lineNum">     451 </span><span class="lineNoCov">          0 :       mLength = 0;</span>
+<span class="lineNum">     452 </span>            :     }
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span>            :   ByteBuffer()
+<span class="lineNum">     456 </span>            :     : mLength(0)
+<span class="lineNum">     457 </span>            :     , mData(nullptr)
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :     , mOwned(false)</span>
+<span class="lineNum">     459 </span>            :   {}
+<a name="460"><span class="lineNum">     460 </span>            : </a>
+<span class="lineNum">     461 </span>            :   bool
+<span class="lineNum">     462 </span><span class="lineNoCov">          0 :   Allocate(size_t aLength)</span>
+<span class="lineNum">     463 </span>            :   {
+<span class="lineNum">     464 </span>            :     MOZ_ASSERT(mData == nullptr);
+<span class="lineNum">     465 </span><span class="lineNoCov">          0 :     mData = (uint8_t*)malloc(aLength);</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :     if (!mData) {</span>
+<span class="lineNum">     467 </span>            :       return false;
+<span class="lineNum">     468 </span>            :     }
+<span class="lineNum">     469 </span><span class="lineNoCov">          0 :     mLength = aLength;</span>
+<span class="lineNum">     470 </span><span class="lineNoCov">          0 :     mOwned = true;</span>
+<span class="lineNum">     471 </span><span class="lineNoCov">          0 :     return true;</span>
+<a name="472"><span class="lineNum">     472 </span>            :   }</a>
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :   ~ByteBuffer()</span>
+<span class="lineNum">     475 </span>            :   {
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :     if (mData &amp;&amp; mOwned) {</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :       free(mData);</span>
+<span class="lineNum">     478 </span>            :     }
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :   const Range&lt;uint8_t&gt; AsSlice() const { return Range&lt;uint8_t&gt;(mData, mLength); }</span>
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :   Range&lt;uint8_t&gt; AsSlice() { return Range&lt;uint8_t&gt;(mData, mLength); }
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            :   bool operator==(const ByteBuffer&amp; other) const {
+<span class="lineNum">     486 </span>            :     return mLength == other.mLength &amp;&amp;
+<span class="lineNum">     487 </span>            :           !(memcmp(mData, other.mData, mLength));
+<span class="lineNum">     488 </span>            :   }
+<span class="lineNum">     489 </span>            : 
+<span class="lineNum">     490 </span>            :   size_t mLength;
+<span class="lineNum">     491 </span>            :   uint8_t* mData;
+<span class="lineNum">     492 </span>            :   bool mOwned;
+<span class="lineNum">     493 </span>            : };
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span>            : inline WrByteSlice RangeToByteSlice(mozilla::Range&lt;uint8_t&gt; aRange) {
+<span class="lineNum">     496 </span>            :   return WrByteSlice { aRange.begin().get(), aRange.length() };
+<span class="lineNum">     497 </span>            : }
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span>            : inline mozilla::Range&lt;const uint8_t&gt; ByteSliceToRange(WrByteSlice aWrSlice) {
+<span class="lineNum">     500 </span>            :   return mozilla::Range&lt;const uint8_t&gt;(aWrSlice.buffer, aWrSlice.len);
+<a name="501"><span class="lineNum">     501 </span>            : }</a>
+<span class="lineNum">     502 </span>            : 
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 : struct BuiltDisplayList {</span>
+<span class="lineNum">     504 </span>            :   VecU8 dl;
+<span class="lineNum">     505 </span>            :   WrBuiltDisplayListDescriptor dl_desc;
+<span class="lineNum">     506 </span>            :   VecU8 aux;
+<span class="lineNum">     507 </span>            :   WrAuxiliaryListsDescriptor aux_desc;
+<span class="lineNum">     508 </span>            : };
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            : } // namespace wr
+<span class="lineNum">     511 </span>            : } // namespace mozilla
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            : #endif /* GFX_WEBRENDERTYPES_H */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

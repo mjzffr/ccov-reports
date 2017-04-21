@@ -1,0 +1,416 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - mochitest-e10s.info - obj-firefox/dist/include/mozilla/SSE.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">obj-firefox/dist/include/mozilla</a> - SSE.h<span style="font-size: 80%;"> (source / <a href="SSE.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">mochitest-e10s.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2017-04-21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Legend:</td>
+            <td class="headerValueLeg">            Lines:
+            <span class="coverLegendCov">hit</span>
+            <span class="coverLegendNoCov">not hit</span>
+</td>
+            <td></td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* vim: set shiftwidth=2 tabstop=8 autoindent cindent expandtab: */</a>
+<span class="lineNum">       2 </span>            : /* This Source Code Form is subject to the terms of the Mozilla Public
+<span class="lineNum">       3 </span>            :  * License, v. 2.0. If a copy of the MPL was not distributed with this
+<span class="lineNum">       4 </span>            :  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /* compile-time and runtime tests for whether to use SSE instructions */
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #ifndef mozilla_SSE_h_
+<span class="lineNum">       9 </span>            : #define mozilla_SSE_h_
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : // for definition of MFBT_DATA
+<span class="lineNum">      12 </span>            : #include &quot;mozilla/Types.h&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : /**
+<span class="lineNum">      15 </span>            :  * The public interface of this header consists of a set of macros and
+<span class="lineNum">      16 </span>            :  * functions for Intel CPU features.
+<span class="lineNum">      17 </span>            :  *
+<span class="lineNum">      18 </span>            :  * DETECTING ISA EXTENSIONS
+<span class="lineNum">      19 </span>            :  * ========================
+<span class="lineNum">      20 </span>            :  *
+<span class="lineNum">      21 </span>            :  * This header provides the following functions for determining whether the
+<span class="lineNum">      22 </span>            :  * current CPU supports a particular instruction set extension:
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  *    mozilla::supports_mmx
+<span class="lineNum">      25 </span>            :  *    mozilla::supports_sse
+<span class="lineNum">      26 </span>            :  *    mozilla::supports_sse2
+<span class="lineNum">      27 </span>            :  *    mozilla::supports_sse3
+<span class="lineNum">      28 </span>            :  *    mozilla::supports_ssse3
+<span class="lineNum">      29 </span>            :  *    mozilla::supports_sse4a
+<span class="lineNum">      30 </span>            :  *    mozilla::supports_sse4_1
+<span class="lineNum">      31 </span>            :  *    mozilla::supports_sse4_2
+<span class="lineNum">      32 </span>            :  *    mozilla::supports_avx
+<span class="lineNum">      33 </span>            :  *    mozilla::supports_avx2
+<span class="lineNum">      34 </span>            :  *
+<span class="lineNum">      35 </span>            :  * If you're writing code using inline assembly, you should guard it with a
+<span class="lineNum">      36 </span>            :  * call to one of these functions.  For instance:
+<span class="lineNum">      37 </span>            :  *
+<span class="lineNum">      38 </span>            :  *   if (mozilla::supports_sse2()) {
+<span class="lineNum">      39 </span>            :  *     asm(&quot; ... &quot;);
+<span class="lineNum">      40 </span>            :  *   }
+<span class="lineNum">      41 </span>            :  *   else {
+<span class="lineNum">      42 </span>            :  *     ...
+<span class="lineNum">      43 </span>            :  *   }
+<span class="lineNum">      44 </span>            :  *
+<span class="lineNum">      45 </span>            :  * Note that these functions depend on cpuid intrinsics only available in gcc
+<span class="lineNum">      46 </span>            :  * 4.3 or later and MSVC 8.0 (Visual C++ 2005) or later, so they return false
+<span class="lineNum">      47 </span>            :  * in older compilers.  (This could be fixed by replacing the code with inline
+<span class="lineNum">      48 </span>            :  * assembly.)
+<span class="lineNum">      49 </span>            :  *
+<span class="lineNum">      50 </span>            :  *
+<span class="lineNum">      51 </span>            :  * USING INTRINSICS
+<span class="lineNum">      52 </span>            :  * ================
+<span class="lineNum">      53 </span>            :  *
+<span class="lineNum">      54 </span>            :  * This header also provides support for coding using CPU intrinsics.
+<span class="lineNum">      55 </span>            :  *
+<span class="lineNum">      56 </span>            :  * For each mozilla::supports_abc function, we define a MOZILLA_MAY_SUPPORT_ABC
+<span class="lineNum">      57 </span>            :  * macro which indicates that the target/compiler combination we're using is
+<span class="lineNum">      58 </span>            :  * compatible with the ABC extension.  For instance, x86_64 with MSVC 2003 is
+<span class="lineNum">      59 </span>            :  * compatible with SSE2 but not SSE3, since although there exist x86_64 CPUs
+<span class="lineNum">      60 </span>            :  * with SSE3 support, MSVC 2003 only supports through SSE2.
+<span class="lineNum">      61 </span>            :  *
+<span class="lineNum">      62 </span>            :  * Until gcc fixes #pragma target [1] [2] or our x86 builds require SSE2,
+<span class="lineNum">      63 </span>            :  * you'll need to separate code using intrinsics into a file separate from your
+<span class="lineNum">      64 </span>            :  * regular code.  Here's the recommended pattern:
+<span class="lineNum">      65 </span>            :  *
+<span class="lineNum">      66 </span>            :  *  #ifdef MOZILLA_MAY_SUPPORT_ABC
+<span class="lineNum">      67 </span>            :  *    namespace mozilla {
+<span class="lineNum">      68 </span>            :  *      namespace ABC {
+<span class="lineNum">      69 </span>            :  *        void foo();
+<span class="lineNum">      70 </span>            :  *      }
+<span class="lineNum">      71 </span>            :  *    }
+<span class="lineNum">      72 </span>            :  *  #endif
+<span class="lineNum">      73 </span>            :  *
+<span class="lineNum">      74 </span>            :  *  void foo() {
+<span class="lineNum">      75 </span>            :  *    #ifdef MOZILLA_MAY_SUPPORT_ABC
+<span class="lineNum">      76 </span>            :  *      if (mozilla::supports_abc()) {
+<span class="lineNum">      77 </span>            :  *        mozilla::ABC::foo(); // in a separate file
+<span class="lineNum">      78 </span>            :  *        return;
+<span class="lineNum">      79 </span>            :  *      }
+<span class="lineNum">      80 </span>            :  *    #endif
+<span class="lineNum">      81 </span>            :  *
+<span class="lineNum">      82 </span>            :  *    foo_unvectorized();
+<span class="lineNum">      83 </span>            :  *  }
+<span class="lineNum">      84 </span>            :  *
+<span class="lineNum">      85 </span>            :  * You'll need to define mozilla::ABC::foo() in a separate file and add the
+<span class="lineNum">      86 </span>            :  * -mabc flag when using gcc.
+<span class="lineNum">      87 </span>            :  *
+<span class="lineNum">      88 </span>            :  * [1] http://gcc.gnu.org/bugzilla/show_bug.cgi?id=39787 and
+<span class="lineNum">      89 </span>            :  * [2] http://gcc.gnu.org/bugzilla/show_bug.cgi?id=41201 being fixed.
+<span class="lineNum">      90 </span>            :  *
+<span class="lineNum">      91 </span>            :  */
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : #if defined(__GNUC__) &amp;&amp; (defined(__i386__) || defined(__x86_64__))
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : #ifdef __MMX__
+<span class="lineNum">      96 </span>            :   // It's ok to use MMX instructions based on the -march option (or
+<span class="lineNum">      97 </span>            :   // the default for x86_64 or for Intel Mac).
+<span class="lineNum">      98 </span>            :   #define MOZILLA_PRESUME_MMX 1
+<span class="lineNum">      99 </span>            : #endif
+<span class="lineNum">     100 </span>            : #ifdef __SSE__
+<span class="lineNum">     101 </span>            :   // It's ok to use SSE instructions based on the -march option (or
+<span class="lineNum">     102 </span>            :   // the default for x86_64 or for Intel Mac).
+<span class="lineNum">     103 </span>            :   #define MOZILLA_PRESUME_SSE 1
+<span class="lineNum">     104 </span>            : #endif
+<span class="lineNum">     105 </span>            : #ifdef __SSE2__
+<span class="lineNum">     106 </span>            :   // It's ok to use SSE2 instructions based on the -march option (or
+<span class="lineNum">     107 </span>            :   // the default for x86_64 or for Intel Mac).
+<span class="lineNum">     108 </span>            :   #define MOZILLA_PRESUME_SSE2 1
+<span class="lineNum">     109 </span>            : #endif
+<span class="lineNum">     110 </span>            : #ifdef __SSE3__
+<span class="lineNum">     111 </span>            :   // It's ok to use SSE3 instructions based on the -march option (or the
+<span class="lineNum">     112 </span>            :   // default for Intel Mac).
+<span class="lineNum">     113 </span>            :   #define MOZILLA_PRESUME_SSE3 1
+<span class="lineNum">     114 </span>            : #endif
+<span class="lineNum">     115 </span>            : #ifdef __SSSE3__
+<span class="lineNum">     116 </span>            :   // It's ok to use SSSE3 instructions based on the -march option.
+<span class="lineNum">     117 </span>            :   #define MOZILLA_PRESUME_SSSE3 1
+<span class="lineNum">     118 </span>            : #endif
+<span class="lineNum">     119 </span>            : #ifdef __SSE4A__
+<span class="lineNum">     120 </span>            :   // It's ok to use SSE4A instructions based on the -march option.
+<span class="lineNum">     121 </span>            :   #define MOZILLA_PRESUME_SSE4A 1
+<span class="lineNum">     122 </span>            : #endif
+<span class="lineNum">     123 </span>            : #ifdef __SSE4_1__
+<span class="lineNum">     124 </span>            :   // It's ok to use SSE4.1 instructions based on the -march option.
+<span class="lineNum">     125 </span>            :   #define MOZILLA_PRESUME_SSE4_1 1
+<span class="lineNum">     126 </span>            : #endif
+<span class="lineNum">     127 </span>            : #ifdef __SSE4_2__
+<span class="lineNum">     128 </span>            :   // It's ok to use SSE4.2 instructions based on the -march option.
+<span class="lineNum">     129 </span>            :   #define MOZILLA_PRESUME_SSE4_2 1
+<span class="lineNum">     130 </span>            : #endif
+<span class="lineNum">     131 </span>            : #ifdef __AVX__
+<span class="lineNum">     132 </span>            :   // It's ok to use AVX instructions based on the -march option.
+<span class="lineNum">     133 </span>            :   #define MOZILLA_PRESUME_AVX 1
+<span class="lineNum">     134 </span>            : #endif
+<span class="lineNum">     135 </span>            : #ifdef __AVX2__
+<span class="lineNum">     136 </span>            :   // It's ok to use AVX instructions based on the -march option.
+<span class="lineNum">     137 </span>            :   #define MOZILLA_PRESUME_AVX2 1
+<span class="lineNum">     138 </span>            : #endif
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            : #ifdef HAVE_CPUID_H
+<span class="lineNum">     143 </span>            :   #define MOZILLA_SSE_HAVE_CPUID_DETECTION
+<span class="lineNum">     144 </span>            : #endif
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            : #elif defined(_MSC_VER) &amp;&amp; (defined(_M_IX86) || defined(_M_AMD64))
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : #define MOZILLA_SSE_HAVE_CPUID_DETECTION
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : #if defined(_M_IX86_FP)
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : #if _M_IX86_FP &gt;= 1
+<span class="lineNum">     153 </span>            :   // It's ok to use SSE instructions based on the /arch option
+<span class="lineNum">     154 </span>            :   #define MOZILLA_PRESUME_SSE
+<span class="lineNum">     155 </span>            : #endif
+<span class="lineNum">     156 </span>            : #if _M_IX86_FP &gt;= 2
+<span class="lineNum">     157 </span>            :   // It's ok to use SSE2 instructions based on the /arch option
+<span class="lineNum">     158 </span>            :   #define MOZILLA_PRESUME_SSE2
+<span class="lineNum">     159 </span>            : #endif
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : #elif defined(_M_AMD64)
+<span class="lineNum">     162 </span>            :   // MSVC for AMD64 doesn't support MMX, so don't presume it here.
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :   // SSE is always available on AMD64.
+<span class="lineNum">     165 </span>            :   #define MOZILLA_PRESUME_SSE
+<span class="lineNum">     166 </span>            :   // SSE2 is always available on AMD64.
+<span class="lineNum">     167 </span>            :   #define MOZILLA_PRESUME_SSE2
+<span class="lineNum">     168 </span>            : #endif
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : #elif defined(__SUNPRO_CC) &amp;&amp; (defined(__i386) || defined(__x86_64__))
+<span class="lineNum">     171 </span>            : // Sun Studio on x86 or amd64
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            : #define MOZILLA_SSE_HAVE_CPUID_DETECTION
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : #if defined(__x86_64__)
+<span class="lineNum">     176 </span>            :   // MMX is always available on AMD64.
+<span class="lineNum">     177 </span>            :   #define MOZILLA_PRESUME_MMX
+<span class="lineNum">     178 </span>            :   // SSE is always available on AMD64.
+<span class="lineNum">     179 </span>            :   #define MOZILLA_PRESUME_SSE
+<span class="lineNum">     180 </span>            :   // SSE2 is always available on AMD64.
+<span class="lineNum">     181 </span>            :   #define MOZILLA_PRESUME_SSE2
+<span class="lineNum">     182 </span>            : #endif
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : #endif
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            : namespace mozilla {
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            :   namespace sse_private {
+<span class="lineNum">     189 </span>            : #if defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)
+<span class="lineNum">     190 </span>            : #if !defined(MOZILLA_PRESUME_MMX)
+<span class="lineNum">     191 </span>            :     extern bool MFBT_DATA mmx_enabled;
+<span class="lineNum">     192 </span>            : #endif
+<span class="lineNum">     193 </span>            : #if !defined(MOZILLA_PRESUME_SSE)
+<span class="lineNum">     194 </span>            :     extern bool MFBT_DATA sse_enabled;
+<span class="lineNum">     195 </span>            : #endif
+<span class="lineNum">     196 </span>            : #if !defined(MOZILLA_PRESUME_SSE2)
+<span class="lineNum">     197 </span>            :     extern bool MFBT_DATA sse2_enabled;
+<span class="lineNum">     198 </span>            : #endif
+<span class="lineNum">     199 </span>            : #if !defined(MOZILLA_PRESUME_SSE3)
+<span class="lineNum">     200 </span>            :     extern bool MFBT_DATA sse3_enabled;
+<span class="lineNum">     201 </span>            : #endif
+<span class="lineNum">     202 </span>            : #if !defined(MOZILLA_PRESUME_SSSE3)
+<span class="lineNum">     203 </span>            :     extern bool MFBT_DATA ssse3_enabled;
+<span class="lineNum">     204 </span>            : #endif
+<span class="lineNum">     205 </span>            : #if !defined(MOZILLA_PRESUME_SSE4A)
+<span class="lineNum">     206 </span>            :     extern bool MFBT_DATA sse4a_enabled;
+<span class="lineNum">     207 </span>            : #endif
+<span class="lineNum">     208 </span>            : #if !defined(MOZILLA_PRESUME_SSE4_1)
+<span class="lineNum">     209 </span>            :     extern bool MFBT_DATA sse4_1_enabled;
+<span class="lineNum">     210 </span>            : #endif
+<span class="lineNum">     211 </span>            : #if !defined(MOZILLA_PRESUME_SSE4_2)
+<span class="lineNum">     212 </span>            :     extern bool MFBT_DATA sse4_2_enabled;
+<span class="lineNum">     213 </span>            : #endif
+<span class="lineNum">     214 </span>            : #if !defined(MOZILLA_PRESUME_AVX)
+<span class="lineNum">     215 </span>            :     extern bool MFBT_DATA avx_enabled;
+<span class="lineNum">     216 </span>            : #endif
+<span class="lineNum">     217 </span>            : #if !defined(MOZILLA_PRESUME_AVX2)
+<span class="lineNum">     218 </span>            :     extern bool MFBT_DATA avx2_enabled;
+<span class="lineNum">     219 </span>            : #endif
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            : #endif
+<span class="lineNum">     223 </span>            :   } // namespace sse_private
+<span class="lineNum">     224 </span>            : 
+<a name="225"><span class="lineNum">     225 </span>            : #if defined(MOZILLA_PRESUME_MMX)</a>
+<span class="lineNum">     226 </span>            : #define MOZILLA_MAY_SUPPORT_MMX 1
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :   inline bool supports_mmx() { return true; }</span>
+<span class="lineNum">     228 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)
+<span class="lineNum">     229 </span>            : #if !(defined(_MSC_VER) &amp;&amp; defined(_M_AMD64))
+<span class="lineNum">     230 </span>            :   // Define MOZILLA_MAY_SUPPORT_MMX only if we're not on MSVC for
+<span class="lineNum">     231 </span>            :   // AMD64, since that compiler doesn't support MMX.
+<span class="lineNum">     232 </span>            : #define MOZILLA_MAY_SUPPORT_MMX 1
+<span class="lineNum">     233 </span>            : #endif
+<span class="lineNum">     234 </span>            :   inline bool supports_mmx() { return sse_private::mmx_enabled; }
+<span class="lineNum">     235 </span>            : #else
+<span class="lineNum">     236 </span>            :   inline bool supports_mmx() { return false; }
+<span class="lineNum">     237 </span>            : #endif
+<span class="lineNum">     238 </span>            : 
+<a name="239"><span class="lineNum">     239 </span>            : #if defined(MOZILLA_PRESUME_SSE)</a>
+<span class="lineNum">     240 </span>            : #define MOZILLA_MAY_SUPPORT_SSE 1
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :   inline bool supports_sse() { return true; }</span>
+<span class="lineNum">     242 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)
+<span class="lineNum">     243 </span>            : #define MOZILLA_MAY_SUPPORT_SSE 1
+<span class="lineNum">     244 </span>            :   inline bool supports_sse() { return sse_private::sse_enabled; }
+<span class="lineNum">     245 </span>            : #else
+<span class="lineNum">     246 </span>            :   inline bool supports_sse() { return false; }
+<span class="lineNum">     247 </span>            : #endif
+<span class="lineNum">     248 </span>            : 
+<a name="249"><span class="lineNum">     249 </span>            : #if defined(MOZILLA_PRESUME_SSE2)</a>
+<span class="lineNum">     250 </span>            : #define MOZILLA_MAY_SUPPORT_SSE2 1
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 :   inline bool supports_sse2() { return true; }</span>
+<span class="lineNum">     252 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)
+<span class="lineNum">     253 </span>            : #define MOZILLA_MAY_SUPPORT_SSE2 1
+<span class="lineNum">     254 </span>            :   inline bool supports_sse2() { return sse_private::sse2_enabled; }
+<span class="lineNum">     255 </span>            : #else
+<span class="lineNum">     256 </span>            :   inline bool supports_sse2() { return false; }
+<span class="lineNum">     257 </span>            : #endif
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : #if defined(MOZILLA_PRESUME_SSE3)
+<span class="lineNum">     260 </span>            : #define MOZILLA_MAY_SUPPORT_SSE3 1
+<span class="lineNum">     261 </span>            :   inline bool supports_sse3() { return true; }
+<a name="262"><span class="lineNum">     262 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     263 </span>            : #define MOZILLA_MAY_SUPPORT_SSE3 1
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :   inline bool supports_sse3() { return sse_private::sse3_enabled; }</span>
+<span class="lineNum">     265 </span>            : #else
+<span class="lineNum">     266 </span>            :   inline bool supports_sse3() { return false; }
+<span class="lineNum">     267 </span>            : #endif
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : #if defined(MOZILLA_PRESUME_SSSE3)
+<span class="lineNum">     270 </span>            : #define MOZILLA_MAY_SUPPORT_SSSE3 1
+<span class="lineNum">     271 </span>            :   inline bool supports_ssse3() { return true; }
+<a name="272"><span class="lineNum">     272 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     273 </span>            : #define MOZILLA_MAY_SUPPORT_SSSE3 1
+<span class="lineNum">     274 </span><span class="lineNoCov">          0 :   inline bool supports_ssse3() { return sse_private::ssse3_enabled; }</span>
+<span class="lineNum">     275 </span>            : #else
+<span class="lineNum">     276 </span>            :   inline bool supports_ssse3() { return false; }
+<span class="lineNum">     277 </span>            : #endif
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : #if defined(MOZILLA_PRESUME_SSE4A)
+<span class="lineNum">     280 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4A 1
+<span class="lineNum">     281 </span>            :   inline bool supports_sse4a() { return true; }
+<a name="282"><span class="lineNum">     282 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     283 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4A 1
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   inline bool supports_sse4a() { return sse_private::sse4a_enabled; }</span>
+<span class="lineNum">     285 </span>            : #else
+<span class="lineNum">     286 </span>            :   inline bool supports_sse4a() { return false; }
+<span class="lineNum">     287 </span>            : #endif
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : #if defined(MOZILLA_PRESUME_SSE4_1)
+<span class="lineNum">     290 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4_1 1
+<span class="lineNum">     291 </span>            :   inline bool supports_sse4_1() { return true; }
+<a name="292"><span class="lineNum">     292 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     293 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4_1 1
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :   inline bool supports_sse4_1() { return sse_private::sse4_1_enabled; }</span>
+<span class="lineNum">     295 </span>            : #else
+<span class="lineNum">     296 </span>            :   inline bool supports_sse4_1() { return false; }
+<span class="lineNum">     297 </span>            : #endif
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            : #if defined(MOZILLA_PRESUME_SSE4_2)
+<span class="lineNum">     300 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4_2 1
+<span class="lineNum">     301 </span>            :   inline bool supports_sse4_2() { return true; }
+<a name="302"><span class="lineNum">     302 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     303 </span>            : #define MOZILLA_MAY_SUPPORT_SSE4_2 1
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :   inline bool supports_sse4_2() { return sse_private::sse4_2_enabled; }</span>
+<span class="lineNum">     305 </span>            : #else
+<span class="lineNum">     306 </span>            :   inline bool supports_sse4_2() { return false; }
+<span class="lineNum">     307 </span>            : #endif
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            : #if defined(MOZILLA_PRESUME_AVX)
+<span class="lineNum">     310 </span>            : #define MOZILLA_MAY_SUPPORT_AVX 1
+<span class="lineNum">     311 </span>            :   inline bool supports_avx() { return true; }
+<a name="312"><span class="lineNum">     312 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     313 </span>            : #define MOZILLA_MAY_SUPPORT_AVX 1
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :   inline bool supports_avx() { return sse_private::avx_enabled; }</span>
+<span class="lineNum">     315 </span>            : #else
+<span class="lineNum">     316 </span>            :   inline bool supports_avx() { return false; }
+<span class="lineNum">     317 </span>            : #endif
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            : #if defined(MOZILLA_PRESUME_AVX2)
+<span class="lineNum">     320 </span>            : #define MOZILLA_MAY_SUPPORT_AVX2 1
+<span class="lineNum">     321 </span>            :   inline bool supports_avx2() { return true; }
+<a name="322"><span class="lineNum">     322 </span>            : #elif defined(MOZILLA_SSE_HAVE_CPUID_DETECTION)</a>
+<span class="lineNum">     323 </span>            : #define MOZILLA_MAY_SUPPORT_AVX2 1
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :   inline bool supports_avx2() { return sse_private::avx2_enabled; }</span>
+<span class="lineNum">     325 </span>            : #else
+<span class="lineNum">     326 </span>            :   inline bool supports_avx2() { return false; }
+<span class="lineNum">     327 </span>            : #endif
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            : } // namespace mozilla
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            : #endif /* !defined(mozilla_SSE_h_) */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
